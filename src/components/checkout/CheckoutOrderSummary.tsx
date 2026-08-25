@@ -2,7 +2,9 @@
 
 import React, { useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Tag, CheckCircle2 } from 'lucide-react'
+import { Tag, CheckCircle2, ShieldCheck } from 'lucide-react'
+import { PayPalPaymentButton } from './PayPalPaymentButton'
+import { BillingDetails } from './types'
 
 // --- ANIMATED COUNTER HOOK ---
 function useAnimatedCounter(targetValue: number, prefix: string = '') {
@@ -58,10 +60,18 @@ interface CheckoutOrderSummaryProps {
   couponLoading: boolean
   couponError: string
   couponSuccessMsg: string
-  onCheckout: () => void
+  onRazorpayCheckout: () => void
+  onFreeCheckout: () => void
+  onPayPalSuccess: (orderNumber: string) => void
+  onPayPalError: (err: string) => void
+  onPayPalProcessing: () => void
   loading: boolean
   paymentStatus: string
   formatPrice: (inr?: number, usd?: number) => string
+  isIndia: boolean
+  billingDetails: BillingDetails
+  items: any[]
+  userId?: string
 }
 
 export function CheckoutOrderSummary({
@@ -79,13 +89,23 @@ export function CheckoutOrderSummary({
   couponLoading,
   couponError,
   couponSuccessMsg,
-  onCheckout,
+  onRazorpayCheckout,
+  onFreeCheckout,
+  onPayPalSuccess,
+  onPayPalError,
+  onPayPalProcessing,
   loading,
   paymentStatus,
   formatPrice,
+  isIndia,
+  billingDetails,
+  items,
+  userId,
 }: CheckoutOrderSummaryProps) {
   const subtotalRef = useAnimatedCounter(currentSubtotal, currencySymbol)
   const totalRef = useAnimatedCounter(finalTotal, currencySymbol)
+
+  const isFree = finalTotal === 0
 
   return (
     <div className="bg-[#141414] border border-[#222222] rounded-xl p-5 sm:p-6 space-y-4">
@@ -169,30 +189,82 @@ export function CheckoutOrderSummary({
         )}
       </div>
 
-      {/* Checkout Action Button */}
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={onCheckout}
-          disabled={loading || paymentStatus === 'processing'}
-          className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
-        >
-          {loading ? (
-            <div className="flex items-center gap-2">
-              <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              <span>Processing...</span>
-            </div>
-          ) : finalTotal === 0 ? (
-            <span>Claim Free Download</span>
-          ) : (
-            <span>
-              Pay {currencySymbol}{finalTotal.toFixed(2)}
-            </span>
-          )}
-        </button>
+      {/* Payment Gateway Actions */}
+      <div className="pt-2 space-y-2">
+        {/* Gateway Identifier Tag */}
+        <div className="flex items-center justify-between text-[11px] text-zinc-400 px-0.5">
+          <span className="font-medium">Payment Method</span>
+          <span className="text-zinc-300 font-semibold">
+            {isFree
+              ? 'Instant Free Access'
+              : isIndia
+              ? 'Razorpay (UPI / Cards / NetBanking)'
+              : 'PayPal (Global / USD)'}
+          </span>
+        </div>
 
-        <p className="text-[10px] text-zinc-500 text-center mt-2.5">
-          Secure payment &bull; Instant delivery to your vault &bull;{' '}
+        {isFree ? (
+          /* Free Instant Activation Button */
+          <button
+            type="button"
+            onClick={onFreeCheckout}
+            disabled={loading || paymentStatus === 'processing'}
+            className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <span>Claiming License...</span>
+              </div>
+            ) : (
+              <span>Claim Free Download</span>
+            )}
+          </button>
+        ) : isIndia ? (
+          /* Razorpay Gateway Button (for India / INR) */
+          <button
+            type="button"
+            onClick={onRazorpayCheckout}
+            disabled={loading || paymentStatus === 'processing'}
+            className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+          >
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <span>Opening Payment Gateway...</span>
+              </div>
+            ) : (
+              <span>
+                Pay {currencySymbol}{finalTotal.toFixed(2)} with UPI / Cards
+              </span>
+            )}
+          </button>
+        ) : (
+          /* PayPal Gateway Buttons (for International / USD) */
+          userId ? (
+            <PayPalPaymentButton
+              finalTotalUsd={finalTotal}
+              items={items}
+              couponCode={coupon}
+              userId={userId}
+              billingDetails={billingDetails}
+              onSuccess={onPayPalSuccess}
+              onError={onPayPalError}
+              onProcessing={onPayPalProcessing}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={onRazorpayCheckout}
+              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider transition-colors"
+            >
+              Sign In to Pay with PayPal
+            </button>
+          )
+        )}
+
+        <p className="text-[10px] text-zinc-500 text-center mt-2">
+          Encrypted 256-bit SSL &bull; Instant vault delivery &bull;{' '}
           <Link href="/terms" className="text-zinc-400 hover:underline">
             Terms
           </Link>

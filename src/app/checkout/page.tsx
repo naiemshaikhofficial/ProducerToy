@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { ChevronLeft, ShieldCheck } from 'lucide-react'
 import { COUNTRIES } from '@/components/checkout/countries'
 import { useCart } from '@/context/CartContext'
@@ -9,7 +10,6 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { validateCouponAction } from '@/actions/couponActions'
-import { processCheckoutAction } from '@/actions/checkoutActions'
 import {
   BillingDetails,
   PaymentStatus,
@@ -24,8 +24,9 @@ import {
 
 export default function CheckoutPage() {
   const countryOptions = COUNTRIES
+  const router = useRouter()
   const { items, removeItem, clearCart, setIsCartOpen } = useCart()
-  const { formatPrice, currency } = useCurrency()
+  const { formatPrice, currency, setCurrency } = useCurrency()
   const { user } = useAuth()
   const supabase = createClient()
 
@@ -119,6 +120,9 @@ export default function CheckoutPage() {
               country: account.country || '',
             }
             setBillingDetails(dbDetails)
+            if (account.country === 'India') setCurrency('INR')
+            else if (account.country) setCurrency('USD')
+
             localStorage.setItem('pt_billing_details', JSON.stringify(dbDetails))
             if (account.newsletter !== undefined && account.newsletter !== null) {
               setNewsletterOptIn(Boolean(account.newsletter))
@@ -141,6 +145,8 @@ export default function CheckoutPage() {
             phone: ensureE164(parsed.phone),
             country: parsed.country || '',
           }))
+          if (parsed.country === 'India') setCurrency('INR')
+          else if (parsed.country) setCurrency('USD')
           return
         }
       } catch (e) {
@@ -152,6 +158,7 @@ export default function CheckoutPage() {
         const meta = currentUser.user_metadata || {}
         const clean = (val: any) => (val === '0' || val === 0 ? '' : val || '')
 
+        const metaCountry = clean(meta.country)
         setBillingDetails((prev) => ({
           fullName: prev.fullName || clean(meta.full_name) || clean(meta.name) || '',
           email: prev.email || currentUser.email || '',
@@ -160,13 +167,15 @@ export default function CheckoutPage() {
           city: prev.city || clean(meta.city),
           state: prev.state || clean(meta.state),
           zip: prev.zip || clean(meta.zip) || clean(meta.postal_code),
-          country: prev.country || clean(meta.country) || '',
+          country: prev.country || metaCountry || '',
         }))
+        if (metaCountry === 'India') setCurrency('INR')
+        else if (metaCountry) setCurrency('USD')
       }
     }
 
     loadData()
-  }, [supabase])
+  }, [supabase, setCurrency])
 
   // 2. Fetch Upsell / Recommended Products
   useEffect(() => {
@@ -194,10 +203,18 @@ export default function CheckoutPage() {
     }
   }, [items, supabase])
 
-  // Handle Billing Input Change
+  // Handle Billing Input Change (and auto-switch currency if country changes)
   const handleBillingChange = (field: keyof BillingDetails, value: string) => {
     const updated = { ...billingDetails, [field]: value }
     setBillingDetails(updated)
+
+    if (field === 'country') {
+      if (value === 'India') {
+        setCurrency('INR')
+      } else if (value) {
+        setCurrency('USD')
+      }
+    }
 
     try {
       localStorage.setItem('pt_billing_details', JSON.stringify(updated))
@@ -254,7 +271,7 @@ export default function CheckoutPage() {
     }
 
     if (!billingDetails.country) {
-      errors.country = 'Country is required'
+      errors.country = 'Please select your country'
     }
 
     setFormErrors(errors)
@@ -262,15 +279,16 @@ export default function CheckoutPage() {
   }
 
   // Calculations
+  const isIndia = billingDetails.country === 'India' || (!billingDetails.country && currency === 'INR')
+
   const rawSubtotalInr = items.reduce((sum, item) => sum + Number(item.price_inr || 0), 0)
   const rawSubtotalUsd = items.reduce(
-    (sum, item) => sum + Number(item.price_usd || item.price_inr / 85),
+    (sum, item) => sum + Number(item.price_usd || (item.price_inr ? item.price_inr / 85 : 0)),
     0
   )
 
-  const isUsd = currency === 'USD'
-  const currentSubtotal = isUsd ? rawSubtotalUsd : rawSubtotalInr
-  const currencySymbol = isUsd ? '$' : '₹'
+  const currentSubtotal = isIndia ? rawSubtotalInr : rawSubtotalUsd
+  const currencySymbol = isIndia ? '₹' : '$'
 
   // Bundle discount (10% on 3+ items)
   const bundleDiscountPercent = items.length >= 3 ? 10 : 0
@@ -278,7 +296,9 @@ export default function CheckoutPage() {
 
   const discountAmount =
     effectiveDiscountPercent > 0
-      ? Math.round((currentSubtotal * effectiveDiscountPercent) / 100 * 100) / 100
+      ? isIndia
+        ? Math.round((currentSubtotal * effectiveDiscountPercent) / 100)
+        : Math.round((currentSubtotal * effectiveDiscountPercent) / 100 * 100) / 100
       : 0
   const finalTotal = Math.max(0, currentSubtotal - discountAmount)
 
@@ -307,9 +327,25 @@ export default function CheckoutPage() {
     }
   }
 
-  // Handle Checkout Execution
-  const handleCheckout = async () => {
-    if (items.length === 0) return
+  // Helper: Load Razorpay SDK
+  const loadRazorpay = () => {
+    return new Promise<boolean>((resolve) => {
+      if (typeof window === 'undefined') return resolve(false)
+      if ((window as any).Razorpay) return resolve(true)
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
+      document.body.appendChild(script)
+    })
+  }
+
+  // --- 1. HANDLE FREE CHECKOUT ---
+  const handleFreeCheckout = async () => {
+    if (!user) {
+      router.push('/auth?next=/checkout')
+      return
+    }
 
     if (!validateForm()) {
       const billingSection = document.getElementById('billing-details-section')
@@ -324,65 +360,160 @@ export default function CheckoutPage() {
     setPaymentStatus('processing')
 
     try {
-      const res = await processCheckoutAction(
-        items.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price_inr: item.price_inr,
-          price_usd: item.price_usd,
-          product_type: item.product_type,
-        })),
-        billingDetails.email || user?.email || '',
-        user?.id,
-        {
-          fullName: billingDetails.fullName,
-          phone: billingDetails.phone,
-          address: billingDetails.address,
-          city: billingDetails.city,
-          state: billingDetails.state,
-          zip: billingDetails.zip,
-          country: billingDetails.country,
-        },
-        {
+      const verifyRes = await fetch('/api/razorpay/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          isFree: true,
+          items: items.map((i) => ({ id: i.id })),
+          userId: user.id,
+          billingDetails: billingDetails,
           couponCode: coupon,
-          discountAmount: discountAmount,
-          currency: isUsd ? 'USD' : 'INR',
-          newsletterOptIn: newsletterOptIn,
-        }
-      )
+        }),
+      })
 
-      if (!res.success || res.error) {
-        throw new Error(res.error || 'Checkout failed. Please try again.')
+      const verifyData = await verifyRes.json()
+      if (verifyData.success) {
+        clearCart()
+        setPaymentStatus('success')
+      } else {
+        setErrorMsg(verifyData.error || 'Failed to claim free download')
+        setPaymentStatus('idle')
       }
-
-      if (user) {
-        try {
-          await supabase.auth.updateUser({
-            data: {
-              full_name: billingDetails.fullName,
-              phone: billingDetails.phone,
-              address: billingDetails.address,
-              city: billingDetails.city,
-              state: billingDetails.state,
-              zip: billingDetails.zip,
-              country: billingDetails.country,
-              newsletter_opt_in: newsletterOptIn,
-            },
-          })
-        } catch (metaErr) {
-          console.warn('Metadata client sync notice:', metaErr)
-        }
-      }
-
-      clearCart()
-      setPaymentStatus('success')
     } catch (err: any) {
-      console.error('Checkout error:', err)
-      setErrorMsg(err.message || 'Payment processing failed. Please try again.')
+      setErrorMsg('Network error during free checkout')
       setPaymentStatus('idle')
     } finally {
       setLoading(false)
     }
+  }
+
+  // --- 2. HANDLE RAZORPAY CHECKOUT (INDIA / INR) ---
+  const handleRazorpayCheckout = async () => {
+    if (!user) {
+      router.push('/auth?next=/checkout')
+      return
+    }
+
+    if (!validateForm()) {
+      const billingSection = document.getElementById('billing-details-section')
+      if (billingSection) {
+        billingSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+      return
+    }
+
+    setLoading(true)
+    setErrorMsg('')
+
+    const sdkLoaded = await loadRazorpay()
+    if (!sdkLoaded) {
+      setErrorMsg('Failed to load Razorpay payment gateway SDK.')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map((i) => ({ id: i.id })),
+          couponCode: coupon,
+        }),
+      })
+
+      const order = await res.json()
+      if (order.error) throw new Error(order.error)
+
+      const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      if (!keyId) throw new Error('Razorpay Key ID is missing')
+
+      const options = {
+        key: keyId,
+        amount: order.amount,
+        currency: order.currency || 'INR',
+        name: 'ProducerToy',
+        description: `Order for ${items.length} ${items.length === 1 ? 'item' : 'items'}`,
+        order_id: order.id,
+        image: '/favicon.ico',
+        prefill: {
+          name: billingDetails.fullName,
+          email: billingDetails.email || user.email,
+          contact: billingDetails.phone,
+        },
+        theme: {
+          color: '#121212',
+        },
+        handler: async function (response: any) {
+          setPaymentStatus('processing')
+          try {
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ...response,
+                items: items.map((i) => ({ id: i.id })),
+                userId: user.id,
+                billingDetails: billingDetails,
+                couponCode: coupon,
+              }),
+            })
+
+            const verifyData = await verifyRes.json()
+            if (verifyData.success) {
+              clearCart()
+              setPaymentStatus('success')
+            } else {
+              setErrorMsg(verifyData.error || 'Payment verification failed.')
+              setPaymentStatus('idle')
+            }
+          } catch (err: any) {
+            setErrorMsg('Error verifying payment on server.')
+            setPaymentStatus('idle')
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false)
+          },
+        },
+      }
+
+      const rzp = new (window as any).Razorpay(options)
+      rzp.open()
+    } catch (err: any) {
+      console.error('Razorpay Error:', err)
+      setErrorMsg(err.message || 'Payment initiation failed')
+      setLoading(false)
+    }
+  }
+
+  // --- 3. HANDLE PAYPAL CHECKOUT (INTERNATIONAL / USD) ---
+  const handlePayPalSuccess = () => {
+    clearCart()
+    setPaymentStatus('success')
+  }
+
+  const handlePayPalError = (msg: string) => {
+    setErrorMsg(msg)
+    setPaymentStatus('idle')
+    setLoading(false)
+  }
+
+  const handlePayPalProcessing = () => {
+    if (!user) {
+      router.push('/auth?next=/checkout')
+      return
+    }
+    if (!validateForm()) {
+      const billingSection = document.getElementById('billing-details-section')
+      if (billingSection) {
+        billingSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+      throw new Error('Please fill in required billing details')
+    }
+    setPaymentStatus('processing')
   }
 
   // Success Confirmation Screen
@@ -411,7 +542,7 @@ export default function CheckoutPage() {
 
           <div className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
             <ShieldCheck size={13} className="text-zinc-400" />
-            <span>256-Bit SSL Encrypted</span>
+            <span>256-Bit SSL Encrypted &bull; Instant Delivery</span>
           </div>
         </div>
 
@@ -421,7 +552,9 @@ export default function CheckoutPage() {
             Checkout
           </h1>
           <p className="text-xs text-zinc-500">
-            Complete your order for instant vault license delivery
+            {isIndia
+              ? 'India Orders &bull; Razorpay UPI, NetBanking & Cards'
+              : 'International Orders &bull; PayPal & Global Cards in USD'}
           </p>
         </div>
 
@@ -463,7 +596,7 @@ export default function CheckoutPage() {
                   Signed in as <strong className="text-zinc-200">{user.email}</strong>
                 </span>
                 <span className="text-[10px] text-zinc-500 font-medium">
-                  Verified
+                  Verified Account
                 </span>
               </div>
             )}
@@ -488,7 +621,7 @@ export default function CheckoutPage() {
 
           {/* ================= RIGHT COLUMN: ORDER SUMMARY & TRUST ================= */}
           <div className="lg:col-span-5 space-y-5">
-            {/* Order Summary Component */}
+            {/* Order Summary Component with Location-Based Gateways */}
             <CheckoutOrderSummary
               itemCount={items.length}
               currentSubtotal={currentSubtotal}
@@ -504,10 +637,18 @@ export default function CheckoutPage() {
               couponLoading={couponLoading}
               couponError={couponError}
               couponSuccessMsg={couponSuccessMsg}
-              onCheckout={handleCheckout}
+              onRazorpayCheckout={handleRazorpayCheckout}
+              onFreeCheckout={handleFreeCheckout}
+              onPayPalSuccess={handlePayPalSuccess}
+              onPayPalError={handlePayPalError}
+              onPayPalProcessing={handlePayPalProcessing}
               loading={loading}
               paymentStatus={paymentStatus}
               formatPrice={formatPrice}
+              isIndia={isIndia}
+              billingDetails={billingDetails}
+              items={items}
+              userId={user?.id}
             />
 
             {/* Trust Badges & Guarantees */}

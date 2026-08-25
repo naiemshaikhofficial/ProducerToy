@@ -11,9 +11,21 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined)
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency] = useState<'USD' | 'INR'>('USD')
+  const [currency, setCurrency] = useState<'USD' | 'INR'>('USD')
 
   const formatPrice = (inrOrUsd?: number, usd?: number) => {
+    if (currency === 'INR') {
+      if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd > 0) {
+        const val = inrOrUsd < 100 && usd ? usd * 85 : inrOrUsd
+        return `₹${Math.round(val).toLocaleString('en-IN')}`
+      }
+      if (usd !== undefined && usd !== null && usd > 0) {
+        return `₹${Math.round(usd * 85).toLocaleString('en-IN')}`
+      }
+      return '₹0'
+    }
+
+    // Default USD
     if (usd !== undefined && usd !== null && usd > 0) {
       return `$${Number(usd).toFixed(2)}`
     }
@@ -24,10 +36,8 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     return '$0.00'
   }
 
-  const setCurrency = () => {}
-
   return (
-    <CurrencyContext.Provider value={{ currency: 'USD', setCurrency, formatPrice }}>
+    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
       {children}
     </CurrencyContext.Provider>
   )
