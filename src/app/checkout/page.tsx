@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ShieldCheck } from 'lucide-react'
-import countryList from 'react-select-country-list'
+import { COUNTRIES } from '@/components/checkout/countries'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
@@ -23,7 +23,7 @@ import {
 } from '@/components/checkout'
 
 export default function CheckoutPage() {
-  const countryOptions = useMemo(() => countryList().getData(), [])
+  const countryOptions = COUNTRIES
   const { items, removeItem, clearCart, setIsCartOpen } = useCart()
   const { formatPrice, currency } = useCurrency()
   const { user } = useAuth()

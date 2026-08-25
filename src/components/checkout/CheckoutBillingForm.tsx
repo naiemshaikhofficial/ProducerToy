@@ -1,11 +1,29 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { ShieldCheck, CheckCircle2, Lock } from 'lucide-react'
-import Select from 'react-select'
+import dynamic from 'next/dynamic'
 import 'react-phone-number-input/style.css'
-import PhoneInput from 'react-phone-number-input'
 import { BillingDetails } from './types'
+
+// Dynamic SSR-safe component imports
+const Select = dynamic(() => import('react-select'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-11 bg-[#202020] border border-[#333333] rounded-xl flex items-center px-4 text-zinc-500 text-xs font-semibold">
+      Loading countries...
+    </div>
+  ),
+})
+
+const PhoneInput = dynamic(() => import('react-phone-number-input'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-11 bg-[#202020] border border-[#333333] rounded-xl flex items-center px-4 text-zinc-500 text-xs font-semibold">
+      Loading phone input...
+    </div>
+  ),
+})
 
 interface CheckoutBillingFormProps {
   billingDetails: BillingDetails
@@ -24,6 +42,12 @@ export function CheckoutBillingForm({
   setNewsletterOptIn,
   countryOptions,
 }: CheckoutBillingFormProps) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   return (
     <div
       id="billing-details-section"
@@ -102,16 +126,26 @@ export function CheckoutBillingForm({
             Phone Number <span className="text-zinc-400">*</span>
           </label>
           <div className="phone-input-pt">
-            <PhoneInput
-              international
-              defaultCountry="IN"
-              placeholder="Enter mobile number"
-              value={billingDetails.phone}
-              onChange={(val) => onBillingChange('phone', val || '')}
-              className={`w-full h-11 bg-[#202020] border px-3 rounded-xl outline-none transition-all focus-within:border-white focus-within:ring-1 focus-within:ring-white ${
-                formErrors.phone ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
-              }`}
-            />
+            {mounted ? (
+              <PhoneInput
+                international
+                defaultCountry="IN"
+                placeholder="Enter mobile number"
+                value={billingDetails.phone}
+                onChange={(val) => onBillingChange('phone', val || '')}
+                className={`w-full h-11 bg-[#202020] border px-3 rounded-xl outline-none transition-all focus-within:border-white focus-within:ring-1 focus-within:ring-white ${
+                  formErrors.phone ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+                }`}
+              />
+            ) : (
+              <input
+                type="tel"
+                placeholder="Enter mobile number"
+                value={billingDetails.phone}
+                onChange={(e) => onBillingChange('phone', e.target.value)}
+                className="w-full h-11 bg-[#202020] border border-[#333333] text-white text-xs px-4 rounded-xl outline-none"
+              />
+            )}
           </div>
           {formErrors.phone && (
             <p className="text-[10px] font-semibold text-red-400">{formErrors.phone}</p>
@@ -200,66 +234,80 @@ export function CheckoutBillingForm({
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
             Country <span className="text-zinc-400">*</span>
           </label>
-          <Select
-            options={countryOptions}
-            value={countryOptions.find((opt) => opt.label === billingDetails.country)}
-            onChange={(val: any) => onBillingChange('country', val?.label || '')}
-            placeholder="Select Country"
-            className="react-select-container"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base, state) => ({
-                ...base,
-                backgroundColor: '#202020',
-                borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#ffffff' : '#333333',
-                borderRadius: '0.75rem',
-                height: '2.75rem',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                boxShadow: state.isFocused ? '0 0 0 1px #ffffff' : 'none',
-                '&:hover': {
-                  borderColor: state.isFocused ? '#ffffff' : '#444444',
-                },
-              }),
-              menu: (base) => ({
-                ...base,
-                backgroundColor: '#181818',
-                border: '1px solid #333333',
-                borderRadius: '0.75rem',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-                zIndex: 50,
-                overflow: 'hidden',
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isSelected
-                  ? '#ffffff'
-                  : state.isFocused
-                  ? '#2a2a2a'
-                  : 'transparent',
-                color: state.isSelected ? '#000000' : '#ffffff',
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                '&:active': {
-                  backgroundColor: '#ffffff',
-                  color: '#000000',
-                },
-              }),
-              singleValue: (base) => ({
-                ...base,
-                color: '#ffffff',
-              }),
-              input: (base) => ({
-                ...base,
-                color: '#ffffff',
-              }),
-              placeholder: (base) => ({
-                ...base,
-                color: '#71717a',
-              }),
-            }}
-          />
+          {mounted ? (
+            <Select
+              options={countryOptions}
+              value={countryOptions.find((opt) => opt.label === billingDetails.country)}
+              onChange={(val: any) => onBillingChange('country', val?.label || '')}
+              placeholder="Select Country"
+              className="react-select-container"
+              classNamePrefix="react-select"
+              styles={{
+                control: (base: any, state: any) => ({
+                  ...base,
+                  backgroundColor: '#202020',
+                  borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#ffffff' : '#333333',
+                  borderRadius: '0.75rem',
+                  height: '2.75rem',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  boxShadow: state.isFocused ? '0 0 0 1px #ffffff' : 'none',
+                  '&:hover': {
+                    borderColor: state.isFocused ? '#ffffff' : '#444444',
+                  },
+                }),
+                menu: (base: any) => ({
+                  ...base,
+                  backgroundColor: '#181818',
+                  border: '1px solid #333333',
+                  borderRadius: '0.75rem',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                  zIndex: 50,
+                  overflow: 'hidden',
+                }),
+                option: (base: any, state: any) => ({
+                  ...base,
+                  backgroundColor: state.isSelected
+                    ? '#ffffff'
+                    : state.isFocused
+                    ? '#2a2a2a'
+                    : 'transparent',
+                  color: state.isSelected ? '#000000' : '#ffffff',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  '&:active': {
+                    backgroundColor: '#ffffff',
+                    color: '#000000',
+                  },
+                }),
+                singleValue: (base: any) => ({
+                  ...base,
+                  color: '#ffffff',
+                }),
+                input: (base: any) => ({
+                  ...base,
+                  color: '#ffffff',
+                }),
+                placeholder: (base: any) => ({
+                  ...base,
+                  color: '#71717a',
+                }),
+              }}
+            />
+          ) : (
+            <select
+              value={billingDetails.country}
+              onChange={(e) => onBillingChange('country', e.target.value)}
+              className="w-full h-11 bg-[#202020] border border-[#333333] text-white text-xs px-4 rounded-xl outline-none font-semibold"
+            >
+              {countryOptions.map((opt) => (
+                <option key={opt.value} value={opt.label} className="bg-[#181818] text-white">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          )}
           {formErrors.country && (
             <p className="text-[10px] font-semibold text-red-400">{formErrors.country}</p>
           )}
