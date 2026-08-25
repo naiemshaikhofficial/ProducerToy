@@ -33,6 +33,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark bg-[#121212] text-white">
+      <head>
+        <link rel="preconnect" href="https://supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://supabase.co" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body className="bg-[#121212] text-white min-h-screen flex flex-col font-sans antialiased">
         <StoreOrganizationJsonLd />
         <AuthProvider>
