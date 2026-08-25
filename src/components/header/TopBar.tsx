@@ -47,6 +47,14 @@ export const TopBar: React.FC<TopBarProps> = ({
           </Link>
 
           <Link 
+            href="/library" 
+            prefetch={true}
+            className="text-zinc-300 hover:text-white text-sm font-semibold transition-colors uppercase tracking-wider"
+          >
+            LIBRARY
+          </Link>
+
+          <Link 
             href="/store" 
             prefetch={true}
             className="hidden md:block text-[#cccccc] hover:text-white text-sm font-medium transition-colors"
@@ -66,7 +74,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* Cart Icon Only Button */}
           <button
             onClick={onOpenCart}
-            className="relative p-2.5 bg-[#26262c] hover:bg-[#32323a] text-white rounded-[8px] transition-colors flex items-center justify-center"
+            className="relative p-2.5 bg-[#26262c] hover:bg-[#32323a] text-white rounded-[8px] transition-colors flex items-center justify-center cursor-pointer"
             title="Shopping Cart"
           >
             <Image
@@ -85,14 +93,24 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Account / Logout Button */}
           {user ? (
-            <button
-              onClick={onSignOut}
-              className="bg-[#26262c] hover:bg-[#e50914] text-zinc-300 hover:text-white border border-transparent text-xs font-semibold px-3.5 py-2 rounded-[6px] transition-all duration-200 flex items-center gap-1.5 shadow-sm"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/library"
+                prefetch={true}
+                className="w-9 h-9 rounded-full bg-[#FC6301] text-white font-black text-xs flex items-center justify-center uppercase shadow-md hover:opacity-90 transition-opacity"
+                title={`Account: ${user.email}`}
+              >
+                {(user.email || 'U')[0].toUpperCase()}
+              </Link>
+              <button
+                onClick={onSignOut}
+                className="bg-[#26262c] hover:bg-[#e50914] text-zinc-300 hover:text-white border border-transparent text-xs font-semibold px-3 py-2 rounded-[6px] transition-all duration-200 flex items-center gap-1.5 shadow-sm cursor-pointer"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
+              </button>
+            </div>
           ) : (
             <Link
               href="/auth"
