@@ -25,6 +25,7 @@ export default function NotFound() {
         <div className="w-full flex flex-col gap-3">
           <Link
             href="/store"
+            prefetch={true}
             className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs uppercase tracking-wider py-3.5 px-6 rounded-full transition-all flex items-center justify-center gap-2 shadow-lg"
           >
             <Search className="w-4 h-4" />
@@ -33,6 +34,7 @@ export default function NotFound() {
 
           <Link
             href="/"
+            prefetch={true}
             className="w-full bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white font-bold text-xs uppercase tracking-wider py-3.5 px-6 rounded-full border border-[#2e2e2e] transition-all flex items-center justify-center gap-2"
           >
             <Home className="w-4 h-4" />
