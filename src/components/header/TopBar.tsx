@@ -34,7 +34,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Left Section: Epic Style Logo + Store Name + Support/Distribute */}
         <div className="flex items-center gap-4 sm:gap-8">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <LogoIcon size={70} />
+            <LogoIcon size={38} />
             <ChevronDown className="w-4 h-4 text-zinc-400 hidden sm:block" />
           </Link>
 
@@ -75,7 +75,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               className="w-5 h-5 object-contain filter brightness-0 invert"
             />
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-white text-black text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#18181c]">
+              <span className="absolute -top-1.5 -right-1.5 bg-[#FF5500] text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#121212]">
                 {itemCount}
               </span>
             )}

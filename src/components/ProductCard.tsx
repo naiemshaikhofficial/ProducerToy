@@ -138,7 +138,7 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="text-sm font-semibold text-white">Free</span>
           ) : (
             <>
-              <span className="text-xs bg-white text-black font-extrabold px-1.5 py-0.5 rounded text-[11px]">
+              <span className="text-xs bg-[#FF5500] text-white font-extrabold px-1.5 py-0.5 rounded text-[11px]">
                 -50%
               </span>
               <span className="text-xs text-zinc-500 line-through">

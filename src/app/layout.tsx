@@ -14,6 +14,14 @@ export const metadata: Metadata = {
   title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
   description: 'The premier minimalist marketplace for music producers. Download VST plugins, sample packs, synth presets, and DAW templates.',
   keywords: ['VST Plugins', 'Sample Packs', 'Synth Presets', 'FL Studio Templates', 'Ableton Templates', 'Music Producer Tools'],
+  icons: {
+    icon: [
+      { url: '/Icon.png' },
+      { url: '/favicon.ico' }
+    ],
+    shortcut: '/Icon.png',
+    apple: '/Icon.png',
+  },
 }
 
 export default function RootLayout({

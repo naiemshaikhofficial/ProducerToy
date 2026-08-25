@@ -20,8 +20,12 @@ export function Footer() {
           
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-2">
-            <Link href="/" className="inline-block">
-              <Logo size={36} showText={true} />
+            <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
+              <img
+                src="/footer-logo.png"
+                alt="Producer Toy"
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
             </Link>
             <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
               The premier marketplace for VST plugins, royalty-free sample packs, synth presets, and DAW templates. Designed for modern music producers.
@@ -32,10 +36,10 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">Store Catalog</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
-              <li><Link href="/store/plugins" className="hover:text-white transition-colors">VST Plugins</Link></li>
-              <li><Link href="/store/sample-packs" className="hover:text-white transition-colors">Sample Packs</Link></li>
-              <li><Link href="/store/presets" className="hover:text-white transition-colors">Synth Presets</Link></li>
-              <li><Link href="/store/templates" className="hover:text-white transition-colors">DAW Templates</Link></li>
+              <li><Link href="/store/plugins" className="hover:text-[#FF5500] transition-colors">VST Plugins</Link></li>
+              <li><Link href="/store/sample-packs" className="hover:text-[#FF5500] transition-colors">Sample Packs</Link></li>
+              <li><Link href="/store/presets" className="hover:text-[#FF5500] transition-colors">Synth Presets</Link></li>
+              <li><Link href="/store/templates" className="hover:text-[#FF5500] transition-colors">DAW Templates</Link></li>
             </ul>
           </div>
 
@@ -43,8 +47,8 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">Account & Library</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
-              <li><Link href="/my-purchases" className="hover:text-white transition-colors">My Library & Keys</Link></li>
-              <li><Link href="/auth" className="hover:text-white transition-colors">Sign In / Register</Link></li>
+              <li><Link href="/my-purchases" className="hover:text-[#FF5500] transition-colors">My Library & Keys</Link></li>
+              <li><Link href="/auth" className="hover:text-[#FF5500] transition-colors">Sign In / Register</Link></li>
             </ul>
           </div>
 
