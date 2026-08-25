@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ChevronUp, Facebook, Twitter, Youtube, Disc } from 'lucide-react'
+import { Twitter, Facebook, Youtube, Instagram, ArrowRight, ChevronUp } from 'lucide-react'
 
 export function Footer() {
   const pathname = usePathname()
@@ -18,138 +18,166 @@ export function Footer() {
   }
 
   return (
-    <footer className="w-full bg-[#141414] text-white border-t border-[#202020] mt-24 select-none">
+    <footer className="w-full bg-[#141414] text-white border-t border-[#26262b] mt-24 select-none font-sans">
       <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 lg:px-16 pt-12 pb-16">
         
-        {/* Top Section: Producer Toy Logo + Social Media Icons */}
-        <div className="flex items-center justify-between pb-8 border-b border-[#26262b]">
+        {/* Main Grid with Vertical Dividers matching Plugin Boutique Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-[#26262b]">
+          
+          {/* Column 1: Discover (Dual Sub-Columns) - Spans 5 cols */}
+          <div className="md:col-span-5 md:pr-8 md:border-r md:border-[#26262b] space-y-4">
+            <h4 className="text-base font-bold text-white tracking-tight mb-4">Discover</h4>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-xs text-zinc-400">
+              {/* Left Sub-column */}
+              <div className="space-y-2.5">
+                <div><Link href="/categories/1-Instruments" className="hover:text-white transition-colors">Instruments</Link></div>
+                <div><Link href="/categories/3-Studio-Tools" className="hover:text-white transition-colors">Studio Tools</Link></div>
+                <div><Link href="/categories/2-Effects" className="hover:text-white transition-colors">Effects</Link></div>
+                <div><Link href="/categories/4-Sounds" className="hover:text-white transition-colors">Sounds</Link></div>
+                <div><Link href="/categories/bundles" className="hover:text-white transition-colors">Bundles</Link></div>
+                <div><Link href="/store" className="hover:text-white transition-colors">Blog</Link></div>
+                <div><Link href="/categories/1-Instruments?free=true" className="hover:text-white transition-colors">Free Instruments</Link></div>
+                <div><Link href="/manufacturers" className="hover:text-white transition-colors">Brands</Link></div>
+              </div>
+
+              {/* Right Sub-column */}
+              <div className="space-y-2.5">
+                <div><Link href="/categories/2-Effects?free=true" className="hover:text-white transition-colors">Free Effects</Link></div>
+                <div><Link href="/categories/3-Studio-Tools?free=true" className="hover:text-white transition-colors">Free Studio Tools</Link></div>
+                <div><Link href="/store" className="hover:text-white transition-colors">Courses</Link></div>
+                <div><Link href="/store?on_sale=true" className="hover:text-white transition-colors">Black Friday</Link></div>
+                <div><Link href="/contact" className="hover:text-white transition-colors">Affiliate Program</Link></div>
+                <div><Link href="/store" className="hover:text-white transition-colors">Plugin+</Link></div>
+                <div><Link href="/store" className="hover:text-white transition-colors">Rent to Own</Link></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Legal - Spans 2 cols */}
+          <div className="md:col-span-2 md:px-4 md:border-r md:border-[#26262b] space-y-4">
+            <h4 className="text-base font-bold text-white tracking-tight mb-4">Legal</h4>
+            <div className="space-y-2.5 text-xs text-zinc-400">
+              <div><Link href="/terms" className="hover:text-white transition-colors">Terms and Conditions</Link></div>
+              <div><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></div>
+              <div><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></div>
+            </div>
+          </div>
+
+          {/* Column 3: Help - Spans 2 cols */}
+          <div className="md:col-span-2 md:px-4 md:border-r md:border-[#26262b] space-y-4">
+            <h4 className="text-base font-bold text-white tracking-tight mb-4">Help</h4>
+            <div className="space-y-2.5 text-xs text-zinc-400">
+              <div><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></div>
+              <div><Link href="/contact" className="hover:text-white transition-colors">About Us</Link></div>
+            </div>
+          </div>
+
+          {/* Column 4: Producer Toy Rewards & Social - Spans 3 cols */}
+          <div className="md:col-span-3 md:pl-4 space-y-6 flex flex-col justify-between">
+            
+            {/* Follow Us Social Icons (Top Right) */}
+            <div className="flex items-center justify-between md:justify-start gap-4">
+              <span className="text-xs font-bold text-white tracking-tight">Follow us:</span>
+              <div className="flex items-center gap-4 text-zinc-400">
+                <a
+                  href="https://x.com/producertoy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                  title="X (Twitter) @producertoy"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://facebook.com/producertoy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                  title="Facebook @producertoy"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://youtube.com/@producertoy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                  title="YouTube @producertoy"
+                >
+                  <Youtube className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://instagram.com/producertoy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                  title="Instagram @producertoy"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Producer Toy Rewards Section */}
+            <div className="space-y-3">
+              <h4 className="text-base font-bold text-white tracking-tight">Producer Toy Rewards</h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                Discover the most rewarding loyalty programme among all plugin retailers.
+              </p>
+              <ul className="space-y-1.5 text-xs text-zinc-400">
+                <li className="flex items-start gap-1.5">
+                  <span className="text-[#FC6301] font-bold">•</span> Free Loopmasters & Exclusive Samplepacks
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-[#FC6301] font-bold">•</span> Discounts on products and courses
+                </li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-[#FC6301] font-bold">•</span> Extra Virtual Cash claimed immediately at checkout
+                </li>
+              </ul>
+
+              <div className="pt-1">
+                <Link
+                  href="/store"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#FC6301] transition-colors group"
+                >
+                  <span>Find out more</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Bottom Section: Logo + Copyright + Back To Top */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          
+          {/* Logo on Bottom Left */}
           <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
             <img
               src="/footer-logo.png"
               alt="Producer Toy"
-              className="h-9 sm:h-11 w-auto object-contain"
+              className="h-8 sm:h-10 w-auto object-contain"
             />
           </Link>
 
-          {/* Epic Style Minimal Social Icons */}
-          <div className="flex items-center gap-6 text-zinc-400">
-            <a href="#" className="hover:text-white transition-colors" title="Facebook">
-              <Facebook className="w-5 h-5" />
-            </a>
-            <a href="#" className="hover:text-white transition-colors" title="X (Twitter)">
-              <Twitter className="w-5 h-5" />
-            </a>
-            <a href="#" className="hover:text-white transition-colors" title="YouTube">
-              <Youtube className="w-5 h-5" />
-            </a>
-            <a href="#" className="hover:text-white transition-colors" title="Discord">
-              <Disc className="w-5 h-5" />
-            </a>
-          </div>
-        </div>
-
-        {/* 6-Column Navigation Grid (Exact Epic Games Store Layout) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 py-10 border-b border-[#26262b]">
-          
-          {/* Column 1: Games / Categories */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-tight">Categories</h4>
-            <ul className="space-y-2 text-xs text-[#a0a0a5]">
-              <li><Link href="/store/plugins" className="hover:text-white transition-colors">VST & AU Plugins</Link></li>
-              <li><Link href="/store/sample-packs" className="hover:text-white transition-colors">Sample Packs</Link></li>
-              <li><Link href="/store/presets" className="hover:text-white transition-colors">Synth Presets</Link></li>
-              <li><Link href="/store/templates" className="hover:text-white transition-colors">DAW Templates</Link></li>
-              <li><Link href="/store?on_sale=true" className="hover:text-white transition-colors">On Sale Deals</Link></li>
-              <li><Link href="/store?free=true" className="hover:text-white transition-colors">Free Downloads</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Rent to Own</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 2: Marketplaces */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-tight">Marketplaces</h4>
-            <ul className="space-y-2 text-xs text-[#a0a0a5]">
-              <li><Link href="/store" className="hover:text-white transition-colors">Producer Toy Store</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Sound Vault</Link></li>
-              <li><Link href="/store/presets" className="hover:text-white transition-colors">Serum Preset Hub</Link></li>
-              <li><Link href="/manufacturers" className="hover:text-white transition-colors">Featured Brands</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Store Refund Policy</Link></li>
-              <li><Link href="/licensing" className="hover:text-white transition-colors">Store EULA</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 3: Tools */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-tight">Tools & DAWs</h4>
-            <ul className="space-y-2 text-xs text-[#a0a0a5]">
-              <li><Link href="/store" className="hover:text-white transition-colors">FL Studio Packs</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Ableton Racks</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Logic Pro Projects</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Cubase Templates</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Serum Banks</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Vital Presets</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 4: Online Services */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-tight">Online Services</h4>
-            <ul className="space-y-2 text-xs text-[#a0a0a5]">
-              <li><Link href="/my-purchases" className="hover:text-white transition-colors">Cloud Key Vault</Link></li>
-              <li><Link href="/my-purchases" className="hover:text-white transition-colors">License Manager</Link></li>
-              <li><Link href="/my-purchases" className="hover:text-white transition-colors">Instant Downloads</Link></li>
-              <li><Link href="/licensing" className="hover:text-[#FC6301] transition-colors">100% Royalty Free</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Trust Statement</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Verified Creators</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 5: Company */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-tight">Company</h4>
-            <ul className="space-y-2 text-xs text-[#a0a0a5]">
-              <li><Link href="/store" className="hover:text-white transition-colors">About Producer Toy</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Newsroom</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Careers</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Creator Portal</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">UX Research</Link></li>
-            </ul>
-          </div>
-
-          {/* Column 6: Resources */}
-          <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-tight">Resources</h4>
-            <ul className="space-y-2 text-xs text-[#a0a0a5]">
-              <li><Link href="/store" className="hover:text-white transition-colors">Producer Community</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Distribute on Producer Toy</Link></li>
-              <li><Link href="/licensing" className="hover:text-white transition-colors">Creator Agreement</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Community Rules</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/store" className="hover:text-white transition-colors">Help & Support</Link></li>
-            </ul>
-          </div>
-
-        </div>
-
-        {/* Bottom Copyright & Legal Disclaimer (Epic Games Store Style) */}
-        <div className="pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="text-[11px] text-[#808085] leading-relaxed max-w-4xl space-y-1">
-            <p>
-              © {new Date().getFullYear()}, Producer Toy, Inc. All rights reserved. Producer Toy, the Producer Toy logo, Sound Vault, and VST Hub are trademarks or registered trademarks of Producer Toy, Inc. in the United States of America and elsewhere.
+          {/* Copyright Text on Bottom Right */}
+          <div className="flex items-center gap-6 text-right">
+            <p className="text-xs text-zinc-500 font-normal">
+              Producer Toy Limited, Registered in Sangamner, Maharashtra. Copyright © 2011-2026 Producer Toy. All rights reserved.
             </p>
-            <p>
-              Other brands or product names are the trademarks of their respective owners. Non-US transactions conducted through Producer Toy International, S.à r.l.
-            </p>
+
+            <button
+              onClick={scrollToTop}
+              className="p-2.5 rounded-md bg-[#202025] hover:bg-[#2a2a30] text-zinc-400 hover:text-white transition-colors cursor-pointer border border-[#2a2a30] flex-shrink-0"
+              title="Back to Top"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Back to Top Button */}
-          <button
-            onClick={scrollToTop}
-            className="flex-shrink-0 p-3 rounded-md bg-[#202025] hover:bg-[#2a2a30] text-zinc-400 hover:text-white transition-colors cursor-pointer border border-[#2a2a30]"
-            title="Back to Top"
-          >
-            <ChevronUp className="w-5 h-5" />
-          </button>
         </div>
 
       </div>
