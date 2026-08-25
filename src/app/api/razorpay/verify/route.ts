@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getUsdToInrRate } from '@/lib/exchangeRate'
 
 export async function POST(request: Request) {
   try {
@@ -109,7 +110,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Generate serial keys & purchase entries
+    // 5. Generate serial keys & purchase entries with live exchange rate
+    const liveRate = await getUsdToInrRate()
     const purchaseRecords = dbProducts.map((dbProduct) => {
       const requiresSerialKey = Boolean(
         dbProduct.delivery_method === 'serial_key' ||
@@ -128,7 +130,7 @@ export async function POST(request: Request) {
 
       const itemInr = Number(dbProduct.price_inr || 0) > 0
         ? Number(dbProduct.price_inr)
-        : Math.round(Number(dbProduct.price_usd || 0) * 85)
+        : Math.round(Number(dbProduct.price_usd || 0) * liveRate)
 
       return {
         user_id: userId,
@@ -165,7 +167,7 @@ export async function POST(request: Request) {
       const inr = Number(p.price_inr || 0)
       const usd = Number(p.price_usd || 0)
       if (inr > 0) return sum + inr
-      if (usd > 0) return sum + Math.round(usd * 85)
+      if (usd > 0) return sum + Math.round(usd * liveRate)
       return sum
     }, 0)
 
