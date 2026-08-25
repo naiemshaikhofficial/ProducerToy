@@ -65,12 +65,21 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-stretch">
         
         {/* Main Hero Banner Container (Left 9 out of 12 columns) */}
-        <div className="lg:col-span-9 relative w-full h-[360px] sm:h-[400px] lg:h-[430px] rounded-none overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]">
+        <div 
+          className="lg:col-span-9 relative w-full h-[360px] sm:h-[400px] lg:h-[430px] rounded-none overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]"
+          style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
+        >
           
           {/* Horizontal Sliding Viewport (Exact Epic Games Slide Transition) */}
           <div 
             className="flex h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
-            style={{ transform: `translateX(-${selectedIndex * 100}%)` }}
+            style={{ 
+              display: 'flex',
+              height: '100%',
+              width: '100%',
+              transform: `translateX(-${selectedIndex * 100}%)`,
+              transition: 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1)',
+            }}
           >
             {featuredList.map((product) => (
               <Link 
@@ -78,6 +87,15 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 href={`/product/${product.slug}`}
                 prefetch={true}
                 className="block relative w-full h-full flex-shrink-0 overflow-hidden group cursor-pointer"
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  minWidth: '100%',
+                  height: '100%',
+                  flexShrink: 0,
+                  overflow: 'hidden',
+                  display: 'block',
+                }}
               >
                 
                 {/* Background Artwork */}
@@ -87,12 +105,19 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   fill
                   priority
                   unoptimized
-                  className="object-cover object-center"
+                  className="object-cover object-center pointer-events-none"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
                 />
 
                 {/* Epic Dark Gradients for Content Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/45 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/45 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
 
                 {/* Hero Content Overlay (Only Name, Description, Buy Now, Cart & Save) */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 lg:p-9 max-w-xl space-y-3 z-10">

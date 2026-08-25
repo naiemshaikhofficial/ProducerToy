@@ -6,16 +6,23 @@ import Image from 'next/image'
 
 export function EpicSpotlightBanner() {
   return (
-    <div className="w-full relative overflow-hidden rounded-none shadow-2xl aspect-[2008/783] bg-[#121212] flex flex-col justify-center select-none">
+    <div 
+      className="w-full relative overflow-hidden rounded-none shadow-2xl aspect-[2008/783] bg-[#121212] flex flex-col justify-center select-none"
+      style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
+    >
       {/* 100% Uncropped Full Banner Image */}
-      <div className="absolute inset-0 z-0">
+      <div 
+        className="absolute inset-0 z-0"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'hidden' }}
+      >
         <Image
           src="/pt-banner.png"
           alt="World's Upcoming Platform For Music Production Toys"
           fill
           priority
           unoptimized
-          className="object-contain object-center opacity-100"
+          className="object-contain object-center opacity-100 pointer-events-none"
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
         />
       </div>
 

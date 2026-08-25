@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
-import { categoryData as fallbackCategoryData, CategoryKey } from './categoryData'
+import { clientCache } from '@/lib/clientCache'
+import { categoryData } from './categoryData'
 
 interface SubCategoryItem {
   id: string
@@ -26,17 +27,42 @@ interface MegaMenuProps {
   onMouseLeave?: () => void
 }
 
+// Pre-seeded DB categories for instant 0ms glitch-free initial render
+const INITIAL_CATEGORIES: CategoryItem[] = Object.keys(categoryData).map((key) => {
+  const cat = categoryData[key]
+  return {
+    id: key,
+    name: cat.label,
+    slug: cat.slug,
+    subcategories: cat.items
+      .filter((item) => item.slug !== '')
+      .map((item, idx) => ({
+        id: `${key}-${idx}`,
+        name: item.name,
+        slug: item.slug,
+      })),
+  }
+})
+
 export const MegaMenu: React.FC<MegaMenuProps> = ({ 
   isOpen, 
   onClose,
   onMouseEnter,
   onMouseLeave 
 }) => {
-  const [dbCategories, setDbCategories] = useState<CategoryItem[]>([])
+  const [categoriesList, setCategoriesList] = useState<CategoryItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const cached = clientCache.get<CategoryItem[]>('mega_menu_categories')
+      if (cached && cached.length > 0) return cached
+    }
+    return INITIAL_CATEGORIES
+  })
+
   const [activeCategorySlug, setActiveCategorySlug] = useState<string>('effects')
 
+  // Background fetch to ensure real-time DB sync without any UI flickering
   useEffect(() => {
-    async function loadCategories() {
+    async function syncCategories() {
       try {
         const supabase = getSupabaseBrowserClient()
         const { data } = await supabase
@@ -51,52 +77,34 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
             slug: cat.slug,
             subcategories: (cat.subcategories || []).sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0)),
           }))
-          setDbCategories(formatted)
-          if (formatted.length > 0 && !formatted.some(c => c.slug === activeCategorySlug)) {
-            setActiveCategorySlug(formatted[0].slug)
-          }
+          setCategoriesList(formatted)
+          clientCache.set('mega_menu_categories', formatted, 30 * 60 * 1000) // 30 min cache
         }
       } catch (err) {
-        console.error('Failed to load categories from Supabase:', err)
+        console.warn('MegaMenu DB background sync skipped:', err)
       }
     }
 
-    if (isOpen) {
-      loadCategories()
-    }
-  }, [isOpen, activeCategorySlug])
+    syncCategories()
+  }, [])
 
   if (!isOpen) return null
 
-  // Use DB categories if available, else fallback
-  const isUsingDb = dbCategories.length > 0
+  const currentCategory = categoriesList.find((c) => c.slug === activeCategorySlug) || categoriesList[0]
+  const categoryLabel = currentCategory?.name || 'Category'
+  const categorySlug = currentCategory?.slug || 'effects'
 
-  const currentCategory = isUsingDb
-    ? dbCategories.find(c => c.slug === activeCategorySlug) || dbCategories[0]
-    : null
-
-  const fallbackKey = activeCategorySlug as CategoryKey
-  const currentFallback = fallbackCategoryData[fallbackKey] || fallbackCategoryData['effects']
-
-  const categoryLabel = isUsingDb ? currentCategory?.name : currentFallback?.label
-  const categorySlug = isUsingDb ? currentCategory?.slug : fallbackKey
-
-  const subItems = isUsingDb
-    ? [
-        { name: 'Show All', href: `/store/${categorySlug}` },
-        ...(currentCategory?.subcategories.map(sub => ({
-          name: sub.name,
-          href: `/store/${categorySlug}/${sub.slug}`
-        })) || [])
-      ]
-    : fallbackCategoryData[fallbackKey]?.items.map(item => ({
-        name: item,
-        href: item === 'Show All' ? `/store/${fallbackKey}` : `/store/${fallbackKey}/${encodeURIComponent(item.toLowerCase())}`
-      })) || []
+  const subItems = [
+    { name: 'Show All', href: `/store/${categorySlug}` },
+    ...(currentCategory?.subcategories.map((sub) => ({
+      name: sub.name,
+      href: `/store/${categorySlug}/${sub.slug}`
+    })) || [])
+  ]
 
   return (
     <div 
-      className="absolute top-full left-0 w-full bg-[#121212] shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+      className="absolute top-full left-0 w-full bg-[#121212] shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150 border-b border-[#222228]"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave || onClose}
     >
@@ -104,46 +112,24 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
         
         {/* Left Side Category Navigation Tabs */}
         <div className="w-56 flex flex-col gap-1 border-r border-[#222228] pr-6">
-          {isUsingDb ? (
-            dbCategories.map((cat) => {
-              const isActive = activeCategorySlug === cat.slug
-              return (
-                <button
-                  key={cat.id}
-                  onMouseEnter={() => setActiveCategorySlug(cat.slug)}
-                  onClick={() => setActiveCategorySlug(cat.slug)}
-                  className={`flex items-center justify-between px-4 py-2.5 rounded-md text-sm font-semibold transition-all text-left ${
-                    isActive
-                      ? 'bg-zinc-800 text-white font-bold'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
-                  }`}
-                >
-                  <span>{cat.name}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 text-white" />}
-                </button>
-              )
-            })
-          ) : (
-            (Object.keys(fallbackCategoryData) as CategoryKey[]).map((key) => {
-              const cat = fallbackCategoryData[key]
-              const isActive = activeCategorySlug === key
-              return (
-                <button
-                  key={key}
-                  onMouseEnter={() => setActiveCategorySlug(key)}
-                  onClick={() => setActiveCategorySlug(key)}
-                  className={`flex items-center justify-between px-4 py-2.5 rounded-md text-sm font-semibold transition-all text-left ${
-                    isActive
-                      ? 'bg-zinc-800 text-white font-bold'
-                      : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                  {isActive && <ChevronRight className="w-4 h-4 text-white" />}
-                </button>
-              )
-            })
-          )}
+          {categoriesList.map((cat) => {
+            const isActive = activeCategorySlug === cat.slug
+            return (
+              <button
+                key={cat.id}
+                onMouseEnter={() => setActiveCategorySlug(cat.slug)}
+                onClick={() => setActiveCategorySlug(cat.slug)}
+                className={`flex items-center justify-between px-4 py-2.5 rounded-md text-sm font-semibold transition-all text-left cursor-pointer ${
+                  isActive
+                    ? 'bg-zinc-800 text-white font-bold'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
+                }`}
+              >
+                <span>{cat.name}</span>
+                {isActive && <ChevronRight className="w-4 h-4 text-white" />}
+              </button>
+            )
+          })}
         </div>
 
         {/* Right Side Subcategory Links Grid */}

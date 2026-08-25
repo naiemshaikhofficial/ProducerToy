@@ -40,6 +40,12 @@
     user-select: none !important;
     -webkit-user-select: none !important;
   }
+
+  /* Next.js Fill Image Containment Safeguard */
+  img[data-nimg="fill"] {
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
 }
 
 ::selection {

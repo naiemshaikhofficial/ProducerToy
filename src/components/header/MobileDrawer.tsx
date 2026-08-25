@@ -54,12 +54,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     {cat.items.map((item, idx) => (
                       <Link
                         key={idx}
-                        href={item === 'Show All' ? `/store/${key}` : `/store/${key}/${encodeURIComponent(item.toLowerCase())}`}
+                        href={item.slug === '' ? `/store/${cat.slug}` : `/store/${cat.slug}/${item.slug}`}
                         prefetch={true}
                         onClick={onClose}
                         className="text-sm text-zinc-400 hover:text-white py-1 block"
                       >
-                        {item}
+                        {item.name}
                       </Link>
                     ))}
                   </div>
