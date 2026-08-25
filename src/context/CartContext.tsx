@@ -15,7 +15,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[]
-  addItem: (item: CartItem) => void
+  addItem: (item: CartItem, openDrawer?: boolean) => void
   removeItem: (id: string) => void
   clearCart: () => void
   isCartOpen: boolean
@@ -43,10 +43,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('pt_cart', JSON.stringify(newItems))
   }
 
-  const addItem = (item: CartItem) => {
+  const addItem = (item: CartItem, openDrawer: boolean = false) => {
     if (!items.some(i => i.id === item.id)) {
       const updated = [...items, item]
       saveCart(updated)
+    }
+    if (openDrawer) {
       setIsCartOpen(true)
     }
   }

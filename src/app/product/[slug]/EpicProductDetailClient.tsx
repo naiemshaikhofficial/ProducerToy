@@ -518,7 +518,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 </button>
 
                 <button
-                  onClick={() => addItem(product)}
+                  onClick={() => addItem(product, true)}
                   className={`p-3.5 rounded-xl border transition-colors cursor-pointer flex items-center justify-center ${
                     added
                       ? 'bg-emerald-950/40 border-emerald-600 text-emerald-400'
