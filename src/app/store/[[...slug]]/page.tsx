@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Handshake } from 'lucide-react'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
+import { LocalDataCache } from '@/components/LocalDataCache'
 
 export const dynamic = 'force-dynamic'
 
@@ -95,16 +96,66 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   try {
     const supabase = getAdminClient()
 
-    // 1. FAST PARALLEL FETCHING for metadata (1 single roundtrip)
-    const [dbCatRes, dbSubRes, dbBrandRes] = await Promise.all([
+    // 1. Build products query prior to parallel execution
+    let query = supabase
+      .from('products')
+      .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url, description)')
+      .eq('is_active', true)
+
+    if (queryText) {
+      query = query.ilike('name', `%${queryText}%`)
+    }
+
+    if (isFree) {
+      query = query.eq('price_usd', 0)
+    }
+
+    if (isDeals) {
+      query = query.gt('original_price_usd', 0)
+    }
+
+    // Category / Product type filtering
+    if (categorySlug && categorySlug.toLowerCase() !== 'brand' && categorySlug.toLowerCase() !== 'free') {
+      const typeInfo = CATEGORY_TYPE_MAP[categorySlug.toLowerCase()]
+      if (typeInfo) {
+        query = query.eq('product_type', typeInfo.productType)
+      } else {
+        const expandedCats = expandCategoryVariants([categorySlug])
+        query = query.overlaps('category_slugs', expandedCats)
+      }
+    }
+
+    // Subcategory / Tag filter
+    const activeCatString = catParam || subTypeSlug
+    if (activeCatString) {
+      const selectedCats = activeCatString.split(',').map(c => c.trim()).filter(Boolean)
+      if (selectedCats.length > 0) {
+        const expandedCats = expandCategoryVariants(selectedCats)
+        query = query.overlaps('category_slugs', expandedCats)
+      }
+    }
+
+    // Sort order
+    if (sortOption === 'price-low') {
+      query = query.order('price_usd', { ascending: true })
+    } else if (sortOption === 'price-high') {
+      query = query.order('price_usd', { ascending: false })
+    } else {
+      query = query.order('created_at', { ascending: false })
+    }
+
+    // 2. SINGLE PARALLEL NETWORK CALL (1 Roundtrip for ALL database queries)
+    const [dbCatRes, dbSubRes, dbBrandRes, productsRes] = await Promise.all([
       supabase.from('categories').select('id, name, slug'),
       supabase.from('subcategories').select('id, name, slug'),
-      supabase.from('brands').select('id, name, slug, logo_url, description').order('name')
+      supabase.from('brands').select('id, name, slug, logo_url, description').order('name'),
+      query
     ])
 
     const dbCatData = dbCatRes.data || []
     const dbSubData = dbSubRes.data || []
     const dbBrandData = dbBrandRes.data || []
+    let fetchedProducts = (productsRes.data || []) as Product[]
 
     const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
       { id: 'reverb', name: 'Reverb', slug: 'reverb' },
@@ -130,86 +181,32 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     categoriesOptions = combinedCategories
     brandsOptions = dbBrandData
 
-    // Fast in-memory lookup for selected brand
+    // Fast in-memory lookup & filter for selected brand
     const brandSearchTerm = brandParam || (categorySlug.toLowerCase() === 'brand' ? subTypeSlug : categorySlug)
     if (brandSearchTerm && brandSearchTerm.toLowerCase() !== 'free') {
       const cleanTerm = brandSearchTerm.toLowerCase()
       selectedBrand = dbBrandData.find(b => b.slug.toLowerCase() === cleanTerm || b.name.toLowerCase().includes(cleanTerm)) || null
-    }
 
-    // 2. Build product query
-    let query = supabase
-      .from('products')
-      .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
-      .eq('is_active', true)
-
-    if (queryText) {
-      query = query.ilike('name', `%${queryText}%`)
-    }
-
-    if (isFree) {
-      query = query.eq('price_usd', 0)
-    }
-
-    if (isDeals) {
-      query = query.gt('original_price_usd', 0)
-    }
-
-    if (selectedBrand) {
-      query = query.eq('brand_id', selectedBrand.id)
-    } else if (categorySlug && categorySlug.toLowerCase() !== 'brand' && categorySlug.toLowerCase() !== 'free') {
-      const typeInfo = CATEGORY_TYPE_MAP[categorySlug.toLowerCase()]
-      if (typeInfo) {
-        query = query.eq('product_type', typeInfo.productType)
-      } else {
-        const catObj = dbCatData.find(c => c.slug.toLowerCase() === categorySlug.toLowerCase())
-        if (catObj) {
-          query = query.eq('category_id', catObj.id)
-        } else {
-          const brandObj = dbBrandData.find(b => b.slug.toLowerCase() === categorySlug.toLowerCase())
-          if (brandObj) {
-            selectedBrand = brandObj
-            query = query.eq('brand_id', brandObj.id)
-          }
-        }
+      if (selectedBrand) {
+        fetchedProducts = fetchedProducts.filter(p => p.brand_id === selectedBrand?.id || p.brands?.slug === selectedBrand?.slug)
       }
     }
 
-    // Subcategory / Category filtering using instant GIN indexed array overlap
-    const activeCatString = catParam || subTypeSlug
-    if (activeCatString && !selectedBrand) {
-      const selectedCats = activeCatString.split(',').map(c => c.trim()).filter(Boolean)
-      if (selectedCats.length > 0) {
-        const expandedCats = expandCategoryVariants(selectedCats)
-        query = query.overlaps('category_slugs', expandedCats)
-      }
-    }
-
-    // Multi-Brand filter parameter (using in-memory metadata)
+    // Multi-Brand filter parameter
     if (brandParam) {
       const selectedBrands = brandParam.split(',').map(b => b.trim().toLowerCase()).filter(Boolean)
       if (selectedBrands.length > 0) {
-        const brandIds = dbBrandData.filter(b => selectedBrands.includes(b.slug.toLowerCase())).map(b => b.id)
-        if (brandIds.length > 0) {
-          query = query.in('brand_id', brandIds)
-        }
+        fetchedProducts = fetchedProducts.filter(p => {
+          const pBrandSlug = p.brands?.slug?.toLowerCase() || p.brand?.toLowerCase()
+          return selectedBrands.some(sb => pBrandSlug?.includes(sb))
+        })
       }
     }
 
-    // Sort order
-    if (sortOption === 'price-low') {
-      query = query.order('price_usd', { ascending: true })
-    } else if (sortOption === 'price-high') {
-      query = query.order('price_usd', { ascending: false })
+    if (productsRes.error) {
+      console.error('Supabase products fetch error:', productsRes.error)
     } else {
-      query = query.order('created_at', { ascending: false })
-    }
-
-    const { data, error } = await query
-    if (error) {
-      console.error('Supabase products fetch error:', error)
-    } else if (data) {
-      products = data as Product[]
+      products = fetchedProducts
       isFromDatabase = true
     }
   } catch (err) {
@@ -364,6 +361,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
   return (
     <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#121212] min-h-screen text-white select-none">
+      <LocalDataCache data={{ categories: categoriesOptions, brands: brandsOptions }} />
       
       {/* Header (Title, Description) */}
       <div className="space-y-2 pt-2">

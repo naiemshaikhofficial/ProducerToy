@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { signDownloadToken } from '@/lib/security'
 import { Download, Key, Package, ShieldCheck, ArrowRight } from 'lucide-react'
+import { BillingHistory } from '@/components/BillingHistory'
 
 export const dynamic = 'force-dynamic'
 
@@ -138,6 +139,15 @@ export default async function MyPurchasesPage() {
             )
           })}
         </div>
+      )}
+
+      {/* Official Billing & EULA License Receipts Section */}
+      {purchases && purchases.length > 0 && (
+        <BillingHistory
+          purchases={purchases as any}
+          userEmail={user.email || ''}
+          userName={user.user_metadata?.full_name || user.user_metadata?.name}
+        />
       )}
 
     </div>

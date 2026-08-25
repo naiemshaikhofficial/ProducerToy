@@ -9,6 +9,7 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { useAudio } from '@/context/AudioContext'
 import { useCart } from '@/context/CartContext'
 import { toggleWishlistAction } from '@/actions/wishlistActions'
+import { getCdnImageUrl } from '@/lib/cdn'
 
 export interface Product {
   id: string
@@ -158,12 +159,11 @@ export function ProductCard({ product }: { product: Product }) {
       {/* 3:4 Tall Epic Games Store Poster Card */}
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#222222] shadow-md mb-2.5">
         <Image
-          src={product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop'}
+          src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop', { width: 600 })}
           alt={product.name}
           fill
-          unoptimized
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
         
         {/* Minimal Epic Games Store Light Glow Overlay on Hover */}

@@ -9,18 +9,20 @@ import { Footer } from '@/components/Footer'
 import { AudioPlayer } from '@/components/AudioPlayer'
 import { CartDrawer } from '@/components/CartDrawer'
 import { ImageProtection } from '@/components/ImageProtection'
+import { ContentProtection } from '@/components/ContentProtection'
+import { StoreOrganizationJsonLd } from '@/components/JsonLd'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://producertoy.com'),
   title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
   description: 'The premier minimalist marketplace for music producers. Download VST plugins, sample packs, synth presets, and DAW templates.',
   keywords: ['VST Plugins', 'Sample Packs', 'Synth Presets', 'FL Studio Templates', 'Ableton Templates', 'Music Producer Tools'],
+  alternates: {
+    canonical: './',
+  },
   icons: {
-    icon: [
-      { url: '/Icon.png' },
-      { url: '/favicon.ico' }
-    ],
-    shortcut: '/Icon.png',
-    apple: '/Icon.png',
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
 }
 
@@ -32,11 +34,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark bg-[#121212] text-white">
       <body className="bg-[#121212] text-white min-h-screen flex flex-col font-sans antialiased">
+        <StoreOrganizationJsonLd />
         <AuthProvider>
           <CurrencyProvider>
             <CartProvider>
               <AudioProvider>
                 <ImageProtection />
+                <ContentProtection />
                 
                 <Header />
                 

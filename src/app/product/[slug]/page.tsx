@@ -5,6 +5,8 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import { EpicProductDetailClient } from './EpicProductDetailClient'
 import { ArrowLeft } from 'lucide-react'
 import { Metadata } from 'next'
+import { ProductJsonLd } from '@/components/JsonLd'
+import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,26 +21,38 @@ export async function generateMetadata({
 
   const { data: product } = await supabase
     .from('products')
-    .select('name, short_description, cover_image')
+    .select('*, categories(name), subcategories!subcategory_id(name), brands!brand_id(name)')
     .ilike('slug', cleanSlug)
     .eq('is_active', true)
     .single()
 
   if (!product) {
     return {
-      title: 'Product Not Found | Producer Toy',
+      title: 'Product Not Found | Producer Toy Store',
     }
   }
 
-  return {
-    title: `${product.name} | Producer Toy Store`,
-    description: product.short_description || `Get ${product.name} on Producer Toy Store with instant direct download.`,
-    openGraph: {
-      title: product.name,
-      description: product.short_description || undefined,
-      images: product.cover_image ? [{ url: product.cover_image }] : [],
-    },
-  }
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://producertoy.com'
+  const brandName = product.brands?.name || product.brand || 'Producer Toy'
+  const isFree = product.price_usd === 0
+  const productType = product.product_type || 'VST Plugin'
+  const priceDisplay = isFree ? 'Free Download' : `$${product.price_usd}`
+
+  const pageTitle = `${product.name} by ${brandName} - ${priceDisplay} ${productType}`
+  const pageDescription = product.short_description || product.description
+    ? `${product.name} by ${brandName}. ${product.short_description || product.description}. Instant direct download for FL Studio, Ableton Live, Logic Pro, Cubase & Pro Tools.`
+    : `Download ${product.name} by ${brandName} on Producer Toy Store. High-quality ${productType} for music producers.`
+
+  const smartKeywords = generateSmartKeywords(product.name, `${productType} ${brandName}`)
+  const ogImageUrl = `${siteUrl}/api/og?title=${encodeURIComponent(product.name)}&brand=${encodeURIComponent(brandName)}&price=${isFree ? 'FREE' : product.price_usd}&type=${encodeURIComponent(productType)}`
+
+  return generatePageMetadata({
+    title: pageTitle,
+    description: pageDescription,
+    image: ogImageUrl,
+    keywords: smartKeywords,
+    path: `/product/${product.slug}`,
+  })
 }
 
 export default async function EpicProductDetailPage({
@@ -63,6 +77,17 @@ export default async function EpicProductDetailPage({
 
   return (
     <div className="max-w-[1240px] mx-auto px-6 sm:px-8 lg:px-12 py-4 space-y-4 text-white min-h-screen">
+      <ProductJsonLd
+        name={product.name}
+        description={product.short_description || product.description}
+        image={product.cover_image}
+        brandName={product.brands?.name || product.brand || 'Producer Toy'}
+        priceUsd={product.price_usd || 0}
+        isFree={product.price_usd === 0}
+        url={`https://producertoy.com/product/${product.slug}`}
+        categoryName={product.product_type || 'VST Plugin'}
+        vstFormat={product.vst_format || 'VST3, AU, AAX'}
+      />
       {/* Main Epic Games Product Detail Client View */}
       <EpicProductDetailClient product={product} />
     </div>

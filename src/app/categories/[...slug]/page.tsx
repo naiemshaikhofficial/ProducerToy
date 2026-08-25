@@ -148,16 +148,63 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   try {
     const supabase = getAdminClient()
 
-    // Fast parallel metadata fetching
-    const [dbCatRes, dbSubRes, dbBrandRes] = await Promise.all([
+    // 1. Build products query prior to parallel execution
+    let query = supabase
+      .from('products')
+      .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
+      .eq('is_active', true)
+
+    // Main page Category filtering
+    const meta = CATEGORY_META_MAP[cleanCategorySlug]
+    if (meta?.productType) {
+      query = query.eq('product_type', meta.productType)
+    } else if (cleanCategorySlug && cleanCategorySlug !== 'all' && cleanCategorySlug !== 'bundles') {
+      const expandedCats = expandCategoryVariants([cleanCategorySlug])
+      query = query.overlaps('category_slugs', expandedCats)
+    }
+
+    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE
+    if (catParam) {
+      const selectedCats = catParam.split(',').map(c => c.trim()).filter(Boolean)
+      if (selectedCats.length > 0) {
+        const expandedCats = expandCategoryVariants(selectedCats)
+        query = query.overlaps('category_slugs', expandedCats)
+      }
+    }
+
+    // Filter pills
+    if (isFree) {
+      query = query.eq('price_usd', 0)
+    }
+    if (isDeals) {
+      query = query.gt('original_price_usd', 0)
+    }
+
+    if (queryText) {
+      query = query.ilike('name', `%${queryText}%`)
+    }
+
+    // Sorting
+    if (sortOption === 'price-low') {
+      query = query.order('price_usd', { ascending: true })
+    } else if (sortOption === 'price-high') {
+      query = query.order('price_usd', { ascending: false })
+    } else {
+      query = query.order('created_at', { ascending: false })
+    }
+
+    // 2. SINGLE PARALLEL NETWORK CALL (1 Roundtrip for ALL database queries)
+    const [dbCatRes, dbSubRes, dbBrandRes, productsRes] = await Promise.all([
       supabase.from('categories').select('id, name, slug'),
       supabase.from('subcategories').select('id, name, slug'),
-      supabase.from('brands').select('id, name, slug').order('name')
+      supabase.from('brands').select('id, name, slug').order('name'),
+      query
     ])
 
     const dbCatData = dbCatRes.data || []
     const dbSubData = dbSubRes.data || []
     const dbBrandData = dbBrandRes.data || []
+    let fetchedProducts = (productsRes.data || []) as Product[]
 
     const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
       { id: 'reverb', name: 'Reverb', slug: 'reverb' },
@@ -183,68 +230,21 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     categoriesOptions = combinedCategories
     brandsOptions = dbBrandData
 
-    let query = supabase
-      .from('products')
-      .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
-      .eq('is_active', true)
-
-    // Main page Category filtering
-    const meta = CATEGORY_META_MAP[cleanCategorySlug]
-    if (meta?.productType) {
-      query = query.eq('product_type', meta.productType)
-    } else if (cleanCategorySlug && cleanCategorySlug !== 'all' && cleanCategorySlug !== 'bundles') {
-      const catObj = dbCatData.find(c => c.slug.toLowerCase() === cleanCategorySlug.toLowerCase())
-      if (catObj) {
-        query = query.eq('category_id', catObj.id)
-      } else {
-        query = query.ilike('name', `%${cleanCategorySlug}%`)
-      }
-    }
-
-    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE
-    if (catParam) {
-      const selectedCats = catParam.split(',').map(c => c.trim()).filter(Boolean)
-      if (selectedCats.length > 0) {
-        const expandedCats = expandCategoryVariants(selectedCats)
-        query = query.overlaps('category_slugs', expandedCats)
-      }
-    }
-
-    // MULTI-BRAND FILTERING FROM SUPABASE
+    // MULTI-BRAND FILTERING IN MEMORY
     if (brandParam) {
       const selectedBrands = brandParam.split(',').map(b => b.trim().toLowerCase()).filter(Boolean)
       if (selectedBrands.length > 0) {
-        const brandIds = dbBrandData.filter(b => selectedBrands.includes(b.slug.toLowerCase())).map(b => b.id)
-        if (brandIds.length > 0) {
-          query = query.in('brand_id', brandIds)
-        }
+        fetchedProducts = fetchedProducts.filter(p => {
+          const pBrandSlug = p.brands?.slug?.toLowerCase() || p.brand?.toLowerCase()
+          return selectedBrands.some(sb => pBrandSlug?.includes(sb))
+        })
       }
     }
 
-    // Filter pills
-    if (isFree) {
-      query = query.eq('price_usd', 0)
-    }
-    if (isDeals) {
-      query = query.gt('original_price_usd', 0)
-    }
-
-    if (queryText) {
-      query = query.ilike('name', `%${queryText}%`)
-    }
-
-    // Sorting
-    if (sortOption === 'price-low') {
-      query = query.order('price_usd', { ascending: true })
-    } else if (sortOption === 'price-high') {
-      query = query.order('price_usd', { ascending: false })
+    if (productsRes.error) {
+      console.error('Supabase products fetch error:', productsRes.error)
     } else {
-      query = query.order('created_at', { ascending: false })
-    }
-
-    const { data, error } = await query
-    if (!error && data) {
-      products = data as Product[]
+      products = fetchedProducts
       isFromDatabase = true
     }
   } catch (err) {
