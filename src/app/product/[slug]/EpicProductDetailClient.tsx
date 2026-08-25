@@ -16,9 +16,11 @@ import {
   ShieldCheck,
   Bookmark
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
 import { useAudio } from '@/context/AudioContext'
+import { useAuth } from '@/context/AuthContext'
 import { ProductSpecsOverview, ProductSidebarBadge } from '@/components/ProductTypeSpecs'
 
 function WindowsIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -46,6 +48,8 @@ function AppleIcon({ className = "w-5 h-5" }: { className?: string }) {
 }
 
 export function EpicProductDetailClient({ product }: { product: any }) {
+  const router = useRouter()
+  const { user } = useAuth()
   const { formatPrice } = useCurrency()
   const { addItem, isInCart } = useCart()
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
@@ -57,6 +61,30 @@ export function EpicProductDetailClient({ product }: { product: any }) {
 
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
   const added = isInCart(product.id)
+
+  const handleGetNow = () => {
+    if (product.external_url) {
+      window.open(product.external_url, '_blank')
+      return
+    }
+
+    addItem({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price_inr: product.price_inr || Math.round((product.price_usd || 0) * 85),
+      price_usd: product.price_usd || 0,
+      cover_image: product.cover_image,
+      product_type: product.product_type,
+      brand: product.brands?.name || product.brand || 'Producer Toy',
+    })
+
+    if (!user) {
+      router.push('/auth?next=/checkout')
+    } else {
+      router.push('/checkout')
+    }
+  }
 
   const ytVideoId = (() => {
     const url = product.youtube_url || product.video_url
@@ -483,22 +511,10 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             ) : (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => addItem(product)}
-                  disabled={added}
-                  className={`flex-1 py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
-                    added
-                      ? 'bg-zinc-800 text-zinc-400 cursor-default'
-                      : 'bg-[#FC6301] hover:bg-[#E05800] text-white shadow-[#FC6301]/20'
-                  }`}
+                  onClick={handleGetNow}
+                  className="flex-1 py-3.5 px-6 text-sm font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg bg-[#FC6301] hover:bg-[#E05800] text-white shadow-[#FC6301]/20 active:scale-[0.99]"
                 >
-                  {added ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>In Cart</span>
-                    </>
-                  ) : (
-                    <span>Get</span>
-                  )}
+                  <span>{product.button_text || 'Get'}</span>
                 </button>
 
                 <button
