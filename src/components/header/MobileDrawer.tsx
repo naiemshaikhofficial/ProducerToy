@@ -92,12 +92,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         <div className="mt-auto pt-6 border-t border-[#202025] flex flex-col gap-4">
 
           <Link
-            href={user ? "/my-purchases" : "/auth"}
+            href={user ? "/library" : "/auth"}
             prefetch={true}
             onClick={onClose}
             className="bg-[#262626] hover:bg-[#333333] text-white text-center font-bold text-sm py-3.5 rounded-lg transition-colors"
           >
-            {user ? "Library & Purchases" : "Sign In / Create Account"}
+            {user ? "My Library" : "Sign In / Create Account"}
           </Link>
         </div>
 

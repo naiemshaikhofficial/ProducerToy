@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase/admin'
+import crypto from 'crypto'
 
 export async function POST(request: Request) {
   try {
@@ -10,59 +12,73 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No items in cart' }, { status: 400 })
     }
 
-    const supabase = getAdminClient()
+    // 1. Get authenticated user directly from request cookie session
+    const serverSupabase = await createClient()
+    const {
+      data: { user: authUser },
+    } = await serverSupabase.auth.getUser()
 
-    let targetUserId: string | null = userId || null
+    let targetUserId: string | null = authUser?.id || userId || null
 
-    // If userId provided, check if user exists in auth.users
-    if (targetUserId) {
-      const { data: userRecord } = await supabase.auth.admin.getUserById(targetUserId)
-      if (!userRecord || !userRecord.user) {
-        targetUserId = null
+    const adminSupabase = getAdminClient()
+
+    // 2. If no targetUserId, attempt to find user by email
+    if (!targetUserId && email) {
+      try {
+        const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+        const existingUser = usersData?.users?.find(
+          (u: any) => u.email?.toLowerCase() === email.toLowerCase()
+        )
+
+        if (existingUser) {
+          targetUserId = existingUser.id
+        }
+      } catch (userErr) {
+        console.warn('User lookup warning:', userErr)
       }
     }
 
-    // If no valid userId yet, search or create user by email
-    if (!targetUserId && email) {
-      const { data: usersData } = await supabase.auth.admin.listUsers()
-      const existingUser = usersData?.users?.find(
-        (u: any) => u.email?.toLowerCase() === email.toLowerCase()
+    // 3. Verify products in database
+    const productIds = items.map((i: any) => i.id)
+    const { data: dbProducts } = await adminSupabase
+      .from('products')
+      .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type')
+      .in('id', productIds)
+
+    const productMap = new Map((dbProducts || []).map((p) => [p.id, p]))
+
+    // 4. Insert purchase records
+    const purchaseRecords = items.map((item: any) => {
+      const dbProduct = productMap.get(item.id) || item
+
+      const requiresSerialKey = Boolean(
+        dbProduct.delivery_method === 'serial_key' ||
+        dbProduct.delivery_method === 'license_key' ||
+        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
+        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
       )
 
-      if (existingUser) {
-        targetUserId = existingUser.id
-      } else {
-        // Create user silently with admin client
-        const { data: newUser, error: createErr } = await supabase.auth.admin.createUser({
-          email,
-          email_confirm: true,
-          user_metadata: { role: 'customer' },
-        })
-
-        if (!createErr && newUser?.user) {
-          targetUserId = newUser.user.id
-        }
+      let serialKey: string | null = null
+      if (requiresSerialKey) {
+        const serialPartA = crypto.randomBytes(3).toString('hex').toUpperCase()
+        const serialPartB = crypto.randomBytes(3).toString('hex').toUpperCase()
+        const serialPartC = crypto.randomBytes(3).toString('hex').toUpperCase()
+        serialKey = `PT-VST-${serialPartA}-${serialPartB}-${serialPartC}`
       }
-    }
 
-    // Insert purchase records securely using admin client
-    const purchaseRecords = items.map((item: any) => ({
-      user_id: targetUserId || null,
-      product_id: item.id,
-      amount_paid: item.price_usd || item.price_inr || 0,
-      currency: 'USD',
-      serial_key:
-        item.product_type === 'plugin' || item.product_type === 'vst' || item.type === 'plugin'
-          ? `PT-VST-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random()
-              .toString(36)
-              .substring(2, 8)
-              .toUpperCase()}`
-          : null,
-      razorpay_order_id: `order_${Math.random().toString(36).substring(2, 12)}`,
-      razorpay_payment_id: `pay_${Math.random().toString(36).substring(2, 12)}`,
-    }))
+      return {
+        user_id: targetUserId,
+        product_id: item.id,
+        amount_paid: item.price_usd || item.price_inr || 0,
+        currency: 'USD',
+        serial_key: serialKey,
+        razorpay_order_id: `ord_${crypto.randomBytes(6).toString('hex')}`,
+        razorpay_payment_id: `pay_${crypto.randomBytes(6).toString('hex')}`,
+        purchased_at: new Date().toISOString(),
+      }
+    })
 
-    const { data: inserted, error: insertErr } = await supabase
+    const { data: inserted, error: insertErr } = await adminSupabase
       .from('purchases')
       .insert(purchaseRecords)
       .select()

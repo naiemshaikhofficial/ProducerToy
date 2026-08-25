@@ -512,7 +512,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleGetNow}
-                  className="flex-1 py-3.5 px-6 text-sm font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg bg-[#FC6301] hover:bg-[#E05800] text-white shadow-[#FC6301]/20 active:scale-[0.99]"
+                  className="flex-1 py-3.5 px-6 text-sm font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FC6301] hover:bg-[#E05800] text-white active:scale-[0.99]"
                 >
                   <span>{product.button_text || 'Get'}</span>
                 </button>

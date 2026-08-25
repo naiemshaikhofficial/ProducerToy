@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         '/api/',
         '/_next/',
         '/checkout/',
-        '/my-purchases/',
+        '/library/',
         '/*?sort=*',
         '/*?price=*',
         '/*?q=*',

@@ -10,6 +10,8 @@ import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { ShieldCheck, CheckCircle2, ShoppingBag, ChevronLeft, Lock, ArrowRight, Zap, Check } from 'lucide-react'
 
+import { processCheckoutAction } from '@/actions/checkoutActions'
+
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart } = useCart()
@@ -39,20 +41,20 @@ export default function CheckoutPage() {
     setErrorMsg('')
 
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items,
-          email: email || user?.email,
-          userId: user?.id,
-        }),
-      })
+      const res = await processCheckoutAction(
+        items.map(item => ({
+          id: item.id,
+          name: item.name,
+          price_inr: item.price_inr,
+          price_usd: item.price_usd,
+          product_type: item.product_type,
+        })),
+        email || user?.email || '',
+        user?.id
+      )
 
-      const data = await res.json()
-
-      if (!res.ok || data.error) {
-        throw new Error(data.error || 'Checkout failed. Please try again.')
+      if (!res.success || res.error) {
+        throw new Error(res.error || 'Checkout failed. Please try again.')
       }
 
       clearCart()
@@ -84,11 +86,11 @@ export default function CheckoutPage() {
 
           <div className="pt-4 flex flex-col sm:flex-row gap-3 w-full">
             <Link
-              href="/my-purchases"
+              href="/library"
               prefetch={true}
-              className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 px-6 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FC6301]/25 text-center cursor-pointer"
+              className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 px-6 rounded-xl uppercase tracking-wider transition-all text-center cursor-pointer active:scale-[0.99]"
             >
-              View My Purchases
+              Go to Library
             </Link>
             <Link
               href="/store"
@@ -180,9 +182,9 @@ export default function CheckoutPage() {
                 </Link>
               </div>
             ) : (
-              <div className="bg-[#181818] border border-[#282828] rounded-2xl p-4 flex items-center justify-between shadow-md">
+              <div className="bg-[#181818] border border-[#282828] rounded-2xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2.5 text-xs text-zinc-300">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
                   <span>Logged in as <strong className="text-white font-bold">{user.email}</strong></span>
                 </div>
                 <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-[#222222] px-2.5 py-1 rounded-full border border-[#2e2e2e]">
@@ -192,7 +194,7 @@ export default function CheckoutPage() {
             )}
 
             {/* Main Form Container */}
-            <form onSubmit={handleSimulatePayment} className="bg-[#181818] border border-[#282828] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
+            <form onSubmit={handleSimulatePayment} className="bg-[#181818] border border-[#282828] rounded-2xl p-6 sm:p-8 space-y-6">
               
               {/* Account Email Field */}
               <div className="space-y-2">
@@ -218,9 +220,9 @@ export default function CheckoutPage() {
                   Payment Method
                 </label>
                 
-                <div className="bg-[#222222] border border-[#333333] p-4 rounded-xl flex items-center justify-between shadow-sm">
+                <div className="bg-[#222222] border border-[#333333] p-4 rounded-xl flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 bg-[#FC6301] rounded-full flex items-center justify-center shadow-sm">
+                    <div className="w-4 h-4 bg-[#FC6301] rounded-full flex items-center justify-center">
                       <div className="w-1.5 h-1.5 bg-white rounded-full" />
                     </div>
                     <div>
@@ -240,7 +242,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs sm:text-sm py-4 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-xl shadow-[#FC6301]/25 cursor-pointer active:scale-[0.99]"
+                className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs sm:text-sm py-4 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99]"
               >
                 {loading ? (
                   <span className="animate-pulse">Processing Order...</span>

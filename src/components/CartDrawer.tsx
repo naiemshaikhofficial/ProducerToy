@@ -187,7 +187,7 @@ export function CartDrawer() {
               <Link
                 href={user ? '/checkout' : '/auth?next=/checkout'}
                 onClick={() => setIsCartOpen(false)}
-                className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 mt-2 transition-all shadow-lg shadow-[#FC6301]/25 cursor-pointer active:scale-[0.99]"
+                className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 mt-2 transition-all cursor-pointer active:scale-[0.99]"
               >
                 <span>Proceed to Checkout</span>
                 <ArrowRight className="w-4 h-4" />
