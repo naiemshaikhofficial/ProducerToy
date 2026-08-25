@@ -2,29 +2,28 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ShoppingBag, Sparkles } from 'lucide-react'
+import { ShoppingBag } from 'lucide-react'
 
 export function CheckoutEmptyCart() {
   return (
-    <div className="min-h-[75vh] flex items-center justify-center px-4 py-20 text-center">
-      <div className="w-full max-w-md bg-[#181818] border border-[#282828] rounded-2xl p-8 sm:p-10 shadow-2xl space-y-5 flex flex-col items-center">
-        <div className="w-16 h-16 bg-[#222222] border border-[#333333] rounded-2xl flex items-center justify-center text-zinc-400">
-          <ShoppingBag size={28} />
+    <div className="min-h-[70vh] flex items-center justify-center px-4 py-16 text-center">
+      <div className="w-full max-w-sm bg-[#141414] border border-[#222222] rounded-xl p-8 space-y-4 flex flex-col items-center">
+        <div className="w-12 h-12 bg-[#1a1a1a] border border-[#262626] rounded-xl flex items-center justify-center text-zinc-400">
+          <ShoppingBag size={22} />
         </div>
         <div className="space-y-1">
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">Your Cart is Empty</h2>
-          <p className="text-xs text-zinc-400">
-            No plugins, sample packs, or presets detected in your shopping bag.
+          <h2 className="text-lg font-bold text-white tracking-tight">Your Cart is Empty</h2>
+          <p className="text-xs text-zinc-500">
+            You don&apos;t have any items in your bag yet.
           </p>
         </div>
         <div className="pt-2 w-full">
           <Link
             href="/store"
             prefetch={true}
-            className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-xl inline-flex items-center justify-center gap-2 uppercase tracking-wider transition-all text-center cursor-pointer active:scale-[0.99]"
+            className="w-full h-10 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg inline-flex items-center justify-center uppercase tracking-wider transition-colors"
           >
-            <Sparkles size={14} />
-            <span>Browse Store Catalog</span>
+            Explore Catalog
           </Link>
         </div>
       </div>

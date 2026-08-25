@@ -1,16 +1,15 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { ShieldCheck, CheckCircle2, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import 'react-phone-number-input/style.css'
 import { BillingDetails } from './types'
 
-// Dynamic SSR-safe component imports
 const Select = dynamic(() => import('react-select'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-11 bg-[#202020] border border-[#333333] rounded-xl flex items-center px-4 text-zinc-500 text-xs font-semibold">
+    <div className="w-full h-10 bg-[#161616] border border-[#262626] rounded-lg flex items-center px-3 text-zinc-600 text-xs">
       Loading countries...
     </div>
   ),
@@ -19,8 +18,8 @@ const Select = dynamic(() => import('react-select'), {
 const PhoneInput = dynamic(() => import('react-phone-number-input'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-11 bg-[#202020] border border-[#333333] rounded-xl flex items-center px-4 text-zinc-500 text-xs font-semibold">
-      Loading phone input...
+    <div className="w-full h-10 bg-[#161616] border border-[#262626] rounded-lg flex items-center px-3 text-zinc-600 text-xs">
+      Loading phone...
     </div>
   ),
 })
@@ -51,193 +50,174 @@ export function CheckoutBillingForm({
   return (
     <div
       id="billing-details-section"
-      className="bg-[#181818] border border-[#282828] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl"
+      className="bg-[#141414] border border-[#222222] rounded-xl p-5 sm:p-6 space-y-5"
     >
-      <div className="flex items-center justify-between border-b border-[#282828] pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-2 h-4 bg-white rounded-sm" />
-          <h2 className="text-base font-extrabold uppercase tracking-wider text-white">
-            Billing &amp; Delivery Details
-          </h2>
-        </div>
-        <span
-          className={`text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md flex items-center gap-1.5 ${
-            Object.keys(formErrors).length > 0
-              ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-              : 'bg-white/10 text-white border border-white/20'
-          }`}
-        >
-          {Object.keys(formErrors).length > 0 ? (
-            <>
-              <ShieldCheck size={11} />
-              <span>Action Required</span>
-            </>
-          ) : (
-            <>
-              <CheckCircle2 size={11} />
-              <span>Auto-Saved</span>
-            </>
-          )}
+      <div className="flex items-center justify-between border-b border-[#222222] pb-3.5">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-200">
+          Billing &amp; Delivery Information
+        </h2>
+        <span className="text-[10px] text-zinc-500 font-medium">
+          Encrypted &amp; Secure
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Full Name */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Full Name <span className="text-zinc-400">*</span>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-zinc-400">
+            Full Name
           </label>
           <input
             type="text"
-            placeholder="e.g. Alex Producer"
+            placeholder="Alex Producer"
             value={billingDetails.fullName}
             onChange={(e) => onBillingChange('fullName', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
-              formErrors.fullName ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
+              formErrors.fullName ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
             }`}
           />
           {formErrors.fullName && (
-            <p className="text-[10px] font-semibold text-red-400">{formErrors.fullName}</p>
+            <p className="text-[10px] text-red-400">{formErrors.fullName}</p>
           )}
         </div>
 
         {/* Delivery Email */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Delivery Email <span className="text-zinc-400">*</span>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-zinc-400">
+            Delivery Email
           </label>
           <input
             type="email"
             placeholder="producer@studio.com"
             value={billingDetails.email}
             onChange={(e) => onBillingChange('email', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
-              formErrors.email ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
+              formErrors.email ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
             }`}
           />
           {formErrors.email && (
-            <p className="text-[10px] font-semibold text-red-400">{formErrors.email}</p>
+            <p className="text-[10px] text-red-400">{formErrors.email}</p>
           )}
         </div>
 
         {/* Phone Number */}
-        <div className="space-y-1.5 md:col-span-2">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Phone Number <span className="text-zinc-400">*</span>
+        <div className="space-y-1 md:col-span-2">
+          <label className="text-[11px] font-medium text-zinc-400">
+            Phone Number
           </label>
           <div className="phone-input-pt">
             {mounted ? (
               <PhoneInput
                 international
                 defaultCountry="IN"
-                placeholder="Enter mobile number"
+                placeholder="Mobile number"
                 value={billingDetails.phone}
                 onChange={(val) => onBillingChange('phone', val || '')}
-                className={`w-full h-11 bg-[#202020] border px-3 rounded-xl outline-none transition-all focus-within:border-white focus-within:ring-1 focus-within:ring-white ${
-                  formErrors.phone ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+                className={`w-full h-10 bg-[#181818] border px-3 rounded-lg outline-none transition-colors focus-within:border-zinc-400 ${
+                  formErrors.phone ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
                 }`}
               />
             ) : (
               <input
                 type="tel"
-                placeholder="Enter mobile number"
+                placeholder="Mobile number"
                 value={billingDetails.phone}
                 onChange={(e) => onBillingChange('phone', e.target.value)}
-                className="w-full h-11 bg-[#202020] border border-[#333333] text-white text-xs px-4 rounded-xl outline-none"
+                className="w-full h-10 bg-[#181818] border border-[#262626] text-white text-xs px-3.5 rounded-lg outline-none"
               />
             )}
           </div>
           {formErrors.phone && (
-            <p className="text-[10px] font-semibold text-red-400">{formErrors.phone}</p>
+            <p className="text-[10px] text-red-400">{formErrors.phone}</p>
           )}
         </div>
 
         {/* Street Address */}
-        <div className="space-y-1.5 md:col-span-2">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Street Address <span className="text-zinc-400">*</span>
+        <div className="space-y-1 md:col-span-2">
+          <label className="text-[11px] font-medium text-zinc-400">
+            Street Address
           </label>
           <input
             type="text"
-            placeholder="House / Studio No, Street, Landmark"
+            placeholder="Studio / House No, Street"
             value={billingDetails.address}
             onChange={(e) => onBillingChange('address', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
-              formErrors.address ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
+              formErrors.address ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
             }`}
           />
           {formErrors.address && (
-            <p className="text-[10px] font-semibold text-red-400">{formErrors.address}</p>
+            <p className="text-[10px] text-red-400">{formErrors.address}</p>
           )}
         </div>
 
         {/* City */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            City <span className="text-zinc-400">*</span>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-zinc-400">
+            City
           </label>
           <input
             type="text"
             placeholder="City"
             value={billingDetails.city}
             onChange={(e) => onBillingChange('city', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
-              formErrors.city ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
+              formErrors.city ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
             }`}
           />
           {formErrors.city && (
-            <p className="text-[10px] font-semibold text-red-400">{formErrors.city}</p>
+            <p className="text-[10px] text-red-400">{formErrors.city}</p>
           )}
         </div>
 
-        {/* State & Pincode Grid */}
+        {/* State & Pincode */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-              State <span className="text-zinc-400">*</span>
+          <div className="space-y-1">
+            <label className="text-[11px] font-medium text-zinc-400">
+              State
             </label>
             <input
               type="text"
               placeholder="State"
               value={billingDetails.state}
               onChange={(e) => onBillingChange('state', e.target.value)}
-              className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
-                formErrors.state ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+              className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
+                formErrors.state ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
               }`}
             />
             {formErrors.state && (
-              <p className="text-[10px] font-semibold text-red-400">{formErrors.state}</p>
+              <p className="text-[10px] text-red-400">{formErrors.state}</p>
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-              Pincode / Zip <span className="text-zinc-400">*</span>
+          <div className="space-y-1">
+            <label className="text-[11px] font-medium text-zinc-400">
+              Postal / Zip
             </label>
             <input
               type="text"
-              placeholder="ZIP"
+              placeholder="Zip Code"
               value={billingDetails.zip}
               onChange={(e) => onBillingChange('zip', e.target.value)}
-              className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
-                formErrors.zip ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
+              className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
+                formErrors.zip ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
               }`}
             />
             {formErrors.zip && (
-              <p className="text-[10px] font-semibold text-red-400">{formErrors.zip}</p>
+              <p className="text-[10px] text-red-400">{formErrors.zip}</p>
             )}
           </div>
         </div>
 
         {/* Country Dropdown */}
-        <div className="space-y-1.5 md:col-span-2">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Country <span className="text-zinc-400">*</span>
+        <div className="space-y-1 md:col-span-2">
+          <label className="text-[11px] font-medium text-zinc-400">
+            Country
           </label>
           {mounted ? (
             <Select
               options={countryOptions}
-              value={countryOptions.find((opt) => opt.label === billingDetails.country)}
+              value={countryOptions.find((opt) => opt.label === billingDetails.country) || null}
               onChange={(val: any) => onBillingChange('country', val?.label || '')}
               placeholder="Select Country"
               className="react-select-container"
@@ -245,22 +225,22 @@ export function CheckoutBillingForm({
               styles={{
                 control: (base: any, state: any) => ({
                   ...base,
-                  backgroundColor: '#202020',
-                  borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#ffffff' : '#333333',
-                  borderRadius: '0.75rem',
-                  height: '2.75rem',
+                  backgroundColor: '#181818',
+                  borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#71717a' : '#262626',
+                  borderRadius: '0.5rem',
+                  minHeight: '2.5rem',
+                  height: '2.5rem',
                   fontSize: '0.75rem',
-                  fontWeight: '600',
-                  boxShadow: state.isFocused ? '0 0 0 1px #ffffff' : 'none',
+                  boxShadow: 'none',
                   '&:hover': {
-                    borderColor: state.isFocused ? '#ffffff' : '#444444',
+                    borderColor: '#52525b',
                   },
                 }),
                 menu: (base: any) => ({
                   ...base,
                   backgroundColor: '#181818',
-                  border: '1px solid #333333',
-                  borderRadius: '0.75rem',
+                  border: '1px solid #2e2e2e',
+                  borderRadius: '0.5rem',
                   boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
                   zIndex: 50,
                   overflow: 'hidden',
@@ -268,18 +248,13 @@ export function CheckoutBillingForm({
                 option: (base: any, state: any) => ({
                   ...base,
                   backgroundColor: state.isSelected
-                    ? '#ffffff'
+                    ? '#282828'
                     : state.isFocused
-                    ? '#2a2a2a'
+                    ? '#202020'
                     : 'transparent',
-                  color: state.isSelected ? '#000000' : '#ffffff',
+                  color: '#ffffff',
                   fontSize: '0.75rem',
-                  fontWeight: '600',
                   cursor: 'pointer',
-                  '&:active': {
-                    backgroundColor: '#ffffff',
-                    color: '#000000',
-                  },
                 }),
                 singleValue: (base: any) => ({
                   ...base,
@@ -297,10 +272,13 @@ export function CheckoutBillingForm({
             />
           ) : (
             <select
-              value={billingDetails.country}
+              value={billingDetails.country || ''}
               onChange={(e) => onBillingChange('country', e.target.value)}
-              className="w-full h-11 bg-[#202020] border border-[#333333] text-white text-xs px-4 rounded-xl outline-none font-semibold"
+              className="w-full h-10 bg-[#181818] border border-[#262626] text-white text-xs px-3 rounded-lg outline-none"
             >
+              <option value="" className="bg-[#181818] text-zinc-500">
+                Select Country
+              </option>
               {countryOptions.map((opt) => (
                 <option key={opt.value} value={opt.label} className="bg-[#181818] text-white">
                   {opt.label}
@@ -309,33 +287,31 @@ export function CheckoutBillingForm({
             </select>
           )}
           {formErrors.country && (
-            <p className="text-[10px] font-semibold text-red-400">{formErrors.country}</p>
+            <p className="text-[10px] text-red-400">{formErrors.country}</p>
           )}
         </div>
       </div>
 
-      {/* Newsletter Opt-in Checkbox */}
-      <div className="flex items-start gap-3 p-3.5 bg-[#202020] border border-[#2a2a2a] rounded-xl">
+      {/* Newsletter */}
+      <div className="flex items-center gap-2.5 pt-1">
         <input
           id="checkout-newsletter"
           type="checkbox"
           checked={newsletterOptIn}
           onChange={(e) => setNewsletterOptIn(e.target.checked)}
-          className="w-4 h-4 mt-0.5 bg-[#181818] border border-[#333333] rounded text-white accent-white focus:ring-0 cursor-pointer"
+          className="w-3.5 h-3.5 bg-[#181818] border border-[#333333] rounded accent-zinc-200 cursor-pointer"
         />
         <label
           htmlFor="checkout-newsletter"
-          className="text-xs text-zinc-300 leading-relaxed cursor-pointer select-none"
+          className="text-[11px] text-zinc-400 cursor-pointer select-none"
         >
-          Receive exclusive producer discount codes, free plugin releases, and preset pack drops.
+          Send updates about new plugin releases, updates, and presets.
         </label>
       </div>
 
-      <div className="p-3.5 bg-[#202020] border border-[#2a2a2a] rounded-xl text-zinc-400 text-xs flex items-center gap-2.5">
-        <Lock size={15} className="text-zinc-400 flex-shrink-0" />
-        <span>
-          All customer and billing details are encrypted and securely verified. Digital licenses are attached to your account permanently.
-        </span>
+      <div className="pt-2 border-t border-[#222222] text-zinc-500 text-[11px] flex items-center gap-2">
+        <Lock size={12} className="text-zinc-500 flex-shrink-0" />
+        <span>Your information is encrypted and securely stored for instant license access.</span>
       </div>
     </div>
   )

@@ -62,7 +62,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     zip: '',
-    country: 'India',
+    country: '',
   })
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
@@ -116,7 +116,7 @@ export default function CheckoutPage() {
               city: account.city || '',
               state: account.state || '',
               zip: account.postal_code || '',
-              country: account.country || 'India',
+              country: account.country || '',
             }
             setBillingDetails(dbDetails)
             localStorage.setItem('pt_billing_details', JSON.stringify(dbDetails))
@@ -139,7 +139,7 @@ export default function CheckoutPage() {
             ...prev,
             ...parsed,
             phone: ensureE164(parsed.phone),
-            country: parsed.country || 'India',
+            country: parsed.country || '',
           }))
           return
         }
@@ -160,7 +160,7 @@ export default function CheckoutPage() {
           city: prev.city || clean(meta.city),
           state: prev.state || clean(meta.state),
           zip: prev.zip || clean(meta.zip) || clean(meta.postal_code),
-          country: prev.country || clean(meta.country) || 'India',
+          country: prev.country || clean(meta.country) || '',
         }))
       }
     }
@@ -396,38 +396,38 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#121212] text-white py-8 sm:py-12 select-none">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Top Navigation & Guarantee Badge */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="w-full min-h-screen bg-[#101010] text-white py-8 sm:py-12 select-none">
+      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 space-y-6">
+        {/* Top Navigation */}
+        <div className="flex items-center justify-between">
           <Link
             href="/store"
             prefetch={true}
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
-            <span>Back to Store Catalog</span>
+            <span>Back to Store</span>
           </Link>
 
-          <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-            <ShieldCheck size={13} className="text-white" />
-            <span>256-Bit SSL Encrypted &bull; Instant Digital Access</span>
+          <div className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
+            <ShieldCheck size={13} className="text-zinc-400" />
+            <span>256-Bit SSL Encrypted</span>
           </div>
         </div>
 
         {/* Page Title */}
-        <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Secure Checkout
+        <div className="space-y-0.5 border-b border-[#202020] pb-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            Checkout
           </h1>
-          <p className="text-xs text-zinc-400 font-medium">
-            Pro Audio Software &bull; Sample Libraries &bull; Direct Authorizations
+          <p className="text-xs text-zinc-500">
+            Complete your order for instant vault license delivery
           </p>
         </div>
 
         {/* Error Notification */}
         {errorMsg && (
-          <div className="bg-[#2a1818] border border-red-500/30 text-red-300 p-4 text-xs rounded-xl flex items-center justify-between shadow-lg">
+          <div className="bg-[#241515] border border-red-500/20 text-red-300 px-4 py-3 text-xs rounded-xl flex items-center justify-between">
             <span>{errorMsg}</span>
             <button onClick={() => setErrorMsg('')} className="text-red-400 hover:text-white font-bold ml-4">
               &times;
@@ -435,38 +435,35 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* ================= LEFT COLUMN: CART ITEMS & BILLING FORM ================= */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-5">
             {/* Account Status Card */}
             {!user ? (
-              <div className="bg-[#181818] border border-[#282828] rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
-                <div className="space-y-1">
-                  <span className="text-xs font-extrabold text-white block">
-                    Have a ProducerToy Account?
+              <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 flex items-center justify-between gap-4">
+                <div>
+                  <span className="text-xs font-semibold text-zinc-200 block">
+                    Already have an account?
                   </span>
-                  <span className="text-xs text-zinc-400 leading-relaxed block">
-                    Sign in to automatically link purchases and serial keys to your profile.
+                  <span className="text-[11px] text-zinc-500 block">
+                    Sign in to link licenses automatically
                   </span>
                 </div>
                 <Link
                   href="/auth?next=/checkout"
                   prefetch={true}
-                  className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider transition-all flex-shrink-0 shadow-md cursor-pointer"
+                  className="bg-[#222222] hover:bg-[#2a2a2a] text-white border border-[#303030] text-xs font-semibold px-4 py-2 rounded-lg transition-colors flex-shrink-0"
                 >
                   Sign In
                 </Link>
               </div>
             ) : (
-              <div className="bg-[#181818] border border-[#282828] rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-2.5 text-xs text-zinc-300">
-                  <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  <span>
-                    Logged in as <strong className="text-white font-bold">{user.email}</strong>
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest bg-[#222222] px-2.5 py-1 rounded-full border border-[#2e2e2e]">
-                  Linked Account
+              <div className="bg-[#141414] border border-[#222222] rounded-xl px-4 py-3 flex items-center justify-between text-xs">
+                <span className="text-zinc-400">
+                  Signed in as <strong className="text-zinc-200">{user.email}</strong>
+                </span>
+                <span className="text-[10px] text-zinc-500 font-medium">
+                  Verified
                 </span>
               </div>
             )}
@@ -490,7 +487,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* ================= RIGHT COLUMN: ORDER SUMMARY & TRUST ================= */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-5">
             {/* Order Summary Component */}
             <CheckoutOrderSummary
               itemCount={items.length}

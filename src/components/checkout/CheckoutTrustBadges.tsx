@@ -2,88 +2,40 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Zap, ShieldCheck, Lock, HelpCircle, ArrowRight } from 'lucide-react'
+import { ShieldCheck, Zap, DownloadCloud } from 'lucide-react'
 
 export function CheckoutTrustBadges() {
   return (
-    <div className="space-y-4">
-      {/* 1. Value Proposition Highlights */}
-      <div className="bg-[#181818] border border-[#282828] rounded-2xl p-6 space-y-4 shadow-xl">
-        <div className="flex items-center gap-2.5 border-b border-[#282828] pb-3">
-          <div className="w-2 h-4 bg-white rounded-sm" />
-          <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">
-            Why Shop on ProducerToy?
-          </h4>
+    <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 sm:p-5 space-y-3.5">
+      <div className="space-y-2 text-xs">
+        <div className="flex items-center gap-2.5 text-zinc-300">
+          <Zap size={13} className="text-zinc-400 flex-shrink-0" />
+          <span>Instant direct download &amp; vault license sync</span>
         </div>
-
-        <div className="space-y-3.5">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-white">
-              <Zap size={15} />
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-white">Instant Vault Delivery</h5>
-              <p className="text-[11px] text-zinc-400 leading-relaxed mt-0.5">
-                Direct high-speed downloads &amp; license keys generated immediately after checkout.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-white">
-              <ShieldCheck size={15} />
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-white">100% Royalty-Free Clearance</h5>
-              <p className="text-[11px] text-zinc-400 leading-relaxed mt-0.5">
-                Commercial license included for streaming, Spotify, YouTube, broadcast, and beats.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-white">
-              <Lock size={15} />
-            </div>
-            <div>
-              <h5 className="text-xs font-bold text-white">Lifetime Vault Access</h5>
-              <p className="text-[11px] text-zinc-400 leading-relaxed mt-0.5">
-                Re-download anytime from your private Library Vault across all your studio machines.
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center gap-2.5 text-zinc-300">
+          <ShieldCheck size={13} className="text-zinc-400 flex-shrink-0" />
+          <span>100% Royalty-Free clearance for commercial use</span>
+        </div>
+        <div className="flex items-center gap-2.5 text-zinc-300">
+          <DownloadCloud size={13} className="text-zinc-400 flex-shrink-0" />
+          <span>Lifetime access across all your DAW systems</span>
         </div>
       </div>
 
-      {/* 2. Secure Payment Badges */}
-      <div className="bg-[#181818] border border-[#282828] rounded-2xl p-4 text-center space-y-2 shadow-sm">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 block">
-          Guaranteed Safe &amp; Secure Payment
-        </span>
-        <div className="flex items-center justify-center gap-2 text-[10px] font-extrabold uppercase text-zinc-400">
-          <span className="bg-[#202020] px-2.5 py-1 rounded border border-[#2a2a2a]">UPI</span>
-          <span className="bg-[#202020] px-2.5 py-1 rounded border border-[#2a2a2a]">VISA</span>
-          <span className="bg-[#202020] px-2.5 py-1 rounded border border-[#2a2a2a]">MASTERCARD</span>
-          <span className="bg-[#202020] px-2.5 py-1 rounded border border-[#2a2a2a]">NETBANKING</span>
+      <div className="pt-3 border-t border-[#222222] flex items-center justify-between text-[10px] text-zinc-500">
+        <div className="flex items-center gap-1.5 font-medium">
+          <span>Accepted:</span>
+          <span className="text-zinc-400">UPI</span>
+          <span>&bull;</span>
+          <span className="text-zinc-400">Cards</span>
+          <span>&bull;</span>
+          <span className="text-zinc-400">NetBanking</span>
         </div>
-      </div>
 
-      {/* 3. Help Support Box */}
-      <Link
-        href="/contact"
-        className="bg-[#181818] border border-[#282828] hover:border-[#383838] rounded-2xl p-4 flex items-center justify-between group transition-all block"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-[#202020] border border-[#2c2c2c] rounded-xl flex items-center justify-center text-zinc-400 group-hover:text-white transition-colors">
-            <HelpCircle size={17} />
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white">Need Help with Order?</h4>
-            <p className="text-[10px] text-zinc-400">Contact our 24/7 technical crew</p>
-          </div>
-        </div>
-        <ArrowRight size={14} className="text-zinc-500 group-hover:text-white transition-colors" />
-      </Link>
+        <Link href="/contact" className="text-zinc-400 hover:text-white transition-colors">
+          Need Help?
+        </Link>
+      </div>
     </div>
   )
 }

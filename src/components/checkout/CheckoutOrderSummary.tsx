@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Tag, Zap, CheckCircle2, Percent } from 'lucide-react'
+import { Tag, CheckCircle2 } from 'lucide-react'
 
 // --- ANIMATED COUNTER HOOK ---
 function useAnimatedCounter(targetValue: number, prefix: string = '') {
@@ -12,7 +12,7 @@ function useAnimatedCounter(targetValue: number, prefix: string = '') {
 
   useEffect(() => {
     const startValue = prevValueRef.current
-    const duration = 350
+    const duration = 300
     let startTime: number | null = null
 
     const animate = (timestamp: number) => {
@@ -88,33 +88,28 @@ export function CheckoutOrderSummary({
   const totalRef = useAnimatedCounter(finalTotal, currencySymbol)
 
   return (
-    <div className="bg-[#181818] border border-[#282828] rounded-2xl p-6 sm:p-7 space-y-5 shadow-xl">
-      <div className="flex items-center justify-between border-b border-[#282828] pb-3.5">
-        <div className="flex items-center gap-2.5">
-          <div className="w-2 h-4 bg-white rounded-sm" />
-          <h3 className="text-sm font-extrabold uppercase tracking-wider text-white">
-            Order Summary
-          </h3>
-        </div>
-        <span className="text-xs text-zinc-400 font-medium">
+    <div className="bg-[#141414] border border-[#222222] rounded-xl p-5 sm:p-6 space-y-4">
+      <div className="flex items-center justify-between border-b border-[#222222] pb-3.5">
+        <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-200">
+          Summary
+        </h3>
+        <span className="text-[11px] text-zinc-500">
           {itemCount} {itemCount === 1 ? 'item' : 'items'}
         </span>
       </div>
 
-      {/* Price Calculation Breakdown */}
-      <div className="space-y-3 text-xs">
+      {/* Pricing Lines */}
+      <div className="space-y-2 text-xs">
         <div className="flex justify-between text-zinc-400">
           <span>Subtotal</span>
-          <span ref={subtotalRef} className="font-semibold text-zinc-200">
+          <span ref={subtotalRef} className="font-medium text-zinc-200">
             {formatPrice(rawSubtotalInr, rawSubtotalUsd)}
           </span>
         </div>
 
         {bundleDiscountPercent > 0 && (
-          <div className="flex justify-between text-zinc-300 font-bold">
-            <span className="flex items-center gap-1">
-              <Percent size={12} /> Bundle Discount (10%)
-            </span>
+          <div className="flex justify-between text-zinc-300">
+            <span>Bundle Discount (10%)</span>
             <span>
               -{currencySymbol}
               {(currentSubtotal * 0.1).toFixed(2)}
@@ -123,10 +118,8 @@ export function CheckoutOrderSummary({
         )}
 
         {discountPercent > 0 && (
-          <div className="flex justify-between text-white font-bold">
-            <span className="flex items-center gap-1">
-              <Tag size={12} /> Coupon ({discountPercent}%)
-            </span>
+          <div className="flex justify-between text-zinc-300">
+            <span>Coupon ({discountPercent}%)</span>
             <span>
               -{currencySymbol}
               {((currentSubtotal * discountPercent) / 100).toFixed(2)}
@@ -134,14 +127,9 @@ export function CheckoutOrderSummary({
           </div>
         )}
 
-        <div className="pt-3 border-t border-[#282828] flex justify-between items-end">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">
-              Total Due
-            </span>
-            <span className="text-[10px] text-zinc-500">Includes all digital licenses</span>
-          </div>
-          <span ref={totalRef} className="text-2xl sm:text-3xl font-extrabold text-white">
+        <div className="pt-3 border-t border-[#222222] flex justify-between items-center">
+          <span className="text-xs font-medium text-zinc-300">Total</span>
+          <span ref={totalRef} className="text-xl font-bold text-white">
             {currencySymbol}
             {finalTotal.toFixed(2)}
           </span>
@@ -149,81 +137,65 @@ export function CheckoutOrderSummary({
       </div>
 
       {/* Coupon Code Input */}
-      <div className="space-y-2 pt-2 border-t border-[#282828]">
+      <div className="space-y-1.5 pt-2 border-t border-[#222222]">
         <div className="flex gap-2">
           <div className="relative flex-grow">
-            <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
+            <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" size={13} />
             <input
               type="text"
-              placeholder="COUPON CODE (e.g. PRODUCER10)"
+              placeholder="Promo code"
               value={coupon}
               onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-              className="w-full h-10 bg-[#202020] border border-[#333333] pl-9 pr-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl focus:border-white outline-none transition-all placeholder:text-zinc-600"
+              className="w-full h-9 bg-[#181818] border border-[#262626] pl-8 pr-3 text-xs uppercase font-medium text-white rounded-lg focus:border-zinc-400 outline-none placeholder:text-zinc-600 transition-colors"
             />
           </div>
           <button
             type="button"
             onClick={onApplyCoupon}
             disabled={couponLoading || !coupon.trim()}
-            className="px-4 bg-[#282828] hover:bg-[#333333] text-white border border-[#383838] rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer"
+            className="px-3.5 h-9 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-lg text-xs font-medium transition-colors disabled:opacity-40 cursor-pointer"
           >
             {couponLoading ? '...' : 'Apply'}
           </button>
         </div>
 
         {couponError && (
-          <p className="text-[10px] font-semibold text-red-400">{couponError}</p>
+          <p className="text-[10px] text-red-400">{couponError}</p>
         )}
         {couponSuccessMsg && (
-          <p className="text-[10px] font-semibold text-zinc-200 flex items-center gap-1">
-            <CheckCircle2 size={12} className="text-white" /> {couponSuccessMsg}
+          <p className="text-[10px] text-zinc-300 flex items-center gap-1">
+            <CheckCircle2 size={11} className="text-white" /> {couponSuccessMsg}
           </p>
         )}
       </div>
 
-      {/* Pay Now Button */}
+      {/* Checkout Action Button */}
       <div className="pt-2">
         <button
           type="button"
           onClick={onCheckout}
           disabled={loading || paymentStatus === 'processing'}
-          className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm py-4 px-6 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+          className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 transition-colors active:scale-[0.99] disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-              <span>Authorizing Order...</span>
+              <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+              <span>Processing...</span>
             </div>
           ) : finalTotal === 0 ? (
-            <>
-              <CheckCircle2 size={16} />
-              <span>Claim Free Download (Instant Access)</span>
-            </>
+            <span>Claim Free Download</span>
           ) : (
-            <>
-              <Zap size={16} className="text-black fill-black" />
-              <span>
-                Pay Now &bull; {currencySymbol}
-                {finalTotal.toFixed(2)}
-              </span>
-            </>
+            <span>
+              Pay {currencySymbol}{finalTotal.toFixed(2)}
+            </span>
           )}
         </button>
 
-        <p className="text-[10px] text-zinc-500 text-center mt-3 leading-relaxed">
-          By clicking Pay Now, you agree to our{' '}
-          <Link href="/terms" className="text-zinc-400 hover:text-white underline">
+        <p className="text-[10px] text-zinc-500 text-center mt-2.5">
+          Secure payment &bull; Instant delivery to your vault &bull;{' '}
+          <Link href="/terms" className="text-zinc-400 hover:underline">
             Terms
           </Link>
-          ,{' '}
-          <Link href="/refund-policy" className="text-zinc-400 hover:text-white underline">
-            Refund Policy
-          </Link>{' '}
-          &amp;{' '}
-          <Link href="/privacy" className="text-zinc-400 hover:text-white underline">
-            Privacy Policy
-          </Link>
-          .
         </p>
       </div>
     </div>

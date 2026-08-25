@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Sparkles, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 interface CheckoutUpsellsProps {
   upsellProducts: any[]
@@ -14,40 +14,37 @@ export function CheckoutUpsells({ upsellProducts, formatPrice }: CheckoutUpsells
   if (!upsellProducts || upsellProducts.length === 0) return null
 
   return (
-    <div className="bg-[#181818] border border-[#282828] rounded-2xl p-5 space-y-3.5 shadow-xl">
-      <div className="flex items-center gap-2">
-        <Sparkles size={14} className="text-white" />
-        <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">
-          Frequently Added By Producers
-        </h4>
-      </div>
+    <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 sm:p-5 space-y-3">
+      <h4 className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+        You May Also Like
+      </h4>
 
-      <div className="space-y-2.5">
+      <div className="divide-y divide-[#202020]">
         {upsellProducts.map((prod) => (
           <div
             key={prod.id}
-            className="flex items-center justify-between gap-3 p-2.5 bg-[#202020] border border-[#2a2a2a] rounded-xl hover:border-[#383838] transition-all"
+            className="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0"
           >
-            <div className="relative w-11 h-11 bg-[#181818] border border-[#2c2c2c] rounded-lg overflow-hidden flex-shrink-0">
+            <div className="relative w-9 h-9 bg-[#1c1c1c] border border-[#282828] rounded-md overflow-hidden flex-shrink-0">
               <Image
                 src={prod.cover_image || '/placeholder.jpg'}
                 alt={prod.name}
                 fill
-                sizes="44px"
+                sizes="36px"
                 className="object-cover"
               />
             </div>
 
             <div className="flex-1 min-w-0">
-              <h5 className="text-xs font-bold text-white truncate">{prod.name}</h5>
-              <span className="text-[10px] font-extrabold text-zinc-300">
+              <h5 className="text-xs font-medium text-zinc-200 truncate">{prod.name}</h5>
+              <span className="text-[10px] text-zinc-400">
                 {formatPrice(prod.price_inr, prod.price_usd)}
               </span>
             </div>
 
             <Link
               href={`/product/${prod.slug}`}
-              className="p-2 bg-[#282828] hover:bg-white hover:text-black text-white rounded-lg transition-all"
+              className="p-1.5 text-zinc-400 hover:text-white transition-colors"
               title="View Product"
             >
               <ArrowRight size={13} />

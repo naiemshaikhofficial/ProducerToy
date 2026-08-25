@@ -625,11 +625,11 @@ export function EpicLibraryClient({
 
             {/* ================= RIGHT SIDEBAR: EXACT EPIC GAMES LAUNCHER FILTERS ================= */}
             <div className="lg:col-span-4 xl:col-span-3 sticky top-4 space-y-4">
-              <div className="bg-[#181818] rounded-2xl p-5 space-y-4 shadow-xl border border-[#242424]">
+              <div className="bg-[#141414] rounded-xl p-4.5 space-y-3.5 border border-[#222222]">
                 
                 {/* Filters Header */}
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white tracking-wide">Filters</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-300">Filters</h3>
                   {(searchTitle || selectedGenres.length > 0 || selectedFeatures.length > 0 || selectedTypes.length > 0 || selectedPlatforms.length > 0) && (
                     <button
                       onClick={() => {
@@ -640,7 +640,7 @@ export function EpicLibraryClient({
                         setSelectedPlatforms([])
                         setInstalledOnly(false)
                       }}
-                      className="text-xs text-white hover:underline font-bold transition-colors cursor-pointer"
+                      className="text-[11px] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer"
                     >
                       Reset
                     </button>
@@ -649,13 +649,13 @@ export function EpicLibraryClient({
 
                 {/* Search Title Input */}
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={searchTitle}
                     onChange={(e) => setSearchTitle(e.target.value)}
-                    placeholder="Title"
-                    className="w-full bg-[#202020] border border-[#2a2a2a] text-white text-xs pl-8 pr-3 py-2 rounded-xl focus:outline-none focus:border-zinc-400 placeholder:text-zinc-500 transition-colors"
+                    placeholder="Search by title..."
+                    className="w-full bg-[#181818] border border-[#262626] text-white text-xs pl-8 pr-3 py-2 rounded-lg focus:outline-none focus:border-zinc-400 placeholder:text-zinc-600 transition-colors"
                   />
                 </div>
 
@@ -857,19 +857,19 @@ export function EpicLibraryClient({
             >
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-xl bg-[#181818] border border-[#2a2a2a] rounded-2xl p-6 sm:p-7 shadow-2xl space-y-6 text-white animate-in zoom-in-95 duration-200 relative"
+                className="w-full max-w-lg bg-[#141414] border border-[#242424] rounded-xl p-6 shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative"
               >
                 {/* Close X */}
                 <button
                   onClick={() => setInstallProduct(null)}
-                  className="absolute top-5 right-5 text-zinc-400 hover:text-white p-1 rounded-full hover:bg-[#242424] transition-colors cursor-pointer"
+                  className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-[#202020] transition-colors cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
 
                 {/* Top Header with 3:4 Artwork Thumbnail */}
-                <div className="flex items-start gap-4">
-                  <div className="relative w-18 aspect-[3/4] rounded-xl overflow-hidden bg-[#202020] border border-[#2e2e2e] flex-shrink-0 shadow-md">
+                <div className="flex items-start gap-3.5">
+                  <div className="relative w-16 aspect-[3/4] rounded-lg overflow-hidden bg-[#1a1a1a] border border-[#262626] flex-shrink-0">
                     <Image
                       src={product.cover_image}
                       alt={product.name}
@@ -879,46 +879,46 @@ export function EpicLibraryClient({
                     />
                   </div>
 
-                  <div className="space-y-1 min-w-0 flex-1 pr-6">
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight truncate">
-                      Choose Install Options
+                  <div className="space-y-0.5 min-w-0 flex-1 pr-6">
+                    <h2 className="text-base font-bold text-white tracking-tight truncate">
+                      {product.name}
                     </h2>
-                    <p className="text-xs text-zinc-300 font-semibold truncate">
-                      {product.name} • <span className="text-zinc-400">{product.brands?.name || product.brand || 'Producer Toy'}</span>
+                    <p className="text-xs text-zinc-400 truncate">
+                      {product.brands?.name || product.brand || 'Producer Toy'}
                     </p>
-                    <p className="text-[11px] text-zinc-400">
+                    <p className="text-[11px] text-zinc-500 pt-0.5">
                       {isSamplePack
-                        ? 'High-Quality Audio Pack (24-bit WAV / Samples & Presets)'
-                        : `${product.vst_format || 'VST3 / AU'} • 64-Bit Digital License`}
+                        ? 'Audio Sample Pack (WAV / 24-bit)'
+                        : `${product.vst_format || 'VST3 / AU'} &bull; 64-Bit`}
                     </p>
                   </div>
                 </div>
 
                 {/* Serial Key Section (Only if genuinely exists) */}
                 {installProduct.serial_key && (
-                  <div className="bg-[#202020] border border-[#2e2e2e] rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-inner">
+                  <div className="bg-[#181818] border border-[#262626] rounded-lg p-3 flex items-center justify-between gap-3">
                     <div className="space-y-0.5 min-w-0">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+                      <span className="text-[10px] uppercase tracking-wider text-zinc-500 block">
                         Serial License Key
                       </span>
-                      <span className="font-mono font-bold text-xs sm:text-sm text-white tracking-wider select-all block truncate">
+                      <span className="font-mono text-xs font-semibold text-white tracking-wider select-all block truncate">
                         {installProduct.serial_key}
                       </span>
                     </div>
 
                     <button
                       onClick={() => handleCopySerial(installProduct.serial_key!, installProduct.id)}
-                      className="bg-[#2a2a2a] hover:bg-[#333333] text-white px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors flex-shrink-0 cursor-pointer"
+                      className="bg-[#222222] hover:bg-[#2a2a2a] text-zinc-300 hover:text-white px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors flex-shrink-0 cursor-pointer"
                     >
                       {copiedKeyId === installProduct.id ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-white" />
-                          <span className="text-white">Copied!</span>
+                          <span className="text-white">Copied</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5 text-zinc-400" />
-                          <span>Copy Key</span>
+                          <span>Copy</span>
                         </>
                       )}
                     </button>
@@ -928,56 +928,55 @@ export function EpicLibraryClient({
                 {/* Download Platform Selector */}
                 {isSamplePack ? (
                   /* Sample Pack / Audio Direct Package */
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 block">
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-zinc-400 block">
                       Download Package
                     </span>
-                    <div className="bg-[#202020] border border-[#2e2e2e] p-3.5 rounded-xl flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-[#282828] flex items-center justify-center text-white">
-                          <Music className="w-5 h-5" />
+                    <div className="bg-[#181818] border border-[#262626] p-3 rounded-lg flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-[#202020] flex items-center justify-center text-zinc-300">
+                          <Music className="w-4 h-4" />
                         </div>
                         <div>
-                          <span className="text-xs font-bold text-white block">
-                            Direct Sample Pack ZIP Archive
+                          <span className="text-xs font-semibold text-white block">
+                            Direct ZIP Archive
                           </span>
-                          <span className="text-[11px] text-zinc-400">
-                            Includes One-Shots, Loops, Midis & Presets
+                          <span className="text-[10px] text-zinc-500">
+                            Includes Loops, One-Shots &amp; Midis
                           </span>
                         </div>
                       </div>
-                      <span className="text-[11px] font-bold text-white bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full">
+                      <span className="text-[10px] text-zinc-400 bg-[#222222] px-2 py-0.5 rounded">
                         Ready
                       </span>
                     </div>
                   </div>
                 ) : (
                   /* VST / Plugin OS Platform Selection (Windows & Apple) */
-                  <div className="space-y-2.5">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 block">
-                      Select OS Platform Installer
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] text-zinc-400 block">
+                      Select OS Platform
                     </span>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2.5">
                       {/* Windows Option */}
                       <button
                         type="button"
                         onClick={() => setSelectedPlatform('windows')}
-                        className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
+                        className={`p-3 rounded-lg border flex items-center gap-2.5 transition-all cursor-pointer text-left ${
                           selectedPlatform === 'windows'
-                            ? 'bg-[#242424] border-white'
-                            : 'bg-[#202020] border-[#2e2e2e] hover:border-zinc-500'
+                            ? 'bg-[#202020] border-zinc-400'
+                            : 'bg-[#181818] border-[#262626] hover:border-zinc-600'
                         }`}
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#282828] flex items-center justify-center flex-shrink-0 text-white">
-                          {/* Windows SVG Icon */}
-                          <svg className="w-4 h-4 fill-current" viewBox="0 0 88 88">
+                        <div className="w-7 h-7 rounded-md bg-[#222222] flex items-center justify-center flex-shrink-0 text-white">
+                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 88 88">
                             <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L.028 75.48.001 45.728zm4.326-39.027L87.914 0v41.527l-47.918.378zm47.918 43.435L87.914 88l-47.918-6.736V45.704z" />
                           </svg>
                         </div>
                         <div className="min-w-0">
-                          <span className="text-xs font-bold text-white block">Windows</span>
-                          <span className="text-[10px] text-zinc-400 block truncate">VST3 / 64-Bit EXE</span>
+                          <span className="text-xs font-semibold text-white block">Windows</span>
+                          <span className="text-[10px] text-zinc-500 block truncate">VST3 / EXE</span>
                         </div>
                       </button>
 
@@ -985,33 +984,32 @@ export function EpicLibraryClient({
                       <button
                         type="button"
                         onClick={() => setSelectedPlatform('mac')}
-                        className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
+                        className={`p-3 rounded-lg border flex items-center gap-2.5 transition-all cursor-pointer text-left ${
                           selectedPlatform === 'mac'
-                            ? 'bg-[#242424] border-white'
-                            : 'bg-[#202020] border-[#2e2e2e] hover:border-zinc-500'
+                            ? 'bg-[#202020] border-zinc-400'
+                            : 'bg-[#181818] border-[#262626] hover:border-zinc-600'
                         }`}
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#282828] flex items-center justify-center flex-shrink-0 text-white">
-                          {/* Apple SVG Icon */}
-                          <svg className="w-4 h-4 fill-current" viewBox="0 0 170 170">
+                        <div className="w-7 h-7 rounded-md bg-[#222222] flex items-center justify-center flex-shrink-0 text-white">
+                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 170 170">
                             <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.74 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.7-7.85-12.01-14.43-6.08-9.35-10.74-19.78-13.98-31.28-3.24-11.51-4.86-22.42-4.86-32.75 0-14.7 3.69-26.68 11.08-35.94 7.39-9.25 16.59-13.98 27.6-14.19 4.35 0 9.29 1.16 14.83 3.48 5.53 2.32 9.07 3.54 10.6 3.66 1.7 0 5.4-1.28 11.1-3.84 5.7-2.57 10.68-3.74 14.94-3.53 11.52.54 20.73 4.67 27.63 12.39-10.02 6.09-14.92 14.77-14.7 26.04.22 8.91 3.59 16.39 10.11 22.44 6.52 6.05 14.44 9.68 23.77 10.88-2.06 6.31-4.63 12.77-7.72 19.37zM119.22 31.84c0-7.39 2.65-14.19 7.94-20.41 5.3-6.22 11.83-9.9 19.6-11.04.22 1.09.33 2.07.33 2.94 0 7.39-2.77 14.34-8.31 20.85-5.54 6.51-12.18 10.22-19.93 11.13-.11-1.09-.33-2.29-.33-3.47z" />
                           </svg>
                         </div>
                         <div className="min-w-0">
-                          <span className="text-xs font-bold text-white block">macOS</span>
-                          <span className="text-[10px] text-zinc-400 block truncate">AU / VST3 / DMG</span>
+                          <span className="text-xs font-semibold text-white block">macOS</span>
+                          <span className="text-[10px] text-zinc-500 block truncate">AU / DMG</span>
                         </div>
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* Bottom Modal Actions (ProducerToy Minimalistic Clean Style) */}
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#2a2a2a]">
+                {/* Bottom Modal Actions */}
+                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#222222]">
                   <button
                     type="button"
                     onClick={() => setInstallProduct(null)}
-                    className="bg-[#242424] hover:bg-[#2e2e2e] text-white font-bold text-xs py-3 px-6 rounded-xl uppercase tracking-wider transition-colors cursor-pointer"
+                    className="bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white font-medium text-xs py-2.5 px-4 rounded-lg transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1022,10 +1020,10 @@ export function EpicLibraryClient({
                     rel="noopener noreferrer"
                     download
                     onClick={() => setInstallProduct(null)}
-                    className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-8 rounded-xl uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 active:scale-[0.99]"
+                    className="bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-6 rounded-lg uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>Install</span>
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download</span>
                   </a>
                 </div>
 
