@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --epic-bg: #121212;
+    --epic-card: #202020;
+    --epic-card-hover: #2a2a2a;
+    --epic-accent: #ffffff;
+    --epic-accent-hover: #e4e4e7;
+    --epic-border: #2a2a2a;
+    --epic-text: #ffffff;
+    --epic-muted: #a0a0a0;
+  }
+
+  html {
+    color-scheme: dark;
+    background-color: #121212;
+    color: #ffffff;
+  }
+
+  body {
+    color-scheme: dark;
+    background-color: #121212;
+    color: #ffffff;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Disable Image Drag & Drop and Selection Across Entire Site */
+  img, svg, picture {
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+    user-drag: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+}
+
+::selection {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+::-moz-selection {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+*:focus {
+  outline: none;
+}
+
+/* Epic Games Store UI Components (Monochrome Dark & White Theme) */
+.epic-card {
+  background-color: #202020;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.epic-card:hover {
+  background-color: #2a2a2a;
+  border-color: #383838;
+  transform: translateY(-2px);
+}
+
+.epic-badge {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+}
+
+.epic-btn {
+  background-color: #ffffff;
+  color: #000000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.epic-btn:hover {
+  background-color: #e4e4e7;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+}
+
+.epic-dark-btn {
+  background-color: #202020;
+  color: #ffffff;
+  border: 1px solid #333333;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.epic-dark-btn:hover {
+  background-color: #2a2a2a;
+  border-color: #444444;
+}
+
+/* Custom Epic Games Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
