@@ -89,13 +89,6 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
         {/* Account & Settings */}
         <div className="mt-auto pt-6 border-t border-[#202025] flex flex-col gap-4">
-          <button
-            onClick={onToggleCurrency}
-            className="flex items-center gap-3 text-sm text-zinc-300 font-medium bg-[#1a1a1e] px-4 py-3 rounded-lg"
-          >
-            <Globe className="w-5 h-5 text-zinc-400" />
-            <span>Currency: <strong className="text-white">{currency}</strong></span>
-          </button>
 
           <Link
             href={user ? "/my-purchases" : "/auth"}

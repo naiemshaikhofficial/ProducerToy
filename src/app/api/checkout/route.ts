@@ -39,8 +39,8 @@ export async function POST(request: Request) {
     const purchaseRecords = items.map((item: any) => ({
       user_id: targetUserId || null,
       product_id: item.id,
-      amount_paid: item.price_inr || 0,
-      currency: 'INR',
+      amount_paid: item.price_usd || item.price_inr || 0,
+      currency: 'USD',
       serial_key: item.product_type === 'plugin' || item.product_type === 'vst' || item.type === 'plugin' 
         ? `PT-VST-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}` 
         : null,

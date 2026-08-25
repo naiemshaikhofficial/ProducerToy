@@ -65,7 +65,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 items-stretch">
         
         {/* Main Hero Banner Container (Left 9 out of 12 columns) */}
-        <div className="lg:col-span-9 relative w-full h-[360px] sm:h-[400px] lg:h-[430px] rounded-2xl overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]">
+        <div className="lg:col-span-9 relative w-full h-[360px] sm:h-[400px] lg:h-[430px] rounded-none overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]">
           
           {/* Horizontal Sliding Viewport (Exact Epic Games Slide Transition) */}
           <div 

@@ -11,32 +11,23 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined)
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrency] = useState<'USD' | 'INR'>('USD')
+  const [currency] = useState<'USD' | 'INR'>('USD')
 
   const formatPrice = (inrOrUsd?: number, usd?: number) => {
-    if (currency === 'USD') {
-      if (usd !== undefined && usd !== null && usd > 0) {
-        return `$${Number(usd).toFixed(2)}`
-      }
-      if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd > 0) {
-        const val = inrOrUsd > 150 ? inrOrUsd / 85 : inrOrUsd
-        return `$${Number(val).toFixed(2)}`
-      }
-      return '$0.00'
-    } else {
-      if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd > 0) {
-        const val = inrOrUsd <= 150 ? inrOrUsd * 85 : inrOrUsd
-        return `₹${Math.round(val).toLocaleString('en-IN')}`
-      }
-      if (usd !== undefined && usd !== null && usd > 0) {
-        return `₹${Math.round(usd * 85).toLocaleString('en-IN')}`
-      }
-      return '₹0'
+    if (usd !== undefined && usd !== null && usd > 0) {
+      return `$${Number(usd).toFixed(2)}`
     }
+    if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd > 0) {
+      const val = inrOrUsd > 150 ? inrOrUsd / 85 : inrOrUsd
+      return `$${Number(val).toFixed(2)}`
+    }
+    return '$0.00'
   }
 
+  const setCurrency = () => {}
+
   return (
-    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+    <CurrencyContext.Provider value={{ currency: 'USD', setCurrency, formatPrice }}>
       {children}
     </CurrencyContext.Provider>
   )
