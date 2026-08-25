@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { cache } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getAdminClient } from '@/lib/supabase/admin'
@@ -8,7 +8,22 @@ import { Metadata } from 'next'
 import { ProductJsonLd } from '@/components/JsonLd'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // Cache static page for 1 hour (revalidate via /api/revalidate)
+
+// React cache wrapper: Ensures Database is queried EXACTLY ONCE per request instead of twice!
+const getCachedProduct = cache(async (slug: string) => {
+  const cleanSlug = decodeURIComponent(slug).trim()
+  const supabase = getAdminClient()
+
+  const { data: product } = await supabase
+    .from('products')
+    .select('*, categories(name, slug), subcategories!subcategory_id(name, slug), brands!brand_id(name, slug, logo_url)')
+    .ilike('slug', cleanSlug)
+    .eq('is_active', true)
+    .maybeSingle()
+
+  return product
+})
 
 export async function generateMetadata({
   params,
@@ -16,15 +31,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const cleanSlug = decodeURIComponent(slug).trim()
-  const supabase = getAdminClient()
-
-  const { data: product } = await supabase
-    .from('products')
-    .select('*, categories(name), subcategories!subcategory_id(name), brands!brand_id(name)')
-    .ilike('slug', cleanSlug)
-    .eq('is_active', true)
-    .single()
+  const product = await getCachedProduct(slug)
 
   if (!product) {
     return {
@@ -61,15 +68,7 @@ export default async function EpicProductDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const cleanSlug = decodeURIComponent(slug).trim()
-  const supabase = getAdminClient()
-
-  const { data: product } = await supabase
-    .from('products')
-    .select('*, categories(name, slug), subcategories!subcategory_id(name, slug), brands!brand_id(name, slug, logo_url)')
-    .ilike('slug', cleanSlug)
-    .eq('is_active', true)
-    .single()
+  const product = await getCachedProduct(slug)
 
   if (!product) {
     notFound()

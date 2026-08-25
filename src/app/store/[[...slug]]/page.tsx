@@ -7,7 +7,7 @@ import { Handshake } from 'lucide-react'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 1800 // Cache static page for 30 minutes (instant 0ms loading, revalidated via /api/revalidate)
 
 interface StorePageProps {
   params: Promise<{ slug?: string[] }>
