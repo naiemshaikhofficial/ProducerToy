@@ -80,22 +80,21 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const formatPrice = useCallback(
     (inrOrUsd?: number, usd?: number) => {
       if (currency === 'INR') {
-        if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd > 0) {
-          // If inrOrUsd is small (< 100) and usd exists, calculate from USD * rate
-          const val = inrOrUsd < 100 && usd ? Math.round(usd * exchangeRate) : inrOrUsd
-          return `₹${Math.round(val).toLocaleString('en-IN')}`
+        if (usd !== undefined && usd !== null && usd >= 0) {
+          return `₹${Math.round(Number(usd) * exchangeRate).toLocaleString('en-IN')}`
         }
-        if (usd !== undefined && usd !== null && usd > 0) {
-          return `₹${Math.round(usd * exchangeRate).toLocaleString('en-IN')}`
+        if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd >= 0) {
+          const val = inrOrUsd > 150 ? inrOrUsd : inrOrUsd * exchangeRate
+          return `₹${Math.round(val).toLocaleString('en-IN')}`
         }
         return '₹0'
       }
 
       // Default USD
-      if (usd !== undefined && usd !== null && usd > 0) {
+      if (usd !== undefined && usd !== null && usd >= 0) {
         return `$${Number(usd).toFixed(2)}`
       }
-      if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd > 0) {
+      if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd >= 0) {
         const val = inrOrUsd > 150 && exchangeRate > 0 ? inrOrUsd / exchangeRate : inrOrUsd
         return `$${Number(val).toFixed(2)}`
       }

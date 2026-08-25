@@ -60,7 +60,7 @@ export function CheckoutCartItems({ items, removeItem, formatPrice }: CheckoutCa
 
             <div className="text-right flex items-center gap-3 flex-shrink-0">
               <span className="font-bold text-xs text-white">
-                {formatPrice(item.price_inr, item.price_usd)}
+                {formatPrice(undefined, item.price_usd)}
               </span>
               <button
                 type="button"

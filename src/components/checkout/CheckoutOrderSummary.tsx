@@ -123,7 +123,7 @@ export function CheckoutOrderSummary({
         <div className="flex justify-between text-zinc-400">
           <span>Subtotal</span>
           <span ref={subtotalRef} className="font-medium text-zinc-200">
-            {formatPrice(rawSubtotalInr, rawSubtotalUsd)}
+            {formatPrice(undefined, rawSubtotalUsd)}
           </span>
         </div>
 

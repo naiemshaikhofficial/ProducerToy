@@ -281,21 +281,8 @@ export default function CheckoutPage() {
   // Calculations with Real-Time Conversion
   const isIndia = billingDetails.country === 'India' || (!billingDetails.country && currency === 'INR')
 
-  const rawSubtotalInr = items.reduce((sum, item) => {
-    const inr = Number(item.price_inr || 0)
-    const usd = Number(item.price_usd || 0)
-    if (inr > 0) return sum + inr
-    if (usd > 0) return sum + convertUsdToInr(usd)
-    return sum
-  }, 0)
-
-  const rawSubtotalUsd = items.reduce((sum, item) => {
-    const usd = Number(item.price_usd || 0)
-    const inr = Number(item.price_inr || 0)
-    if (usd > 0) return sum + usd
-    if (inr > 0) return sum + convertInrToUsd(inr)
-    return sum
-  }, 0)
+  const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || (item.price_inr ? item.price_inr / exchangeRate : 0)), 0)
+  const rawSubtotalInr = Math.round(rawSubtotalUsd * exchangeRate)
 
   const currentSubtotal = isIndia ? rawSubtotalInr : rawSubtotalUsd
   const currencySymbol = isIndia ? '₹' : '$'

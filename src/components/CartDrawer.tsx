@@ -11,7 +11,7 @@ import { validateCouponAction } from '@/actions/couponActions'
 
 export function CartDrawer() {
   const { items, removeItem, isCartOpen, setIsCartOpen } = useCart()
-  const { formatPrice } = useCurrency()
+  const { formatPrice, exchangeRate } = useCurrency()
   const { user } = useAuth()
   const [coupon, setCoupon] = useState('')
   const [discountPercent, setDiscountPercent] = useState(0)
@@ -19,18 +19,18 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null
 
-  const rawSubtotalInr = items.reduce((sum, item) => sum + Number(item.price_inr || 0), 0)
-  const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || (item.price_inr / 85)), 0)
+  const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || 0), 0)
+  const rawSubtotalInr = Math.round(rawSubtotalUsd * exchangeRate)
 
   // Bundle Discount: 10% off for 3+ items
-  const bundleDiscountInr = items.length >= 3 ? Math.round(rawSubtotalInr * 0.1) : 0
-  const bundleDiscountUsd = items.length >= 3 ? (rawSubtotalUsd * 0.1) : 0
+  const bundleDiscountUsd = items.length >= 3 ? rawSubtotalUsd * 0.1 : 0
+  const bundleDiscountInr = Math.round(bundleDiscountUsd * exchangeRate)
 
-  const couponDiscountInr = Math.round((rawSubtotalInr - bundleDiscountInr) * (discountPercent / 100))
   const couponDiscountUsd = (rawSubtotalUsd - bundleDiscountUsd) * (discountPercent / 100)
+  const couponDiscountInr = Math.round(couponDiscountUsd * exchangeRate)
 
-  const finalTotalInr = Math.max(0, rawSubtotalInr - bundleDiscountInr - couponDiscountInr)
   const finalTotalUsd = Math.max(0, rawSubtotalUsd - bundleDiscountUsd - couponDiscountUsd)
+  const finalTotalInr = Math.max(0, rawSubtotalInr - bundleDiscountInr - couponDiscountInr)
 
   const applyCoupon = async () => {
     const res = await validateCouponAction(coupon)
@@ -97,7 +97,7 @@ export function CartDrawer() {
                       {item.name}
                     </div>
                     <div className="text-[11px] text-zinc-400 font-semibold mt-0.5">
-                      {formatPrice(item.price_inr, item.price_usd)}
+                      {formatPrice(undefined, item.price_usd)}
                     </div>
                   </div>
 
