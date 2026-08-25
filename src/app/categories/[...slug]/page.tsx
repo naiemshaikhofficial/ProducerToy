@@ -2,8 +2,8 @@ import React from 'react'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { ProductCard, Product } from '@/components/ProductCard'
 import Link from 'next/link'
-import { Filter, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
 import { Metadata } from 'next'
+import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,6 +18,7 @@ interface CategoryPageProps {
     rent_to_own?: string
     brand?: string
     price?: string
+    cat?: string
   }>
 }
 
@@ -75,7 +76,7 @@ function formatTitle(slug: string): string {
     .join(' ')
 }
 
-export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params
   const rawSlug = slug?.[0] || 'all'
   const cleanSlug = parseCategorySlug(rawSlug)
@@ -96,7 +97,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     deals: dealsParam,
     bundles: bundlesParam,
     rent_to_own: rentParam,
-    brand: brandParam
+    brand: brandParam,
+    price: priceParam,
+    cat: catParam
   } = await searchParams
 
   const rawCategorySlug = slug?.[0] || ''
@@ -108,6 +111,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const isRentToOwn = rentParam === 'true'
 
   let products: Product[] = []
+  let categoriesOptions: Array<{ id: string; name: string; slug: string }> = []
+  let brandsOptions: Array<{ id: string; name: string; slug: string }> = []
   let isFromDatabase = false
 
   try {
@@ -118,7 +123,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
       .eq('is_active', true)
 
-    // Category filtering logic
+    // Main page Category filtering
     const meta = CATEGORY_META_MAP[cleanCategorySlug]
     if (meta?.productType) {
       query = query.eq('product_type', meta.productType)
@@ -133,6 +138,63 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         query = query.eq('category_id', catData.id)
       } else {
         query = query.ilike('name', `%${cleanCategorySlug}%`)
+      }
+    }
+
+    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE
+    if (catParam) {
+      const selectedCats = catParam.split(',').map(c => c.trim().toLowerCase()).filter(Boolean)
+      
+      if (selectedCats.length > 0) {
+        const conditions: string[] = []
+
+        // Match subcategories
+        const { data: matchedSubs } = await supabase
+          .from('subcategories')
+          .select('id, slug')
+          .in('slug', selectedCats)
+
+        // Match categories
+        const { data: matchedCats } = await supabase
+          .from('categories')
+          .select('id, slug')
+          .in('slug', selectedCats)
+
+        const subIds = matchedSubs?.map(s => s.id) || []
+        const catIds = matchedCats?.map(c => c.id) || []
+
+        if (subIds.length > 0) {
+          conditions.push(`subcategory_id.in.(${subIds.join(',')})`)
+        }
+        if (catIds.length > 0) {
+          conditions.push(`category_id.in.(${catIds.join(',')})`)
+        }
+
+        selectedCats.forEach(term => {
+          conditions.push(`name.ilike.%${term}%`)
+          conditions.push(`short_description.ilike.%${term}%`)
+          conditions.push(`vst_format.ilike.%${term}%`)
+        })
+
+        if (conditions.length > 0) {
+          query = query.or(conditions.join(','))
+        }
+      }
+    }
+
+    // MULTI-BRAND FILTERING FROM SUPABASE
+    if (brandParam) {
+      const selectedBrands = brandParam.split(',').map(b => b.trim().toLowerCase()).filter(Boolean)
+      if (selectedBrands.length > 0) {
+        const { data: matchedBrandObjs } = await supabase
+          .from('brands')
+          .select('id, slug')
+          .in('slug', selectedBrands)
+
+        const brandIds = matchedBrandObjs?.map(b => b.id) || []
+        if (brandIds.length > 0) {
+          query = query.in('brand_id', brandIds)
+        }
       }
     }
 
@@ -157,6 +219,47 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       query = query.order('created_at', { ascending: false })
     }
 
+    // Query categories & subcategories for the dropdown list
+    const { data: dbCatData } = await supabase.from('categories').select('id, name, slug')
+    const { data: dbSubData } = await supabase.from('subcategories').select('id, name, slug')
+
+    const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
+      { id: 'reverb', name: 'Reverb', slug: 'reverb' },
+      { id: 'delay', name: 'Delay & Echo', slug: 'delay' },
+      { id: 'compressor', name: 'Compressor', slug: 'compressor' },
+      { id: 'saturation', name: 'Saturation & Warmth', slug: 'saturation' },
+      { id: 'eq', name: 'Equalizer (EQ)', slug: 'eq' },
+      { id: 'distortion', name: 'Distortion & Overdrive', slug: 'distortion' },
+      { id: 'modulation', name: 'Chorus & Modulation', slug: 'modulation' },
+      { id: 'synth', name: 'Synthesizer VST', slug: 'synth' },
+      { id: 'vocal', name: 'Vocal Processor', slug: 'vocal' },
+      { id: '808', name: '808 & Bass', slug: '808' },
+      { id: 'drum-kit', name: 'Drum Kit & Loops', slug: 'drum-kit' },
+    ]
+
+    if (dbCatData && dbCatData.length > 0) {
+      dbCatData.forEach(c => {
+        if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
+      })
+    }
+
+    if (dbSubData && dbSubData.length > 0) {
+      dbSubData.forEach(s => {
+        if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
+      })
+    }
+
+    categoriesOptions = combinedCategories
+
+    const { data: dbBrandData } = await supabase
+      .from('brands')
+      .select('id, name, slug')
+      .order('name')
+
+    if (dbBrandData && dbBrandData.length > 0) {
+      brandsOptions = dbBrandData
+    }
+
     const { data, error } = await query
     if (!error && data) {
       products = data as Product[]
@@ -166,9 +269,22 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     console.error('Error querying category products:', err)
   }
 
-  // Fallback mock items if DB returned 0 rows
+  // Fallback mock items including Valhalla Supermassive
   if (!isFromDatabase || products.length === 0) {
-    const mockAll: Product[] = [
+    let mockAll: Product[] = [
+      {
+        id: 'valhalla-supermassive',
+        name: 'Valhalla Supermassive',
+        slug: 'valhalla-supermassive',
+        brand: 'Valhalla DSP',
+        brands: { id: 'valhalla', name: 'Valhalla DSP', slug: 'valhalla-dsp' },
+        product_type: 'plugin',
+        price_usd: 0,
+        original_price_usd: 49.99,
+        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
+        demo_audio_url: '',
+        short_description: 'Lush reverbs, harmonic delays, and space echo clouds in one plugin.',
+      },
       {
         id: 'mock-1',
         name: 'Depthcharge Compressor',
@@ -247,10 +363,19 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       }
     ]
 
-    products = mockAll
     if (isFree) {
-      products = products.filter(p => (p.price_usd ?? 0) === 0)
+      mockAll = mockAll.filter(p => (p.price_usd ?? 0) === 0)
     }
+
+    if (catParam) {
+      const selectedCats = catParam.split(',').map(c => c.trim().toLowerCase()).filter(Boolean)
+      mockAll = mockAll.filter(p => {
+        const text = `${p.name} ${p.short_description}`.toLowerCase()
+        return selectedCats.some(cat => text.includes(cat))
+      })
+    }
+
+    products = mockAll
   }
 
   const categoryTitle = formatTitle(cleanCategorySlug)
@@ -275,7 +400,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
         {/* Plugin Boutique Style Quick Filter Pills */}
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          
           <Link
             href={baseUrl}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
@@ -330,38 +454,17 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           >
             Rent to Own
           </Link>
-
         </div>
 
-        {/* Dropdown Filter Bar (Category, Brand, Price, Popularity Sort) */}
-        <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-y border-zinc-800/80">
-          
-          <div className="flex items-center gap-3 flex-wrap text-xs font-semibold text-zinc-300">
-            <div className="bg-[#1c1c1c] border border-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-[#242424] transition-colors">
-              <span>Category</span>
-              <span className="text-zinc-500 text-[10px]">▼</span>
-            </div>
-
-            <div className="bg-[#1c1c1c] border border-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-[#242424] transition-colors">
-              <span>Brand</span>
-              <span className="text-zinc-500 text-[10px]">▼</span>
-            </div>
-
-            <div className="bg-[#1c1c1c] border border-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-[#242424] transition-colors">
-              <span>Price</span>
-              <span className="text-zinc-500 text-[10px]">▼</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-zinc-400">
-            <span className="font-medium text-zinc-400">Sort by:</span>
-            <div className="bg-[#1c1c1c] border border-zinc-800 px-4 py-2 rounded-lg flex items-center gap-2 cursor-pointer hover:bg-[#242424] transition-colors text-white font-bold">
-              <span>Popularity</span>
-              <span className="text-zinc-500 text-[10px]">▼</span>
-            </div>
-          </div>
-
-        </div>
+        {/* Interactive Dropdown Filter Bar (Multi-Category, Multi-Brand, Price, Popularity Sort) */}
+        <CategoryFilterBar
+          categories={categoriesOptions}
+          brands={brandsOptions}
+          activeCategory={catParam}
+          activeBrand={brandParam}
+          activePrice={priceParam}
+          activeSort={sortOption}
+        />
 
         {/* Product Cards Grid */}
         {products.length === 0 ? (
