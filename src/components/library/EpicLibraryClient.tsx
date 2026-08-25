@@ -391,7 +391,7 @@ export function EpicLibraryClient({
                           }`}
                         >
                           <span>{sortLabels[key]}</span>
-                          {sortBy === key && <Check className="w-3.5 h-3.5 text-[#FC6301]" />}
+                          {sortBy === key && <Check className="w-3.5 h-3.5 text-white" />}
                         </button>
                       ))}
                     </div>
@@ -436,7 +436,7 @@ export function EpicLibraryClient({
                     <Link
                       href="/store"
                       prefetch={true}
-                      className="bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 px-6 rounded-xl inline-block uppercase tracking-wider transition-all text-center cursor-pointer active:scale-[0.99]"
+                      className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-xl inline-block uppercase tracking-wider transition-all text-center cursor-pointer active:scale-[0.99]"
                     >
                       Browse Store Catalog
                     </Link>
@@ -640,7 +640,7 @@ export function EpicLibraryClient({
                         setSelectedPlatforms([])
                         setInstalledOnly(false)
                       }}
-                      className="text-xs text-[#FC6301] hover:underline font-bold transition-colors cursor-pointer"
+                      className="text-xs text-white hover:underline font-bold transition-colors cursor-pointer"
                     >
                       Reset
                     </button>
@@ -666,7 +666,7 @@ export function EpicLibraryClient({
                       type="checkbox"
                       checked={installedOnly}
                       onChange={(e) => setInstalledOnly(e.target.checked)}
-                      className="rounded bg-[#202020] border-[#333333] text-[#FC6301] focus:ring-0 cursor-pointer"
+                      className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
                     />
                     <span>Installed</span>
                   </label>
@@ -704,7 +704,7 @@ export function EpicLibraryClient({
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => toggleFilter(selectedGenres, setSelectedGenres, g)}
-                              className="rounded bg-[#202020] border-[#333333] text-[#FC6301] focus:ring-0 cursor-pointer"
+                              className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
                             />
                             <span>{label}</span>
                           </label>
@@ -741,7 +741,7 @@ export function EpicLibraryClient({
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => toggleFilter(selectedFeatures, setSelectedFeatures, feat)}
-                              className="rounded bg-[#202020] border-[#333333] text-[#FC6301] focus:ring-0 cursor-pointer"
+                              className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
                             />
                             <span className="uppercase">{feat}</span>
                           </label>
@@ -787,7 +787,7 @@ export function EpicLibraryClient({
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => toggleFilter(selectedTypes, setSelectedTypes, typ)}
-                              className="rounded bg-[#202020] border-[#333333] text-[#FC6301] focus:ring-0 cursor-pointer"
+                              className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
                             />
                             <span>{label}</span>
                           </label>
@@ -824,7 +824,7 @@ export function EpicLibraryClient({
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => toggleFilter(selectedPlatforms, setSelectedPlatforms, plat)}
-                              className="rounded bg-[#202020] border-[#333333] text-[#FC6301] focus:ring-0 cursor-pointer"
+                              className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
                             />
                             <span className="capitalize">{plat === 'mac' ? 'macOS' : 'Windows'}</span>
                           </label>
@@ -901,7 +901,7 @@ export function EpicLibraryClient({
                       <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
                         Serial License Key
                       </span>
-                      <span className="font-mono font-bold text-xs sm:text-sm text-emerald-400 tracking-wider select-all block truncate">
+                      <span className="font-mono font-bold text-xs sm:text-sm text-white tracking-wider select-all block truncate">
                         {installProduct.serial_key}
                       </span>
                     </div>
@@ -912,8 +912,8 @@ export function EpicLibraryClient({
                     >
                       {copiedKeyId === installProduct.id ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span className="text-emerald-400">Copied!</span>
+                          <Check className="w-3.5 h-3.5 text-white" />
+                          <span className="text-white">Copied!</span>
                         </>
                       ) : (
                         <>
@@ -934,7 +934,7 @@ export function EpicLibraryClient({
                     </span>
                     <div className="bg-[#202020] border border-[#2e2e2e] p-3.5 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-[#282828] flex items-center justify-center text-[#FC6301]">
+                        <div className="w-9 h-9 rounded-lg bg-[#282828] flex items-center justify-center text-white">
                           <Music className="w-5 h-5" />
                         </div>
                         <div>
@@ -946,7 +946,7 @@ export function EpicLibraryClient({
                           </span>
                         </div>
                       </div>
-                      <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1 rounded-full">
+                      <span className="text-[11px] font-bold text-white bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full">
                         Ready
                       </span>
                     </div>
@@ -965,11 +965,11 @@ export function EpicLibraryClient({
                         onClick={() => setSelectedPlatform('windows')}
                         className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
                           selectedPlatform === 'windows'
-                            ? 'bg-[#242424] border-[#FC6301]'
+                            ? 'bg-[#242424] border-white'
                             : 'bg-[#202020] border-[#2e2e2e] hover:border-zinc-500'
                         }`}
                       >
-                        <div className="w-8 h-8 rounded-lg bg-[#282828] flex items-center justify-center flex-shrink-0 text-[#FC6301]">
+                        <div className="w-8 h-8 rounded-lg bg-[#282828] flex items-center justify-center flex-shrink-0 text-white">
                           {/* Windows SVG Icon */}
                           <svg className="w-4 h-4 fill-current" viewBox="0 0 88 88">
                             <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L.028 75.48.001 45.728zm4.326-39.027L87.914 0v41.527l-47.918.378zm47.918 43.435L87.914 88l-47.918-6.736V45.704z" />
@@ -987,7 +987,7 @@ export function EpicLibraryClient({
                         onClick={() => setSelectedPlatform('mac')}
                         className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
                           selectedPlatform === 'mac'
-                            ? 'bg-[#242424] border-[#FC6301]'
+                            ? 'bg-[#242424] border-white'
                             : 'bg-[#202020] border-[#2e2e2e] hover:border-zinc-500'
                         }`}
                       >
@@ -1022,7 +1022,7 @@ export function EpicLibraryClient({
                     rel="noopener noreferrer"
                     download
                     onClick={() => setInstallProduct(null)}
-                    className="bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3 px-8 rounded-xl uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 active:scale-[0.99]"
+                    className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-8 rounded-xl uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 active:scale-[0.99]"
                   >
                     <Download className="w-4 h-4" />
                     <span>Install</span>

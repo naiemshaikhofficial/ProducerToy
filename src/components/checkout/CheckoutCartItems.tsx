@@ -17,14 +17,14 @@ export function CheckoutCartItems({ items, removeItem, formatPrice }: CheckoutCa
     <div className="bg-[#181818] border border-[#282828] rounded-2xl p-6 space-y-4 shadow-xl">
       <div className="flex items-center justify-between border-b border-[#282828] pb-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-2 h-4 bg-[#FC6301] rounded-sm" />
+          <div className="w-2 h-4 bg-white rounded-sm" />
           <h2 className="text-sm font-extrabold uppercase tracking-wider text-white">
             Items in Order ({items.length})
           </h2>
         </div>
         <Link
           href="/store"
-          className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 hover:text-[#FC6301] transition-colors"
+          className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-colors"
         >
           + Add More Sounds
         </Link>
@@ -47,7 +47,7 @@ export function CheckoutCartItems({ items, removeItem, formatPrice }: CheckoutCa
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-sm text-white truncate group-hover:text-[#FC6301] transition-colors">
+              <h3 className="font-bold text-sm text-white truncate transition-colors">
                 {item.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">

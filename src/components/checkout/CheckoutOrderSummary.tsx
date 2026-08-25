@@ -91,7 +91,7 @@ export function CheckoutOrderSummary({
     <div className="bg-[#181818] border border-[#282828] rounded-2xl p-6 sm:p-7 space-y-5 shadow-xl">
       <div className="flex items-center justify-between border-b border-[#282828] pb-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-2 h-4 bg-[#FC6301] rounded-sm" />
+          <div className="w-2 h-4 bg-white rounded-sm" />
           <h3 className="text-sm font-extrabold uppercase tracking-wider text-white">
             Order Summary
           </h3>
@@ -111,7 +111,7 @@ export function CheckoutOrderSummary({
         </div>
 
         {bundleDiscountPercent > 0 && (
-          <div className="flex justify-between text-emerald-400 font-bold">
+          <div className="flex justify-between text-zinc-300 font-bold">
             <span className="flex items-center gap-1">
               <Percent size={12} /> Bundle Discount (10%)
             </span>
@@ -123,7 +123,7 @@ export function CheckoutOrderSummary({
         )}
 
         {discountPercent > 0 && (
-          <div className="flex justify-between text-[#FC6301] font-bold">
+          <div className="flex justify-between text-white font-bold">
             <span className="flex items-center gap-1">
               <Tag size={12} /> Coupon ({discountPercent}%)
             </span>
@@ -158,7 +158,7 @@ export function CheckoutOrderSummary({
               placeholder="COUPON CODE (e.g. PRODUCER10)"
               value={coupon}
               onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-              className="w-full h-10 bg-[#202020] border border-[#333333] pl-9 pr-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl focus:border-[#FC6301] outline-none transition-all placeholder:text-zinc-600"
+              className="w-full h-10 bg-[#202020] border border-[#333333] pl-9 pr-3 text-xs font-bold uppercase tracking-wider text-white rounded-xl focus:border-white outline-none transition-all placeholder:text-zinc-600"
             />
           </div>
           <button
@@ -175,8 +175,8 @@ export function CheckoutOrderSummary({
           <p className="text-[10px] font-semibold text-red-400">{couponError}</p>
         )}
         {couponSuccessMsg && (
-          <p className="text-[10px] font-semibold text-emerald-400 flex items-center gap-1">
-            <CheckCircle2 size={12} /> {couponSuccessMsg}
+          <p className="text-[10px] font-semibold text-zinc-200 flex items-center gap-1">
+            <CheckCircle2 size={12} className="text-white" /> {couponSuccessMsg}
           </p>
         )}
       </div>
@@ -187,11 +187,11 @@ export function CheckoutOrderSummary({
           type="button"
           onClick={onCheckout}
           disabled={loading || paymentStatus === 'processing'}
-          className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs sm:text-sm py-4 px-6 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-[#FC6301]/25 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
+          className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm py-4 px-6 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-[0.99] disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
               <span>Authorizing Order...</span>
             </div>
           ) : finalTotal === 0 ? (
@@ -201,7 +201,7 @@ export function CheckoutOrderSummary({
             </>
           ) : (
             <>
-              <Zap size={16} className="text-white fill-white" />
+              <Zap size={16} className="text-black fill-black" />
               <span>
                 Pay Now &bull; {currencySymbol}
                 {finalTotal.toFixed(2)}

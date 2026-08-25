@@ -10,7 +10,7 @@ export function CheckoutTrustBadges() {
       {/* 1. Value Proposition Highlights */}
       <div className="bg-[#181818] border border-[#282828] rounded-2xl p-6 space-y-4 shadow-xl">
         <div className="flex items-center gap-2.5 border-b border-[#282828] pb-3">
-          <div className="w-2 h-4 bg-emerald-400 rounded-sm" />
+          <div className="w-2 h-4 bg-white rounded-sm" />
           <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">
             Why Shop on ProducerToy?
           </h4>
@@ -18,7 +18,7 @@ export function CheckoutTrustBadges() {
 
         <div className="space-y-3.5">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-[#FC6301]">
+            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-white">
               <Zap size={15} />
             </div>
             <div>
@@ -30,7 +30,7 @@ export function CheckoutTrustBadges() {
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-emerald-400">
+            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-white">
               <ShieldCheck size={15} />
             </div>
             <div>
@@ -42,7 +42,7 @@ export function CheckoutTrustBadges() {
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-blue-400">
+            <div className="p-2 bg-[#202020] border border-[#2a2a2a] rounded-lg text-white">
               <Lock size={15} />
             </div>
             <div>

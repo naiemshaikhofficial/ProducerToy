@@ -21,7 +21,7 @@ export function CheckoutEmptyCart() {
           <Link
             href="/store"
             prefetch={true}
-            className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 px-6 rounded-xl inline-flex items-center justify-center gap-2 uppercase tracking-wider transition-all shadow-lg shadow-[#FC6301]/25 text-center cursor-pointer"
+            className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-xl inline-flex items-center justify-center gap-2 uppercase tracking-wider transition-all text-center cursor-pointer active:scale-[0.99]"
           >
             <Sparkles size={14} />
             <span>Browse Store Catalog</span>

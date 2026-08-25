@@ -136,7 +136,7 @@ export function CartDrawer() {
               
               {/* Bundle Discount Banner */}
               {items.length >= 3 && (
-                <div className="bg-[#222222] text-[#FC6301] text-[11px] font-extrabold p-2.5 text-center rounded-xl border border-[#333333]">
+                <div className="bg-[#222222] text-white text-[11px] font-extrabold p-2.5 text-center rounded-xl border border-[#333333]">
                   🎉 10% Bundle Discount Applied!
                 </div>
               )}
@@ -166,13 +166,13 @@ export function CartDrawer() {
                   <span className="text-zinc-200 font-semibold">{formatPrice(rawSubtotalInr, rawSubtotalUsd)}</span>
                 </div>
                 {bundleDiscountInr > 0 && (
-                  <div className="flex justify-between text-emerald-400 font-bold">
+                  <div className="flex justify-between text-zinc-300 font-bold">
                     <span>Bundle Discount (10%)</span>
                     <span>-{formatPrice(bundleDiscountInr, bundleDiscountUsd)}</span>
                   </div>
                 )}
                 {discountPercent > 0 && (
-                  <div className="flex justify-between text-emerald-400 font-bold">
+                  <div className="flex justify-between text-zinc-300 font-bold">
                     <span>Coupon ({discountPercent}%)</span>
                     <span>-{formatPrice(couponDiscountInr, couponDiscountUsd)}</span>
                   </div>
@@ -187,7 +187,7 @@ export function CartDrawer() {
               <Link
                 href={user ? '/checkout' : '/auth?next=/checkout'}
                 onClick={() => setIsCartOpen(false)}
-                className="w-full bg-[#FC6301] hover:bg-[#E05800] text-white font-extrabold text-xs py-3.5 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 mt-2 transition-all cursor-pointer active:scale-[0.99]"
+                className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 rounded-xl uppercase tracking-wider flex items-center justify-center gap-2 mt-2 transition-all cursor-pointer active:scale-[0.99]"
               >
                 <span>Proceed to Checkout</span>
                 <ArrowRight className="w-4 h-4" />

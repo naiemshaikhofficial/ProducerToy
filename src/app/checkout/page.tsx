@@ -409,8 +409,8 @@ export default function CheckoutPage() {
             <span>Back to Store Catalog</span>
           </Link>
 
-          <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
-            <ShieldCheck size={13} />
+          <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-300 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+            <ShieldCheck size={13} className="text-white" />
             <span>256-Bit SSL Encrypted &bull; Instant Digital Access</span>
           </div>
         </div>
@@ -418,7 +418,7 @@ export default function CheckoutPage() {
         {/* Page Title */}
         <div className="space-y-1">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Secure <span className="text-[#FC6301]">Checkout</span>
+            Secure Checkout
           </h1>
           <p className="text-xs text-zinc-400 font-medium">
             Pro Audio Software &bull; Sample Libraries &bull; Direct Authorizations
@@ -460,7 +460,7 @@ export default function CheckoutPage() {
             ) : (
               <div className="bg-[#181818] border border-[#282828] rounded-2xl p-4 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-2.5 text-xs text-zinc-300">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                   <span>
                     Logged in as <strong className="text-white font-bold">{user.email}</strong>
                   </span>

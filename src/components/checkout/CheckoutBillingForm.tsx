@@ -31,7 +31,7 @@ export function CheckoutBillingForm({
     >
       <div className="flex items-center justify-between border-b border-[#282828] pb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-2 h-4 bg-[#FC6301] rounded-sm" />
+          <div className="w-2 h-4 bg-white rounded-sm" />
           <h2 className="text-base font-extrabold uppercase tracking-wider text-white">
             Billing &amp; Delivery Details
           </h2>
@@ -40,7 +40,7 @@ export function CheckoutBillingForm({
           className={`text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md flex items-center gap-1.5 ${
             Object.keys(formErrors).length > 0
               ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-              : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              : 'bg-white/10 text-white border border-white/20'
           }`}
         >
           {Object.keys(formErrors).length > 0 ? (
@@ -61,14 +61,14 @@ export function CheckoutBillingForm({
         {/* Full Name */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Full Name <span className="text-[#FC6301]">*</span>
+            Full Name <span className="text-zinc-400">*</span>
           </label>
           <input
             type="text"
             placeholder="e.g. Alex Producer"
             value={billingDetails.fullName}
             onChange={(e) => onBillingChange('fullName', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-[#FC6301] focus:ring-1 focus:ring-[#FC6301] ${
+            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
               formErrors.fullName ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
             }`}
           />
@@ -80,14 +80,14 @@ export function CheckoutBillingForm({
         {/* Delivery Email */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Delivery Email <span className="text-[#FC6301]">*</span>
+            Delivery Email <span className="text-zinc-400">*</span>
           </label>
           <input
             type="email"
             placeholder="producer@studio.com"
             value={billingDetails.email}
             onChange={(e) => onBillingChange('email', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-[#FC6301] focus:ring-1 focus:ring-[#FC6301] ${
+            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
               formErrors.email ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
             }`}
           />
@@ -99,7 +99,7 @@ export function CheckoutBillingForm({
         {/* Phone Number */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Phone Number <span className="text-[#FC6301]">*</span>
+            Phone Number <span className="text-zinc-400">*</span>
           </label>
           <div className="phone-input-pt">
             <PhoneInput
@@ -108,7 +108,7 @@ export function CheckoutBillingForm({
               placeholder="Enter mobile number"
               value={billingDetails.phone}
               onChange={(val) => onBillingChange('phone', val || '')}
-              className={`w-full h-11 bg-[#202020] border px-3 rounded-xl outline-none transition-all focus-within:border-[#FC6301] focus-within:ring-1 focus-within:ring-[#FC6301] ${
+              className={`w-full h-11 bg-[#202020] border px-3 rounded-xl outline-none transition-all focus-within:border-white focus-within:ring-1 focus-within:ring-white ${
                 formErrors.phone ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
               }`}
             />
@@ -121,14 +121,14 @@ export function CheckoutBillingForm({
         {/* Street Address */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Street Address <span className="text-[#FC6301]">*</span>
+            Street Address <span className="text-zinc-400">*</span>
           </label>
           <input
             type="text"
             placeholder="House / Studio No, Street, Landmark"
             value={billingDetails.address}
             onChange={(e) => onBillingChange('address', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-[#FC6301] focus:ring-1 focus:ring-[#FC6301] ${
+            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
               formErrors.address ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
             }`}
           />
@@ -140,14 +140,14 @@ export function CheckoutBillingForm({
         {/* City */}
         <div className="space-y-1.5">
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            City <span className="text-[#FC6301]">*</span>
+            City <span className="text-zinc-400">*</span>
           </label>
           <input
             type="text"
             placeholder="City"
             value={billingDetails.city}
             onChange={(e) => onBillingChange('city', e.target.value)}
-            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-[#FC6301] focus:ring-1 focus:ring-[#FC6301] ${
+            className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
               formErrors.city ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
             }`}
           />
@@ -160,14 +160,14 @@ export function CheckoutBillingForm({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-              State <span className="text-[#FC6301]">*</span>
+              State <span className="text-zinc-400">*</span>
             </label>
             <input
               type="text"
               placeholder="State"
               value={billingDetails.state}
               onChange={(e) => onBillingChange('state', e.target.value)}
-              className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-[#FC6301] focus:ring-1 focus:ring-[#FC6301] ${
+              className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
                 formErrors.state ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
               }`}
             />
@@ -178,14 +178,14 @@ export function CheckoutBillingForm({
 
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-              Pincode / Zip <span className="text-[#FC6301]">*</span>
+              Pincode / Zip <span className="text-zinc-400">*</span>
             </label>
             <input
               type="text"
               placeholder="ZIP"
               value={billingDetails.zip}
               onChange={(e) => onBillingChange('zip', e.target.value)}
-              className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-[#FC6301] focus:ring-1 focus:ring-[#FC6301] ${
+              className={`w-full h-11 bg-[#202020] border text-white text-xs px-4 rounded-xl outline-none transition-all placeholder:text-zinc-600 focus:border-white focus:ring-1 focus:ring-white ${
                 formErrors.zip ? 'border-red-500 bg-red-950/10' : 'border-[#333333]'
               }`}
             />
@@ -198,7 +198,7 @@ export function CheckoutBillingForm({
         {/* Country Dropdown */}
         <div className="space-y-1.5 md:col-span-2">
           <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
-            Country <span className="text-[#FC6301]">*</span>
+            Country <span className="text-zinc-400">*</span>
           </label>
           <Select
             options={countryOptions}
@@ -211,14 +211,14 @@ export function CheckoutBillingForm({
               control: (base, state) => ({
                 ...base,
                 backgroundColor: '#202020',
-                borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#FC6301' : '#333333',
+                borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#ffffff' : '#333333',
                 borderRadius: '0.75rem',
                 height: '2.75rem',
                 fontSize: '0.75rem',
                 fontWeight: '600',
-                boxShadow: state.isFocused ? '0 0 0 1px #FC6301' : 'none',
+                boxShadow: state.isFocused ? '0 0 0 1px #ffffff' : 'none',
                 '&:hover': {
-                  borderColor: state.isFocused ? '#FC6301' : '#444444',
+                  borderColor: state.isFocused ? '#ffffff' : '#444444',
                 },
               }),
               menu: (base) => ({
@@ -233,16 +233,17 @@ export function CheckoutBillingForm({
               option: (base, state) => ({
                 ...base,
                 backgroundColor: state.isSelected
-                  ? '#FC6301'
+                  ? '#ffffff'
                   : state.isFocused
                   ? '#2a2a2a'
                   : 'transparent',
-                color: '#ffffff',
+                color: state.isSelected ? '#000000' : '#ffffff',
                 fontSize: '0.75rem',
                 fontWeight: '600',
                 cursor: 'pointer',
                 '&:active': {
-                  backgroundColor: '#FC6301',
+                  backgroundColor: '#ffffff',
+                  color: '#000000',
                 },
               }),
               singleValue: (base) => ({
@@ -272,7 +273,7 @@ export function CheckoutBillingForm({
           type="checkbox"
           checked={newsletterOptIn}
           onChange={(e) => setNewsletterOptIn(e.target.checked)}
-          className="w-4 h-4 mt-0.5 bg-[#181818] border border-[#333333] rounded text-[#FC6301] accent-[#FC6301] focus:ring-0 cursor-pointer"
+          className="w-4 h-4 mt-0.5 bg-[#181818] border border-[#333333] rounded text-white accent-white focus:ring-0 cursor-pointer"
         />
         <label
           htmlFor="checkout-newsletter"
@@ -283,7 +284,7 @@ export function CheckoutBillingForm({
       </div>
 
       <div className="p-3.5 bg-[#202020] border border-[#2a2a2a] rounded-xl text-zinc-400 text-xs flex items-center gap-2.5">
-        <Lock size={15} className="text-emerald-400 flex-shrink-0" />
+        <Lock size={15} className="text-zinc-400 flex-shrink-0" />
         <span>
           All customer and billing details are encrypted and securely verified. Digital licenses are attached to your account permanently.
         </span>
