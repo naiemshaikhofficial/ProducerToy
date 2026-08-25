@@ -10,7 +10,7 @@ export function EpicSpotlightBanner() {
       {/* 100% Uncropped Full Banner Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/pt-banner.png?v=5"
+          src="/pt-banner.png"
           alt="World's Upcoming Platform For Music Production Toys"
           fill
           priority
