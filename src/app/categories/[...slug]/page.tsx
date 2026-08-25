@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 import { LocalDataCache } from '@/components/LocalDataCache'
+import { matchesSearchQuery } from '@/lib/search'
 
 export const revalidate = 1800 // Cache category pages with ISR for 30 minutes (0ms instant page loads)
 
@@ -198,10 +199,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       query = query.gt('original_price_usd', 0)
     }
 
-    if (queryText) {
-      query = query.ilike('name', `%${queryText}%`)
-    }
-
     // Sorting
     if (sortOption === 'price-low') {
       query = query.order('price_usd', { ascending: true })
@@ -262,6 +259,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     if (productsRes.error) {
       console.error('Supabase products fetch error:', productsRes.error)
     } else {
+      // High-performance multi-field token search (Name, Slug, Brand, Category, Subcategory, Description, Type, Format, Tags)
+      if (queryText) {
+        fetchedProducts = fetchedProducts.filter(p => matchesSearchQuery(p, queryText))
+      }
       products = fetchedProducts
       isFromDatabase = true
     }

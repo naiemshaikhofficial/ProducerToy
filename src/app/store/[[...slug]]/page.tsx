@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Handshake } from 'lucide-react'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 import { LocalDataCache } from '@/components/LocalDataCache'
+import { matchesSearchQuery } from '@/lib/search'
 
 export const revalidate = 1800 // Cache static page for 30 minutes (instant 0ms loading, revalidated via /api/revalidate)
 
@@ -115,10 +116,6 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url, description)')
       .eq('is_active', true)
 
-    if (queryText) {
-      query = query.ilike('name', `%${queryText}%`)
-    }
-
     if (isFree) {
       query = query.eq('price_usd', 0)
     }
@@ -219,6 +216,10 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     if (productsRes.error) {
       console.error('Supabase products fetch error:', productsRes.error)
     } else {
+      // High-performance multi-field token search (Name, Slug, Brand, Category, Subcategory, Description, Type, Format, Tags)
+      if (queryText) {
+        fetchedProducts = fetchedProducts.filter(p => matchesSearchQuery(p, queryText))
+      }
       products = fetchedProducts
       isFromDatabase = true
     }
