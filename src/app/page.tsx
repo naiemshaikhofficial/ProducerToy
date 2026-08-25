@@ -93,7 +93,7 @@ export default async function HomePage() {
     <div className="w-full bg-[#121212] min-h-screen text-white flex flex-col items-center select-none">
       
       {/* 1st Section: Epic Store Billboard Poster Banner */}
-      <section className="w-full mt-6 sm:mt-8 mb-12 sm:mb-16">
+      <section className="w-full mt-2 sm:mt-3 mb-10 sm:mb-12">
         <EpicSpotlightBanner />
       </section>
 

@@ -86,56 +86,50 @@ export const Header: React.FC = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#121212] text-white select-none shadow-lg">
-      
-      {/* Tier 1 Top Header Bar (Ultra-fast 150ms GPU smooth Grid collapse) */}
-      <div 
-        className={`w-full grid transition-[grid-template-rows,opacity] duration-150 ease-out ${
-          isScrolled ? 'grid-rows-[0fr] opacity-0 pointer-events-none' : 'grid-rows-[1fr] opacity-100'
-        }`}
-      >
-        <div className="overflow-hidden">
-          <TopBar
-            currency={currency}
-            onToggleCurrency={toggleCurrency}
-            user={user}
-            onSignOut={signOut}
-            itemCount={items.length}
-            onOpenCart={() => setIsCartOpen(true)}
-            isMobileMenuOpen={isMobileMenuOpen}
-            onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          />
-        </div>
+    <>
+      {/* Tier 1 Top Header Bar (Scrolls away naturally) */}
+      <div className="w-full bg-[#121212] select-none">
+        <TopBar
+          currency={currency}
+          onToggleCurrency={toggleCurrency}
+          user={user}
+          onSignOut={signOut}
+          itemCount={items.length}
+          onOpenCart={() => setIsCartOpen(true)}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        />
       </div>
 
-      {/* Tier 2 Sub-Header Bar */}
-      <SubBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onSearchSubmit={handleSearch}
-        isScrolled={isScrolled}
-        isProductsMegaOpen={isProductsMegaOpen}
-        onMouseEnterProducts={handleMouseEnterMenu}
-        onMouseLeaveProducts={handleMouseLeaveMenu}
-      />
+      {/* Tier 2 Sub-Header Bar (Sticks to top-0 across entire page scroll) */}
+      <header className="sticky top-0 z-50 w-full bg-[#121212] select-none">
+        <SubBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={handleSearch}
+          isScrolled={isScrolled}
+          isProductsMegaOpen={isProductsMegaOpen}
+          onMouseEnterProducts={handleMouseEnterMenu}
+          onMouseLeaveProducts={handleMouseLeaveMenu}
+        />
 
-      {/* Desktop Products Mega Dropdown Overlay */}
-      <MegaMenu
-        isOpen={isProductsMegaOpen}
-        onClose={() => setIsProductsMegaOpen(false)}
-        onMouseEnter={handleMouseEnterMenu}
-        onMouseLeave={handleMouseLeaveMenu}
-      />
+        {/* Desktop Products Mega Dropdown Overlay */}
+        <MegaMenu
+          isOpen={isProductsMegaOpen}
+          onClose={() => setIsProductsMegaOpen(false)}
+          onMouseEnter={handleMouseEnterMenu}
+          onMouseLeave={handleMouseLeaveMenu}
+        />
 
-      {/* Mobile Touch-Friendly Drawer Navigation */}
-      <MobileDrawer
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        currency={currency}
-        onToggleCurrency={toggleCurrency}
-        user={user}
-      />
-
-    </header>
+        {/* Mobile Touch-Friendly Drawer Navigation */}
+        <MobileDrawer
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+          currency={currency}
+          onToggleCurrency={toggleCurrency}
+          user={user}
+        />
+      </header>
+    </>
   )
 }
