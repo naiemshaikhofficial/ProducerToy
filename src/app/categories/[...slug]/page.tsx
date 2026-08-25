@@ -141,20 +141,24 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       }
     }
 
-    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE
+    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE (OPTION 2: Human-readable category_slugs text array)
     if (catParam) {
       const selectedCats = catParam.split(',').map(c => c.trim().toLowerCase()).filter(Boolean)
       
       if (selectedCats.length > 0) {
         const conditions: string[] = []
 
-        // Match subcategories
+        // 1. Direct match on human-readable category_slugs text array in Supabase
+        selectedCats.forEach(term => {
+          conditions.push(`category_slugs.cs.{${term}}`)
+        })
+
+        // 2. Match subcategories & main categories as fallback
         const { data: matchedSubs } = await supabase
           .from('subcategories')
           .select('id, slug')
           .in('slug', selectedCats)
 
-        // Match categories
         const { data: matchedCats } = await supabase
           .from('categories')
           .select('id, slug')
@@ -169,12 +173,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         if (catIds.length > 0) {
           conditions.push(`category_id.in.(${catIds.join(',')})`)
         }
-
-        selectedCats.forEach(term => {
-          conditions.push(`name.ilike.%${term}%`)
-          conditions.push(`short_description.ilike.%${term}%`)
-          conditions.push(`vst_format.ilike.%${term}%`)
-        })
 
         if (conditions.length > 0) {
           query = query.or(conditions.join(','))

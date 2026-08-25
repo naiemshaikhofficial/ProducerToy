@@ -3,13 +3,24 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import { ProductCard, Product } from '@/components/ProductCard'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Handshake, Building2 } from 'lucide-react'
+import { Handshake } from 'lucide-react'
+import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 
 export const dynamic = 'force-dynamic'
 
 interface StorePageProps {
   params: Promise<{ slug?: string[] }>
-  searchParams: Promise<{ q?: string; sort?: string; free?: string; brand?: string }>
+  searchParams: Promise<{
+    q?: string
+    sort?: string
+    free?: string
+    deals?: string
+    bundles?: string
+    rent_to_own?: string
+    brand?: string
+    price?: string
+    cat?: string
+  }>
 }
 
 const CATEGORY_TYPE_MAP: Record<string, { productType: string; categorySlugs: string[] }> = {
@@ -25,21 +36,77 @@ const CATEGORY_TYPE_MAP: Record<string, { productType: string; categorySlugs: st
 
 export default async function StorePage({ params, searchParams }: StorePageProps) {
   const { slug } = await params
-  const { q: queryText = '', sort: sortOption = 'newest', free: freeParam, brand: brandParam } = await searchParams
+  const {
+    q: queryText = '',
+    sort: sortOption = 'popularity',
+    free: freeParam,
+    deals: dealsParam,
+    bundles: bundlesParam,
+    rent_to_own: rentParam,
+    brand: brandParam,
+    price: priceParam,
+    cat: catParam
+  } = await searchParams
 
   const categorySlug = slug?.[0] || ''
   const subTypeSlug = slug?.[1] || ''
 
   const isFree = categorySlug.toLowerCase() === 'free' || freeParam === 'true'
+  const isDeals = dealsParam === 'true'
+  const isBundles = bundlesParam === 'true' || categorySlug.toLowerCase() === 'bundles'
+  const isRentToOwn = rentParam === 'true'
 
   let products: Product[] = []
+  let categoriesOptions: Array<{ id: string; name: string; slug: string }> = []
+  let brandsOptions: Array<{ id: string; name: string; slug: string }> = []
   let selectedBrand: { id: string; name: string; slug: string; logo_url: string | null; description?: string | null } | null = null
   let isFromDatabase = false
 
   try {
     const supabase = getAdminClient()
 
-    // 1. Check if Brand is requested via URL /store/[brandSlug] or ?brand=...
+    // 1. Fetch categories & subcategories options for the FilterBar
+    const { data: dbCatData } = await supabase.from('categories').select('id, name, slug')
+    const { data: dbSubData } = await supabase.from('subcategories').select('id, name, slug')
+
+    const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
+      { id: 'reverb', name: 'Reverb', slug: 'reverb' },
+      { id: 'delay', name: 'Delay & Echo', slug: 'delay' },
+      { id: 'compressor', name: 'Compressor', slug: 'compressor' },
+      { id: 'saturation', name: 'Saturation & Warmth', slug: 'saturation' },
+      { id: 'eq', name: 'Equalizer (EQ)', slug: 'eq' },
+      { id: 'distortion', name: 'Distortion & Overdrive', slug: 'distortion' },
+      { id: 'modulation', name: 'Chorus & Modulation', slug: 'modulation' },
+      { id: 'synth', name: 'Synthesizer VST', slug: 'synth' },
+      { id: 'vocal', name: 'Vocal Processor', slug: 'vocal' },
+      { id: '808', name: '808 & Bass', slug: '808' },
+      { id: 'drum-kit', name: 'Drum Kit & Loops', slug: 'drum-kit' },
+    ]
+
+    if (dbCatData && dbCatData.length > 0) {
+      dbCatData.forEach(c => {
+        if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
+      })
+    }
+
+    if (dbSubData && dbSubData.length > 0) {
+      dbSubData.forEach(s => {
+        if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
+      })
+    }
+
+    categoriesOptions = combinedCategories
+
+    const { data: dbBrandData } = await supabase
+      .from('brands')
+      .select('id, name, slug')
+      .order('name')
+
+    if (dbBrandData && dbBrandData.length > 0) {
+      brandsOptions = dbBrandData
+    }
+
+    // 2. Check if Brand is requested via URL /store/[brandSlug] or ?brand=...
     const brandSearchTerm = brandParam || (categorySlug.toLowerCase() === 'brand' ? subTypeSlug : categorySlug)
     if (brandSearchTerm && brandSearchTerm.toLowerCase() !== 'free') {
       const cleanTerm = brandSearchTerm.replace(/-/g, ' ')
@@ -54,7 +121,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       }
     }
 
-    // 2. Build product query joining relational brands (via foreign key brand_id)
+    // 3. Build product query
     let query = supabase
       .from('products')
       .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
@@ -66,6 +133,10 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
     if (isFree) {
       query = query.eq('price_usd', 0)
+    }
+
+    if (isDeals) {
+      query = query.gt('original_price_usd', 0)
     }
 
     if (selectedBrand) {
@@ -84,7 +155,6 @@ export default async function StorePage({ params, searchParams }: StorePageProps
         if (catData) {
           query = query.eq('category_id', catData.id)
         } else {
-          // Check if categorySlug matches a brand name or slug
           const cleanCat = categorySlug.replace(/-/g, ' ')
           const { data: matchedBrand } = await supabase
             .from('brands')
@@ -100,20 +170,61 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       }
     }
 
-    if (subTypeSlug && !selectedBrand) {
-      const { data: subData } = await supabase
-        .from('subcategories')
-        .select('id')
-        .eq('slug', subTypeSlug)
-        .maybeSingle()
+    // Subcategory or Cat query parameter handling
+    const activeCatString = catParam || subTypeSlug
+    if (activeCatString && !selectedBrand) {
+      const selectedCats = activeCatString.split(',').map(c => c.trim().toLowerCase()).filter(Boolean)
+      
+      if (selectedCats.length > 0) {
+        const conditions: string[] = []
 
-      if (subData) {
-        query = query.eq('subcategory_id', subData.id)
-      } else {
-        query = query.ilike('vst_format', `%${subTypeSlug}%`)
+        selectedCats.forEach(term => {
+          conditions.push(`category_slugs.cs.{${term}}`)
+        })
+
+        const { data: matchedSubs } = await supabase
+          .from('subcategories')
+          .select('id, slug')
+          .in('slug', selectedCats)
+
+        const { data: matchedCats } = await supabase
+          .from('categories')
+          .select('id, slug')
+          .in('slug', selectedCats)
+
+        const subIds = matchedSubs?.map(s => s.id) || []
+        const catIds = matchedCats?.map(c => c.id) || []
+
+        if (subIds.length > 0) {
+          conditions.push(`subcategory_id.in.(${subIds.join(',')})`)
+        }
+        if (catIds.length > 0) {
+          conditions.push(`category_id.in.(${catIds.join(',')})`)
+        }
+
+        if (conditions.length > 0) {
+          query = query.or(conditions.join(','))
+        }
       }
     }
 
+    // Multi-Brand filter parameter
+    if (brandParam) {
+      const selectedBrands = brandParam.split(',').map(b => b.trim().toLowerCase()).filter(Boolean)
+      if (selectedBrands.length > 0) {
+        const { data: matchedBrandObjs } = await supabase
+          .from('brands')
+          .select('id, slug')
+          .in('slug', selectedBrands)
+
+        const brandIds = matchedBrandObjs?.map(b => b.id) || []
+        if (brandIds.length > 0) {
+          query = query.in('brand_id', brandIds)
+        }
+      }
+    }
+
+    // Sort order
     if (sortOption === 'price-low') {
       query = query.order('price_usd', { ascending: true })
     } else if (sortOption === 'price-high') {
@@ -133,14 +244,28 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     console.error('Supabase store page query exception:', err)
   }
 
-  // Fallback Mock Products if DB is offline or returned no rows
+  // Fallback Mock Products
   if (!isFromDatabase && products.length === 0) {
     let mockProducts: Product[] = [
+      {
+        id: 'valhalla-supermassive',
+        name: 'Valhalla Supermassive',
+        slug: 'valhalla-supermassive',
+        brand: 'Valhalla DSP',
+        category_slugs: ['reverb', 'delay', 'effects'],
+        brands: { id: 'valhalla', name: 'Valhalla DSP', slug: 'valhalla-dsp' },
+        product_type: 'plugin',
+        price_usd: 0,
+        original_price_usd: 49.99,
+        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
+        short_description: 'Lush reverbs, harmonic delays, and space echo clouds in one plugin.',
+      },
       {
         id: 'c527a285-1440-431e-a06e-ca798cbf4538',
         name: 'Fresh Air',
         slug: 'fresh-air',
         brand: 'Slate Digital',
+        category_slugs: ['saturation', 'effects'],
         brand_id: '3d6f7802-69f4-4bf9-af36-dd8ba37bca08',
         brands: {
           id: '3d6f7802-69f4-4bf9-af36-dd8ba37bca08',
@@ -152,112 +277,59 @@ export default async function StorePage({ params, searchParams }: StorePageProps
         price_inr: 0,
         price_usd: 0,
         cover_image: 'https://images.equipboard.com/uploads/item/image/93658/slate-digital-fresh-air-xl.webp?v=1785999836',
-        demo_audio_url: '',
-        external_url: 'https://slatedigital.com/fresh-air',
-        button_text: 'Get It On Slate Digital',
         vst_format: 'VST3, AU, AAX (64-Bit)',
         short_description: 'Add the smoothest high end you’ve ever heard without even a hint of harshness.',
       },
       {
-        id: '1',
-        name: 'Analog Warmth Saturator VST',
-        slug: 'analog-warmth-saturator-vst',
-        brand: 'Toy Audio',
-        brands: { id: '61db0d9d-3aaa-455e-bfed-578313cfa024', name: 'Toy Audio', slug: 'toy-audio' },
+        id: 'b19c8010-7fdd-4569-96e3-957d1993e45a',
+        name: 'TDR Nova',
+        slug: 'tdr-nova',
+        brand: 'Tokyo Dawn Records',
+        category_slugs: ['eq'],
+        brands: { id: 'tdr', name: 'Tokyo Dawn Records', slug: 'tokyo-dawn-records' },
         product_type: 'plugin',
-        price_inr: 1499,
-        price_usd: 19.99,
-        cover_image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop',
-        demo_audio_url: 'https://cdn.freesound.org/previews/612/612683_5674468-lq.mp3',
-        vst_format: 'VST3, AU, AAX (64-Bit)',
-        short_description: 'Vintage analog saturation & tube warmth plugin for vocals, drums, and mixbus.',
+        price_usd: 0,
+        original_price_usd: 29.99,
+        cover_image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop',
+        short_description: 'Parallel dynamic equalizer plugin.',
       },
       {
-        id: '2',
-        name: 'Cyber Drill Sample Pack',
-        slug: 'cyber-drill-sample-pack',
-        brand: 'Producer Toy',
-        brands: { id: '7f4acc81-4d35-4f94-b1f3-cc7717471f26', name: 'Producer Toy', slug: 'producer-toy' },
-        product_type: 'sample_pack',
-        price_inr: 999,
-        price_usd: 12.99,
-        cover_image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1200&auto=format&fit=crop',
-        demo_audio_url: 'https://cdn.freesound.org/previews/573/573582_11861866-lq.mp3',
-        vst_format: 'WAV 24-Bit / 44.1kHz',
-        short_description: 'Dark UK & Brooklyn drill melodies, aggressive 808s, and hard-hitting drum loops.',
-      },
-      {
-        id: '3',
-        name: 'Serum Polyphonic Synth Presets',
-        slug: 'serum-polyphonic-synth-presets',
-        brand: 'SoundCraft',
-        brands: { id: '8d5c08c3-f41f-4e63-9107-6cda07b00b9f', name: 'SoundCraft', slug: 'soundcraft' },
-        product_type: 'preset',
-        price_inr: 799,
-        price_usd: 9.99,
-        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200&auto=format&fit=crop',
-        demo_audio_url: 'https://cdn.freesound.org/previews/456/456123_1234567-lq.mp3',
-        vst_format: 'Xfer Serum v1.357+',
-        short_description: '64 Lush ambient pads, cyberpunk leads, and heavy Reese basses for Xfer Serum.',
+        id: '866725e6-9a20-4b09-8033-386bb83a5e83',
+        name: 'iZotope Ozone EQ',
+        slug: 'ozone-eq',
+        brand: 'iZotope',
+        category_slugs: ['eq'],
+        brands: { id: 'izotope', name: 'iZotope', slug: 'izotope' },
+        product_type: 'plugin',
+        price_usd: 0,
+        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
+        short_description: 'Surgical mixing and mastering EQ with transient processing.',
       }
     ]
 
     if (isFree) {
-      mockProducts = mockProducts.filter((p) => (p.price_usd ?? 0) === 0 && (p.price_inr ?? 0) === 0)
-    }
-
-    if (selectedBrand) {
-      mockProducts = mockProducts.filter((p) => p.brands?.name.toLowerCase() === selectedBrand!.name.toLowerCase() || p.brand_id === selectedBrand!.id)
-    } else if (categorySlug && categorySlug.toLowerCase() !== 'brand' && categorySlug.toLowerCase() !== 'free') {
-      const typeInfo = CATEGORY_TYPE_MAP[categorySlug.toLowerCase()]
-      if (typeInfo) {
-        mockProducts = mockProducts.filter((p) => p.product_type === typeInfo.productType)
-      }
-    }
-
-    if (queryText) {
-      mockProducts = mockProducts.filter((p) =>
-        p.name.toLowerCase().includes(queryText.toLowerCase())
-      )
+      mockProducts = mockProducts.filter(p => p.price_usd === 0)
     }
 
     products = mockProducts
   }
 
-  // Helper to generate dynamic Epic Games style category header details
+  // Calculate Header Titles
   const getHeaderMeta = () => {
     if (selectedBrand) {
       return {
-        subLabel: 'OFFICIAL BRAND',
+        subLabel: null,
         title: selectedBrand.name,
         logo: selectedBrand.logo_url,
         description: selectedBrand.description || `Explore premier VST plugins, sample packs, and sound design tools created by ${selectedBrand.name}.`
       }
     }
 
-    if (isFree) {
-      return {
-        subLabel: 'Play More & Download',
-        title: 'Free Plugins & Sounds',
-        logo: null,
-        description: 'Producer Toy gives you free studio VST plugins, 808 sample toolkits, and vocal chain presets. Download free tools to enhance your music production today.'
-      }
-    }
-
-    if (queryText) {
-      return {
-        subLabel: 'Search Results',
-        title: `Search: "${queryText}"`,
-        logo: null,
-        description: `Showing available music production tools matching "${queryText}".`
-      }
-    }
-
     if (subTypeSlug) {
       const formattedSub = subTypeSlug.replace(/-/g, ' ')
       return {
-        subLabel: categorySlug ? `${categorySlug.toUpperCase()} SUB-CATEGORY` : 'COLLECTION',
-        title: formattedSub.charAt(0).toUpperCase() + formattedSub.slice(1),
+        subLabel: null,
+        title: formattedSub.toUpperCase(),
         logo: null,
         description: `Explore top-rated ${formattedSub} plugins and presets curated for mixing, mastering, and modern sound design.`
       }
@@ -267,7 +339,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       switch (categorySlug.toLowerCase()) {
         case 'plugins':
           return {
-            subLabel: 'Software & FX',
+            subLabel: null,
             title: 'VST Plugins',
             logo: null,
             description: 'Browse premier VST audio plugins, analog saturators, synths, and mixing processors crafted for professional music producers.'
@@ -276,28 +348,29 @@ export default async function StorePage({ params, searchParams }: StorePageProps
         case 'sounds':
         case 'samples':
           return {
-            subLabel: 'Royalty Free Audio',
+            subLabel: null,
             title: 'Sample Packs & Drum Kits',
             logo: null,
             description: 'Explore high-quality royalty-free 808 sub basses, drum kits, vocal chops, and melody loops ready for your DAW.'
           }
         case 'presets':
           return {
-            subLabel: 'Sound Design',
+            subLabel: null,
             title: 'Synth & Mixing Presets',
             logo: null,
             description: 'Instantly upgrade your sound with synth presets for Serum, Vital, and DAW vocal chain mixing templates.'
           }
         case 'templates':
           return {
-            subLabel: 'DAW Projects',
+            subLabel: null,
             title: 'DAW Templates & Stems',
+            logo: null,
             description: 'Full DAW project templates designed to jumpstart your track creation and learn pro arrangement techniques.'
           }
         default:
           const formattedCat = categorySlug.replace(/-/g, ' ')
           return {
-            subLabel: 'Catalog',
+            subLabel: null,
             title: formattedCat.charAt(0).toUpperCase() + formattedCat.slice(1),
             logo: null,
             description: `Discover top tools and resources under ${formattedCat}.`
@@ -306,7 +379,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     }
 
     return {
-      subLabel: 'Explore Store',
+      subLabel: null,
       title: 'Store Catalog',
       logo: null,
       description: 'Discover the premier marketplace for VST plugins, royalty-free sample packs, synth presets, and DAW templates.'
@@ -314,29 +387,101 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   }
 
   const { subLabel, title, logo, description } = getHeaderMeta()
+  const baseUrl = categorySlug ? `/store/${categorySlug}` : '/store'
+  const activeFilter = isFree ? 'free' : isDeals ? 'deals' : isBundles ? 'bundles' : isRentToOwn ? 'rent' : 'all'
 
   return (
-    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 bg-[#121212] min-h-screen text-white">
+    <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#121212] min-h-screen text-white select-none">
       
-      {/* Epic Games Store Dynamic Header (Sublabel, Logo, Title, Description) */}
-      <div className="space-y-2 pt-2 pb-2">
-        <span className="text-xs font-black uppercase tracking-wider text-zinc-400 block">
-          {subLabel}
-        </span>
+      {/* Header (Title, Description) */}
+      <div className="space-y-2 pt-2">
+        {subLabel && (
+          <span className="text-xs font-black uppercase tracking-wider text-zinc-400 block">
+            {subLabel}
+          </span>
+        )}
         <div className="flex items-center gap-4">
           {logo && (
             <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-black/40 border border-zinc-800 flex-shrink-0">
               <Image src={logo} alt={title} fill className="object-contain p-1" />
             </div>
           )}
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white uppercase flex items-center gap-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase flex items-center gap-3">
             {title}
           </h1>
         </div>
-        <p className="text-sm md:text-base text-zinc-400 font-medium max-w-3xl leading-relaxed pt-1">
+        <p className="text-xs sm:text-sm text-zinc-400 max-w-3xl leading-relaxed pt-1">
           {description}
         </p>
       </div>
+
+      {/* Quick Filter Pills (All, Deals, Free, Bundles, Rent to Own) */}
+      <div className="flex flex-wrap items-center gap-3 pt-2">
+        <Link
+          href={baseUrl}
+          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            activeFilter === 'all'
+              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
+              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
+          }`}
+        >
+          All
+        </Link>
+
+        <Link
+          href={`${baseUrl}?deals=true`}
+          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            activeFilter === 'deals'
+              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
+              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
+          }`}
+        >
+          Deals
+        </Link>
+
+        <Link
+          href={`${baseUrl}?free=true`}
+          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            activeFilter === 'free'
+              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
+              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
+          }`}
+        >
+          Free
+        </Link>
+
+        <Link
+          href={`${baseUrl}?bundles=true`}
+          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            activeFilter === 'bundles'
+              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
+              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
+          }`}
+        >
+          Bundles
+        </Link>
+
+        <Link
+          href={`${baseUrl}?rent_to_own=true`}
+          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+            activeFilter === 'rent'
+              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
+              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
+          }`}
+        >
+          Rent to Own
+        </Link>
+      </div>
+
+      {/* Interactive Dropdown Filter Bar (Category, Brand, Price, Popularity Sort) */}
+      <CategoryFilterBar
+        categories={categoriesOptions}
+        brands={brandsOptions}
+        activeCategory={catParam || subTypeSlug}
+        activeBrand={brandParam}
+        activePrice={priceParam}
+        activeSort={sortOption}
+      />
 
       {/* Product Grid or Brand Tying-Up Banner */}
       {products.length === 0 ? (

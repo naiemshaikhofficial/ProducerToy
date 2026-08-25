@@ -13,6 +13,14 @@ export interface Product {
   slug: string
   brand: string
   brand_id?: string
+  category_slugs?: string[]
+  product_subcategories?: Array<{
+    subcategories?: {
+      id?: string
+      name?: string
+      slug?: string
+    } | null
+  }> | null
   brands?: {
     id: string
     name: string
@@ -48,12 +56,31 @@ export function ProductCard({ product }: { product: Product }) {
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
 
   const subCategoryLabel = (() => {
+    // 1. If product_subcategories junction array exists from Supabase dropdown selection
+    if (Array.isArray(product.product_subcategories) && product.product_subcategories.length > 0) {
+      const names = product.product_subcategories
+        .map(ps => ps.subcategories?.name)
+        .filter(Boolean) as string[]
+      if (names.length > 0) return names.slice(0, 3).join(' • ')
+    }
+
+    // 2. If category_slugs array exists
+    if (Array.isArray(product.category_slugs) && product.category_slugs.length > 0) {
+      const specific = product.category_slugs.filter(s => s !== 'effects' && s !== 'plugin')
+      const itemsToUse = specific.length > 0 ? specific : product.category_slugs
+      return itemsToUse.slice(0, 3).map(s => s.replace('-', ' ')).join(' • ')
+    }
+
     if (product.subcategories?.name) return product.subcategories.name
     if (product.subcategory_name) return product.subcategory_name
 
     const sub = product.sub_category || product.subcategory || product.tags
-    if (Array.isArray(sub) && sub.length > 0) return sub[0]
-    if (typeof sub === 'string' && sub.trim()) return sub.split(',')[0].trim()
+    if (Array.isArray(sub) && sub.length > 0) {
+      return sub.slice(0, 3).join(' • ')
+    }
+    if (typeof sub === 'string' && sub.trim()) {
+      return sub.split(',').map(s => s.trim()).slice(0, 3).join(' • ')
+    }
 
     return product.product_type ? product.product_type.replace('_', ' ') : 'AUDIO TOOL'
   })()
