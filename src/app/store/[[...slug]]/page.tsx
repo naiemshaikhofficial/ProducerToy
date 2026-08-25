@@ -363,7 +363,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   const activeFilter = isFree ? 'free' : isDeals ? 'deals' : isBundles ? 'bundles' : isRentToOwn ? 'rent' : 'all'
 
   return (
-    <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#121212] min-h-screen text-white select-none">
+    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#121212] min-h-screen text-white select-none">
       
       {/* Header (Title, Description) */}
       <div className="space-y-2 pt-2">
@@ -492,7 +492,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
           </div>
         )
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-8 sm:gap-x-6 sm:gap-y-10">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

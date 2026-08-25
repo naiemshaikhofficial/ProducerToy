@@ -33,7 +33,7 @@ export const SubBar: React.FC<SubBarProps> = ({
 }) => {
   return (
     <div className="w-full bg-[#121212]">
-      <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 lg:px-16 h-[100px] flex items-center justify-start gap-8 lg:gap-12">
+      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-[100px] flex items-center justify-start gap-8 lg:gap-12">
         
         {/* Exact Epic Games Store Search Pill (240px width, 40px height, #404044 bg, full rounded) */}
         <form onSubmit={onSearchSubmit} className="relative w-56 sm:w-60 lg:w-[240px] flex-shrink-0">

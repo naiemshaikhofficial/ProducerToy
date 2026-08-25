@@ -156,51 +156,31 @@ export function ProductCard({ product }: { product: Product }) {
       className="group flex flex-col cursor-pointer select-none"
     >
       {/* 3:4 Tall Epic Games Store Poster Card */}
-      <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-[#181818] border border-[#222222] shadow-lg mb-3">
+      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#222222] shadow-md mb-2.5">
         <Image
           src={product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop'}
           alt={product.name}
           fill
           unoptimized
-          className="object-cover object-center"
+          className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
         />
         
-        {/* Wishlist Bookmark Button */}
+        {/* Minimal Epic Games Store Light Glow Overlay on Hover */}
+        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+        
+        {/* Wishlist Bookmark Button (Top Right Glass Badge) */}
         <button 
           type="button"
           onClick={handleWishlistToggle}
-          className={`absolute top-3 right-3 w-8.5 h-8.5 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
             isSaved
               ? 'bg-white text-black opacity-100 scale-105'
-              : 'bg-black/60 text-white/70 hover:text-white opacity-0 group-hover:opacity-100'
+              : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80 opacity-0 group-hover:opacity-100'
           }`}
           title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
         >
           <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-        </button>
-
-        {/* Snappy Quick Add To Cart Button */}
-        <button
-          type="button"
-          onClick={handleQuickAdd}
-          className={`absolute bottom-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md flex items-center gap-1.5 transition-all z-20 shadow-xl border border-white/10 ${
-            added
-              ? 'bg-[#FC6301] text-white opacity-100'
-              : 'bg-black/80 hover:bg-white hover:text-black text-white opacity-0 group-hover:opacity-100'
-          }`}
-        >
-          {added ? (
-            <>
-              <Check className="w-3.5 h-3.5 stroke-[3]" />
-              <span>In Cart</span>
-            </>
-          ) : (
-            <>
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>+ Cart</span>
-            </>
-          )}
         </button>
 
         {/* Audio Audition Play Button Overlay */}
@@ -220,25 +200,25 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      {/* Content Details Below Card (Exact Epic Games Store Layout) */}
-      <div className="flex flex-col gap-1 px-0.5">
-        {/* Subcategory Tag */}
-        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider line-clamp-1">
+      {/* Content Details Below Card (Exact Minimalist Epic Games Store Layout) */}
+      <div className="flex flex-col gap-0.5 px-0.5">
+        {/* Subcategory / Tag */}
+        <span className="text-[11px] sm:text-xs font-medium text-zinc-400 capitalize line-clamp-1">
           {subCategoryLabel}
         </span>
 
         {/* Title */}
-        <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-white/80 transition-colors">
+        <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
           {product.name}
         </h3>
 
         {/* Brand Name */}
-        <span className="text-xs text-zinc-400 font-medium line-clamp-1 -mt-0.5 z-20">
+        <span className="text-xs text-zinc-400 font-medium line-clamp-1 z-20">
           by{' '}
           <button
             type="button"
             onClick={handleBrandClick}
-            className="text-zinc-300 font-semibold hover:text-[#FC6301] focus:outline-none transition-colors cursor-pointer inline-block"
+            className="text-zinc-300 font-semibold hover:text-[#FC6301] transition-colors cursor-pointer inline-block"
           >
             {brandName}
           </button>
@@ -247,11 +227,11 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Price Row */}
         <div className="flex items-center gap-2 mt-1">
           {isFree ? (
-            <span className="text-sm font-semibold text-white">Free</span>
+            <span className="text-sm font-bold text-white">Free</span>
           ) : (
             <>
               {discountPercent > 0 && (
-                <span className="text-xs bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded text-[11px]">
+                <span className="text-[11px] bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded">
                   -{discountPercent}%
                 </span>
               )}
@@ -260,7 +240,7 @@ export function ProductCard({ product }: { product: Product }) {
                   {formatPrice(undefined, originalPrice)}
                 </span>
               )}
-              <span className="text-sm font-semibold text-white">
+              <span className="text-sm font-bold text-white">
                 {formatPrice(undefined, product.price_usd)}
               </span>
             </>

@@ -367,8 +367,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const activeFilter = isFree ? 'free' : isDeals ? 'deals' : isBundles ? 'bundles' : isRentToOwn ? 'rent' : 'all'
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white py-8 px-4 sm:px-8 lg:px-12 font-sans select-none">
-      <div className="max-w-[1500px] mx-auto space-y-8">
+    <div className="min-h-screen bg-[#121212] text-white py-8 px-4 sm:px-6 lg:px-8 font-sans select-none">
+      <div className="max-w-[1240px] mx-auto space-y-8">
         
         {/* Category Header Title (Plugin Boutique Style) */}
         <div className="space-y-2 pt-2">
@@ -461,7 +461,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-8 sm:gap-x-6 sm:gap-y-10">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

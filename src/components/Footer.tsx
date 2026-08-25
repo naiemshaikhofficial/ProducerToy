@@ -19,7 +19,7 @@ export function Footer() {
 
   return (
     <footer className="w-full bg-[#141414] text-white border-t border-[#26262b] mt-24 select-none font-sans">
-      <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 lg:px-16 pt-12 pb-16">
+      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
         
         {/* Main Grid with Vertical Dividers matching Plugin Boutique Layout */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-[#26262b]">
