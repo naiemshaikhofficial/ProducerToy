@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   const countryOptions = COUNTRIES
   const router = useRouter()
   const { items, removeItem, clearCart, setIsCartOpen } = useCart()
-  const { formatPrice, currency, setCurrency } = useCurrency()
+  const { formatPrice, currency, setCurrency, convertUsdToInr, convertInrToUsd } = useCurrency()
   const { user } = useAuth()
   const supabase = createClient()
 
@@ -278,14 +278,14 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0
   }
 
-  // Calculations
+  // Calculations with Real-Time Conversion
   const isIndia = billingDetails.country === 'India' || (!billingDetails.country && currency === 'INR')
 
   const rawSubtotalInr = items.reduce((sum, item) => {
     const inr = Number(item.price_inr || 0)
     const usd = Number(item.price_usd || 0)
     if (inr > 0) return sum + inr
-    if (usd > 0) return sum + Math.round(usd * 85)
+    if (usd > 0) return sum + convertUsdToInr(usd)
     return sum
   }, 0)
 
@@ -293,7 +293,7 @@ export default function CheckoutPage() {
     const usd = Number(item.price_usd || 0)
     const inr = Number(item.price_inr || 0)
     if (usd > 0) return sum + usd
-    if (inr > 0) return sum + Math.round((inr / 85) * 100) / 100
+    if (inr > 0) return sum + convertInrToUsd(inr)
     return sum
   }, 0)
 

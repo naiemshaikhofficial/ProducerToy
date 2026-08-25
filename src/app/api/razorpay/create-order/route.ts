@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getUsdToInrRate } from '@/lib/exchangeRate'
 
 export async function POST(request: Request) {
   try {
@@ -31,7 +32,8 @@ export async function POST(request: Request) {
       key_secret: keySecret,
     })
 
-    // 1. Fetch tamper-proof product prices from database
+    // 1. Fetch tamper-proof product prices from database & live exchange rate
+    const liveRate = await getUsdToInrRate()
     const adminSupabase = createAdminClient()
     const productIds = items.map((i: any) => i.id)
     const { data: dbProducts, error: prodErr } = await adminSupabase
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
       const inr = Number(p.price_inr || 0)
       const usd = Number(p.price_usd || 0)
       if (inr > 0) return sum + inr
-      if (usd > 0) return sum + Math.round(usd * 85)
+      if (usd > 0) return sum + Math.round(usd * liveRate)
       return sum
     }, 0)
 
