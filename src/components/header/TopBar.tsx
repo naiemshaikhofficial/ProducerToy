@@ -75,7 +75,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               className="w-5 h-5 object-contain filter brightness-0 invert"
             />
             {itemCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 bg-[#FF5500] text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#121212]">
+              <span className="absolute -top-1.5 -right-1.5 bg-[#FC6301] text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#121212]">
                 {itemCount}
               </span>
             )}

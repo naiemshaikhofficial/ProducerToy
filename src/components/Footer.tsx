@@ -36,10 +36,10 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">Store Catalog</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
-              <li><Link href="/store/plugins" className="hover:text-[#FF5500] transition-colors">VST Plugins</Link></li>
-              <li><Link href="/store/sample-packs" className="hover:text-[#FF5500] transition-colors">Sample Packs</Link></li>
-              <li><Link href="/store/presets" className="hover:text-[#FF5500] transition-colors">Synth Presets</Link></li>
-              <li><Link href="/store/templates" className="hover:text-[#FF5500] transition-colors">DAW Templates</Link></li>
+              <li><Link href="/store/plugins" className="hover:text-[#FC6301] transition-colors">VST Plugins</Link></li>
+              <li><Link href="/store/sample-packs" className="hover:text-[#FC6301] transition-colors">Sample Packs</Link></li>
+              <li><Link href="/store/presets" className="hover:text-[#FC6301] transition-colors">Synth Presets</Link></li>
+              <li><Link href="/store/templates" className="hover:text-[#FC6301] transition-colors">DAW Templates</Link></li>
             </ul>
           </div>
 
@@ -47,8 +47,8 @@ export function Footer() {
           <div className="space-y-3">
             <h4 className="text-xs font-extrabold uppercase tracking-wider text-white">Account & Library</h4>
             <ul className="space-y-2 text-xs text-zinc-400">
-              <li><Link href="/my-purchases" className="hover:text-[#FF5500] transition-colors">My Library & Keys</Link></li>
-              <li><Link href="/auth" className="hover:text-[#FF5500] transition-colors">Sign In / Register</Link></li>
+              <li><Link href="/my-purchases" className="hover:text-[#FC6301] transition-colors">My Library & Keys</Link></li>
+              <li><Link href="/auth" className="hover:text-[#FC6301] transition-colors">Sign In / Register</Link></li>
             </ul>
           </div>
 

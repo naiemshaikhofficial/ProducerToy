@@ -24,7 +24,7 @@ export function Logo({ size = 36, className = '', showText = true }: LogoProps) 
         <div className="flex flex-col">
           <span className="font-black text-base uppercase tracking-tight leading-none">
             <span className="text-white">PRODUCER</span>{' '}
-            <span className="text-[#FF5500]">TOY</span>
+            <span className="text-[#FC6301]">TOY</span>
           </span>
           <span className="text-[9px] font-bold text-zinc-400 tracking-widest uppercase leading-none mt-0.5">
             AUDIO MARKETPLACE

@@ -431,7 +431,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 href={product.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#FF5500] hover:bg-[#e04b00] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FF5500]/20 cursor-pointer"
+                className="bg-[#FC6301] hover:bg-[#E05800] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FC6301]/20 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
@@ -444,7 +444,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                   className={`flex-1 py-3.5 px-6 text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
                     added
                       ? 'bg-zinc-800 text-zinc-400 cursor-default'
-                      : 'bg-[#FF5500] hover:bg-[#e04b00] text-white shadow-[#FF5500]/20'
+                      : 'bg-[#FC6301] hover:bg-[#E05800] text-white shadow-[#FC6301]/20'
                   }`}
                 >
                   {added ? (
