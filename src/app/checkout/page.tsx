@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   const countryOptions = COUNTRIES
   const router = useRouter()
   const { items, removeItem, clearCart, setIsCartOpen } = useCart()
-  const { formatPrice, currency, setCurrency, convertUsdToInr, convertInrToUsd } = useCurrency()
+  const { formatPrice, currency, setCurrency, exchangeRate, convertUsdToInr, convertInrToUsd } = useCurrency()
   const { user } = useAuth()
   const supabase = createClient()
 
