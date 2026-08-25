@@ -7,8 +7,9 @@ import { Product } from '@/components/ProductCard'
 import { EpicHeroCarousel } from '@/components/EpicHeroCarousel'
 import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
+import { LocalDataCache } from '@/components/LocalDataCache'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 1800 // Cache homepage with ISR for 30 minutes (0ms instant page loads, background revalidation)
 
 export default async function HomePage() {
   const supabase = getAdminClient()
@@ -107,6 +108,8 @@ export default async function HomePage() {
         <ProducerToyGrid products={products} title="Producer Toy Originals" />
 
       </div>
+
+      <LocalDataCache data={{ products }} />
     </div>
   )
 }

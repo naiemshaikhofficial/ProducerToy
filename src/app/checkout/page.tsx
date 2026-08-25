@@ -81,10 +81,10 @@ export default function CheckoutPage() {
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row gap-3 w-full">
-            <Link href="/my-purchases" className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-full uppercase tracking-wider transition-all shadow-lg text-center">
+            <Link href="/my-purchases" prefetch={true} className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-full uppercase tracking-wider transition-all shadow-lg text-center">
               View My Purchases
             </Link>
-            <Link href="/store" className="w-full bg-[#202020] hover:bg-[#282828] text-white font-bold text-xs py-3.5 px-6 rounded-full border border-[#2e2e2e] uppercase tracking-wider transition-all text-center">
+            <Link href="/store" prefetch={true} className="w-full bg-[#202020] hover:bg-[#282828] text-white font-bold text-xs py-3.5 px-6 rounded-full border border-[#2e2e2e] uppercase tracking-wider transition-all text-center">
               Continue Shopping
             </Link>
           </div>
@@ -103,7 +103,7 @@ export default function CheckoutPage() {
           <h2 className="text-2xl font-extrabold text-white tracking-tight">Your Cart is Empty</h2>
           <p className="text-xs text-zinc-400">Add VST plugins or sample packs to proceed with checkout.</p>
           <div className="pt-2 w-full">
-            <Link href="/store" className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-full inline-block uppercase tracking-wider transition-all shadow-lg">
+            <Link href="/store" prefetch={true} className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-full inline-block uppercase tracking-wider transition-all shadow-lg">
               Browse Store Catalog
             </Link>
           </div>
@@ -117,7 +117,7 @@ export default function CheckoutPage() {
       
       {/* Back Link */}
       <div>
-        <Link href="/store" className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase hover:underline text-zinc-400 hover:text-white transition-colors">
+        <Link href="/store" prefetch={true} className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase hover:underline text-zinc-400 hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Store</span>
         </Link>

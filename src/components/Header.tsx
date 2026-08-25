@@ -88,7 +88,7 @@ export const Header: React.FC = () => {
   return (
     <>
       {/* Tier 1 Top Header Bar (Scrolls away naturally) */}
-      <div className="w-full bg-[#121212] select-none">
+      <div className="relative z-40 w-full bg-[#121212] select-none">
         <TopBar
           currency={currency}
           onToggleCurrency={toggleCurrency}

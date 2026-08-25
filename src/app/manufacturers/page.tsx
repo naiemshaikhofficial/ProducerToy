@@ -1,6 +1,6 @@
-import React from 'react'
 import { getAdminClient } from '@/lib/supabase/admin'
 import ManufacturersClient from './ManufacturersClient'
+import { LocalDataCache } from '@/components/LocalDataCache'
 
 export const metadata = {
   title: 'Audio Plugin Manufacturers & Brands | ProducerToy',
@@ -29,6 +29,7 @@ export default async function ManufacturersPage() {
   return (
     <main className="min-h-screen bg-[#121212] text-white">
       <ManufacturersClient initialBrands={brands} />
+      <LocalDataCache data={{ brands }} />
     </main>
   )
 }

@@ -72,6 +72,7 @@ export const SubBar: React.FC<SubBarProps> = ({
             <Link 
               key={link.label} 
               href={link.href} 
+              prefetch={true}
               className="text-zinc-300 hover:text-white font-normal transition-colors py-2"
             >
               {link.label}

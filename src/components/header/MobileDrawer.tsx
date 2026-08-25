@@ -55,6 +55,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                       <Link
                         key={idx}
                         href={item === 'Show All' ? `/store/${key}` : `/store/${key}/${encodeURIComponent(item.toLowerCase())}`}
+                        prefetch={true}
                         onClick={onClose}
                         className="text-sm text-zinc-400 hover:text-white py-1 block"
                       >
@@ -73,16 +74,16 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-2">
             Store Links
           </span>
-          <Link href="/store?on_sale=true" onClick={onClose} className="text-base font-semibold text-white py-1">
+          <Link href="/store?on_sale=true" prefetch={true} onClick={onClose} className="text-base font-semibold text-white py-1">
             🔥 Hot Deals
           </Link>
-          <Link href="/store?free=true" onClick={onClose} className="text-base font-semibold text-white py-1">
+          <Link href="/store?free=true" prefetch={true} onClick={onClose} className="text-base font-semibold text-white py-1">
             🎁 Free Software & Packs
           </Link>
-          <Link href="/manufacturers" onClick={onClose} className="text-base font-semibold text-white py-1">
+          <Link href="/manufacturers" prefetch={true} onClick={onClose} className="text-base font-semibold text-white py-1">
             🏷️ All Brands
           </Link>
-          <Link href="/store" onClick={onClose} className="text-base font-semibold text-white py-1">
+          <Link href="/store" prefetch={true} onClick={onClose} className="text-base font-semibold text-white py-1">
             ⏳ Rent to Own
           </Link>
         </div>
@@ -92,6 +93,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
           <Link
             href={user ? "/my-purchases" : "/auth"}
+            prefetch={true}
             onClick={onClose}
             className="bg-[#262626] hover:bg-[#333333] text-white text-center font-bold text-sm py-3.5 rounded-lg transition-colors"
           >

@@ -25,6 +25,28 @@ const getCachedProduct = cache(async (slug: string) => {
   return product
 })
 
+// Build-time static generation: Pre-renders ALL active products into 100% pure static HTML
+// Result: 0 Vercel Serverless Function Invocations & 0 Supabase DB queries on user visits
+export async function generateStaticParams() {
+  try {
+    const supabase = getAdminClient()
+    const { data: products } = await supabase
+      .from('products')
+      .select('slug')
+      .eq('is_active', true)
+
+    if (!products) return []
+    return products
+      .filter((p) => p && p.slug)
+      .map((p) => ({
+        slug: p.slug,
+      }))
+  } catch (e) {
+    console.error('generateStaticParams product error:', e)
+    return []
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {

@@ -4,8 +4,9 @@ import { ProductCard, Product } from '@/components/ProductCard'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
+import { LocalDataCache } from '@/components/LocalDataCache'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 1800 // Cache category pages with ISR for 30 minutes (0ms instant page loads)
 
 interface CategoryPageProps {
   params: Promise<{ slug?: string[] }>
@@ -104,6 +105,23 @@ function formatTitle(slug: string): string {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+export async function generateStaticParams() {
+  return [
+    { slug: ['all'] },
+    { slug: ['1-Instruments'] },
+    { slug: ['2-Effects'] },
+    { slug: ['3-Studio-Tools'] },
+    { slug: ['4-Sounds'] },
+    { slug: ['bundles'] },
+    { slug: ['effects'] },
+    { slug: ['instruments'] },
+    { slug: ['studio-tools'] },
+    { slug: ['sounds'] },
+    { slug: ['sample-packs'] },
+    { slug: ['presets'] },
+  ]
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
@@ -384,6 +402,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <Link
             href={baseUrl}
+            prefetch={true}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
               activeFilter === 'all'
                 ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -395,6 +414,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
           <Link
             href={`${baseUrl}?deals=true`}
+            prefetch={true}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
               activeFilter === 'deals'
                 ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -406,6 +426,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
           <Link
             href={`${baseUrl}?free=true`}
+            prefetch={true}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
               activeFilter === 'free'
                 ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -417,6 +438,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
           <Link
             href={`${baseUrl}?bundles=true`}
+            prefetch={true}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
               activeFilter === 'bundles'
                 ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -428,6 +450,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
           <Link
             href={`${baseUrl}?rent_to_own=true`}
+            prefetch={true}
             className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
               activeFilter === 'rent'
                 ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -455,6 +478,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             <p className="text-xs text-zinc-400">No items match your selected category filter.</p>
             <Link
               href={baseUrl}
+              prefetch={true}
               className="inline-block mt-2 bg-[#FC6301] hover:bg-[#E05800] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
             >
               Clear Filters
@@ -468,6 +492,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           </div>
         )}
 
+        <LocalDataCache data={{ products, categories: categoriesOptions, brands: brandsOptions }} />
       </div>
     </div>
   )

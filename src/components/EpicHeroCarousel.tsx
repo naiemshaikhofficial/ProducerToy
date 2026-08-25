@@ -76,6 +76,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               <Link 
                 key={product.id} 
                 href={`/product/${product.slug}`}
+                prefetch={true}
                 className="block relative w-full h-full flex-shrink-0 overflow-hidden group cursor-pointer"
               >
                 

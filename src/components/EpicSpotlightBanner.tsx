@@ -36,6 +36,7 @@ export function EpicSpotlightBanner() {
         <div className="mt-2 sm:mt-3">
           <Link
             href="/store"
+            prefetch={true}
             className="inline-flex items-center justify-center min-w-[160px] sm:min-w-[175px] h-[44px] sm:h-[48px] bg-white hover:bg-zinc-200 text-black font-bold text-[14px] sm:text-[15px] rounded-lg active:scale-95 transition-all shadow-xl tracking-wide font-sans cursor-pointer"
           >
             Play Now

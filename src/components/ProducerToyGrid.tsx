@@ -34,6 +34,7 @@ export function ProducerToyGrid({ products, title = "Producer Toy Originals" }: 
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <Link 
           href="/store?brand=producer-toy" 
+          prefetch={true}
           className="group inline-flex items-center gap-1 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
         >
           <span>{title}</span>

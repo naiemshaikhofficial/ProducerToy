@@ -248,7 +248,7 @@ export default function AuthPage() {
 
             {/* Header Logo + Title */}
             <div className="flex flex-col items-center text-center space-y-3">
-              <Link href="/" className="hover:opacity-80 transition-opacity">
+              <Link href="/" prefetch={true} className="hover:opacity-80 transition-opacity">
                 <LogoIcon size={48} />
               </Link>
 

@@ -154,6 +154,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
             </h3>
             <Link 
               href={`/store/${categorySlug}`} 
+              prefetch={true}
               onClick={onClose}
               className="text-xs font-semibold text-zinc-400 hover:text-white underline transition-colors"
             >
@@ -168,6 +169,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                 <Link
                   key={idx}
                   href={item.href}
+                  prefetch={true}
                   onClick={onClose}
                   className={`text-sm transition-colors py-1 truncate block ${
                     isShowAll

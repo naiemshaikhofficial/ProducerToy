@@ -353,6 +353,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                           ? '/store/presets'
                           : '/store'
                       }
+                      prefetch={true}
                       className="bg-[#202020] hover:bg-[#282828] hover:text-[#FC6301] text-zinc-200 border border-[#2a2a2a] text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
                     >
                       {formattedType(product.product_type)}
@@ -363,6 +364,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                         <Link
                           key={idx}
                           href={`/store?cat=${encodeURIComponent(catSlug)}`}
+                          prefetch={true}
                           className="bg-[#202020] hover:bg-[#282828] hover:text-[#FC6301] text-zinc-200 border border-[#2a2a2a] text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
                         >
                           {subCat.trim()}
@@ -573,6 +575,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               {(product.brands?.slug || product.brand) ? (
                 <Link
                   href={`/store/${product.brands?.slug || (product.brand ? product.brand.toLowerCase().replace(/\s+/g, '-') : '')}`}
+                  prefetch={true}
                   className="font-semibold text-white hover:underline transition-colors"
                 >
                   {developerName}

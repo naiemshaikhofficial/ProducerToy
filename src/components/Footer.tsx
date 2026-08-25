@@ -30,25 +30,25 @@ export function Footer() {
             <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-xs text-zinc-400">
               {/* Left Sub-column */}
               <div className="space-y-2.5">
-                <div><Link href="/categories/1-Instruments" className="hover:text-white transition-colors">Instruments</Link></div>
-                <div><Link href="/categories/3-Studio-Tools" className="hover:text-white transition-colors">Studio Tools</Link></div>
-                <div><Link href="/categories/2-Effects" className="hover:text-white transition-colors">Effects</Link></div>
-                <div><Link href="/categories/4-Sounds" className="hover:text-white transition-colors">Sounds</Link></div>
-                <div><Link href="/categories/bundles" className="hover:text-white transition-colors">Bundles</Link></div>
-                <div><Link href="/store" className="hover:text-white transition-colors">Blog</Link></div>
-                <div><Link href="/categories/1-Instruments?free=true" className="hover:text-white transition-colors">Free Instruments</Link></div>
-                <div><Link href="/manufacturers" className="hover:text-white transition-colors">Brands</Link></div>
+                <div><Link href="/categories/1-Instruments" prefetch={true} className="hover:text-white transition-colors">Instruments</Link></div>
+                <div><Link href="/categories/3-Studio-Tools" prefetch={true} className="hover:text-white transition-colors">Studio Tools</Link></div>
+                <div><Link href="/categories/2-Effects" prefetch={true} className="hover:text-white transition-colors">Effects</Link></div>
+                <div><Link href="/categories/4-Sounds" prefetch={true} className="hover:text-white transition-colors">Sounds</Link></div>
+                <div><Link href="/categories/bundles" prefetch={true} className="hover:text-white transition-colors">Bundles</Link></div>
+                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Blog</Link></div>
+                <div><Link href="/categories/1-Instruments?free=true" prefetch={true} className="hover:text-white transition-colors">Free Instruments</Link></div>
+                <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands</Link></div>
               </div>
 
               {/* Right Sub-column */}
               <div className="space-y-2.5">
-                <div><Link href="/categories/2-Effects?free=true" className="hover:text-white transition-colors">Free Effects</Link></div>
-                <div><Link href="/categories/3-Studio-Tools?free=true" className="hover:text-white transition-colors">Free Studio Tools</Link></div>
-                <div><Link href="/store" className="hover:text-white transition-colors">Courses</Link></div>
-                <div><Link href="/store?on_sale=true" className="hover:text-white transition-colors">Black Friday</Link></div>
-                <div><Link href="/contact" className="hover:text-white transition-colors">Affiliate Program</Link></div>
-                <div><Link href="/store" className="hover:text-white transition-colors">Plugin+</Link></div>
-                <div><Link href="/store" className="hover:text-white transition-colors">Rent to Own</Link></div>
+                <div><Link href="/categories/2-Effects?free=true" prefetch={true} className="hover:text-white transition-colors">Free Effects</Link></div>
+                <div><Link href="/categories/3-Studio-Tools?free=true" prefetch={true} className="hover:text-white transition-colors">Free Studio Tools</Link></div>
+                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Courses</Link></div>
+                <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Black Friday</Link></div>
+                <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Affiliate Program</Link></div>
+                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Plugin+</Link></div>
+                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Rent to Own</Link></div>
               </div>
             </div>
           </div>
@@ -57,9 +57,9 @@ export function Footer() {
           <div className="md:col-span-2 md:px-4 md:border-r md:border-[#26262b] space-y-4">
             <h4 className="text-base font-bold text-white tracking-tight mb-4">Legal</h4>
             <div className="space-y-2.5 text-xs text-zinc-400">
-              <div><Link href="/terms" className="hover:text-white transition-colors">Terms and Conditions</Link></div>
-              <div><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></div>
-              <div><Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link></div>
+              <div><Link href="/terms" prefetch={true} className="hover:text-white transition-colors">Terms and Conditions</Link></div>
+              <div><Link href="/privacy" prefetch={true} className="hover:text-white transition-colors">Privacy Policy</Link></div>
+              <div><Link href="/refund-policy" prefetch={true} className="hover:text-white transition-colors">Refund Policy</Link></div>
             </div>
           </div>
 
@@ -67,8 +67,8 @@ export function Footer() {
           <div className="md:col-span-2 md:px-4 md:border-r md:border-[#26262b] space-y-4">
             <h4 className="text-base font-bold text-white tracking-tight mb-4">Help</h4>
             <div className="space-y-2.5 text-xs text-zinc-400">
-              <div><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></div>
-              <div><Link href="/contact" className="hover:text-white transition-colors">About Us</Link></div>
+              <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Contact Us</Link></div>
+              <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">About Us</Link></div>
             </div>
           </div>
 
@@ -139,6 +139,7 @@ export function Footer() {
               <div className="pt-1">
                 <Link
                   href="/store"
+                  prefetch={true}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#FC6301] transition-colors group"
                 >
                   <span>Find out more</span>
@@ -155,7 +156,7 @@ export function Footer() {
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
           
           {/* Logo on Bottom Left */}
-          <Link href="/" className="inline-block hover:opacity-90 transition-opacity">
+          <Link href="/" prefetch={true} className="inline-block hover:opacity-90 transition-opacity">
             <img
               src="/footer-logo.png"
               alt="Producer Toy"

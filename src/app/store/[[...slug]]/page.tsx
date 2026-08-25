@@ -65,6 +65,19 @@ function expandCategoryVariants(rawCats: string[]): string[] {
   return Array.from(set)
 }
 
+export async function generateStaticParams() {
+  return [
+    { slug: [] },
+    { slug: ['plugins'] },
+    { slug: ['sounds'] },
+    { slug: ['presets'] },
+    { slug: ['templates'] },
+    { slug: ['effects'] },
+    { slug: ['instruments'] },
+    { slug: ['bundles'] },
+  ]
+}
+
 export default async function StorePage({ params, searchParams }: StorePageProps) {
   const { slug } = await params
   const {
@@ -389,6 +402,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       <div className="flex flex-wrap items-center gap-3 pt-2">
         <Link
           href={baseUrl}
+          prefetch={true}
           className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
             activeFilter === 'all'
               ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -400,6 +414,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
         <Link
           href={`${baseUrl}?deals=true`}
+          prefetch={true}
           className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
             activeFilter === 'deals'
               ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -411,6 +426,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
         <Link
           href={`${baseUrl}?free=true`}
+          prefetch={true}
           className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
             activeFilter === 'free'
               ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -422,6 +438,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
         <Link
           href={`${baseUrl}?bundles=true`}
+          prefetch={true}
           className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
             activeFilter === 'bundles'
               ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -433,6 +450,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
         <Link
           href={`${baseUrl}?rent_to_own=true`}
+          prefetch={true}
           className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
             activeFilter === 'rent'
               ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
@@ -470,10 +488,10 @@ export default async function StorePage({ params, searchParams }: StorePageProps
               {selectedBrand.description || `We are currently tying up with ${selectedBrand.name} to bring their complete catalog of VST plugins, sample tools, and presets to ProducerToy. Stay tuned!`}
             </p>
             <div className="pt-4 flex items-center justify-center gap-4 flex-wrap">
-              <Link href="/manufacturers" className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-xl uppercase transition-all shadow-lg">
+              <Link href="/manufacturers" prefetch={true} className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-xl uppercase transition-all shadow-lg">
                 Browse All Manufacturers
               </Link>
-              <Link href="/store" className="bg-[#202020] hover:bg-[#282828] text-white font-extrabold text-xs py-3 px-6 rounded-xl border border-[#303030] uppercase transition-all">
+              <Link href="/store" prefetch={true} className="bg-[#202020] hover:bg-[#282828] text-white font-extrabold text-xs py-3 px-6 rounded-xl border border-[#303030] uppercase transition-all">
                 Explore Available Products
               </Link>
             </div>
@@ -483,7 +501,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
             <p className="text-lg font-bold text-white tracking-tight">No products found matching your filter</p>
             <p className="text-xs text-zinc-400">Try searching for another keyword or clearing category filters.</p>
             <div className="pt-2">
-              <Link href="/store" className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-full inline-block uppercase transition-all shadow-lg">
+              <Link href="/store" prefetch={true} className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-full inline-block uppercase transition-all shadow-lg">
                 Reset Store Catalog
               </Link>
             </div>

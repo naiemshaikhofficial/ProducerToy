@@ -53,7 +53,7 @@ export default async function MyPurchasesPage() {
             You haven&apos;t purchased any VST plugins, preset banks, or sample packs yet.
           </p>
           <div className="pt-2 w-full">
-            <Link href="/store" className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-full inline-block uppercase tracking-wider transition-all shadow-lg">
+            <Link href="/store" prefetch={true} className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 px-6 rounded-full inline-block uppercase tracking-wider transition-all shadow-lg">
               Browse Audio Tools
             </Link>
           </div>

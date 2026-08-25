@@ -17,6 +17,7 @@ export default function TermsAndConditionsPage() {
         <div className="space-y-4 pb-6 border-b border-zinc-800/60">
           <Link
             href="/"
+            prefetch={true}
             className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />

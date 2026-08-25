@@ -33,13 +33,14 @@ export const TopBar: React.FC<TopBarProps> = ({
         
         {/* Left Section: Epic Style Logo + Store Name + Support/Distribute */}
         <div className="flex items-center gap-4 sm:gap-8">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <Link href="/" prefetch={true} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
             <LogoIcon size={38} />
             <ChevronDown className="w-4 h-4 text-zinc-400 hidden sm:block" />
           </Link>
 
           <Link 
             href="/store" 
+            prefetch={true}
             className="text-white font-black text-base sm:text-lg tracking-widest uppercase font-sans hover:text-zinc-200 transition-colors"
           >
             STORE
@@ -47,6 +48,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           <Link 
             href="/store" 
+            prefetch={true}
             className="hidden md:block text-[#cccccc] hover:text-white text-sm font-medium transition-colors"
           >
             Support
@@ -94,6 +96,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           ) : (
             <Link
               href="/auth"
+              prefetch={true}
               className="bg-[#26262c] hover:bg-[#32323a] text-white text-xs font-semibold px-4 py-2 rounded-[6px] transition-colors"
             >
               Sign in
@@ -128,11 +131,12 @@ export const TopBar: React.FC<TopBarProps> = ({
               className="bg-[#26262c] hover:bg-[#e50914] text-zinc-300 hover:text-white p-2 rounded-[6px] transition-all duration-200 flex items-center justify-center"
               title="Sign Out"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4" />
             </button>
           ) : (
             <Link 
               href="/auth" 
+              prefetch={true}
               className="bg-[#26262c] hover:bg-[#32323a] text-white text-xs font-semibold px-3 py-1.5 rounded-[6px] transition-colors"
             >
               Sign in
