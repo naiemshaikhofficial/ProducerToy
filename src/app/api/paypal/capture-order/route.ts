@@ -18,7 +18,49 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing PayPal order or user parameters' }, { status: 400 })
     }
 
-    // 1. Capture the order with PayPal
+    const adminSupabase = createAdminClient()
+
+    // 1. Fetch tamper-proof product prices directly from database
+    const productIds = items.map((i: any) => i.id).filter(Boolean)
+    const { data: dbProducts, error: prodErr } = await adminSupabase
+      .from('products')
+      .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type')
+      .in('id', productIds)
+
+    if (prodErr || !dbProducts || dbProducts.length === 0) {
+      return NextResponse.json({ error: 'Failed to verify items in database' }, { status: 404 })
+    }
+
+    // 2. Server-side expected USD price calculation
+    const rawSubtotalUsd = dbProducts.reduce(
+      (sum, p) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 90 : 0)),
+      0
+    )
+
+    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
+    const bundleDiscountUsd = (rawSubtotalUsd * bundleDiscountPercent) / 100
+    const subtotalAfterBundle = rawSubtotalUsd - bundleDiscountUsd
+
+    // Verified coupon discount calculation
+    let verifiedCouponDiscountPercent = 0
+    if (couponCode) {
+      const { data: couponData } = await adminSupabase
+        .from('coupons')
+        .select('discount_percent')
+        .eq('code', String(couponCode).trim().toUpperCase())
+        .eq('is_active', true)
+        .or(`expires_at.gt.${new Date().toISOString()},expires_at.is.null`)
+        .maybeSingle()
+
+      if (couponData?.discount_percent) {
+        verifiedCouponDiscountPercent = couponData.discount_percent
+      }
+    }
+
+    const couponDiscountUsd = (subtotalAfterBundle * verifiedCouponDiscountPercent) / 100
+    const expectedTotalUsd = Math.max(0, subtotalAfterBundle - couponDiscountUsd)
+
+    // 3. SECURITY DEFENSE: Capture order via official PayPal Server API
     const captureData = await capturePayPalOrderOnServer(orderId)
 
     if (captureData.status !== 'COMPLETED') {
@@ -28,10 +70,41 @@ export async function POST(request: Request) {
       )
     }
 
-    const captureId = captureData.purchase_units?.[0]?.payments?.captures?.[0]?.id || orderId
-    const adminSupabase = createAdminClient()
+    // 4. SECURITY DEFENSE: Verify Captured Amount & Currency Match Expected Database Value
+    const capturedUnit = captureData.purchase_units?.[0]?.payments?.captures?.[0]
+    const captureId = capturedUnit?.id || orderId
+    const capturedAmount = Number(capturedUnit?.amount?.value || 0)
+    const capturedCurrency = capturedUnit?.amount?.currency_code || 'USD'
 
-    // 2. Fetch authenticated target user
+    if (capturedCurrency !== 'USD') {
+      console.error('[SECURITY_ALERT] PayPal currency mismatch:', { capturedCurrency, expected: 'USD' })
+      return NextResponse.json({ error: 'Invalid payment currency.' }, { status: 400 })
+    }
+
+    // Allow minor floating point epsilon (0.05 USD)
+    if (Math.abs(capturedAmount - expectedTotalUsd) > 0.1) {
+      console.error('[SECURITY_ALERT] PayPal amount mismatch attempt:', {
+        capturedAmount,
+        expectedTotalUsd,
+      })
+      return NextResponse.json({ error: 'Security alert: Captured payment amount mismatch.' }, { status: 400 })
+    }
+
+    // 5. SECURITY DEFENSE: Replay Attack Prevention
+    const { data: existingPurchase } = await adminSupabase
+      .from('purchases')
+      .select('id')
+      .eq('razorpay_payment_id', captureId)
+      .limit(1)
+
+    if (existingPurchase && existingPurchase.length > 0) {
+      return NextResponse.json(
+        { error: 'This transaction has already been recorded.' },
+        { status: 409 }
+      )
+    }
+
+    // 6. Fetch target user
     const {
       data: { user: targetUser },
       error: userErr,
@@ -42,21 +115,9 @@ export async function POST(request: Request) {
     }
 
     const targetEmail = billingDetails?.email || targetUser.email || ''
-
-    // 3. Fetch product records
-    const productIds = items.map((i: any) => i.id)
-    const { data: dbProducts, error: prodErr } = await adminSupabase
-      .from('products')
-      .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type')
-      .in('id', productIds)
-
-    if (prodErr || !dbProducts || dbProducts.length === 0) {
-      return NextResponse.json({ error: 'Failed to verify items in database' }, { status: 404 })
-    }
-
     const orderNumber = `PT-PP-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`
 
-    // 4. Update/Upsert user profile with billing details
+    // 7. Sync user account & billing details
     if (billingDetails) {
       try {
         await adminSupabase.from('user_accounts').upsert(
@@ -95,7 +156,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Generate serial keys & purchase entries
+    // 8. Generate genuine serial keys & purchase entries
     const purchaseRecords = dbProducts.map((dbProduct) => {
       const requiresSerialKey = Boolean(
         dbProduct.delivery_method === 'serial_key' ||
@@ -128,7 +189,7 @@ export async function POST(request: Request) {
         billing_state: billingDetails?.state || null,
         billing_zip: billingDetails?.zip || null,
         billing_country: billingDetails?.country || null,
-        coupon_code: couponCode || null,
+        coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
         purchased_at: new Date().toISOString(),
       }
     })
@@ -142,12 +203,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to record purchases' }, { status: 500 })
     }
 
-    // 6. Record in orders table
-    const subtotalUsd = dbProducts.reduce(
-      (sum, p) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 85 : 0)),
-      0
-    )
-
+    // 9. Record in orders table
     await adminSupabase.from('orders').insert({
       user_id: userId,
       order_number: orderNumber,
@@ -159,10 +215,11 @@ export async function POST(request: Request) {
       billing_state: billingDetails?.state || null,
       billing_zip: billingDetails?.zip || null,
       billing_country: billingDetails?.country || null,
-      subtotal: subtotalUsd,
-      total_amount: subtotalUsd,
+      subtotal: rawSubtotalUsd,
+      discount: bundleDiscountUsd + couponDiscountUsd,
+      total_amount: expectedTotalUsd,
       currency: 'USD',
-      coupon_code: couponCode || null,
+      coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
       payment_status: 'completed',
       payment_gateway: 'paypal',
       razorpay_order_id: orderId,

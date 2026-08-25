@@ -144,6 +144,34 @@ export async function processCheckoutAction(
       return { success: false, error: 'Failed to verify items in database' }
     }
 
+    // 3.1 Verify server-side total and coupons to prevent unpaid bypass
+    const rawSubtotalUsd = dbProducts.reduce((sum, p) => sum + Number(p.price_usd || 0), 0)
+    let verifiedDiscountPercent = 0
+    if (options?.couponCode) {
+      const { data: couponData } = await adminSupabase
+        .from('coupons')
+        .select('discount_percent')
+        .eq('code', String(options.couponCode).trim().toUpperCase())
+        .eq('is_active', true)
+        .or(`expires_at.gt.${new Date().toISOString()},expires_at.is.null`)
+        .maybeSingle()
+
+      if (couponData?.discount_percent) {
+        verifiedDiscountPercent = couponData.discount_percent
+      }
+    }
+
+    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
+    const totalDiscountPercent = Math.min(100, bundleDiscountPercent + verifiedDiscountPercent)
+    const expectedTotal = Math.max(0, rawSubtotalUsd - (rawSubtotalUsd * totalDiscountPercent) / 100)
+
+    if (expectedTotal > 0) {
+      return {
+        success: false,
+        error: 'Paid orders must be completed through Razorpay or PayPal payment gateway.',
+      }
+    }
+
     const orderNumber = `PT-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`
     const randomOrderId = `ord_${crypto.randomBytes(8).toString('hex')}`
     const randomPaymentId = `pay_${crypto.randomBytes(8).toString('hex')}`
