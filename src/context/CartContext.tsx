@@ -29,23 +29,50 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
 
+  const normalizeItem = (item: any): CartItem => {
+    const priceUsd = Number(item.price_usd || 0)
+    const priceInr = Number(item.price_inr || 0)
+
+    const resolvedInr = priceInr > 0 ? priceInr : (priceUsd > 0 ? Math.round(priceUsd * 85) : 0)
+    const resolvedUsd = priceUsd > 0 ? priceUsd : (priceInr > 0 ? Math.round((priceInr / 85) * 100) / 100 : 0)
+
+    return {
+      id: item.id,
+      name: item.name || '',
+      slug: item.slug || '',
+      price_inr: resolvedInr,
+      price_usd: resolvedUsd,
+      cover_image: item.cover_image || '',
+      product_type: item.product_type || 'plugin',
+      brand: item.brand || item.brands?.name || 'Producer Toy',
+    }
+  }
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('pt_cart')
-      if (saved) setItems(JSON.parse(saved))
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          const normalized = parsed.map(normalizeItem)
+          setItems(normalized)
+        }
+      }
     } catch {
       // JSON parse fallback
     }
   }, [])
 
   const saveCart = (newItems: CartItem[]) => {
-    setItems(newItems)
-    localStorage.setItem('pt_cart', JSON.stringify(newItems))
+    const normalized = newItems.map(normalizeItem)
+    setItems(normalized)
+    localStorage.setItem('pt_cart', JSON.stringify(normalized))
   }
 
-  const addItem = (item: CartItem, openDrawer: boolean = false) => {
-    if (!items.some(i => i.id === item.id)) {
-      const updated = [...items, item]
+  const addItem = (item: any, openDrawer: boolean = false) => {
+    const normalized = normalizeItem(item)
+    if (!items.some((i) => i.id === normalized.id)) {
+      const updated = [...items, normalized]
       saveCart(updated)
     }
     if (openDrawer) {
