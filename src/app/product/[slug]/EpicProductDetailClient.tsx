@@ -144,7 +144,22 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const deliveryMethod = product.delivery_method || 'Instant Encrypted Cloud Download'
   const publisherName = product.publisher || 'Producer Toy'
   const releaseYear = product.release_year || product.release_date || (product.created_at ? new Date(product.created_at).getFullYear().toString() : '2026')
-  const licenseType = product.license_type || '100% Royalty Free'
+  const licenseType = (() => {
+    if (product.license_type) return product.license_type
+    const type = (product.product_type || '').toLowerCase()
+    const isFree = Number(product.price_usd) === 0
+
+    if (type === 'plugin' || type === 'vst' || product.vst_format) {
+      if (isFree) return 'Freeware (Free License)'
+      return product.is_rent_to_own ? 'Rent-to-Own / Perpetual' : 'Lifetime Commercial License'
+    }
+
+    if (type === 'preset' || type === 'template') {
+      return isFree ? 'Free Commercial License' : 'Commercial License'
+    }
+
+    return '100% Royalty Free'
+  })()
   const developerName = product.brands?.name || product.brand || 'Producer Toy'
 
   const getProductFeaturesList = (prod: any): string[] => {
@@ -328,17 +343,32 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 <div className="space-y-2.5">
                   <span className="text-xs font-semibold text-zinc-400 block">Genres</span>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="bg-[#202020] text-zinc-200 border border-[#2a2a2a] text-xs font-semibold px-3.5 py-1.5 rounded-lg">
+                    <Link
+                      href={
+                        product.product_type === 'plugin'
+                          ? '/store/plugins'
+                          : product.product_type === 'sample_pack'
+                          ? '/store/sounds'
+                          : product.product_type === 'preset'
+                          ? '/store/presets'
+                          : '/store'
+                      }
+                      className="bg-[#202020] hover:bg-[#282828] hover:text-[#FC6301] text-zinc-200 border border-[#2a2a2a] text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                    >
                       {formattedType(product.product_type)}
-                    </span>
-                    {subCategoryList.map((subCat: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="bg-[#202020] text-zinc-200 border border-[#2a2a2a] text-xs font-semibold px-3.5 py-1.5 rounded-lg"
-                      >
-                        {subCat.trim()}
-                      </span>
-                    ))}
+                    </Link>
+                    {subCategoryList.map((subCat: string, idx: number) => {
+                      const catSlug = subCat.toLowerCase().trim().replace(/\s+/g, '-')
+                      return (
+                        <Link
+                          key={idx}
+                          href={`/store?cat=${encodeURIComponent(catSlug)}`}
+                          className="bg-[#202020] hover:bg-[#282828] hover:text-[#FC6301] text-zinc-200 border border-[#2a2a2a] text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+                        >
+                          {subCat.trim()}
+                        </Link>
+                      )
+                    })}
                   </div>
                 </div>
 

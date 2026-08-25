@@ -27,6 +27,8 @@ crop-logo.js
 process_*.py
 scripts/*.py
 public/ChatGPT Image*.png
+*.tsbuildinfo
+/scratch/
 
 # Operating System Files
 .DS_Store

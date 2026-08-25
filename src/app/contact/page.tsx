@@ -3,9 +3,11 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { Send, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { submitContactFormAction } from '@/actions/contactActions'
 
 export default function ContactSupportPage() {
   const [submitted, setSubmitted] = useState(false)
+  const [serverMsg, setServerMsg] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,9 +16,19 @@ export default function ContactSupportPage() {
     message: '',
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    const payload = new FormData()
+    payload.append('name', formData.name)
+    payload.append('email', formData.email)
+    payload.append('subject', formData.subject)
+    payload.append('message', formData.message)
+    
+    const res = await submitContactFormAction(payload)
+    if (res.success) {
+      setServerMsg(res.message)
+      setSubmitted(true)
+    }
   }
 
   return (

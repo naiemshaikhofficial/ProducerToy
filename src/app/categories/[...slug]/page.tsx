@@ -59,6 +59,36 @@ const CATEGORY_META_MAP: Record<string, { title: string; productType?: string; d
   }
 }
 
+function expandCategoryVariants(rawCats: string[]): string[] {
+  const set = new Set<string>()
+  rawCats.forEach(raw => {
+    if (!raw) return
+    const s = raw.trim()
+    set.add(s)
+    const lower = s.toLowerCase()
+    set.add(lower)
+
+    const withSpace = lower.replace(/[-_]+/g, ' ')
+    set.add(withSpace)
+
+    const withHyphen = lower.replace(/[\s_]+/g, '-')
+    set.add(withHyphen)
+
+    const withUnderscore = lower.replace(/[\s-]+/g, '_')
+    set.add(withUnderscore)
+
+    const titleCaseSpace = withSpace.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    set.add(titleCaseSpace)
+
+    const titleCaseHyphen = withHyphen.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-')
+    set.add(titleCaseHyphen)
+
+    set.add(withSpace.toUpperCase())
+    set.add(withHyphen.toUpperCase())
+  })
+  return Array.from(set)
+}
+
 // Clean helper to convert "2-Effects" or "3-Studio-Tools" to "effects" or "studio-tools"
 function parseCategorySlug(rawSlug: string): string {
   if (!rawSlug) return 'all'
@@ -118,6 +148,41 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   try {
     const supabase = getAdminClient()
 
+    // Fast parallel metadata fetching
+    const [dbCatRes, dbSubRes, dbBrandRes] = await Promise.all([
+      supabase.from('categories').select('id, name, slug'),
+      supabase.from('subcategories').select('id, name, slug'),
+      supabase.from('brands').select('id, name, slug').order('name')
+    ])
+
+    const dbCatData = dbCatRes.data || []
+    const dbSubData = dbSubRes.data || []
+    const dbBrandData = dbBrandRes.data || []
+
+    const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
+      { id: 'reverb', name: 'Reverb', slug: 'reverb' },
+      { id: 'delay', name: 'Delay & Echo', slug: 'delay' },
+      { id: 'compressor', name: 'Compressor', slug: 'compressor' },
+      { id: 'saturation', name: 'Saturation & Warmth', slug: 'saturation' },
+      { id: 'eq', name: 'Equalizer (EQ)', slug: 'eq' },
+      { id: 'distortion', name: 'Distortion & Overdrive', slug: 'distortion' },
+      { id: 'modulation', name: 'Chorus & Modulation', slug: 'modulation' },
+      { id: 'synth', name: 'Synthesizer VST', slug: 'synth' },
+      { id: 'vocal', name: 'Vocal Processor', slug: 'vocal' },
+      { id: '808', name: '808 & Bass', slug: '808' },
+      { id: 'drum-kit', name: 'Drum Kit & Loops', slug: 'drum-kit' },
+    ]
+
+    dbCatData.forEach(c => {
+      if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
+    })
+    dbSubData.forEach(s => {
+      if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
+    })
+
+    categoriesOptions = combinedCategories
+    brandsOptions = dbBrandData
+
     let query = supabase
       .from('products')
       .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
@@ -128,55 +193,20 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     if (meta?.productType) {
       query = query.eq('product_type', meta.productType)
     } else if (cleanCategorySlug && cleanCategorySlug !== 'all' && cleanCategorySlug !== 'bundles') {
-      const { data: catData } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('slug', cleanCategorySlug)
-        .maybeSingle()
-
-      if (catData) {
-        query = query.eq('category_id', catData.id)
+      const catObj = dbCatData.find(c => c.slug.toLowerCase() === cleanCategorySlug.toLowerCase())
+      if (catObj) {
+        query = query.eq('category_id', catObj.id)
       } else {
         query = query.ilike('name', `%${cleanCategorySlug}%`)
       }
     }
 
-    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE (OPTION 2: Human-readable category_slugs text array)
+    // MULTI-CATEGORY / MULTI-SUBCATEGORY FILTERING FROM SUPABASE
     if (catParam) {
-      const selectedCats = catParam.split(',').map(c => c.trim().toLowerCase()).filter(Boolean)
-      
+      const selectedCats = catParam.split(',').map(c => c.trim()).filter(Boolean)
       if (selectedCats.length > 0) {
-        const conditions: string[] = []
-
-        // 1. Direct match on human-readable category_slugs text array in Supabase
-        selectedCats.forEach(term => {
-          conditions.push(`category_slugs.cs.{${term}}`)
-        })
-
-        // 2. Match subcategories & main categories as fallback
-        const { data: matchedSubs } = await supabase
-          .from('subcategories')
-          .select('id, slug')
-          .in('slug', selectedCats)
-
-        const { data: matchedCats } = await supabase
-          .from('categories')
-          .select('id, slug')
-          .in('slug', selectedCats)
-
-        const subIds = matchedSubs?.map(s => s.id) || []
-        const catIds = matchedCats?.map(c => c.id) || []
-
-        if (subIds.length > 0) {
-          conditions.push(`subcategory_id.in.(${subIds.join(',')})`)
-        }
-        if (catIds.length > 0) {
-          conditions.push(`category_id.in.(${catIds.join(',')})`)
-        }
-
-        if (conditions.length > 0) {
-          query = query.or(conditions.join(','))
-        }
+        const expandedCats = expandCategoryVariants(selectedCats)
+        query = query.overlaps('category_slugs', expandedCats)
       }
     }
 
@@ -184,12 +214,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     if (brandParam) {
       const selectedBrands = brandParam.split(',').map(b => b.trim().toLowerCase()).filter(Boolean)
       if (selectedBrands.length > 0) {
-        const { data: matchedBrandObjs } = await supabase
-          .from('brands')
-          .select('id, slug')
-          .in('slug', selectedBrands)
-
-        const brandIds = matchedBrandObjs?.map(b => b.id) || []
+        const brandIds = dbBrandData.filter(b => selectedBrands.includes(b.slug.toLowerCase())).map(b => b.id)
         if (brandIds.length > 0) {
           query = query.in('brand_id', brandIds)
         }
@@ -215,47 +240,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       query = query.order('price_usd', { ascending: false })
     } else {
       query = query.order('created_at', { ascending: false })
-    }
-
-    // Query categories & subcategories for the dropdown list
-    const { data: dbCatData } = await supabase.from('categories').select('id, name, slug')
-    const { data: dbSubData } = await supabase.from('subcategories').select('id, name, slug')
-
-    const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
-      { id: 'reverb', name: 'Reverb', slug: 'reverb' },
-      { id: 'delay', name: 'Delay & Echo', slug: 'delay' },
-      { id: 'compressor', name: 'Compressor', slug: 'compressor' },
-      { id: 'saturation', name: 'Saturation & Warmth', slug: 'saturation' },
-      { id: 'eq', name: 'Equalizer (EQ)', slug: 'eq' },
-      { id: 'distortion', name: 'Distortion & Overdrive', slug: 'distortion' },
-      { id: 'modulation', name: 'Chorus & Modulation', slug: 'modulation' },
-      { id: 'synth', name: 'Synthesizer VST', slug: 'synth' },
-      { id: 'vocal', name: 'Vocal Processor', slug: 'vocal' },
-      { id: '808', name: '808 & Bass', slug: '808' },
-      { id: 'drum-kit', name: 'Drum Kit & Loops', slug: 'drum-kit' },
-    ]
-
-    if (dbCatData && dbCatData.length > 0) {
-      dbCatData.forEach(c => {
-        if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
-      })
-    }
-
-    if (dbSubData && dbSubData.length > 0) {
-      dbSubData.forEach(s => {
-        if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
-      })
-    }
-
-    categoriesOptions = combinedCategories
-
-    const { data: dbBrandData } = await supabase
-      .from('brands')
-      .select('id, name, slug')
-      .order('name')
-
-    if (dbBrandData && dbBrandData.length > 0) {
-      brandsOptions = dbBrandData
     }
 
     const { data, error } = await query

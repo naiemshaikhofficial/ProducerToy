@@ -34,6 +34,36 @@ const CATEGORY_TYPE_MAP: Record<string, { productType: string; categorySlugs: st
   'templates': { productType: 'template', categorySlugs: ['templates'] },
 }
 
+function expandCategoryVariants(rawCats: string[]): string[] {
+  const set = new Set<string>()
+  rawCats.forEach(raw => {
+    if (!raw) return
+    const s = raw.trim()
+    set.add(s)
+    const lower = s.toLowerCase()
+    set.add(lower)
+
+    const withSpace = lower.replace(/[-_]+/g, ' ')
+    set.add(withSpace)
+
+    const withHyphen = lower.replace(/[\s_]+/g, '-')
+    set.add(withHyphen)
+
+    const withUnderscore = lower.replace(/[\s-]+/g, '_')
+    set.add(withUnderscore)
+
+    const titleCaseSpace = withSpace.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    set.add(titleCaseSpace)
+
+    const titleCaseHyphen = withHyphen.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-')
+    set.add(titleCaseHyphen)
+
+    set.add(withSpace.toUpperCase())
+    set.add(withHyphen.toUpperCase())
+  })
+  return Array.from(set)
+}
+
 export default async function StorePage({ params, searchParams }: StorePageProps) {
   const { slug } = await params
   const {
@@ -65,9 +95,16 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   try {
     const supabase = getAdminClient()
 
-    // 1. Fetch categories & subcategories options for the FilterBar
-    const { data: dbCatData } = await supabase.from('categories').select('id, name, slug')
-    const { data: dbSubData } = await supabase.from('subcategories').select('id, name, slug')
+    // 1. FAST PARALLEL FETCHING for metadata (1 single roundtrip)
+    const [dbCatRes, dbSubRes, dbBrandRes] = await Promise.all([
+      supabase.from('categories').select('id, name, slug'),
+      supabase.from('subcategories').select('id, name, slug'),
+      supabase.from('brands').select('id, name, slug, logo_url, description').order('name')
+    ])
+
+    const dbCatData = dbCatRes.data || []
+    const dbSubData = dbSubRes.data || []
+    const dbBrandData = dbBrandRes.data || []
 
     const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
       { id: 'reverb', name: 'Reverb', slug: 'reverb' },
@@ -83,45 +120,24 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       { id: 'drum-kit', name: 'Drum Kit & Loops', slug: 'drum-kit' },
     ]
 
-    if (dbCatData && dbCatData.length > 0) {
-      dbCatData.forEach(c => {
-        if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
-      })
-    }
-
-    if (dbSubData && dbSubData.length > 0) {
-      dbSubData.forEach(s => {
-        if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
-      })
-    }
+    dbCatData.forEach(c => {
+      if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
+    })
+    dbSubData.forEach(s => {
+      if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
+    })
 
     categoriesOptions = combinedCategories
+    brandsOptions = dbBrandData
 
-    const { data: dbBrandData } = await supabase
-      .from('brands')
-      .select('id, name, slug')
-      .order('name')
-
-    if (dbBrandData && dbBrandData.length > 0) {
-      brandsOptions = dbBrandData
-    }
-
-    // 2. Check if Brand is requested via URL /store/[brandSlug] or ?brand=...
+    // Fast in-memory lookup for selected brand
     const brandSearchTerm = brandParam || (categorySlug.toLowerCase() === 'brand' ? subTypeSlug : categorySlug)
     if (brandSearchTerm && brandSearchTerm.toLowerCase() !== 'free') {
-      const cleanTerm = brandSearchTerm.replace(/-/g, ' ')
-      const { data: brandData } = await supabase
-        .from('brands')
-        .select('id, name, slug, logo_url, description')
-        .or(`slug.ilike.${brandSearchTerm},name.ilike.%${cleanTerm}%`)
-        .maybeSingle()
-
-      if (brandData) {
-        selectedBrand = brandData
-      }
+      const cleanTerm = brandSearchTerm.toLowerCase()
+      selectedBrand = dbBrandData.find(b => b.slug.toLowerCase() === cleanTerm || b.name.toLowerCase().includes(cleanTerm)) || null
     }
 
-    // 3. Build product query
+    // 2. Build product query
     let query = supabase
       .from('products')
       .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
@@ -146,78 +162,34 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       if (typeInfo) {
         query = query.eq('product_type', typeInfo.productType)
       } else {
-        const { data: catData } = await supabase
-          .from('categories')
-          .select('id')
-          .eq('slug', categorySlug)
-          .maybeSingle()
-
-        if (catData) {
-          query = query.eq('category_id', catData.id)
+        const catObj = dbCatData.find(c => c.slug.toLowerCase() === categorySlug.toLowerCase())
+        if (catObj) {
+          query = query.eq('category_id', catObj.id)
         } else {
-          const cleanCat = categorySlug.replace(/-/g, ' ')
-          const { data: matchedBrand } = await supabase
-            .from('brands')
-            .select('*')
-            .or(`slug.ilike.${categorySlug},name.ilike.%${cleanCat}%`)
-            .maybeSingle()
-
-          if (matchedBrand) {
-            selectedBrand = matchedBrand
-            query = query.eq('brand_id', matchedBrand.id)
+          const brandObj = dbBrandData.find(b => b.slug.toLowerCase() === categorySlug.toLowerCase())
+          if (brandObj) {
+            selectedBrand = brandObj
+            query = query.eq('brand_id', brandObj.id)
           }
         }
       }
     }
 
-    // Subcategory or Cat query parameter handling
+    // Subcategory / Category filtering using instant GIN indexed array overlap
     const activeCatString = catParam || subTypeSlug
     if (activeCatString && !selectedBrand) {
-      const selectedCats = activeCatString.split(',').map(c => c.trim().toLowerCase()).filter(Boolean)
-      
+      const selectedCats = activeCatString.split(',').map(c => c.trim()).filter(Boolean)
       if (selectedCats.length > 0) {
-        const conditions: string[] = []
-
-        selectedCats.forEach(term => {
-          conditions.push(`category_slugs.cs.{${term}}`)
-        })
-
-        const { data: matchedSubs } = await supabase
-          .from('subcategories')
-          .select('id, slug')
-          .in('slug', selectedCats)
-
-        const { data: matchedCats } = await supabase
-          .from('categories')
-          .select('id, slug')
-          .in('slug', selectedCats)
-
-        const subIds = matchedSubs?.map(s => s.id) || []
-        const catIds = matchedCats?.map(c => c.id) || []
-
-        if (subIds.length > 0) {
-          conditions.push(`subcategory_id.in.(${subIds.join(',')})`)
-        }
-        if (catIds.length > 0) {
-          conditions.push(`category_id.in.(${catIds.join(',')})`)
-        }
-
-        if (conditions.length > 0) {
-          query = query.or(conditions.join(','))
-        }
+        const expandedCats = expandCategoryVariants(selectedCats)
+        query = query.overlaps('category_slugs', expandedCats)
       }
     }
 
-    // Multi-Brand filter parameter
+    // Multi-Brand filter parameter (using in-memory metadata)
     if (brandParam) {
       const selectedBrands = brandParam.split(',').map(b => b.trim().toLowerCase()).filter(Boolean)
       if (selectedBrands.length > 0) {
-        const { data: matchedBrandObjs } = await supabase
-          .from('brands')
-          .select('id, slug')
-          .in('slug', selectedBrands)
-
-        const brandIds = matchedBrandObjs?.map(b => b.id) || []
+        const brandIds = dbBrandData.filter(b => selectedBrands.includes(b.slug.toLowerCase())).map(b => b.id)
         if (brandIds.length > 0) {
           query = query.in('brand_id', brandIds)
         }

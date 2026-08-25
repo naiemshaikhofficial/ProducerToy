@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { X, Trash2, ArrowRight, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
+import { validateCouponAction } from '@/actions/couponActions'
 
 export function CartDrawer() {
   const { items, removeItem, isCartOpen, setIsCartOpen } = useCart()
@@ -29,15 +30,13 @@ export function CartDrawer() {
   const finalTotalInr = Math.max(0, rawSubtotalInr - bundleDiscountInr - couponDiscountInr)
   const finalTotalUsd = Math.max(0, rawSubtotalUsd - bundleDiscountUsd - couponDiscountUsd)
 
-  const applyCoupon = () => {
-    if (coupon.toUpperCase() === 'PRODUCER10') {
-      setDiscountPercent(10)
-      setCouponError('')
-    } else if (coupon.toUpperCase() === 'TOY20') {
-      setDiscountPercent(20)
-      setCouponError('')
+  const applyCoupon = async () => {
+    const res = await validateCouponAction(coupon)
+    if (res.success) {
+      setDiscountPercent(res.discountPercent)
+      setCouponError(res.message)
     } else {
-      setCouponError('Invalid coupon code')
+      setCouponError(res.message)
       setDiscountPercent(0)
     }
   }

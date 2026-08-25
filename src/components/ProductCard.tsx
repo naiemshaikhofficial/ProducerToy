@@ -1,11 +1,14 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Play, Pause, Bookmark } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Play, Pause, Bookmark, ShoppingBag, Check } from 'lucide-react'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAudio } from '@/context/AudioContext'
+import { useCart } from '@/context/CartContext'
+import { toggleWishlistAction } from '@/actions/wishlistActions'
 
 export interface Product {
   id: string
@@ -50,10 +53,48 @@ export interface Product {
 }
 
 export function ProductCard({ product }: { product: Product }) {
+  const router = useRouter()
   const { formatPrice } = useCurrency()
   const { currentTrack, isPlaying, playTrack } = useAudio()
+  const { addItem, isInCart } = useCart()
+  const [isSaved, setIsSaved] = useState(false)
+  const [isCartAdded, setIsCartAdded] = useState(false)
 
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
+  const added = isInCart(product.id) || isCartAdded
+
+  const brandName = product.brands?.name || product.brand || 'Producer Toy'
+  const brandSlug = product.brands?.slug || (product.brand ? product.brand.toLowerCase().trim().replace(/\s+/g, '-') : 'producer-toy')
+
+  const handleBrandClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    router.push(`/store?brand=${brandSlug}`)
+  }
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    // Optimistic UI update immediately for instant 0ms feedback
+    setIsSaved(prev => !prev)
+    await toggleWishlistAction(product.id)
+  }
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addItem({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price_inr: product.price_inr || Math.round(product.price_usd * 85),
+      price_usd: product.price_usd,
+      cover_image: product.cover_image,
+      product_type: product.product_type,
+      brand: product.brands?.name || product.brand || 'Producer Toy',
+    })
+    setIsCartAdded(true)
+  }
 
   const subCategoryLabel = (() => {
     // 1. If product_subcategories junction array exists from Supabase dropdown selection
@@ -128,14 +169,38 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Wishlist Bookmark Button */}
         <button 
           type="button"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white/70 hover:text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-white/10 z-10"
-          title="Save to Wishlist"
+          onClick={handleWishlistToggle}
+          className={`absolute top-3 right-3 w-8.5 h-8.5 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
+            isSaved
+              ? 'bg-white text-black opacity-100 scale-105'
+              : 'bg-black/60 text-white/70 hover:text-white opacity-0 group-hover:opacity-100'
+          }`}
+          title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
         >
-          <Bookmark className="w-4 h-4" />
+          <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+        </button>
+
+        {/* Snappy Quick Add To Cart Button */}
+        <button
+          type="button"
+          onClick={handleQuickAdd}
+          className={`absolute bottom-3 left-3 px-3 py-1.5 rounded-full text-xs font-bold backdrop-blur-md flex items-center gap-1.5 transition-all z-20 shadow-xl border border-white/10 ${
+            added
+              ? 'bg-[#FC6301] text-white opacity-100'
+              : 'bg-black/80 hover:bg-white hover:text-black text-white opacity-0 group-hover:opacity-100'
+          }`}
+        >
+          {added ? (
+            <>
+              <Check className="w-3.5 h-3.5 stroke-[3]" />
+              <span>In Cart</span>
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>+ Cart</span>
+            </>
+          )}
         </button>
 
         {/* Audio Audition Play Button Overlay */}
@@ -166,6 +231,18 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-white/80 transition-colors">
           {product.name}
         </h3>
+
+        {/* Brand Name */}
+        <span className="text-xs text-zinc-400 font-medium line-clamp-1 -mt-0.5 z-20">
+          by{' '}
+          <button
+            type="button"
+            onClick={handleBrandClick}
+            className="text-zinc-300 font-semibold hover:text-[#FC6301] focus:outline-none transition-colors cursor-pointer inline-block"
+          >
+            {brandName}
+          </button>
+        </span>
 
         {/* Price Row */}
         <div className="flex items-center gap-2 mt-1">
