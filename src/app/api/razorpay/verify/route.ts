@@ -126,10 +126,14 @@ export async function POST(request: Request) {
         serialKey = `PT-VST-${serialPartA}-${serialPartB}-${serialPartC}`
       }
 
+      const itemInr = Number(dbProduct.price_inr || 0) > 0
+        ? Number(dbProduct.price_inr)
+        : Math.round(Number(dbProduct.price_usd || 0) * 85)
+
       return {
         user_id: userId,
         product_id: dbProduct.id,
-        amount_paid: Number(dbProduct.price_inr || 0),
+        amount_paid: itemInr,
         currency: 'INR',
         serial_key: serialKey,
         razorpay_order_id: finalOrderId,
@@ -157,7 +161,13 @@ export async function POST(request: Request) {
     }
 
     // 6. Record in orders table
-    const subtotalInr = dbProducts.reduce((sum, p) => sum + Number(p.price_inr || 0), 0)
+    const subtotalInr = dbProducts.reduce((sum, p) => {
+      const inr = Number(p.price_inr || 0)
+      const usd = Number(p.price_usd || 0)
+      if (inr > 0) return sum + inr
+      if (usd > 0) return sum + Math.round(usd * 85)
+      return sum
+    }, 0)
 
     await adminSupabase.from('orders').insert({
       user_id: userId,

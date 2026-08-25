@@ -44,7 +44,13 @@ export async function POST(request: Request) {
     }
 
     // 2. Server-side price calculation in INR
-    const rawSubtotalInr = dbProducts.reduce((sum, p) => sum + Number(p.price_inr || 0), 0)
+    const rawSubtotalInr = dbProducts.reduce((sum, p) => {
+      const inr = Number(p.price_inr || 0)
+      const usd = Number(p.price_usd || 0)
+      if (inr > 0) return sum + inr
+      if (usd > 0) return sum + Math.round(usd * 85)
+      return sum
+    }, 0)
 
     // Bundle discount: 10% off for 3+ items
     const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
