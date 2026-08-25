@@ -138,6 +138,31 @@ export default function CheckoutPage() {
             </div>
           )}
 
+          {/* Quick Sign-In Banner if Not Logged In */}
+          {!user ? (
+            <div className="bg-[#181820] border border-[#2a2a38] rounded-xl p-4 flex items-center justify-between text-xs">
+              <div className="space-y-0.5">
+                <span className="text-white font-bold block">Have an account?</span>
+                <span className="text-zinc-400 text-[11px]">Sign in with Google or Email to automatically link your downloads & serial keys.</span>
+              </div>
+              <Link
+                href="/auth?next=/checkout"
+                prefetch={true}
+                className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-4 py-2 rounded-lg uppercase tracking-wider transition-all flex-shrink-0 shadow-md ml-3"
+              >
+                Sign In
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-[#141a14] border border-[#203420] rounded-xl p-3.5 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2 text-zinc-300">
+                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span>Signed in as <strong className="text-white">{user.email}</strong></span>
+              </div>
+              <span className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">Account Active</span>
+            </div>
+          )}
+
           <form onSubmit={handleSimulatePayment} className="space-y-6">
             
             {/* Account Info */}
@@ -148,7 +173,7 @@ export default function CheckoutPage() {
               <input
                 type="email"
                 required
-                value={email}
+                value={email || user?.email || ''}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="producer@studio.com"
                 className="w-full px-3.5 py-3 text-xs font-mono bg-[#16161a] border border-[#24242e] rounded-xl text-white focus:outline-none focus:border-zinc-500"
@@ -182,10 +207,15 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-white hover:bg-zinc-200 text-black rounded-xl py-4 text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full bg-white hover:bg-zinc-200 text-black rounded-xl py-4 text-sm font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg active:scale-[0.99]"
             >
               {loading ? (
                 <span>Processing Order...</span>
+              ) : finalTotalUsd === 0 ? (
+                <>
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  <span>Claim Free Download (Instant Access)</span>
+                </>
               ) : (
                 <>
                   <ShieldCheck className="w-5 h-5" />

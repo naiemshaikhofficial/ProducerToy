@@ -6,11 +6,13 @@ import Link from 'next/link'
 import { X, Trash2, ArrowRight, ShoppingBag } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
+import { useAuth } from '@/context/AuthContext'
 import { validateCouponAction } from '@/actions/couponActions'
 
 export function CartDrawer() {
   const { items, removeItem, isCartOpen, setIsCartOpen } = useCart()
   const { formatPrice } = useCurrency()
+  const { user } = useAuth()
   const [coupon, setCoupon] = useState('')
   const [discountPercent, setDiscountPercent] = useState(0)
   const [couponError, setCouponError] = useState('')
@@ -182,9 +184,9 @@ export function CartDrawer() {
 
               {/* Checkout Link */}
               <Link
-                href="/checkout"
+                href={user ? '/checkout' : '/auth?next=/checkout'}
                 onClick={() => setIsCartOpen(false)}
-                className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 rounded-full uppercase tracking-wider flex items-center justify-center gap-2 mt-2 transition-all shadow-lg"
+                className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 rounded-full uppercase tracking-wider flex items-center justify-center gap-2 mt-2 transition-all shadow-lg cursor-pointer"
               >
                 <span>Proceed to Checkout</span>
                 <ArrowRight className="w-4 h-4" />

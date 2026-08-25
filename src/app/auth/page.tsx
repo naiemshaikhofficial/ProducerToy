@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogoIcon } from '@/components/Logo'
 import { ChevronLeft, Eye, EyeOff, Mail, CheckCircle2, Lock, AlertCircle } from 'lucide-react'
@@ -31,8 +31,10 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
   )
 }
 
-export default function AuthPage() {
+function AuthForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const nextUrl = searchParams.get('next') || '/'
   const supabase = createClient()
 
   // Navigation mode ('signin' | 'signup') & Step ('email' | 'details')
@@ -72,10 +74,11 @@ export default function AuthPage() {
     try {
       setLoading(true)
       setError('')
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: callbackUrl,
         },
       })
       if (error) throw error
@@ -155,7 +158,7 @@ export default function AuthPage() {
           password,
         })
         if (signInError) throw signInError
-        router.push('/my-purchases')
+        router.push(nextUrl)
         router.refresh()
       }
     } catch (err: any) {
@@ -518,5 +521,13 @@ export default function AuthPage() {
       </div>
 
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#121212] flex items-center justify-center text-white text-xs font-mono">Loading...</div>}>
+      <AuthForm />
+    </Suspense>
   )
 }
