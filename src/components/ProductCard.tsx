@@ -31,6 +31,7 @@ export interface Product {
   product_type: 'plugin' | 'sample_pack' | 'preset' | 'template' | string
   price_inr?: number
   price_usd: number
+  original_price_usd?: number | null
   cover_image: string
   demo_audio_url?: string
   vst_format?: string
@@ -72,7 +73,14 @@ export function ProductCard({ product }: { product: Product }) {
     })
   }
 
-  const isFree = product.price_usd === 0 || product.price_inr === 0
+  const isFree = Number(product.price_usd) === 0
+  const originalPrice = product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd)
+    ? Number(product.original_price_usd)
+    : 0
+
+  const discountPercent = originalPrice > 0 && Number(product.price_usd) > 0
+    ? Math.round(((originalPrice - Number(product.price_usd)) / originalPrice) * 100)
+    : 0
 
   return (
     <Link
@@ -138,14 +146,18 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="text-sm font-semibold text-white">Free</span>
           ) : (
             <>
-              <span className="text-xs bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded text-[11px]">
-                -50%
-              </span>
-              <span className="text-xs text-zinc-500 line-through">
-                {formatPrice((product.price_inr || 999) * 2, (product.price_usd || 12.99) * 2)}
-              </span>
+              {discountPercent > 0 && (
+                <span className="text-xs bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded text-[11px]">
+                  -{discountPercent}%
+                </span>
+              )}
+              {originalPrice > 0 && (
+                <span className="text-xs text-zinc-500 line-through">
+                  {formatPrice(undefined, originalPrice)}
+                </span>
+              )}
               <span className="text-sm font-semibold text-white">
-                {formatPrice(product.price_inr, product.price_usd)}
+                {formatPrice(undefined, product.price_usd)}
               </span>
             </>
           )}

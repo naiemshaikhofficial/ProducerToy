@@ -414,13 +414,25 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           </div>
 
           <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              {product.price_usd === 0 ? (
+            <div className="flex items-center gap-3 flex-wrap">
+              {Number(product.price_usd) === 0 ? (
                 <span className="text-2xl sm:text-3xl font-extrabold text-white">FREE</span>
               ) : (
-                <span className="text-2xl sm:text-3xl font-extrabold text-white">
-                  {formatPrice(undefined, product.price_usd)}
-                </span>
+                <>
+                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
+                    <>
+                      <span className="text-xs bg-[#FC6301] text-white font-extrabold px-2 py-1 rounded text-[12px]">
+                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
+                      </span>
+                      <span className="text-base text-zinc-500 line-through">
+                        {formatPrice(undefined, Number(product.original_price_usd))}
+                      </span>
+                    </>
+                  )}
+                  <span className="text-2xl sm:text-3xl font-extrabold text-white">
+                    {formatPrice(undefined, product.price_usd)}
+                  </span>
+                </>
               )}
             </div>
           </div>
