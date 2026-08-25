@@ -12,12 +12,22 @@ export async function POST(request: Request) {
 
     const supabase = getAdminClient()
 
-    let targetUserId = userId
+    let targetUserId: string | null = userId || null
 
-    // If user is not logged in, search or create user by email
+    // If userId provided, check if user exists in auth.users
+    if (targetUserId) {
+      const { data: userRecord } = await supabase.auth.admin.getUserById(targetUserId)
+      if (!userRecord || !userRecord.user) {
+        targetUserId = null
+      }
+    }
+
+    // If no valid userId yet, search or create user by email
     if (!targetUserId && email) {
       const { data: usersData } = await supabase.auth.admin.listUsers()
-      const existingUser = usersData?.users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
+      const existingUser = usersData?.users?.find(
+        (u: any) => u.email?.toLowerCase() === email.toLowerCase()
+      )
 
       if (existingUser) {
         targetUserId = existingUser.id
@@ -26,7 +36,7 @@ export async function POST(request: Request) {
         const { data: newUser, error: createErr } = await supabase.auth.admin.createUser({
           email,
           email_confirm: true,
-          user_metadata: { role: 'customer' }
+          user_metadata: { role: 'customer' },
         })
 
         if (!createErr && newUser?.user) {
@@ -41,9 +51,13 @@ export async function POST(request: Request) {
       product_id: item.id,
       amount_paid: item.price_usd || item.price_inr || 0,
       currency: 'USD',
-      serial_key: item.product_type === 'plugin' || item.product_type === 'vst' || item.type === 'plugin' 
-        ? `PT-VST-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}` 
-        : null,
+      serial_key:
+        item.product_type === 'plugin' || item.product_type === 'vst' || item.type === 'plugin'
+          ? `PT-VST-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random()
+              .toString(36)
+              .substring(2, 8)
+              .toUpperCase()}`
+          : null,
       razorpay_order_id: `order_${Math.random().toString(36).substring(2, 12)}`,
       razorpay_payment_id: `pay_${Math.random().toString(36).substring(2, 12)}`,
     }))
