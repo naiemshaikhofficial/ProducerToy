@@ -281,11 +281,21 @@ export default function CheckoutPage() {
   // Calculations
   const isIndia = billingDetails.country === 'India' || (!billingDetails.country && currency === 'INR')
 
-  const rawSubtotalInr = items.reduce((sum, item) => sum + Number(item.price_inr || 0), 0)
-  const rawSubtotalUsd = items.reduce(
-    (sum, item) => sum + Number(item.price_usd || (item.price_inr ? item.price_inr / 85 : 0)),
-    0
-  )
+  const rawSubtotalInr = items.reduce((sum, item) => {
+    const inr = Number(item.price_inr || 0)
+    const usd = Number(item.price_usd || 0)
+    if (inr > 0) return sum + inr
+    if (usd > 0) return sum + Math.round(usd * 85)
+    return sum
+  }, 0)
+
+  const rawSubtotalUsd = items.reduce((sum, item) => {
+    const usd = Number(item.price_usd || 0)
+    const inr = Number(item.price_inr || 0)
+    if (usd > 0) return sum + usd
+    if (inr > 0) return sum + Math.round((inr / 85) * 100) / 100
+    return sum
+  }, 0)
 
   const currentSubtotal = isIndia ? rawSubtotalInr : rawSubtotalUsd
   const currencySymbol = isIndia ? '₹' : '$'
@@ -542,7 +552,7 @@ export default function CheckoutPage() {
 
           <div className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
             <ShieldCheck size={13} className="text-zinc-400" />
-            <span>256-Bit SSL Encrypted &bull; Instant Delivery</span>
+            <span>256-Bit SSL Encrypted • Instant Delivery</span>
           </div>
         </div>
 
@@ -553,8 +563,8 @@ export default function CheckoutPage() {
           </h1>
           <p className="text-xs text-zinc-500">
             {isIndia
-              ? 'India Orders &bull; Razorpay UPI, NetBanking & Cards'
-              : 'International Orders &bull; PayPal & Global Cards in USD'}
+              ? 'India Orders • Razorpay UPI, NetBanking & Cards'
+              : 'International Orders • PayPal & Global Cards in USD'}
           </p>
         </div>
 

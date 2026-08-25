@@ -264,7 +264,7 @@ export function CheckoutOrderSummary({
         )}
 
         <p className="text-[10px] text-zinc-500 text-center mt-2">
-          Encrypted 256-bit SSL &bull; Instant vault delivery &bull;{' '}
+          Encrypted 256-bit SSL • Instant vault delivery •{' '}
           <Link href="/terms" className="text-zinc-400 hover:underline">
             Terms
           </Link>

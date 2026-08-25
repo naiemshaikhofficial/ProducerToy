@@ -51,7 +51,7 @@ export function CheckoutCartItems({ items, removeItem, formatPrice }: CheckoutCa
                 <span className="capitalize">{item.product_type?.replace('_', ' ') || 'Plugin'}</span>
                 {item.brand && (
                   <>
-                    <span>&bull;</span>
+                    <span>•</span>
                     <span className="truncate">{item.brand}</span>
                   </>
                 )}
