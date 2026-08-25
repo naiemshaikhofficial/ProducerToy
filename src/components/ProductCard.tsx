@@ -154,6 +154,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/product/${product.slug}`}
+      prefetch={true}
       className="group flex flex-col cursor-pointer select-none"
     >
       {/* 3:4 Tall Epic Games Store Poster Card */}

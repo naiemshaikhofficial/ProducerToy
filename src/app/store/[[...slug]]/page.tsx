@@ -497,6 +497,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
         </div>
       )}
 
+      <LocalDataCache data={{ products, categories: categoriesOptions, brands: brandsOptions }} />
     </div>
   )
 }

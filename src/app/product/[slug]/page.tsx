@@ -18,7 +18,7 @@ const getCachedProduct = cache(async (slug: string) => {
   const { data: product } = await supabase
     .from('products')
     .select('*, categories(name, slug), subcategories!subcategory_id(name, slug), brands!brand_id(name, slug, logo_url)')
-    .ilike('slug', cleanSlug)
+    .eq('slug', cleanSlug.toLowerCase())
     .eq('is_active', true)
     .maybeSingle()
 
