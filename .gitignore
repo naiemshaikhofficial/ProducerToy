@@ -38,5 +38,7 @@ ehthumbs.db
 # IDE / Editor Files
 .vscode/
 .idea/
+ProducerToy/
+
 *.swp
 *.swo
