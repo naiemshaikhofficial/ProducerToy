@@ -8,7 +8,6 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { AudioPlayer } from '@/components/AudioPlayer'
 import { CartDrawer } from '@/components/CartDrawer'
-import { GlobalCheckoutModal } from '@/components/checkout/GlobalCheckoutModal'
 import { ImageProtection } from '@/components/ImageProtection'
 import { ContentProtection } from '@/components/ContentProtection'
 import { StoreOrganizationJsonLd } from '@/components/JsonLd'
@@ -59,7 +58,6 @@ export default function RootLayout({
                 
                 <AudioPlayer />
                 <CartDrawer />
-                <GlobalCheckoutModal />
 
               </AudioProvider>
             </CartProvider>

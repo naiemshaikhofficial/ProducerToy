@@ -3,11 +3,17 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { X, Trash2, ArrowRight } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
 import { validateCouponAction } from '@/actions/couponActions'
+
+const GlobalCheckoutModal = dynamic(
+  () => import('./checkout/GlobalCheckoutModal').then((mod) => mod.GlobalCheckoutModal),
+  { ssr: false }
+)
 
 export function CartDrawer() {
   const { items, removeItem, isCartOpen, setIsCartOpen, openCheckout } = useCart()
@@ -16,8 +22,6 @@ export function CartDrawer() {
   const [coupon, setCoupon] = useState('')
   const [discountPercent, setDiscountPercent] = useState(0)
   const [couponError, setCouponError] = useState('')
-
-  if (!isCartOpen) return null
 
   const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || 0), 0)
   const rawSubtotalInr = Math.round(rawSubtotalUsd * exchangeRate)
@@ -44,12 +48,14 @@ export function CartDrawer() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden select-none">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-        onClick={() => setIsCartOpen(false)}
-      />
+    <>
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden select-none">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsCartOpen(false)}
+          />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
         <div className="w-screen max-w-sm bg-[#121212] text-white border-l border-[#222222] flex flex-col justify-between shadow-2xl animate-in slide-in-from-right duration-200">
@@ -185,5 +191,10 @@ export function CartDrawer() {
         </div>
       </div>
     </div>
-  )
+  )}
+
+  {/* In-Place Epic Games Checkout Modal */}
+  <GlobalCheckoutModal />
+</>
+)
 }
