@@ -119,6 +119,7 @@ export async function POST(request: Request) {
 
     // 7. Sync user account & billing details
     if (billingDetails) {
+      try {
         await adminSupabase.from('profiles').upsert(
           {
             id: userId,
