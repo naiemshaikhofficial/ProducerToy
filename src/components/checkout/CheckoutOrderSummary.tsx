@@ -6,6 +6,7 @@ import { Tag, CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react'
 import { PayPalPaymentButton } from './PayPalPaymentButton'
 import { BillingDetails } from './types'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { PaymentAccepted } from '@/components/ui/PaymentAccepted'
 
 // --- ANIMATED COUNTER HOOK ---
 function useAnimatedCounter(targetValue: number, prefix: string = '') {
@@ -274,6 +275,13 @@ export function CheckoutOrderSummary({
             Terms
           </Link>
         </p>
+
+        {/* Accepted Payment Methods Vector Logos */}
+        {!isFree && (
+          <div className="pt-3 border-t border-[#222222]/80 mt-3">
+            <PaymentAccepted isIndia={isIndia} />
+          </div>
+        )}
       </div>
     </div>
   )
