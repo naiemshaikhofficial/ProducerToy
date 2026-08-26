@@ -8,8 +8,13 @@ import { Twitter, Facebook, Youtube, Instagram, ArrowRight, ChevronUp } from 'lu
 export function Footer() {
   const pathname = usePathname()
 
-  // Hide footer completely on Auth page
-  if (pathname === '/auth' || pathname?.startsWith('/auth')) {
+  // Hide footer completely on Auth and Checkout pages (exact Epic Games screen lock)
+  if (
+    pathname === '/auth' ||
+    pathname?.startsWith('/auth') ||
+    pathname === '/checkout' ||
+    pathname?.startsWith('/checkout')
+  ) {
     return null
   }
 

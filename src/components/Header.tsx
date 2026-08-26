@@ -65,8 +65,13 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Hide Header completely on Auth page (placed after hooks to respect Rules of Hooks)
-  if (pathname === '/auth' || pathname?.startsWith('/auth')) {
+  // Hide Header completely on Auth and Checkout pages (exact Epic Games screen lock)
+  if (
+    pathname === '/auth' ||
+    pathname?.startsWith('/auth') ||
+    pathname === '/checkout' ||
+    pathname?.startsWith('/checkout')
+  ) {
     return null
   }
 

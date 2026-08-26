@@ -2,14 +2,18 @@
 
 import React from 'react'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { Play, Pause, Square, Music, Volume2 } from 'lucide-react'
 import { useAudio } from '@/context/AudioContext'
 import { LogoIcon } from '@/components/Logo'
 
 export function AudioPlayer() {
+  const pathname = usePathname()
   const { currentTrack, isPlaying, togglePlay, stopTrack, progress, duration, seek } = useAudio()
 
-  if (!currentTrack) return null
+  if (!currentTrack || pathname === '/checkout' || pathname?.startsWith('/checkout') || pathname === '/auth' || pathname?.startsWith('/auth')) {
+    return null
+  }
 
   const formatTime = (secs: number) => {
     if (!secs || isNaN(secs)) return '0:00'

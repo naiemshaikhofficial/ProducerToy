@@ -574,7 +574,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#0e0e0e] text-white py-6 sm:py-10 px-4 sm:px-6 select-none flex flex-col items-center justify-center">
+    <div className="fixed inset-0 z-50 bg-[#0e0e0e] text-white overflow-y-auto py-6 sm:py-10 px-4 sm:px-6 select-none flex flex-col items-center justify-center">
       {/* Error Notification */}
       {errorMsg && (
         <div className="max-w-[1020px] w-full mb-4 bg-[#241515] border border-red-500/20 text-red-300 px-4 py-3 text-xs rounded-xl flex items-center justify-between">
