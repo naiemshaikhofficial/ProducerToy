@@ -44,12 +44,15 @@ export function CustomCountrySelect({
   const containerRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Find currently selected country by name or code
-  const selectedCountry = COUNTRY_PHONE_DATA.find(
-    (c) =>
-      c.name.toLowerCase() === (value || '').toLowerCase() ||
-      c.code.toLowerCase() === (value || '').toLowerCase()
-  )
+  // Find currently selected country by name or code (strictly null when unselected)
+  const selectedCountry =
+    value && value.trim()
+      ? COUNTRY_PHONE_DATA.find(
+          (c) =>
+            c.name.toLowerCase() === value.trim().toLowerCase() ||
+            c.code.toLowerCase() === value.trim().toLowerCase()
+        )
+      : null
 
   // Focus search input on open
   useEffect(() => {
