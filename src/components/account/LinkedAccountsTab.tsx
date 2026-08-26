@@ -159,27 +159,29 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   const [feedback, setFeedback] = useState<string | null>(null)
 
   useEffect(() => {
-    const existing = profile?.linked_accounts || {}
-    const merged = { ...existing }
-
     // Auto-detect Google connection from Supabase Auth identities or Google email
+    const googleIdentity = user?.identities?.find((id: any) => id.provider === 'google')
     const isGoogleAuth =
+      Boolean(googleIdentity) ||
       user?.app_metadata?.provider === 'google' ||
       user?.app_metadata?.providers?.includes('google') ||
-      user?.identities?.some((id: any) => id.provider === 'google') ||
-      Boolean(user?.email && user.email.includes('@gmail.com')) ||
-      Boolean(user?.user_metadata?.iss?.includes('google'))
+      Boolean(user?.email && (user.email.includes('@gmail.com') || user.user_metadata?.iss?.includes('google')))
 
-    if (isGoogleAuth && !merged.google) {
+    if (isGoogleAuth) {
+      const googleEmail = googleIdentity?.identity_data?.email || user?.email || ''
+      const googleName =
+        googleIdentity?.identity_data?.full_name ||
+        googleIdentity?.identity_data?.name ||
+        user?.user_metadata?.full_name ||
+        user?.user_metadata?.name ||
+        profile?.full_name ||
+        (googleEmail ? googleEmail.split('@')[0] : 'Google Account')
+
       merged.google = {
-        handle:
-          user?.user_metadata?.full_name ||
-          user?.user_metadata?.name ||
-          profile?.full_name ||
-          user?.email?.split('@')[0] ||
-          'Google Account',
-        email: user?.email,
+        handle: googleName,
+        email: googleEmail,
         connected_at: user?.created_at || new Date().toISOString(),
+        ...existing.google,
       }
     }
 
@@ -377,6 +379,15 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                   <p className="text-xs text-zinc-400 leading-relaxed">
                     {provider.description}
                   </p>
+
+                  {isLinked && (
+                    <div className="p-3 bg-[#181818] border border-[#262626] rounded-xl flex items-center justify-between text-xs">
+                      <span className="text-zinc-400">Connected Account:</span>
+                      <span className="text-white font-mono font-semibold">
+                        {linkedAccounts[provider.id]?.email || handle}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
                     <span className="text-xs text-zinc-500 font-semibold">
