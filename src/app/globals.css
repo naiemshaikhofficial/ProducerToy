@@ -145,3 +145,41 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #ffffff;
 }
+
+/* Universal Autofill Fix: Keep dark theme on browser autocomplete / autofill across all forms */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #181818 inset !important;
+  box-shadow: 0 0 0 1000px #181818 inset !important;
+  transition: background-color 5000000s ease-in-out 0s !important;
+  caret-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* For #202020 inputs (Auth & Account settings) */
+input.bg-\[\#202020\]:-webkit-autofill,
+input.bg-\[\#202020\]:-webkit-autofill:hover,
+input.bg-\[\#202020\]:-webkit-autofill:focus,
+input.bg-\[\#202020\]:-webkit-autofill:active,
+.bg-\[\#202020\] input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #202020 inset !important;
+  box-shadow: 0 0 0 1000px #202020 inset !important;
+}
+
+/* Phone input field fix */
+.PhoneInputInput:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #181818 inset !important;
+  box-shadow: 0 0 0 1000px #181818 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
