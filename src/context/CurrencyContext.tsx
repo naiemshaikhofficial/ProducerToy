@@ -80,23 +80,25 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const formatPrice = useCallback(
     (inrOrUsd?: number, usd?: number) => {
       if (currency === 'INR') {
-        if (usd !== undefined && usd !== null && usd >= 0) {
-          return `₹${Math.round(Number(usd) * exchangeRate).toLocaleString('en-IN')}`
+        // 1. If explicit INR price is provided, use it directly (1:1 match with checkout & db)
+        if (inrOrUsd !== undefined && inrOrUsd !== null && Number(inrOrUsd) > 0) {
+          return `₹${Math.round(Number(inrOrUsd)).toLocaleString('en-IN')}`
         }
-        if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd >= 0) {
-          const val = inrOrUsd > 150 ? inrOrUsd : inrOrUsd * exchangeRate
-          return `₹${Math.round(val).toLocaleString('en-IN')}`
+        // 2. Fallback: Convert USD to INR using exchange rate
+        if (usd !== undefined && usd !== null && Number(usd) >= 0) {
+          return `₹${Math.round(Number(usd) * exchangeRate).toLocaleString('en-IN')}`
         }
         return '₹0'
       }
 
-      // Default USD
-      if (usd !== undefined && usd !== null && usd >= 0) {
+      // Default USD mode:
+      // 1. If explicit USD price is provided, use it directly
+      if (usd !== undefined && usd !== null && Number(usd) >= 0) {
         return `$${Number(usd).toFixed(2)}`
       }
-      if (inrOrUsd !== undefined && inrOrUsd !== null && inrOrUsd >= 0) {
-        const val = inrOrUsd > 150 && exchangeRate > 0 ? inrOrUsd / exchangeRate : inrOrUsd
-        return `$${Number(val).toFixed(2)}`
+      // 2. Fallback: Convert INR to USD using exchange rate
+      if (inrOrUsd !== undefined && inrOrUsd !== null && Number(inrOrUsd) > 0 && exchangeRate > 0) {
+        return `$${(Number(inrOrUsd) / exchangeRate).toFixed(2)}`
       }
       return '$0.00'
     },

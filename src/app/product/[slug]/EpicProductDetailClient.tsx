@@ -478,16 +478,16 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 <>
                   {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
                     <>
-                      <span className="text-xs bg-[#FC6301] text-white font-extrabold px-2 py-1 rounded text-[12px]">
+                      <span className="text-xs bg-[#FA742B] text-white font-extrabold px-2 py-1 rounded text-[12px]">
                         -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
                       </span>
                       <span className="text-base text-zinc-500 line-through">
-                        {formatPrice(undefined, Number(product.original_price_usd))}
+                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
                       </span>
                     </>
                   )}
                   <span className="text-2xl sm:text-3xl font-extrabold text-white">
-                    {formatPrice(undefined, product.price_usd)}
+                    {formatPrice(product.price_inr, product.price_usd)}
                   </span>
                 </>
               )}
