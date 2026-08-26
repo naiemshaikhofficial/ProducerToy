@@ -444,10 +444,10 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                   
                   {isLinked ? (
                     <>
-                      {/* Shared Data Status Line (Screenshot 2 Match) */}
-                      <div className="flex items-center gap-2 text-xs font-semibold text-green-400">
-                        <ArrowRight className="w-3.5 h-3.5" />
-                        <span>Data is shared from {provider.name} to ProducerToy</span>
+                      {/* Shared Data Status Line (Exact Epic Games Green Match) */}
+                      <div className="flex items-center gap-2 text-xs font-semibold text-[#00df81]">
+                        <span className="text-sm font-bold text-[#00df81]">→</span>
+                        <span className="text-[#00df81] font-medium">Data is shared from {provider.name} to ProducerToy</span>
                       </div>
 
                       <p className="text-xs text-zinc-400 leading-relaxed">
