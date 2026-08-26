@@ -59,9 +59,13 @@ export const TopBar: React.FC<TopBarProps> = ({
     }
   }, [isAccountMenuOpen])
 
-  // Derive initial and display name
-  const displayName = user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Naiem Shaikh')
-  const initialLetter = (displayName || 'N')[0].toUpperCase()
+  // Derive initial and display name only when user is present
+  const displayName = user
+    ? user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      (user.email ? user.email.split('@')[0] : 'Producer')
+    : ''
+  const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
     <div className="w-full bg-[#121212]">
@@ -110,38 +114,39 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span className="text-zinc-300">{currency}</span>
           </button>
 
-          {/* Account Popover Trigger with Initial Circle + User Name */}
-          <div className="relative" ref={accountMenuRef}>
-            <button
-              type="button"
-              onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-              className="flex items-center gap-2.5 py-1 px-2 hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
-            >
-              <div className="w-7 h-7 rounded-full bg-[#2a2a2a] text-white text-xs font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm flex-shrink-0">
-                {initialLetter}
-              </div>
-              <span className="text-xs font-semibold text-zinc-200 hover:text-white truncate max-w-[130px]">
-                {displayName}
-              </span>
-            </button>
-
-            {/* Desktop Account Popover (Solid Minimalist Dark, No Glassmorphism) */}
-            {isAccountMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#181818] border border-[#262626] rounded-[16px] shadow-2xl p-3 z-[100] animate-in fade-in zoom-in-95 duration-100">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 pt-1 block mb-1">
-                  STORE
+          {/* Account Popover Trigger or Sign In Button */}
+          {user ? (
+            <div className="relative" ref={accountMenuRef}>
+              <button
+                type="button"
+                onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                className="flex items-center gap-2.5 py-1 px-2 hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
+              >
+                <div className="w-7 h-7 rounded-full bg-[#2a2a2a] text-white text-xs font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm flex-shrink-0">
+                  {initialLetter}
+                </div>
+                <span className="text-xs font-semibold text-zinc-200 hover:text-white truncate max-w-[130px]">
+                  {displayName}
                 </span>
+              </button>
 
-                <div className="flex flex-col space-y-0.5">
-                  <Link
-                    href="/library"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <Trophy className="w-4 h-4 text-zinc-400" />
-                    <span>My Achievements</span>
-                  </Link>
+              {/* Desktop Account Popover (Solid Minimalist Dark, No Glassmorphism) */}
+              {isAccountMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#181818] border border-[#262626] rounded-[16px] shadow-2xl p-3 z-[100] animate-in fade-in zoom-in-95 duration-100">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 pt-1 block mb-1">
+                    STORE
+                  </span>
+
+                  <div className="flex flex-col space-y-0.5">
+                    <Link
+                      href="/library"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <Trophy className="w-4 h-4 text-zinc-400" />
+                      <span>My Achievements</span>
+                    </Link>
 
                   <Link
                     href="/store"
@@ -242,21 +247,20 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
                     </button>
-                  ) : (
-                    <Link
-                      href="/auth"
-                      prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                    >
-                      <LogOut className="w-4 h-4 text-zinc-400" />
-                      <span>Sign In</span>
-                    </Link>
-                  )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/auth"
+              prefetch={true}
+              className="flex items-center gap-2 py-1.5 px-3 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
+            >
+              <User className="w-4 h-4 text-zinc-400" />
+              <span>Sign In</span>
+            </Link>
+          )}
 
           {/* Download Button */}
           <Link

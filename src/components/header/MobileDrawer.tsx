@@ -48,9 +48,13 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
     setMobileExpandedCat(mobileExpandedCat === catKey ? null : catKey)
   }
 
-  // Derive initial and display name from user or defaults
-  const displayName = user?.user_metadata?.full_name || (user?.email ? user.email.split('@')[0] : 'Naiem Shaikh')
-  const initialLetter = (displayName || 'N')[0].toUpperCase()
+  // Derive initial and display name from user
+  const displayName = user
+    ? user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      (user.email ? user.email.split('@')[0] : 'Producer')
+    : ''
+  const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
     <div className="fixed inset-0 top-[52px] z-50 bg-[#121212] flex flex-col md:hidden animate-in slide-in-from-right duration-200 overflow-y-auto">
@@ -233,15 +237,27 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 <span>{currency}</span>
               </button>
 
-              {/* Corner Circular Profile Initial Button (Exact Screenshot 2 Match) */}
-              <button
-                type="button"
-                onClick={() => setActiveView('account')}
-                className="w-8 h-8 rounded-full bg-[#2a2a2a] hover:bg-[#383838] text-white text-xs font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm active:scale-95 transition-all cursor-pointer"
-                title={`Open Account (${displayName})`}
-              >
-                {initialLetter}
-              </button>
+              {/* Corner Profile Button (If logged in, show Initial Circle. If logged out, show Sign In link) */}
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => setActiveView('account')}
+                  className="w-8 h-8 rounded-full bg-[#2a2a2a] hover:bg-[#383838] text-white text-xs font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  title={`Open Account (${displayName})`}
+                >
+                  {initialLetter}
+                </button>
+              ) : (
+                <Link
+                  href="/auth"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="flex items-center gap-1.5 py-1.5 px-3 text-xs font-bold text-zinc-300 hover:text-white bg-[#202020] hover:bg-[#282828] border border-[#2e2e2e] rounded-lg transition-colors cursor-pointer"
+                >
+                  <User className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Sign In</span>
+                </Link>
+              )}
             </div>
 
             {/* Big Bold "Menu" Header (Exact Image 2 Match) */}
