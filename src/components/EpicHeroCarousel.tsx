@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Plus, Bookmark, Check } from 'lucide-react'
@@ -14,18 +14,18 @@ interface EpicHeroCarouselProps {
   products: Product[]
 }
 
-const ROTATION_DURATION = 7000 // 7 seconds per slide
-
 export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
   const [savedIds, setSavedIds] = useState<Record<string, boolean>>({})
   const { formatPrice } = useCurrency()
   const { addItem, isInCart } = useCart()
 
-  // Touch Swipe tracking for mobile
-  const touchStartX = useRef<number | null>(null)
-  const touchEndX = useRef<number | null>(null)
+  // Real-time Touch & Drag Gesture Tracking
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState(0)
+  const startXRef = useRef<number>(0)
+  const currentXRef = useRef<number>(0)
+  const isPointerDownRef = useRef<boolean>(false)
 
   // Priority to featured products (is_featured === true), backfilling with top products
   const featuredOnly = products.filter((p) => p.is_featured === true)
@@ -35,34 +35,8 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
     : [...featuredOnly, ...nonFeatured]
   ).slice(0, 5)
 
-  // Hook 1: Smoothly tick progress from 0 to 100% for the current slide
-  useEffect(() => {
-    if (featuredList.length <= 1) return
-
-    const intervalMs = 50
-    const step = (intervalMs / ROTATION_DURATION) * 100
-
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100
-        return prev + step
-      })
-    }, intervalMs)
-
-    return () => clearInterval(timer)
-  }, [selectedIndex, featuredList.length])
-
-  // Hook 2: Trigger slide transition when progress hits 100%
-  useEffect(() => {
-    if (progress >= 100) {
-      setSelectedIndex((prevIndex) => (prevIndex + 1) % featuredList.length)
-      setProgress(0)
-    }
-  }, [progress, featuredList.length])
-
   const handleSelect = (index: number) => {
     setSelectedIndex(index)
-    setProgress(0)
   }
 
   const handleWishlistToggle = async (e: React.MouseEvent, productId: string) => {
@@ -72,32 +46,70 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
     await toggleWishlistAction(productId)
   }
 
-  // Touch swipe event handlers for mobile
+  // --- Real-Time Touch Gestures ---
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.targetTouches[0].clientX
+    startXRef.current = e.touches[0].clientX
+    currentXRef.current = e.touches[0].clientX
+    setIsDragging(true)
+    setDragOffset(0)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.targetTouches[0].clientX
+    if (!isDragging) return
+    currentXRef.current = e.touches[0].clientX
+    const diff = currentXRef.current - startXRef.current
+    setDragOffset(diff)
   }
 
   const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return
-    const distance = touchStartX.current - touchEndX.current
-    const minSwipeDistance = 45
+    if (!isDragging) return
+    setIsDragging(false)
+    const diff = currentXRef.current - startXRef.current
+    const threshold = 40
 
-    if (distance > minSwipeDistance) {
-      // Swiped Left -> Next Slide
-      setSelectedIndex((prev) => (prev + 1) % featuredList.length)
-      setProgress(0)
-    } else if (distance < -minSwipeDistance) {
-      // Swiped Right -> Prev Slide
-      setSelectedIndex((prev) => (prev - 1 + featuredList.length) % featuredList.length)
-      setProgress(0)
+    if (diff < -threshold && selectedIndex < featuredList.length - 1) {
+      setSelectedIndex((prev) => prev + 1)
+    } else if (diff > threshold && selectedIndex > 0) {
+      setSelectedIndex((prev) => prev - 1)
     }
+    setDragOffset(0)
+  }
 
-    touchStartX.current = null
-    touchEndX.current = null
+  // --- Real-Time Mouse Drag Gestures (For desktop & touch simulators) ---
+  const handleMouseDown = (e: React.MouseEvent) => {
+    startXRef.current = e.clientX
+    currentXRef.current = e.clientX
+    isPointerDownRef.current = true
+    setIsDragging(true)
+    setDragOffset(0)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isPointerDownRef.current) return
+    currentXRef.current = e.clientX
+    const diff = currentXRef.current - startXRef.current
+    setDragOffset(diff)
+  }
+
+  const handleMouseUp = () => {
+    if (!isPointerDownRef.current) return
+    isPointerDownRef.current = false
+    setIsDragging(false)
+    const diff = currentXRef.current - startXRef.current
+    const threshold = 40
+
+    if (diff < -threshold && selectedIndex < featuredList.length - 1) {
+      setSelectedIndex((prev) => prev + 1)
+    } else if (diff > threshold && selectedIndex > 0) {
+      setSelectedIndex((prev) => prev - 1)
+    }
+    setDragOffset(0)
+  }
+
+  const handleMouseLeave = () => {
+    if (isPointerDownRef.current) {
+      handleMouseUp()
+    }
   }
 
   if (featuredList.length === 0) return null
@@ -109,18 +121,25 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       {/* 1. MOBILE & TABLET LAYOUT (< 1024px): Epic Games Store Peek Card Slider */}
       {/* ========================================================================= */}
       <div className="block lg:hidden w-full">
-        {/* Peek Carousel Viewport */}
+        {/* Peek Carousel Viewport with Real-time Drag Gestures */}
         <div 
-          className="w-full overflow-hidden touch-pan-y"
+          className="w-full overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
         >
           <div 
-            className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] pl-4 sm:pl-6"
+            className="flex pl-4 sm:pl-6"
             style={{
-              transform: `translateX(calc(-${selectedIndex} * (86% + 12px)))`,
-              gap: '12px',
+              transform: isDragging 
+                ? `translateX(calc(-${selectedIndex} * (80vw + 14px) + ${dragOffset}px))`
+                : `translateX(calc(-${selectedIndex} * (80vw + 14px)))`,
+              transition: isDragging ? 'none' : 'transform 450ms cubic-bezier(0.2, 1, 0.3, 1)',
+              gap: '14px',
             }}
           >
             {featuredList.map((product, idx) => {
@@ -131,9 +150,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               return (
                 <div
                   key={product.id}
-                  className="flex-shrink-0 w-[86%] sm:w-[75%] max-w-[440px]"
+                  className="flex-shrink-0 w-[80vw] sm:w-[400px] max-w-[420px]"
                 >
-                  <div className="relative w-full h-[460px] sm:h-[500px] rounded-2xl overflow-hidden border border-[#262626] bg-[#141414] shadow-2xl group flex flex-col justify-end">
+                  <div className="relative w-full h-[510px] sm:h-[530px] rounded-[22px] overflow-hidden border border-[#242424] bg-[#141414] shadow-2xl group flex flex-col justify-end">
                     
                     {/* Background Product Artwork */}
                     <Image
@@ -146,17 +165,17 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     />
 
                     {/* Dark Dramatic Epic Gradient Overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent pointer-events-none" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent pointer-events-none" />
 
-                    {/* Top Right Wishlist Bookmark Button */}
+                    {/* Top Right Wishlist Bookmark Button (Glass Pill) */}
                     <button
                       type="button"
                       onClick={(e) => handleWishlistToggle(e, product.id)}
-                      className={`absolute top-3.5 right-3.5 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
+                      className={`absolute top-4 right-4 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                         isSaved
                           ? 'bg-white text-black border-white'
-                          : 'bg-black/60 text-white/90 border-white/15 hover:bg-black/80'
+                          : 'bg-black/50 text-white/90 border-white/20 hover:bg-black/70'
                       }`}
                       title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
                     >
@@ -164,30 +183,30 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     </button>
 
                     {/* Card Content Overlay */}
-                    <div className="relative z-10 p-5 sm:p-6 flex flex-col gap-2">
+                    <div className="relative z-10 p-5 sm:p-6 flex flex-col gap-2 pointer-events-auto">
                       
-                      {/* Product Type / Brand Badge */}
+                      {/* Product Type / Brand Tag */}
                       <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                        {product.brand || 'Producer Toy'} • {product.product_type?.replace('_', ' ') || 'Plugin'}
+                        {product.brand || 'Producer Toy'} • {product.product_type?.replace('_', ' ') || 'Audio Tool'}
                       </span>
 
                       {/* Main Product Title */}
                       <Link 
                         href={`/product/${product.slug}`}
                         prefetch={true}
-                        className="block text-xl sm:text-2xl font-black uppercase tracking-tight text-white leading-tight font-sans drop-shadow-md hover:underline"
+                        className="block text-[22px] sm:text-2xl font-black uppercase tracking-tight text-white leading-tight font-sans drop-shadow-md hover:underline"
                       >
                         {product.name}
                       </Link>
 
                       {/* Subtitle / Short Description */}
-                      <p className="text-xs sm:text-[13px] text-zinc-300 font-normal leading-relaxed line-clamp-2 drop-shadow-sm">
-                        {product.short_description || 'Professional audio tools, presets, and sample packs for elite music production.'}
+                      <p className="text-[13px] text-zinc-200 font-normal leading-relaxed line-clamp-3 drop-shadow-sm">
+                        {product.short_description || 'Professional audio tools, presets, and sample packs designed for elite music producers.'}
                       </p>
 
-                      {/* Price Badge */}
-                      <div className="pt-1">
-                        <span className="text-base font-black text-white drop-shadow">
+                      {/* Price Tag (Exact Epic Clean White) */}
+                      <div className="pt-0.5">
+                        <span className="text-base font-bold text-white drop-shadow">
                           {isFree ? 'Free' : formatPrice(product.price_inr, product.price_usd)}
                         </span>
                       </div>
@@ -233,8 +252,8 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
           </div>
         </div>
 
-        {/* Mobile Pagination Indicator Dots (Exact Epic Games Store Bottom Dots) */}
-        <div className="flex items-center justify-center gap-1.5 mt-4 sm:mt-5">
+        {/* Mobile Pagination Indicator Dots with Glowing Effect (Exact Image 2 Match) */}
+        <div className="flex items-center justify-center gap-2 mt-4 sm:mt-5">
           {featuredList.map((_, idx) => {
             const isActive = idx === selectedIndex
             return (
@@ -243,10 +262,10 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 type="button"
                 onClick={() => handleSelect(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                className={`transition-all duration-300 rounded-full ${
+                className={`rounded-full transition-all duration-300 cursor-pointer ${
                   isActive
-                    ? 'w-5 h-1.5 bg-white shadow-sm'
-                    : 'w-1.5 h-1.5 bg-white/30 hover:bg-white/60'
+                    ? 'w-2.5 h-2.5 bg-white shadow-[0_0_8px_rgba(255,255,255,1),0_0_3px_rgba(255,255,255,0.8)] scale-110'
+                    : 'w-2 h-2 bg-[#3e3e42] hover:bg-[#525258] opacity-70'
                 }`}
               />
             )

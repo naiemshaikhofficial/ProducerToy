@@ -137,35 +137,48 @@ export const SubBar: React.FC<SubBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1.5 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors py-1.5 px-3 rounded-lg active:scale-95"
+                className="flex items-center gap-1.5 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors py-1.5 px-3 rounded-lg active:scale-95 cursor-pointer"
               >
                 <span>{currentSectionLabel}</span>
-                <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-white transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Mobile Discover Dropdown Menu */}
+              {/* Exact Epic Games Store Mobile Dropdown Menu (Screenshot 2 Match) */}
               {isDiscoverMenuOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 bg-[#18181c] border border-[#2a2a2e] rounded-xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150 backdrop-blur-xl">
-                  {MOBILE_DISCOVER_OPTIONS.map((item) => {
-                    const isSelected = item.label === currentSectionLabel
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        prefetch={true}
-                        onClick={() => setIsDiscoverMenuOpen(false)}
-                        className={`flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
-                          isSelected
-                            ? 'text-white bg-[#26262c] font-bold'
-                            : 'text-zinc-300 hover:text-white hover:bg-[#202025]'
-                        }`}
-                      >
-                        <span>{item.label}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
-                      </Link>
-                    )
-                  })}
-                </div>
+                <>
+                  {/* Backdrop Overlay */}
+                  <div 
+                    className="fixed inset-0 top-0 bg-black/60 backdrop-blur-sm z-40"
+                    onClick={() => setIsDiscoverMenuOpen(false)}
+                  />
+
+                  {/* Dropdown Container directly below SubBar */}
+                  <div className="absolute left-0 right-0 top-full bg-[#121212] border-b border-[#242424] shadow-2xl px-6 py-2 z-50 animate-in slide-in-from-top-2 duration-150">
+                    <div className="flex flex-col">
+                      {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
+                        const isSelected = item.label === currentSectionLabel
+                        const isLast = idx === MOBILE_DISCOVER_OPTIONS.length - 1
+                        return (
+                          <div key={item.label}>
+                            <Link
+                              href={item.href}
+                              prefetch={true}
+                              onClick={() => setIsDiscoverMenuOpen(false)}
+                              className={`block py-4 text-[16px] transition-colors ${
+                                isSelected
+                                  ? 'text-white font-semibold'
+                                  : 'text-zinc-400 font-normal hover:text-white'
+                              }`}
+                            >
+                              {item.label}
+                            </Link>
+                            {!isLast && <div className="w-full h-[1px] bg-[#222224]" />}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
 

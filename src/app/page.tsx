@@ -93,19 +93,21 @@ export default async function HomePage() {
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white flex flex-col items-center select-none">
       
-      {/* 1st Section: Epic Store Billboard Poster Banner */}
-      <section className="w-full mt-2 sm:mt-3 mb-10 sm:mb-12">
+      {/* 1st Section: Epic Store Billboard Poster Banner (Desktop only - Hidden on Mobile) */}
+      <section className="hidden lg:block w-full mt-2 sm:mt-3 mb-10 sm:mb-12">
         <EpicSpotlightBanner />
       </section>
 
       {/* Main Content Area */}
-      <div className="w-full max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-12 sm:space-y-16">
+      <div className="w-full max-w-[1220px] mx-auto px-0 sm:px-6 lg:px-8 pt-3 sm:pt-4 lg:pt-0 pb-16 space-y-8 sm:space-y-12 lg:space-y-16">
         
-        {/* 2nd Section: Centered Epic Hero Carousel */}
+        {/* Centered Epic Hero Carousel (Starts immediately on mobile) */}
         <EpicHeroCarousel products={products} />
 
-        {/* 3rd Section: Producer Toy Originals Row (Matching Epic Games Store Featured Row Aesthetic) */}
-        <ProducerToyGrid products={products} title="Producer Toy Originals" />
+        {/* 3rd Section: Producer Toy Originals Row */}
+        <div className="px-4 sm:px-0">
+          <ProducerToyGrid products={products} title="Producer Toy Originals" />
+        </div>
 
       </div>
 
