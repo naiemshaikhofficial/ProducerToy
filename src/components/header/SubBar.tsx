@@ -99,7 +99,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store..."
-                className="w-full bg-[#202024] text-white text-sm pl-10 pr-8 h-[36px] rounded-full border border-zinc-700 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-400"
+                className="w-full bg-[#202020] text-white text-sm pl-10 pr-8 h-[36px] rounded-full border border-zinc-700 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-400"
               />
               {searchQuery && (
                 <button
@@ -153,7 +153,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                   />
 
                   {/* Dropdown Container (Dead Center in the Middle) */}
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-[90vw] max-w-[400px] bg-[#121214] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150">
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-[90vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020]">
                     <div className="flex flex-col">
                       {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                         const isSelected = item.label === currentSectionLabel
@@ -167,12 +167,12 @@ export const SubBar: React.FC<SubBarProps> = ({
                               className={`block py-4 text-[18px] sm:text-[19px] tracking-wide transition-colors ${
                                 isSelected
                                   ? 'text-white font-bold'
-                                  : 'text-[#909098] font-normal hover:text-white'
+                                  : 'text-zinc-400 font-normal hover:text-white'
                               }`}
                             >
                               {item.label}
                             </Link>
-                            {!isLast && <div className="w-full h-[1px] bg-[#2a2a2e]" />}
+                            {!isLast && <div className="w-full h-[1px] bg-[#222222]" />}
                           </div>
                         )
                       })}
@@ -195,7 +195,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       <div className="hidden md:flex w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-[80px] lg:h-[90px] items-center justify-start gap-8 lg:gap-12">
         
-        {/* Exact Epic Games Store Search Pill (240px width, 40px height, #404044 bg, full rounded) */}
+        {/* Exact Epic Games Store Search Pill */}
         <div className="relative w-56 sm:w-60 lg:w-[240px] flex-shrink-0">
           <form onSubmit={onSearchSubmit} className="relative w-full">
             <Search className="w-4 h-4 text-zinc-300 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -204,7 +204,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Search store"
-              className="w-full bg-[#404044] text-white text-sm pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:bg-[#4a4a50] focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-300 transition-all"
+              className="w-full bg-[#242424] text-white text-sm pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:bg-[#303030] focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-300 transition-all"
             />
             {searchQuery && (
               <button

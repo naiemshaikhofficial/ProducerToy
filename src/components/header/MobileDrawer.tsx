@@ -50,7 +50,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               href="/library"
               prefetch={true}
               onClick={onClose}
-              className="bg-[#26262c] hover:bg-[#32323a] text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
+              className="bg-[#202020] hover:bg-[#282828] text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors flex items-center gap-1.5"
             >
               <User className="w-3.5 h-3.5" />
               <span>{(user.email || 'Account').split('@')[0]}</span>
@@ -60,7 +60,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               href="/auth"
               prefetch={true}
               onClick={onClose}
-              className="bg-[#26262c] hover:bg-[#32323a] text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors"
+              className="bg-[#202020] hover:bg-[#282828] text-white text-xs font-semibold px-3.5 py-1.5 rounded-md transition-colors"
             >
               Sign in
             </Link>
@@ -125,7 +125,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         </div>
 
         {/* Categories Accordion Section */}
-        <div className="mt-4 pt-5 border-t border-[#222226]">
+        <div className="mt-4 pt-5 border-t border-[#202020]">
           <button
             type="button"
             onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
@@ -141,7 +141,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 const cat = categoryData[key]
                 const isExpanded = mobileExpandedCat === key
                 return (
-                  <div key={key} className="border-b border-[#202025] pb-2">
+                  <div key={key} className="border-b border-[#202020] pb-2">
                     <button
                       onClick={() => toggleAccordion(key)}
                       className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
@@ -150,7 +150,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                       <ChevronDown className={`w-3.5 h-3.5 text-zinc-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                     </button>
                     {isExpanded && (
-                      <div className="pl-3 py-1 flex flex-col gap-1.5 bg-[#18181c] rounded-md my-1">
+                      <div className="pl-3 py-1 flex flex-col gap-1.5 bg-[#181818] rounded-md my-1">
                         {cat.items.map((item, idx) => (
                           <Link
                             key={idx}
@@ -172,12 +172,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         </div>
 
         {/* Bottom Library / Account Button */}
-        <div className="mt-auto pt-6 border-t border-[#222226]">
+        <div className="mt-auto pt-6 border-t border-[#202020]">
           <Link
             href={user ? "/library" : "/auth"}
             prefetch={true}
             onClick={onClose}
-            className="bg-[#222226] hover:bg-[#2c2c32] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-md"
+            className="bg-[#202020] hover:bg-[#282828] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-md"
           >
             {user ? "Go to My Library" : "Sign In to ProducerToy"}
           </Link>

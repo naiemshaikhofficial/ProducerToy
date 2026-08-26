@@ -74,7 +74,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* Cart Icon Only Button */}
           <button
             onClick={onOpenCart}
-            className="relative p-2.5 bg-[#26262c] hover:bg-[#32323a] text-white rounded-[8px] transition-colors flex items-center justify-center cursor-pointer"
+            className="relative p-2.5 bg-[#202020] hover:bg-[#2c2c2c] text-white rounded-[8px] transition-colors flex items-center justify-center cursor-pointer"
             title="Shopping Cart"
           >
             <Image
@@ -104,7 +104,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               </Link>
               <button
                 onClick={onSignOut}
-                className="bg-[#26262c] hover:bg-[#e50914] text-zinc-300 hover:text-white border border-transparent text-xs font-semibold px-3 py-2 rounded-[6px] transition-all duration-200 flex items-center gap-1.5 shadow-sm cursor-pointer"
+                className="bg-[#202020] hover:bg-[#e50914] text-zinc-300 hover:text-white border border-transparent text-xs font-semibold px-3 py-2 rounded-[6px] transition-all duration-200 flex items-center gap-1.5 shadow-sm cursor-pointer"
                 title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -115,7 +115,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <Link
               href="/auth"
               prefetch={true}
-              className="bg-[#26262c] hover:bg-[#32323a] text-white text-xs font-semibold px-4 py-2 rounded-[6px] transition-colors"
+              className="bg-[#202020] hover:bg-[#2c2c2c] text-white text-xs font-semibold px-4 py-2 rounded-[6px] transition-colors"
             >
               Sign in
             </Link>

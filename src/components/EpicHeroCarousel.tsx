@@ -226,7 +226,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                               brand: product.brand,
                             })
                           }}
-                          className="bg-[#1e1e22]/90 hover:bg-[#282830] text-white border border-white/15 p-2 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center"
+                          className="bg-[#202020] hover:bg-[#282828] text-white border border-white/15 p-2 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center"
                           title={inCart ? "In Cart" : "Add to Cart"}
                         >
                           {inCart ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Plus className="w-3.5 h-3.5" />}

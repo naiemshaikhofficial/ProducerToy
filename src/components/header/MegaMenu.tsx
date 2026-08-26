@@ -104,14 +104,14 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
 
   return (
     <div 
-      className="absolute top-full left-0 w-full bg-[#121212] shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150 border-b border-[#222228]"
+      className="absolute top-full left-0 w-full bg-[#121212] shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-150 border-b border-[#202020]"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave || onClose}
     >
       <div className="max-w-7xl mx-auto px-8 py-8 flex gap-12">
         
         {/* Left Side Category Navigation Tabs */}
-        <div className="w-56 flex flex-col gap-1 border-r border-[#222228] pr-6">
+        <div className="w-56 flex flex-col gap-1 border-r border-[#202020] pr-6">
           {categoriesList.map((cat) => {
             const isActive = activeCategorySlug === cat.slug
             return (
@@ -121,8 +121,8 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                 onClick={() => setActiveCategorySlug(cat.slug)}
                 className={`flex items-center justify-between px-4 py-2.5 rounded-md text-sm font-semibold transition-all text-left cursor-pointer ${
                   isActive
-                    ? 'bg-zinc-800 text-white font-bold'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60'
+                    ? 'bg-[#262626] text-white font-bold'
+                    : 'text-zinc-400 hover:text-white hover:bg-[#1a1a1a]'
                 }`}
               >
                 <span>{cat.name}</span>
@@ -134,7 +134,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
 
         {/* Right Side Subcategory Links Grid */}
         <div className="flex-1">
-          <div className="flex items-center justify-between border-b border-[#222228] pb-4 mb-6">
+          <div className="flex items-center justify-between border-b border-[#202020] pb-4 mb-6">
             <h3 className="text-white text-base font-bold tracking-wide uppercase">
               {categoryLabel} Catalog
             </h3>
