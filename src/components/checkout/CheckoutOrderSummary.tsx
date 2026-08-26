@@ -281,7 +281,7 @@ export function CheckoutOrderSummary({
           <p className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider text-center select-none">
             We Accept Domestic &amp; Global Payments
           </p>
-          <PaymentAccepted isIndia={isIndia} />
+          <PaymentAccepted variant="compact" />
         </div>
       </div>
     </div>

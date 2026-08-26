@@ -4,33 +4,27 @@ import React, { useState } from 'react'
 
 interface PaymentAcceptedProps {
   className?: string
-  isIndia?: boolean
+  variant?: 'compact' | 'full'
 }
 
-export function PaymentAccepted({ className = '', isIndia = true }: PaymentAcceptedProps) {
+export function PaymentAccepted({ className = '', variant = 'compact' }: PaymentAcceptedProps) {
   const [hoveredFile, setHoveredFile] = useState<string | null>(null)
 
-  const indiaLogos = [
+  const logos = [
     { name: 'UPI', file: 'upi' },
-    { name: 'Google Pay', file: 'gpay' },
-    { name: 'PhonePe', file: 'phonepe' },
-    { name: 'Paytm', file: 'paytm' },
     { name: 'RuPay', file: 'rupay' },
     { name: 'Visa', file: 'visa' },
     { name: 'Mastercard', file: 'mastercard' },
-  ]
-
-  const globalLogos = [
-    { name: 'PayPal', file: 'paypal' },
-    { name: 'Visa', file: 'visa' },
-    { name: 'Mastercard', file: 'mastercard' },
     { name: 'American Express', file: 'amex' },
+    { name: 'PayPal', file: 'paypal' },
   ]
 
-  const activeLogos = isIndia ? indiaLogos : globalLogos
+  const activeLogos = variant === 'compact'
+    ? logos.filter((l) => ['upi', 'rupay', 'visa', 'mastercard', 'amex', 'paypal'].includes(l.file))
+    : logos
 
   return (
-    <div className={`flex flex-wrap items-center justify-center gap-3.5 sm:gap-5 ${className}`}>
+    <div className={`flex flex-wrap items-center justify-center gap-3.5 sm:gap-4.5 ${className}`}>
       {activeLogos.map((logo) => {
         const isHovered = hoveredFile === logo.file
         return (
@@ -39,7 +33,7 @@ export function PaymentAccepted({ className = '', isIndia = true }: PaymentAccep
             title={logo.name}
             onMouseEnter={() => setHoveredFile(logo.file)}
             onMouseLeave={() => setHoveredFile(null)}
-            className="relative flex items-center justify-center w-[38px] h-[22px] sm:w-[44px] sm:h-[26px] select-none transition-transform duration-200 hover:scale-110 cursor-pointer"
+            className="relative flex items-center justify-center w-[36px] h-[20px] sm:w-[42px] sm:h-[24px] select-none transition-transform duration-200 hover:scale-110 cursor-pointer"
           >
             <img
               src={`/payment-logos/${logo.file}.svg`}
