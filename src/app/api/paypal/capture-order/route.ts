@@ -153,14 +153,21 @@ export async function POST(request: Request) {
     // 7. Sync user account & billing details
     if (billingDetails) {
       try {
+        const nameParts = (billingDetails.fullName || '').trim().split(' ')
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || ''
+
         await adminSupabase.from('profiles').upsert(
           {
             id: userId,
             email: targetEmail,
+            first_name: firstName,
+            last_name: lastName,
             full_name: billingDetails.fullName || '',
             display_name: billingDetails.fullName || '',
             phone_number: billingDetails.phone || '',
             address_line1: billingDetails.address || '',
+            address_line2: billingDetails.address2 || '',
             city: billingDetails.city || '',
             state: billingDetails.state || '',
             region: billingDetails.state || '',

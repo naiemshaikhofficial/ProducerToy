@@ -10,6 +10,7 @@ export interface BillingDetailsInput {
   email?: string
   phone?: string
   address?: string
+  address2?: string
   city?: string
   state?: string
   zip?: string
@@ -81,15 +82,27 @@ export async function processCheckoutAction(
     // 2.1 Update unified profiles and auth user metadata
     if (targetUserId && billingDetails) {
       try {
+        const nameParts = (billingDetails.fullName || '').trim().split(' ')
+        const firstName = nameParts[0] || ''
+        const lastName = nameParts.slice(1).join(' ') || ''
+
         // Update Supabase auth user metadata
         await adminSupabase.auth.admin.updateUserById(targetUserId, {
           user_metadata: {
             full_name: billingDetails.fullName,
+            first_name: firstName,
+            last_name: lastName,
             phone: billingDetails.phone,
+            phone_number: billingDetails.phone,
             address: billingDetails.address,
+            address2: billingDetails.address2,
+            address_line1: billingDetails.address,
+            address_line2: billingDetails.address2,
             city: billingDetails.city,
             state: billingDetails.state,
+            region: billingDetails.state,
             zip: billingDetails.zip,
+            postal_code: billingDetails.zip,
             country: billingDetails.country,
           },
         })
@@ -99,10 +112,13 @@ export async function processCheckoutAction(
           {
             id: targetUserId,
             email: targetEmail,
+            first_name: firstName,
+            last_name: lastName,
             full_name: billingDetails.fullName,
             display_name: billingDetails.fullName,
             phone_number: billingDetails.phone,
             address_line1: billingDetails.address,
+            address_line2: billingDetails.address2 || '',
             city: billingDetails.city,
             state: billingDetails.state,
             region: billingDetails.state,

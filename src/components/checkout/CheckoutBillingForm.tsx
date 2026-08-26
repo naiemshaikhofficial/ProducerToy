@@ -132,14 +132,14 @@ export function CheckoutBillingForm({
           )}
         </div>
 
-        {/* Street Address */}
+        {/* Address Line 1 */}
         <div className="space-y-1 md:col-span-2">
           <label className="text-[11px] font-medium text-zinc-400">
-            Street Address
+            Address Line 1 *
           </label>
           <input
             type="text"
-            placeholder="Studio / House No, Street"
+            placeholder="Studio / House No, Street name"
             value={billingDetails.address}
             onChange={(e) => onBillingChange('address', e.target.value)}
             className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
@@ -149,6 +149,23 @@ export function CheckoutBillingForm({
           {formErrors.address && (
             <p className="text-[10px] text-red-400">{formErrors.address}</p>
           )}
+        </div>
+
+        {/* Address Line 2 (Optional) */}
+        <div className="space-y-1 md:col-span-2">
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] font-medium text-zinc-400">
+              Address Line 2
+            </label>
+            <span className="text-[10px] text-zinc-500">Optional</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Apartment, suite, unit, building, floor, etc."
+            value={billingDetails.address2 || ''}
+            onChange={(e) => onBillingChange('address2', e.target.value)}
+            className="w-full h-10 bg-[#181818] border border-[#262626] text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400"
+          />
         </div>
 
         {/* City */}

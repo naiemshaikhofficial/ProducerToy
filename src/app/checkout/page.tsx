@@ -109,15 +109,19 @@ export default function CheckoutPage() {
             .eq('id', currentUser.id)
             .maybeSingle()
 
-          if (profile && (profile.address_line1 || profile.full_name || profile.display_name)) {
-            const dbDetails = {
-              fullName: profile.full_name || profile.display_name || '',
+          if (profile) {
+            const nameParts = [profile.first_name, profile.last_name].filter(Boolean).join(' ')
+            const fullName = profile.full_name || nameParts || profile.display_name || ''
+
+            const dbDetails: BillingDetails = {
+              fullName: fullName || '',
               email: profile.email || currentUser.email || '',
-              phone: ensureE164(profile.phone_number || ''),
-              address: profile.address_line1 || '',
+              phone: ensureE164(profile.phone_number || profile.phone || ''),
+              address: profile.address_line1 || profile.address || '',
+              address2: profile.address_line2 || profile.address2 || '',
               city: profile.city || '',
               state: profile.state || profile.region || '',
-              zip: profile.postal_code || '',
+              zip: profile.postal_code || profile.zip || '',
               country: profile.country || '',
             }
             setBillingDetails(dbDetails)
@@ -160,13 +164,15 @@ export default function CheckoutPage() {
         const clean = (val: any) => (val === '0' || val === 0 ? '' : val || '')
 
         const metaCountry = clean(meta.country)
+        const metaName = clean(meta.full_name) || clean(meta.name) || clean(meta.display_name)
         setBillingDetails((prev) => ({
-          fullName: prev.fullName || clean(meta.full_name) || clean(meta.name) || '',
+          fullName: prev.fullName || metaName || '',
           email: prev.email || currentUser.email || '',
-          phone: prev.phone || ensureE164(clean(meta.phone)),
-          address: prev.address || clean(meta.address),
+          phone: prev.phone || ensureE164(clean(meta.phone) || clean(meta.phone_number)),
+          address: prev.address || clean(meta.address) || clean(meta.address_line1),
+          address2: prev.address2 || clean(meta.address2) || clean(meta.address_line2),
           city: prev.city || clean(meta.city),
-          state: prev.state || clean(meta.state),
+          state: prev.state || clean(meta.state) || clean(meta.region),
           zip: prev.zip || clean(meta.zip) || clean(meta.postal_code),
           country: prev.country || metaCountry || '',
         }))
