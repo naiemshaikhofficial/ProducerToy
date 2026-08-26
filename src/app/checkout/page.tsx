@@ -15,13 +15,9 @@ import { saveBillingAddressAction } from '@/actions/accountActions'
 import {
   BillingDetails,
   PaymentStatus,
-  CheckoutCartItems,
-  CheckoutBillingForm,
-  CheckoutOrderSummary,
-  CheckoutTrustBadges,
-  CheckoutUpsells,
   CheckoutSuccessView,
   CheckoutEmptyCart,
+  EpicCheckoutLayout,
 } from '@/components/checkout'
 
 export default function CheckoutPage() {
@@ -578,152 +574,47 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#101010] text-white py-8 sm:py-12 select-none">
-      <div className="max-w-[1120px] mx-auto px-4 sm:px-6 space-y-6">
-        {/* Top Navigation */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/store"
-            prefetch={true}
-            className="inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-white transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Back to Store</span>
-          </Link>
-
-          <div className="inline-flex items-center gap-1.5 text-[11px] text-zinc-500">
-            <ShieldCheck size={13} className="text-zinc-400" />
-            <span>256-Bit SSL Encrypted • Instant Delivery</span>
-          </div>
+    <div className="w-full min-h-screen bg-[#0e0e0e] text-white py-6 sm:py-10 px-4 sm:px-6 select-none flex flex-col items-center justify-center">
+      {/* Error Notification */}
+      {errorMsg && (
+        <div className="max-w-[1020px] w-full mb-4 bg-[#241515] border border-red-500/20 text-red-300 px-4 py-3 text-xs rounded-xl flex items-center justify-between">
+          <span>{errorMsg}</span>
+          <button onClick={() => setErrorMsg('')} className="text-red-400 hover:text-white font-bold ml-4">
+            &times;
+          </button>
         </div>
+      )}
 
-        {/* Page Title */}
-        <div className="space-y-0.5 pb-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            Checkout
-          </h1>
-          <p className="text-xs text-zinc-500">
-            {isIndia
-              ? 'India Orders • Razorpay UPI, NetBanking & Cards'
-              : 'International Orders • PayPal & Global Cards in USD'}
-          </p>
-        </div>
-
-        {/* Error Notification */}
-        {errorMsg && (
-          <div className="bg-[#241515] border border-red-500/20 text-red-300 px-4 py-3 text-xs rounded-xl flex items-center justify-between">
-            <span>{errorMsg}</span>
-            <button onClick={() => setErrorMsg('')} className="text-red-400 hover:text-white font-bold ml-4">
-              &times;
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* ================= LEFT COLUMN: CART ITEMS & BILLING FORM ================= */}
-          <div className="lg:col-span-7 space-y-5">
-            {/* Account Status Card */}
-            {!user ? (
-              <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 flex items-center justify-between gap-4">
-                <div>
-                  <span className="text-xs font-semibold text-zinc-200 block">
-                    Already have an account?
-                  </span>
-                  <span className="text-[11px] text-zinc-500 block">
-                    Sign in to link licenses automatically
-                  </span>
-                </div>
-                <Link
-                  href="/auth?next=/checkout"
-                  prefetch={true}
-                  className="bg-[#222222] hover:bg-[#2a2a2a] text-white border border-[#303030] text-xs font-semibold px-4 py-2 rounded-lg transition-colors flex-shrink-0"
-                >
-                  Sign In
-                </Link>
-              </div>
-            ) : (
-              <div className="bg-[#141414] border border-[#222222] rounded-xl px-4 py-3 flex items-center justify-between text-xs">
-                <span className="text-zinc-400">
-                  Signed in as <strong className="text-zinc-200">{user.email}</strong>
-                </span>
-                <span className="text-[10px] text-zinc-500 font-medium">
-                  Verified Account
-                </span>
-              </div>
-            )}
-
-            {/* Cart Items List Component */}
-            <CheckoutCartItems
-              items={items}
-              removeItem={removeItem}
-              formatPrice={formatPrice}
-            />
-
-            {/* Billing Details Form Component */}
-            <CheckoutBillingForm
-              billingDetails={billingDetails}
-              onBillingChange={handleBillingChange}
-              formErrors={formErrors}
-              newsletterOptIn={newsletterOptIn}
-              setNewsletterOptIn={setNewsletterOptIn}
-              countryOptions={countryOptions}
-            />
-          </div>
-
-          {/* ================= RIGHT COLUMN: ORDER SUMMARY (STICKY & CLEAN) ================= */}
-          <div className="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
-            {/* Order Summary Component with Location-Based Gateways */}
-            <CheckoutOrderSummary
-              itemCount={items.length}
-              currentSubtotal={currentSubtotal}
-              rawSubtotalInr={rawSubtotalInr}
-              rawSubtotalUsd={rawSubtotalUsd}
-              bundleDiscountPercent={bundleDiscountPercent}
-              discountPercent={discountPercent}
-              finalTotal={finalTotal}
-              currencySymbol={currencySymbol}
-              coupon={coupon}
-              setCoupon={setCoupon}
-              onApplyCoupon={handleApplyCoupon}
-              couponLoading={couponLoading}
-              couponError={couponError}
-              couponSuccessMsg={couponSuccessMsg}
-              onRazorpayCheckout={handleRazorpayCheckout}
-              onFreeCheckout={handleFreeCheckout}
-              onPayPalSuccess={handlePayPalSuccess}
-              onPayPalError={handlePayPalError}
-              onPayPalProcessing={handlePayPalProcessing}
-              loading={loading}
-              paymentStatus={paymentStatus}
-              formatPrice={formatPrice}
-              isIndia={isIndia}
-              billingDetails={billingDetails}
-              items={items}
-              userId={user?.id}
-            />
-          </div>
-        </div>
-
-        {/* Global Phone Input Styling */}
-        <style jsx global>{`
-          .phone-input-pt .PhoneInputInput {
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-            color: #ffffff !important;
-            font-size: 0.75rem !important;
-            font-weight: 500 !important;
-            width: 100% !important;
-          }
-          .phone-input-pt .PhoneInputCountry {
-            margin-right: 0.5rem !important;
-          }
-          .phone-input-pt .PhoneInputCountrySelect {
-            background: #181818 !important;
-            color: #ffffff !important;
-          }
-        `}</style>
-      </div>
+      {/* Exact Epic Games Store Checkout Container */}
+      <EpicCheckoutLayout
+        items={items}
+        removeItem={removeItem}
+        user={user}
+        billingDetails={billingDetails}
+        onBillingChange={handleBillingChange}
+        formErrors={formErrors}
+        newsletterOptIn={newsletterOptIn}
+        setNewsletterOptIn={setNewsletterOptIn}
+        countryOptions={countryOptions}
+        currencySymbol={currencySymbol}
+        currentSubtotal={currentSubtotal}
+        finalTotal={finalTotal}
+        isIndia={isIndia}
+        coupon={coupon}
+        setCoupon={setCoupon}
+        onApplyCoupon={handleApplyCoupon}
+        couponLoading={couponLoading}
+        couponError={couponError}
+        couponSuccessMsg={couponSuccessMsg}
+        onRazorpayCheckout={handleRazorpayCheckout}
+        onFreeCheckout={handleFreeCheckout}
+        onPayPalSuccess={handlePayPalSuccess}
+        onPayPalError={handlePayPalError}
+        onPayPalProcessing={handlePayPalProcessing}
+        loading={loading}
+        paymentStatus={paymentStatus}
+        formatPrice={formatPrice}
+      />
     </div>
   )
 }
