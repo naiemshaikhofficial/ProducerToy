@@ -217,11 +217,6 @@ export function CheckoutBillingForm({
           Send updates about new plugin releases, updates, and presets.
         </label>
       </div>
-
-      <div className="pt-2 text-zinc-500 text-[11px] flex items-center gap-2">
-        <Lock size={12} className="text-zinc-500 flex-shrink-0" />
-        <span>Your information is encrypted and securely stored for instant license access.</span>
-      </div>
     </div>
   )
 }

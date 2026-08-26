@@ -203,11 +203,6 @@ export function EpicCheckoutLayout({
             </div>
           )}
         </div>
-
-        {/* Bottom Secure Vault Notice */}
-        <div className="pt-4 text-[10.5px] text-zinc-500 select-none">
-          Instant vault delivery • 256-bit SSL encrypted
-        </div>
       </div>
 
 
