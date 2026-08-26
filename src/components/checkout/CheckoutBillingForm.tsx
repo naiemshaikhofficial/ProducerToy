@@ -63,8 +63,8 @@ export function CheckoutBillingForm({
             placeholder="Alex Producer"
             value={billingDetails.fullName}
             onChange={(e) => onBillingChange('fullName', e.target.value)}
-            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
-              formErrors.fullName ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
+            className={`w-full h-10 bg-[#161616] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] focus:border-zinc-400 ${
+              formErrors.fullName ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626] hover:border-[#383838]'
             }`}
           />
           {formErrors.fullName && (
@@ -82,8 +82,8 @@ export function CheckoutBillingForm({
             placeholder="producer@studio.com"
             value={billingDetails.email}
             onChange={(e) => onBillingChange('email', e.target.value)}
-            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
-              formErrors.email ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
+            className={`w-full h-10 bg-[#161616] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] focus:border-zinc-400 ${
+              formErrors.email ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626] hover:border-[#383838]'
             }`}
           />
           {formErrors.email && (
@@ -117,8 +117,8 @@ export function CheckoutBillingForm({
             placeholder="Studio / House No, Street name"
             value={billingDetails.address}
             onChange={(e) => onBillingChange('address', e.target.value)}
-            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
-              formErrors.address ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
+            className={`w-full h-10 bg-[#161616] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] focus:border-zinc-400 ${
+              formErrors.address ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626] hover:border-[#383838]'
             }`}
           />
           {formErrors.address && (
@@ -139,7 +139,7 @@ export function CheckoutBillingForm({
             placeholder="Apartment, suite, unit, building, floor, etc."
             value={billingDetails.address2 || ''}
             onChange={(e) => onBillingChange('address2', e.target.value)}
-            className="w-full h-10 bg-[#181818] border border-[#262626] text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400"
+            className="w-full h-10 bg-[#161616] border border-[#262626] hover:border-[#383838] focus:border-zinc-400 text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]"
           />
         </div>
 
@@ -153,8 +153,8 @@ export function CheckoutBillingForm({
             placeholder="City"
             value={billingDetails.city}
             onChange={(e) => onBillingChange('city', e.target.value)}
-            className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
-              formErrors.city ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
+            className={`w-full h-10 bg-[#161616] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] focus:border-zinc-400 ${
+              formErrors.city ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626] hover:border-[#383838]'
             }`}
           />
           {formErrors.city && (
@@ -173,8 +173,8 @@ export function CheckoutBillingForm({
               placeholder="State"
               value={billingDetails.state}
               onChange={(e) => onBillingChange('state', e.target.value)}
-              className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
-                formErrors.state ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
+              className={`w-full h-10 bg-[#161616] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] focus:border-zinc-400 ${
+                formErrors.state ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626] hover:border-[#383838]'
               }`}
             />
             {formErrors.state && (
@@ -191,8 +191,8 @@ export function CheckoutBillingForm({
               placeholder="Zip Code"
               value={billingDetails.zip}
               onChange={(e) => onBillingChange('zip', e.target.value)}
-              className={`w-full h-10 bg-[#181818] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-400 ${
-                formErrors.zip ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
+              className={`w-full h-10 bg-[#161616] border text-white text-xs px-3.5 rounded-lg outline-none transition-colors placeholder:text-zinc-500 shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] focus:border-zinc-400 ${
+                formErrors.zip ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626] hover:border-[#383838]'
               }`}
             />
             {formErrors.zip && (
@@ -217,16 +217,27 @@ export function CheckoutBillingForm({
               styles={{
                 control: (base: any, state: any) => ({
                   ...base,
-                  backgroundColor: '#181818',
-                  borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#71717a' : '#262626',
+                  backgroundColor: '#161616',
+                  borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#a1a1aa' : '#262626',
                   borderRadius: '0.5rem',
                   minHeight: '2.5rem',
                   height: '2.5rem',
                   fontSize: '0.75rem',
-                  boxShadow: 'none',
+                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
                   cursor: 'pointer',
                   '&:hover': {
-                    borderColor: '#52525b',
+                    borderColor: '#383838',
+                  },
+                }),
+                indicatorSeparator: () => ({
+                  display: 'none',
+                }),
+                dropdownIndicator: (base: any, state: any) => ({
+                  ...base,
+                  color: state.isFocused ? '#ffffff' : '#71717a',
+                  padding: '6px 8px',
+                  '&:hover': {
+                    color: '#ffffff',
                   },
                 }),
                 menu: (base: any) => ({
@@ -255,7 +266,7 @@ export function CheckoutBillingForm({
                   fontWeight: state.isSelected ? '700' : '500',
                   fontSize: '0.8125rem',
                   padding: '12px 16px',
-                  borderBottom: '1px solid #222222',
+                  borderBottom: '1px solid #202020',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   '&:last-child': {
@@ -285,13 +296,13 @@ export function CheckoutBillingForm({
             <select
               value={billingDetails.country || ''}
               onChange={(e) => onBillingChange('country', e.target.value)}
-              className="w-full h-10 bg-[#181818] border border-[#262626] text-white text-xs px-3 rounded-lg outline-none"
+              className="w-full h-10 bg-[#161616] border border-[#262626] text-white text-xs px-3 rounded-lg outline-none"
             >
-              <option value="" className="bg-[#181818] text-zinc-500">
+              <option value="" className="bg-[#161616] text-zinc-500">
                 Select Country
               </option>
               {countryOptions.map((opt) => (
-                <option key={opt.value} value={opt.label} className="bg-[#181818] text-white">
+                <option key={opt.value} value={opt.label} className="bg-[#161616] text-white">
                   {opt.label}
                 </option>
               ))}

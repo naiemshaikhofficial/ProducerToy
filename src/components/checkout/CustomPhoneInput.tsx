@@ -125,24 +125,24 @@ export function CustomPhoneInput({
     <div ref={containerRef} className="relative w-full">
       {/* Input Outer Container */}
       <div
-        className={`w-full h-10 bg-[#181818] border rounded-lg flex items-center px-3 transition-colors ${
+        className={`w-full h-10 bg-[#161616] border rounded-lg flex items-center px-3 transition-colors shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] ${
           error
             ? 'border-red-500/70 bg-red-950/10'
             : isOpen
-            ? 'border-zinc-400'
-            : 'border-[#262626] hover:border-zinc-600'
+            ? 'border-zinc-400 ring-1 ring-zinc-500/20'
+            : 'border-[#262626] hover:border-[#383838]'
         }`}
       >
         {/* Country Selector Trigger Button */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 pr-2.5 border-r border-[#2a2a2a] text-xs font-semibold text-white hover:text-zinc-200 transition-colors cursor-pointer select-none"
+          className="flex items-center gap-2 pr-2.5 border-r border-[#262626] text-xs font-semibold text-white hover:text-zinc-200 transition-colors cursor-pointer select-none"
         >
           <CountryFlagIcon code={selectedCountry.code} name={selectedCountry.name} />
-          <span className="text-zinc-300 font-medium text-xs">{selectedCountry.dialCode}</span>
+          <span className="text-zinc-300 font-medium text-xs tracking-tight">{selectedCountry.dialCode}</span>
           <ChevronDown
-            className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${
+            className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 ${
               isOpen ? 'rotate-180 text-white' : ''
             }`}
           />
@@ -154,7 +154,7 @@ export function CustomPhoneInput({
           placeholder="Mobile number"
           value={rawNumber}
           onChange={handleNumberChange}
-          className="flex-1 h-full bg-transparent text-white text-xs px-3 outline-none placeholder:text-zinc-600 font-medium"
+          className="flex-1 h-full bg-transparent text-white text-xs px-3 outline-none placeholder:text-zinc-500 font-medium"
         />
       </div>
 
