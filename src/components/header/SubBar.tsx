@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Search, ChevronDown, X, Check } from 'lucide-react'
+import { Search, ChevronDown, X, Check, ShoppingCart } from 'lucide-react'
 
 interface SubBarProps {
   searchQuery: string
@@ -82,7 +82,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
-      <div className="flex md:hidden w-full px-4 sm:px-6 h-[46px] items-center justify-between relative">
+      <div className="flex md:hidden w-full px-4 sm:px-6 h-[48px] items-center justify-between relative">
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
@@ -100,14 +100,14 @@ export const SubBar: React.FC<SubBarProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search store..."
-                className="w-full bg-[#202020] text-white text-sm pl-10 pr-8 h-[36px] rounded-full border border-zinc-700 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-400"
+                placeholder="Search store"
+                className="w-full bg-[#202020] text-white text-xs pl-10 pr-8 h-[38px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => onSearchChange('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -116,15 +116,15 @@ export const SubBar: React.FC<SubBarProps> = ({
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(false)}
-              className="text-xs font-semibold text-zinc-300 hover:text-white px-2 py-1.5"
+              className="text-xs text-zinc-400 hover:text-white px-2 py-1"
             >
               Cancel
             </button>
           </form>
         ) : (
-          /* Mobile Normal State: Search Icon on Left, Discover Dropdown in Center */
+          /* Normal Mobile SubBar: Search Icon (Left) + Discover ▾ (Center) */
           <>
-            {/* Search Trigger Icon */}
+            {/* Search Icon Trigger */}
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(true)}
@@ -195,12 +195,13 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 2. DESKTOP SUBBAR (>= 768px): Exact PC Screenshot Match                    */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16 h-[72px] items-center justify-between">
+      <div className="hidden md:flex w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-14 h-[68px] items-center justify-between">
         
         {/* Left Side: Search Bar + Discover / Browse / News Links */}
-        <div className="flex items-center gap-8 lg:gap-10">
-          {/* Epic Search Pill */}
-          <div className="relative w-56 sm:w-60 lg:w-[240px] flex-shrink-0">
+        <div className="flex items-center gap-7 lg:gap-9">
+          
+          {/* Epic Search Pill (Clean & Prominent) */}
+          <div className="relative w-60 lg:w-[250px] flex-shrink-0">
             <form onSubmit={onSearchSubmit} className="relative w-full">
               <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -208,7 +209,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store"
-                className="w-full bg-[#242424] text-white text-sm pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:bg-[#303030] focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-400 transition-all"
+                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#282828] text-white text-[13.5px] pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-400 transition-all font-sans"
               />
               {searchQuery && (
                 <button
@@ -224,7 +225,7 @@ export const SubBar: React.FC<SubBarProps> = ({
           </div>
 
           {/* Desktop Sub Navigation Links */}
-          <nav className="flex items-center gap-6 lg:gap-8 text-sm">
+          <nav className="flex items-center gap-6 lg:gap-7 text-[14px]">
             {NAV_LINKS.map((link, idx) => {
               const isActive = idx === 0 && pathname === '/store' || (idx > 0 && pathname === link.href)
               return (
@@ -232,10 +233,10 @@ export const SubBar: React.FC<SubBarProps> = ({
                   key={link.label} 
                   href={link.href} 
                   prefetch={true}
-                  className={`transition-colors py-2 font-medium ${
+                  className={`transition-colors py-2 ${
                     isActive 
                       ? 'text-white font-bold' 
-                      : 'text-zinc-400 hover:text-white'
+                      : 'text-zinc-400 font-medium hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -245,25 +246,42 @@ export const SubBar: React.FC<SubBarProps> = ({
           </nav>
         </div>
 
-        {/* Right Side: Cart Link (Exact PC Screenshot Match) */}
-        {onOpenCart && (
-          <button
-            onClick={onOpenCart}
-            className="flex items-center gap-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer py-2 px-3 hover:bg-[#1a1a1a] rounded-lg"
+        {/* Right Side: Wishlist, Gifts, Cart (Exact PC Screenshot Match) */}
+        <div className="flex items-center gap-6 text-[14px]">
+          <Link
+            href="/library"
+            prefetch={true}
+            className="text-zinc-400 hover:text-white font-medium transition-colors"
           >
-            <span>Cart</span>
-            {itemCount > 0 && (
-              <span className="bg-white text-black text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </button>
-        )}
+            Wishlist
+          </Link>
+
+          <Link
+            href="/store?on_sale=true"
+            prefetch={true}
+            className="text-zinc-400 hover:text-white font-medium transition-colors"
+          >
+            Gifts
+          </Link>
+
+          {onOpenCart && (
+            <button
+              type="button"
+              onClick={onOpenCart}
+              className="flex items-center gap-2 text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 px-2.5 hover:bg-[#1a1a1a] rounded-lg group"
+            >
+              <ShoppingCart className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
+              <span>Cart</span>
+              {itemCount > 0 && (
+                <span className="bg-white text-black text-[10.5px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+          )}
+        </div>
 
       </div>
     </div>
   )
 }
-
-
-
