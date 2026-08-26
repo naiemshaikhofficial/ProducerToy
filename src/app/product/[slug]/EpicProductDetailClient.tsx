@@ -19,6 +19,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
 import { useAudio } from '@/context/AudioContext'
 import { useAuth } from '@/context/AuthContext'
 import { ProductSpecsOverview, ProductSidebarBadge } from '@/components/ProductTypeSpecs'
@@ -52,13 +53,14 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const { user } = useAuth()
   const { formatPrice } = useCurrency()
   const { addItem, isInCart, openCheckout } = useCart()
+  const { isWishlisted: checkWishlisted, toggleWishlist } = useWishlist()
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
 
   const [activeTab, setActiveTab] = useState<'overview' | 'addons' | 'faq' | 'specs'>('overview')
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [isWishlisted, setIsWishlisted] = useState(false)
   const [copied, setCopied] = useState(false)
 
+  const isSaved = checkWishlisted(product.id)
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
   const added = isInCart(product.id)
 
@@ -498,7 +500,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 href={product.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#FC6301] hover:bg-[#E05800] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FC6301]/20 cursor-pointer"
+                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
@@ -507,7 +509,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleGetNow}
-                  className="flex-1 py-3.5 px-6 text-sm font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FC6301] hover:bg-[#E05800] text-white active:scale-[0.99]"
+                  className="flex-1 py-3.5 px-6 text-sm font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99]"
                 >
                   <span>{product.button_text || 'Get'}</span>
                 </button>
@@ -552,15 +554,28 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             )}
 
             <button
-              onClick={() => setIsWishlisted(!isWishlisted)}
+              onClick={() =>
+                toggleWishlist({
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  brand: product.brands?.name || product.brand || 'Producer Toy',
+                  product_type: product.product_type || 'plugin',
+                  price_inr: product.price_inr || Math.round((product.price_usd || 0) * 85),
+                  price_usd: product.price_usd || 0,
+                  cover_image: product.cover_image,
+                  vst_format: product.vst_format,
+                  short_description: product.short_description,
+                })
+              }
               className={`w-full py-3 px-4 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                isWishlisted
+                isSaved
                   ? 'bg-rose-950/40 border-rose-600 text-rose-400'
                   : 'bg-[#222222] hover:bg-[#2a2a2a] border-[#333333] text-white'
               }`}
             >
-              <Bookmark className={`w-4 h-4 ${isWishlisted ? 'fill-rose-400' : ''}`} />
-              <span>{isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}</span>
+              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-400' : ''}`} />
+              <span>{isSaved ? 'Wishlisted' : 'Add to Wishlist'}</span>
             </button>
 
             <div className="grid grid-cols-2 gap-2.5 pt-1">

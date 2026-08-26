@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { useAuth } from './AuthContext'
 import {
   WishlistProduct,
@@ -32,27 +32,38 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
   // Fast Set lookup for O(1) checks
-  const wishlistIds = React.useMemo(() => new Set(wishlist.map((item) => item.id)), [wishlist])
+  const wishlistIds = useMemo(() => new Set(wishlist.map((item) => String(item.id))), [wishlist])
 
-  // Load from localStorage or Supabase
+  // Load from localStorage first (0ms instant), then merge with Supabase if logged in
   const loadWishlist = useCallback(async () => {
     setIsLoading(true)
     try {
+      let localItems: WishlistProduct[] = []
+      try {
+        const stored = localStorage.getItem(LOCAL_STORAGE_KEY)
+        if (stored) {
+          localItems = JSON.parse(stored)
+          setWishlist(localItems)
+        }
+      } catch {}
+
       if (user?.id) {
         // Fetch from Supabase
         const { success, items } = await getWishlistAction(user.id)
         if (success && items) {
+          // If local items exist, merge any new ones to Supabase
+          if (localItems.length > 0) {
+            const dbIds = new Set(items.map((i) => i.id))
+            const unSynced = localItems.filter((i) => !dbIds.has(i.id))
+            if (unSynced.length > 0) {
+              await bulkAddToWishlistAction(unSynced.map((i) => i.id), user.id)
+            }
+          }
+          
           setWishlist(items)
-          // Also sync to local storage cache
           try {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items))
           } catch {}
-        }
-      } else {
-        // Guest: Read from localStorage
-        const stored = localStorage.getItem(LOCAL_STORAGE_KEY)
-        if (stored) {
-          setWishlist(JSON.parse(stored))
         }
       }
     } catch (err) {
@@ -68,63 +79,74 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const isWishlisted = useCallback(
     (id: string) => {
-      return wishlistIds.has(id)
+      if (!id) return false
+      return wishlistIds.has(String(id))
     },
     [wishlistIds]
   )
 
   const toggleWishlist = useCallback(
     async (product: WishlistProduct) => {
-      const alreadySaved = wishlistIds.has(product.id)
-      
-      // Optimistic state update
-      if (alreadySaved) {
-        setWishlist((prev) => prev.filter((item) => item.id !== product.id))
-      } else {
-        setWishlist((prev) => [product, ...prev])
-      }
+      if (!product || !product.id) return
+      const targetId = String(product.id)
+      const alreadySaved = wishlistIds.has(targetId)
 
-      // Sync local storage
-      try {
-        const next = alreadySaved
-          ? wishlist.filter((item) => item.id !== product.id)
-          : [product, ...wishlist]
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(next))
-      } catch {}
+      // 0ms Instant Optimistic State Update
+      setWishlist((prev) => {
+        const updated = alreadySaved
+          ? prev.filter((item) => String(item.id) !== targetId)
+          : [product, ...prev.filter((item) => String(item.id) !== targetId)]
+        
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated))
+        } catch {}
+        
+        return updated
+      })
 
-      // If user logged in, call server action
+      // Sync with Supabase if logged in
       if (user?.id) {
-        await toggleWishlistAction(product.id, user.id)
+        try {
+          await toggleWishlistAction(targetId, user.id)
+        } catch (e) {
+          console.error('Failed to sync toggle with Supabase:', e)
+        }
       }
     },
-    [wishlist, wishlistIds, user?.id]
+    [wishlistIds, user?.id]
   )
 
   const removeFromWishlist = useCallback(
     async (productId: string) => {
-      // Optimistic update
-      setWishlist((prev) => prev.filter((item) => item.id !== productId))
-      
-      try {
-        const next = wishlist.filter((item) => item.id !== productId)
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(next))
-      } catch {}
+      if (!productId) return
+      const targetId = String(productId)
+
+      setWishlist((prev) => {
+        const updated = prev.filter((item) => String(item.id) !== targetId)
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated))
+        } catch {}
+        return updated
+      })
 
       if (user?.id) {
-        await toggleWishlistAction(productId, user.id)
+        try {
+          await toggleWishlistAction(targetId, user.id)
+        } catch (e) {
+          console.error('Failed to sync remove with Supabase:', e)
+        }
       }
     },
-    [wishlist, user?.id]
+    [user?.id]
   )
 
   const bulkAdd = useCallback(
     async (products: WishlistProduct[]) => {
       if (!products.length) return
       
-      // Optimistic update merging unique items
       setWishlist((prev) => {
-        const existingIds = new Set(prev.map((i) => i.id))
-        const newItems = products.filter((p) => !existingIds.has(p.id))
+        const existingIds = new Set(prev.map((i) => String(i.id)))
+        const newItems = products.filter((p) => !existingIds.has(String(p.id)))
         const combined = [...newItems, ...prev]
         try {
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(combined))
@@ -133,8 +155,12 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       })
 
       if (user?.id) {
-        const ids = products.map((p) => p.id)
-        await bulkAddToWishlistAction(ids, user.id)
+        try {
+          const ids = products.map((p) => String(p.id))
+          await bulkAddToWishlistAction(ids, user.id)
+        } catch (e) {
+          console.error('Failed to bulk add to Supabase:', e)
+        }
       }
     },
     [user?.id]
@@ -143,10 +169,10 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const bulkRemove = useCallback(
     async (productIds: string[]) => {
       if (!productIds.length) return
-      const removeSet = new Set(productIds)
+      const removeSet = new Set(productIds.map(String))
 
       setWishlist((prev) => {
-        const remaining = prev.filter((item) => !removeSet.has(item.id))
+        const remaining = prev.filter((item) => !removeSet.has(String(item.id)))
         try {
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(remaining))
         } catch {}
@@ -154,7 +180,11 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       })
 
       if (user?.id) {
-        await bulkRemoveFromWishlistAction(productIds, user.id)
+        try {
+          await bulkRemoveFromWishlistAction(productIds, user.id)
+        } catch (e) {
+          console.error('Failed to bulk remove from Supabase:', e)
+        }
       }
     },
     [user?.id]

@@ -258,11 +258,11 @@ export const TopBar: React.FC<TopBarProps> = ({
             </Link>
           )}
 
-          {/* Download Button (Exact 1:1 Epic Games Cyan Blue Style) */}
+          {/* Download Button (Producer Toy Light Orange Accent) */}
           <Link
             href="/store"
             prefetch={true}
-            className="bg-[#0074e4] hover:bg-[#0060c0] text-white font-bold text-[12px] px-4 py-2 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-normal"
+            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[12px] px-4 py-2 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-normal"
           >
             Download
           </Link>
@@ -274,7 +274,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link
             href="/store"
             prefetch={true}
-            className="bg-[#0074e4] hover:bg-[#0060c0] text-white font-bold text-[11px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
+            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[11px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
           >
             Download
           </Link>
