@@ -85,10 +85,21 @@ export const Header: React.FC = () => {
     setCurrency(currency === 'INR' ? 'USD' : 'INR')
   }
 
+  // Determine if current route is a shop/catalog browsing page
+  const isShopPage =
+    pathname === '/' ||
+    pathname === '/store' ||
+    pathname?.startsWith('/store/') ||
+    pathname?.startsWith('/manufacturers') ||
+    pathname?.startsWith('/categories') ||
+    pathname?.startsWith('/product/') ||
+    pathname?.startsWith('/p/') ||
+    pathname?.startsWith('/brands')
+
   return (
     <>
-      {/* Tier 1 Top Header Bar (Scrolls away naturally, high z-index for popovers) */}
-      <div className="relative z-[60] w-full bg-[#121212] select-none">
+      {/* Tier 1 Top Header Bar (Sticky on non-shop pages like /account, /library, /checkout, etc.) */}
+      <div className={`${isShopPage ? 'relative' : 'sticky top-0'} z-[60] w-full bg-[#121212] select-none ${!isShopPage ? 'border-b border-[#202020]' : ''}`}>
         <TopBar
           currency={currency}
           onToggleCurrency={toggleCurrency}
@@ -101,38 +112,40 @@ export const Header: React.FC = () => {
         />
       </div>
 
-      {/* Tier 2 Sub-Header Bar (Sticks to top-0 across entire page scroll) */}
-      <header className="sticky top-0 z-50 w-full bg-[#121212] select-none">
-        <SubBar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onSearchSubmit={handleSearch}
-          isScrolled={isScrolled}
-          isProductsMegaOpen={isProductsMegaOpen}
-          onMouseEnterProducts={handleMouseEnterMenu}
-          onMouseLeaveProducts={handleMouseLeaveMenu}
-          itemCount={items.length}
-          onOpenCart={() => setIsCartOpen(true)}
-        />
+      {/* Tier 2 Sub-Header Bar (Only on store/catalog browsing pages) */}
+      {isShopPage && (
+        <header className="sticky top-0 z-50 w-full bg-[#121212] select-none">
+          <SubBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSearchSubmit={handleSearch}
+            isScrolled={isScrolled}
+            isProductsMegaOpen={isProductsMegaOpen}
+            onMouseEnterProducts={handleMouseEnterMenu}
+            onMouseLeaveProducts={handleMouseLeaveMenu}
+            itemCount={items.length}
+            onOpenCart={() => setIsCartOpen(true)}
+          />
 
-        {/* Desktop Products Mega Dropdown Overlay */}
-        <MegaMenu
-          isOpen={isProductsMegaOpen}
-          onClose={() => setIsProductsMegaOpen(false)}
-          onMouseEnter={handleMouseEnterMenu}
-          onMouseLeave={handleMouseLeaveMenu}
-        />
+          {/* Desktop Products Mega Dropdown Overlay */}
+          <MegaMenu
+            isOpen={isProductsMegaOpen}
+            onClose={() => setIsProductsMegaOpen(false)}
+            onMouseEnter={handleMouseEnterMenu}
+            onMouseLeave={handleMouseLeaveMenu}
+          />
+        </header>
+      )}
 
-        {/* Mobile Touch-Friendly Drawer Navigation */}
-        <MobileDrawer
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-          currency={currency}
-          onToggleCurrency={toggleCurrency}
-          user={user}
-          onSignOut={signOut}
-        />
-      </header>
+      {/* Mobile Touch-Friendly Drawer Navigation (Available on all pages) */}
+      <MobileDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        currency={currency}
+        onToggleCurrency={toggleCurrency}
+        user={user}
+        onSignOut={signOut}
+      />
     </>
   )
 }

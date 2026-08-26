@@ -1,13 +1,18 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 interface CompanyDetailsSectionProps {
+  user: any
+  profile: any
   onSaveSuccess: () => void
 }
 
 export const CompanyDetailsSection: React.FC<CompanyDetailsSectionProps> = ({
+  user,
+  profile,
   onSaveSuccess,
 }) => {
   const [companyName, setCompanyName] = useState('')
@@ -17,10 +22,46 @@ export const CompanyDetailsSection: React.FC<CompanyDetailsSectionProps> = ({
   const [companyCity, setCompanyCity] = useState('')
   const [companyRegion, setCompanyRegion] = useState('')
   const [companyPostal, setCompanyPostal] = useState('')
+  const [saving, setSaving] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (profile) {
+      setCompanyName(profile.company_name || '')
+      setCompanyVat(profile.company_vat || '')
+      setCompanyAddress1(profile.company_address_line1 || '')
+      setCompanyAddress2(profile.company_address_line2 || '')
+      setCompanyCity(profile.company_city || '')
+      setCompanyRegion(profile.company_region || '')
+      setCompanyPostal(profile.company_postal_code || '')
+    }
+  }, [profile])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSaveSuccess()
+    if (!user) return
+    setSaving(true)
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        email: user.email,
+        company_name: companyName,
+        company_vat: companyVat,
+        company_address_line1: companyAddress1,
+        company_address_line2: companyAddress2,
+        company_city: companyCity,
+        company_region: companyRegion,
+        company_postal_code: companyPostal,
+        updated_at: new Date().toISOString(),
+      })
+      if (!error) {
+        onSaveSuccess()
+      }
+    } catch (err) {
+      console.warn('Error saving company details:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -144,9 +185,10 @@ export const CompanyDetailsSection: React.FC<CompanyDetailsSectionProps> = ({
       <div className="pt-2">
         <button
           type="submit"
-          className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
+          disabled={saving}
+          className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60"
         >
-          Save Changes
+          {saving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </form>

@@ -13,34 +13,80 @@ import { LinkedAccountsTab } from './LinkedAccountsTab'
 import { CommunicationTab } from './CommunicationTab'
 import { SecurityTab } from './SecurityTab'
 import { RedeemCodeTab } from './RedeemCodeTab'
+import { TransactionsTab } from './TransactionsTab'
+import { RewardsAndWalletTab } from './RewardsAndWalletTab'
 
 export default function EpicAccountClient() {
   const [activeTab, setActiveTab] = useState<AccountTab>('settings')
   const [user, setUser] = useState<any>(null)
+  const [profile, setProfile] = useState<any>(null)
   const [displayName, setDisplayName] = useState('Naiem Shaikh')
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function loadUser() {
+    async function loadUserData() {
       try {
         const supabase = getSupabaseBrowserClient()
         const {
           data: { user },
         } = await supabase.auth.getUser()
+
         if (user) {
           setUser(user)
-          const name =
-            user.user_metadata?.full_name ||
-            user.user_metadata?.display_name ||
-            (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
-          setDisplayName(name)
+
+          // Fetch full profile from Supabase
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle()
+
+          if (prof) {
+            setProfile(prof)
+            const name =
+              prof.display_name ||
+              prof.full_name ||
+              user.user_metadata?.full_name ||
+              (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
+            setDisplayName(name)
+          } else {
+            const name =
+              user.user_metadata?.full_name ||
+              user.user_metadata?.display_name ||
+              (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
+            setDisplayName(name)
+          }
         }
       } catch (err) {
         console.warn('Error loading account user:', err)
+      } finally {
+        setLoading(false)
       }
     }
-    loadUser()
+    loadUserData()
   }, [])
+
+  const handleSaveDisplayName = async (name: string) => {
+    setDisplayName(name)
+    if (!user) return
+    try {
+      const supabase = getSupabaseBrowserClient()
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        email: user.email,
+        display_name: name,
+        full_name: name,
+        updated_at: new Date().toISOString(),
+      })
+      await supabase.auth.updateUser({
+        data: { display_name: name, full_name: name },
+      })
+      handleSaveSuccess()
+    } catch (err) {
+      console.warn('Error saving display name:', err)
+    }
+  }
 
   const handleSaveSuccess = () => {
     setSaveSuccess(true)
@@ -106,17 +152,22 @@ export default function EpicAccountClient() {
                   accountId={accountId}
                   displayName={displayName}
                   maskedEmail={maskedEmail}
-                  onSaveDisplayName={(name) => {
-                    setDisplayName(name)
-                    handleSaveSuccess()
-                  }}
+                  onSaveDisplayName={handleSaveDisplayName}
                 />
 
                 {/* Sub-component: Personal Details (First Name, Last Name, Address, Country) */}
-                <PersonalDetailsSection onSaveSuccess={handleSaveSuccess} />
+                <PersonalDetailsSection
+                  user={user}
+                  profile={profile}
+                  onSaveSuccess={handleSaveSuccess}
+                />
 
                 {/* Sub-component: Company Details (Company Name, VAT, Address) */}
-                <CompanyDetailsSection onSaveSuccess={handleSaveSuccess} />
+                <CompanyDetailsSection
+                  user={user}
+                  profile={profile}
+                  onSaveSuccess={handleSaveSuccess}
+                />
 
                 {/* Sub-component: Data & Privacy (Download Data, Delete Account) */}
                 <DataPrivacySection />
@@ -128,7 +179,11 @@ export default function EpicAccountClient() {
 
             {/* TAB: COMMUNICATION PREFERENCES */}
             {activeTab === 'communication' && (
-              <CommunicationTab maskedEmail={maskedEmail} />
+              <CommunicationTab
+                user={user}
+                profile={profile}
+                maskedEmail={maskedEmail}
+              />
             )}
 
             {/* TAB: PASSWORD AND SECURITY */}
@@ -137,11 +192,21 @@ export default function EpicAccountClient() {
             {/* TAB: REDEEM CODE */}
             {activeTab === 'redeem' && <RedeemCodeTab />}
 
+            {/* TAB: TRANSACTIONS */}
+            {activeTab === 'transactions' && <TransactionsTab user={user} />}
+
+            {/* TAB: EPIC REWARDS */}
+            {activeTab === 'rewards' && (
+              <RewardsAndWalletTab type="rewards" profile={profile} />
+            )}
+
+            {/* TAB: IN-GAME CURRENCY / WALLET */}
+            {activeTab === 'currency' && (
+              <RewardsAndWalletTab type="currency" profile={profile} />
+            )}
+
             {/* TAB: PLACEHOLDER FOR REMAINING TABS */}
-            {(activeTab === 'transactions' ||
-              activeTab === 'payment' ||
-              activeTab === 'currency' ||
-              activeTab === 'rewards' ||
+            {(activeTab === 'payment' ||
               activeTab === 'subscriptions' ||
               activeTab === 'legal' ||
               activeTab === 'parental' ||
@@ -159,7 +224,7 @@ export default function EpicAccountClient() {
 
                 <div className="bg-[#181818] border border-[#242424] p-8 rounded-2xl text-center space-y-3">
                   <p className="text-sm text-zinc-300">
-                    No records found for this section yet.
+                    No active {activeTab.replace('_', ' ')} found for this account.
                   </p>
                   <Link
                     href="/store"

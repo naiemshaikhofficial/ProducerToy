@@ -1,14 +1,19 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Info, Edit2 } from 'lucide-react'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 interface PersonalDetailsSectionProps {
+  user: any
+  profile: any
   onSaveSuccess: () => void
 }
 
 export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
+  user,
+  profile,
   onSaveSuccess,
 }) => {
   const [firstName, setFirstName] = useState('')
@@ -20,10 +25,49 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
   const [postalCode, setPostalCode] = useState('')
   const [country, setCountry] = useState('INDIA')
   const [isEditingCountry, setIsEditingCountry] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.first_name || '')
+      setLastName(profile.last_name || '')
+      setAddressLine1(profile.address_line1 || '')
+      setAddressLine2(profile.address_line2 || '')
+      setCity(profile.city || '')
+      setRegion(profile.region || profile.state || '')
+      setPostalCode(profile.postal_code || '')
+      setCountry(profile.country || 'INDIA')
+    }
+  }, [profile])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSaveSuccess()
+    if (!user) return
+    setSaving(true)
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        email: user.email,
+        first_name: firstName,
+        last_name: lastName,
+        address_line1: addressLine1,
+        address_line2: addressLine2,
+        city: city,
+        region: region,
+        state: region,
+        postal_code: postalCode,
+        country: country,
+        updated_at: new Date().toISOString(),
+      })
+      if (!error) {
+        onSaveSuccess()
+      }
+    } catch (err) {
+      console.warn('Error saving personal details:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -193,13 +237,14 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
         </div>
       </div>
 
-      {/* Save Changes Button (Pure Neutral Darks, NO Blue) */}
+      {/* Save Changes Button */}
       <div className="pt-2">
         <button
           type="submit"
-          className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
+          disabled={saving}
+          className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60"
         >
-          Save Changes
+          {saving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </form>
