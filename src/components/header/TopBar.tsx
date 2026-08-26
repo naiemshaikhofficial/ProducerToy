@@ -19,6 +19,8 @@ import {
   ExternalLink
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
+import { useAuth } from '@/context/AuthContext'
 
 interface TopBarProps {
   currency: string
@@ -152,8 +154,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
-                      <Sparkles className="w-4 h-4 text-zinc-400" />
-                      <span>Producer Rewards</span>
+                      <ToywardsIcon size={16} />
+                      <span>Toywards</span>
                     </Link>
 
                     <Link
