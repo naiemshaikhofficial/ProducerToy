@@ -19,6 +19,7 @@ import {
   Loader2,
   X,
   ArrowRight,
+  AlertTriangle,
 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { CustomConfirmModal } from './CustomConfirmModal'
@@ -154,17 +155,19 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   const [expandedId, setExpandedId] = useState<string | null>('google')
   const [linkedAccounts, setLinkedAccounts] = useState<Record<string, any>>({})
   const [oauthModalProvider, setOauthModalProvider] = useState<MusicProvider | null>(null)
+  const [googleLinkModalOpen, setGoogleLinkModalOpen] = useState(false)
   const [oauthConnecting, setOauthConnecting] = useState(false)
   const [oauthHandleInput, setOauthHandleInput] = useState('')
   const [disconnectTarget, setDisconnectTarget] = useState<MusicProvider | null>(null)
   const [saving, setSaving] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const existing = profile?.linked_accounts || {}
     const merged = { ...existing }
 
-    // Auto-detect Google connection from Supabase Auth session or email
+    // Auto-detect Google connection from Supabase Auth session
     const googleIdentity = user?.identities?.find((id: any) => id.provider === 'google')
     const isGoogleAuth =
       Boolean(user) &&
@@ -173,10 +176,10 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
         user?.app_metadata?.providers?.includes('google') ||
         Boolean(user?.email && (user.email.includes('@gmail.com') || user.user_metadata?.iss?.includes('google'))) ||
         Boolean(user?.user_metadata?.full_name) ||
-        Boolean(user?.email))
+        Boolean(existing.google))
 
     if (isGoogleAuth) {
-      const googleEmail = googleIdentity?.identity_data?.email || user?.email || ''
+      const googleEmail = googleIdentity?.identity_data?.email || user?.email || existing.google?.email || ''
       const googleName =
         googleIdentity?.identity_data?.full_name ||
         googleIdentity?.identity_data?.name ||
@@ -184,12 +187,14 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
         user?.user_metadata?.name ||
         profile?.full_name ||
         profile?.display_name ||
+        existing.google?.handle ||
         (googleEmail ? googleEmail.split('@')[0] : 'Naiem Shaikh')
 
       merged.google = {
         handle: googleName,
         email: googleEmail,
-        connected_at: user?.created_at || new Date().toISOString(),
+        connected_at: existing.google?.connected_at || user?.created_at || new Date().toISOString(),
+        is_permanent: true,
         ...existing.google,
       }
     }
@@ -201,26 +206,52 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     setExpandedId(expandedId === id ? null : id)
   }
 
-  // Open the OAuth Connection Modal or initiate Google OAuth
-  const handleConnectClick = async (provider: MusicProvider) => {
-    if (provider.id === 'google') {
-      try {
-        const supabase = getSupabaseBrowserClient()
-        if (supabase.auth.linkIdentity) {
-          const { error } = await supabase.auth.linkIdentity({
-            provider: 'google',
-            options: {
-              redirectTo: `${window.location.origin}/account`,
-            },
-          })
-          if (!error) return
-        }
-      } catch (err) {
-        console.warn('Google linkIdentity note:', err)
-      }
+  // Handle Google Connection with Email Matching Validation & One-Time Rule
+  const handleInitiateGoogleLink = async () => {
+    if (!user?.email) {
+      setErrorMessage('Please make sure you are logged in to link your Google account.')
+      return
     }
 
-    // Open the OAuth Permissions Modal
+    setOauthConnecting(true)
+    setErrorMessage(null)
+
+    try {
+      const supabase = getSupabaseBrowserClient()
+      
+      // Execute Google OAuth linking
+      if (supabase.auth.linkIdentity) {
+        const { error } = await supabase.auth.linkIdentity({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback?next=/account`,
+          },
+        })
+        if (error) throw error
+      } else {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback?next=/account`,
+          },
+        })
+        if (error) throw error
+      }
+    } catch (err: any) {
+      console.warn('Google link error:', err)
+      setErrorMessage(err.message || 'Failed to initiate Google authentication.')
+      setOauthConnecting(false)
+      setGoogleLinkModalOpen(false)
+    }
+  }
+
+  // Open the OAuth Connection Modal for other providers
+  const handleConnectClick = async (provider: MusicProvider) => {
+    if (provider.id === 'google') {
+      setGoogleLinkModalOpen(true)
+      return
+    }
+
     const defaultHandle =
       user?.user_metadata?.full_name ||
       profile?.display_name ||
@@ -230,7 +261,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     setOauthModalProvider(provider)
   }
 
-  // Execute OAuth Authorization & Link Account
+  // Execute OAuth Authorization & Link Account for Music Providers
   const handleAuthorizeOAuth = async () => {
     if (!user || !oauthModalProvider) return
     setOauthConnecting(true)
@@ -274,8 +305,10 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
 
   const handleConfirmDisconnect = async () => {
     if (!user || !disconnectTarget) return
-    setSaving(true)
+    // Prevent disconnecting Google
+    if (disconnectTarget.id === 'google') return
 
+    setSaving(true)
     const updated = { ...linkedAccounts }
     delete updated[disconnectTarget.id]
 
@@ -323,6 +356,13 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
           </span>
         )}
       </div>
+
+      {errorMessage && (
+        <div className="bg-[#2a1719] border border-[#4d2428] text-[#ff6b7a] p-4 rounded-2xl flex items-center gap-3 text-xs">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
       {/* Provider List (Accordion Cards matching Screenshot 2) */}
       <div className="space-y-3.5">
@@ -399,7 +439,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                         Visit your {provider.name} account to review what data is shared with ProducerToy.
                       </p>
 
-                      {/* Footer Info & Unlink (NO UNLINK FOR GOOGLE AS SPECIFIED) */}
+                      {/* Footer Info & Unlink (NO UNLINK FOR GOOGLE AS SPECIFIED - PERMANENT LINK) */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#202020]">
                         <span className="text-xs text-zinc-500">
                           Linked on {linkedDateFormatted}{' '}
@@ -450,20 +490,120 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* OAUTH PERMISSIONS & AUTHORIZATION MODAL                                     */}
+      {/* ONE-TIME GOOGLE LINK CONFIRMATION MODAL                                    */}
+      {/* ========================================================================= */}
+      {googleLinkModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+            onClick={() => !oauthConnecting && setGoogleLinkModalOpen(false)}
+          />
+
+          <div className="relative z-10 w-full max-w-lg bg-[#181818] border border-[#2c2c2c] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-150 select-none">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md bg-white text-black">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white tracking-tight">
+                    Link Google Account
+                  </h3>
+                  <span className="text-xs text-zinc-400">
+                    One-Time Permanent Authentication
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGoogleLinkModalOpen(false)}
+                className="text-zinc-500 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 space-y-3">
+              <div className="flex items-start gap-2.5 text-xs text-zinc-300">
+                <ShieldCheck className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-bold text-white block">Email Match Required:</span>
+                  <span>
+                    Your Google Account email must match your registered account email:
+                  </span>
+                  <span className="block text-white font-mono font-bold mt-1 bg-[#202020] px-2.5 py-1 rounded-lg border border-[#303030]">
+                    {user?.email || 'Registered Email'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5 text-xs text-zinc-400 pt-2 border-t border-[#1e1e1e]">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span>
+                  This is a permanent one-time link. Once connected, your Google Account cannot be unlinked or disconnected.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#242424]">
+              <button
+                type="button"
+                onClick={() => setGoogleLinkModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={oauthConnecting}
+                onClick={handleInitiateGoogleLink}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60"
+              >
+                {oauthConnecting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Connecting to Google...</span>
+                  </>
+                ) : (
+                  <span>Continue to Google</span>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* OAUTH PERMISSIONS & AUTHORIZATION MODAL FOR MUSIC PROVIDERS                */}
       {/* ========================================================================= */}
       {oauthModalProvider && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
             onClick={() => setOauthModalProvider(null)}
           />
 
-          {/* Modal Dialog Card */}
           <div className="relative z-10 w-full max-w-lg bg-[#181818] border border-[#2c2c2c] rounded-2xl shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-150 select-none">
             
-            {/* Header with Provider Logo */}
             <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
               <div className="flex items-center gap-3">
                 <div
@@ -489,7 +629,6 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
               </button>
             </div>
 
-            {/* Scopes & Permissions Requested */}
             <div className="space-y-2.5">
               <span className="text-xs font-bold text-zinc-300 block">
                 ProducerToy is requesting permission to:
@@ -504,7 +643,6 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
               </div>
             </div>
 
-            {/* Account Handle / Artist ID Input */}
             <div>
               <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
                 {oauthModalProvider.name} Username / Artist Handle
@@ -518,7 +656,6 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#242424]">
               <button
                 type="button"
