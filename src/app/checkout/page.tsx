@@ -99,6 +99,7 @@ export default function CheckoutPage() {
         data: { user: currentUser },
       } = await supabase.auth.getUser()
 
+      if (currentUser) {
         // Fetch saved profile from unified profiles table
         try {
           const { data: profile } = await supabase

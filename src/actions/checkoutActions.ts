@@ -77,7 +77,7 @@ export async function processCheckoutAction(
       }
     }
 
-    // 2.1 Update user_accounts, profiles, and auth user metadata
+    // 2.1 Update unified profiles and auth user metadata
     if (targetUserId && billingDetails) {
       try {
         // Update Supabase auth user metadata
