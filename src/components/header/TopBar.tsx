@@ -235,32 +235,31 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
                   </Link>
 
-                  {user ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsAccountMenuOpen(false)
-                        if (onSignOut) onSignOut()
-                      }}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 rounded-lg transition-colors w-full text-left cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAccountMenuOpen(false)
+                      if (onSignOut) onSignOut()
+                    }}
+                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 rounded-lg transition-colors w-full text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </button>
                 </div>
-              )}
-            </div>
-          ) : (
-            <Link
-              href="/auth"
-              prefetch={true}
-              className="flex items-center gap-2 py-1.5 px-3 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
-            >
-              <User className="w-4 h-4 text-zinc-400" />
-              <span>Sign In</span>
-            </Link>
-          )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link
+            href="/auth"
+            prefetch={true}
+            className="flex items-center gap-2 py-1.5 px-3 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
+          >
+            <User className="w-4 h-4 text-zinc-400" />
+            <span>Sign In</span>
+          </Link>
+        )}
 
           {/* Download Button */}
           <Link
