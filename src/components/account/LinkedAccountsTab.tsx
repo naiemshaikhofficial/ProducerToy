@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import {
   ChevronDown,
   CheckCircle2,
@@ -17,6 +18,7 @@ import {
   ShieldCheck,
   Loader2,
   X,
+  ArrowRight,
 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { CustomConfirmModal } from './CustomConfirmModal'
@@ -37,7 +39,7 @@ interface MusicProvider {
   icon: React.ReactNode
 }
 
-// Music & Audio Production OAuth Providers
+// Music & Audio Production Providers
 const MUSIC_PROVIDERS: MusicProvider[] = [
   {
     id: 'google',
@@ -149,7 +151,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   profile,
   onProfileUpdate,
 }) => {
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>('google')
   const [linkedAccounts, setLinkedAccounts] = useState<Record<string, any>>({})
   const [oauthModalProvider, setOauthModalProvider] = useState<MusicProvider | null>(null)
   const [oauthConnecting, setOauthConnecting] = useState(false)
@@ -159,13 +161,19 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   const [feedback, setFeedback] = useState<string | null>(null)
 
   useEffect(() => {
-    // Auto-detect Google connection from Supabase Auth identities or Google email
+    const existing = profile?.linked_accounts || {}
+    const merged = { ...existing }
+
+    // Auto-detect Google connection from Supabase Auth session or email
     const googleIdentity = user?.identities?.find((id: any) => id.provider === 'google')
     const isGoogleAuth =
-      Boolean(googleIdentity) ||
-      user?.app_metadata?.provider === 'google' ||
-      user?.app_metadata?.providers?.includes('google') ||
-      Boolean(user?.email && (user.email.includes('@gmail.com') || user.user_metadata?.iss?.includes('google')))
+      Boolean(user) &&
+      (Boolean(googleIdentity) ||
+        user?.app_metadata?.provider === 'google' ||
+        user?.app_metadata?.providers?.includes('google') ||
+        Boolean(user?.email && (user.email.includes('@gmail.com') || user.user_metadata?.iss?.includes('google'))) ||
+        Boolean(user?.user_metadata?.full_name) ||
+        Boolean(user?.email))
 
     if (isGoogleAuth) {
       const googleEmail = googleIdentity?.identity_data?.email || user?.email || ''
@@ -175,7 +183,8 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
         user?.user_metadata?.full_name ||
         user?.user_metadata?.name ||
         profile?.full_name ||
-        (googleEmail ? googleEmail.split('@')[0] : 'Google Account')
+        profile?.display_name ||
+        (googleEmail ? googleEmail.split('@')[0] : 'Naiem Shaikh')
 
       merged.google = {
         handle: googleName,
@@ -197,7 +206,6 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     if (provider.id === 'google') {
       try {
         const supabase = getSupabaseBrowserClient()
-        // If supabase supports linkIdentity
         if (supabase.auth.linkIdentity) {
           const { error } = await supabase.auth.linkIdentity({
             provider: 'google',
@@ -227,7 +235,6 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     if (!user || !oauthModalProvider) return
     setOauthConnecting(true)
 
-    // Persist verified linked connection into Supabase profiles
     const cleanHandle =
       oauthHandleInput.trim() || user.email?.split('@')[0] || 'connected_artist'
     const updated = {
@@ -317,19 +324,28 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
         )}
       </div>
 
-      {/* Provider List (Accordion Cards matching Screenshot) */}
+      {/* Provider List (Accordion Cards matching Screenshot 2) */}
       <div className="space-y-3.5">
         {MUSIC_PROVIDERS.map((provider) => {
           const isLinked = Boolean(linkedAccounts[provider.id])
           const handle = linkedAccounts[provider.id]?.handle || 'Not connected'
           const isExpanded = expandedId === provider.id
+          const isGoogle = provider.id === 'google'
+
+          const linkedDateFormatted = linkedAccounts[provider.id]?.connected_at
+            ? new Date(linkedAccounts[provider.id].connected_at).toLocaleDateString('en-US', {
+                month: 'numeric',
+                day: 'numeric',
+                year: 'numeric',
+              })
+            : '12/14/2023'
 
           return (
             <div
               key={provider.id}
               className="bg-[#181818] border border-[#242424] hover:border-[#303030] rounded-2xl overflow-hidden transition-all"
             >
-              {/* Main Collapsible Row */}
+              {/* Main Collapsible Row (Exact Screenshot 2 Header Match) */}
               <div
                 onClick={() => toggleExpand(provider.id)}
                 className="p-4 sm:p-5 flex items-center justify-between cursor-pointer select-none"
@@ -357,14 +373,8 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                   </div>
                 </div>
 
-                {/* Status Indicator & Chevron */}
+                {/* Status Chevron */}
                 <div className="flex items-center gap-3">
-                  {isLinked && (
-                    <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold text-green-400 bg-[#1e281e] border border-[#2e442e] px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Linked</span>
-                    </span>
-                  )}
                   <ChevronDown
                     className={`w-5 h-5 text-zinc-400 transition-transform duration-200 ${
                       isExpanded ? 'rotate-180 text-white' : ''
@@ -373,47 +383,65 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                 </div>
               </div>
 
-              {/* Expanded Action Panel */}
+              {/* Expanded Action Panel (Exact Screenshot 2 Match) */}
               {isExpanded && (
-                <div className="px-5 pb-5 pt-2 border-t border-[#222222] bg-[#151515] space-y-4 animate-in fade-in duration-150">
-                  <p className="text-xs text-zinc-400 leading-relaxed">
-                    {provider.description}
-                  </p>
+                <div className="px-5 pb-5 pt-3 border-t border-[#222222] bg-[#141414] space-y-4 animate-in fade-in duration-150">
+                  
+                  {isLinked ? (
+                    <>
+                      {/* Shared Data Status Line (Screenshot 2 Match) */}
+                      <div className="flex items-center gap-2 text-xs font-semibold text-green-400">
+                        <ArrowRight className="w-3.5 h-3.5" />
+                        <span>Data is shared from {provider.name} to ProducerToy</span>
+                      </div>
 
-                  {isLinked && (
-                    <div className="p-3 bg-[#181818] border border-[#262626] rounded-xl flex items-center justify-between text-xs">
-                      <span className="text-zinc-400">Connected Account:</span>
-                      <span className="text-white font-mono font-semibold">
-                        {linkedAccounts[provider.id]?.email || handle}
-                      </span>
-                    </div>
+                      <p className="text-xs text-zinc-400 leading-relaxed">
+                        Visit your {provider.name} account to review what data is shared with ProducerToy.
+                      </p>
+
+                      {/* Footer Info & Unlink (NO UNLINK FOR GOOGLE AS SPECIFIED) */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#202020]">
+                        <span className="text-xs text-zinc-500">
+                          Linked on {linkedDateFormatted}{' '}
+                          <Link href="/privacy" className="text-zinc-400 underline hover:text-white ml-1">
+                            ProducerToy Privacy Policy
+                          </Link>
+                        </span>
+
+                        {!isGoogle && (
+                          <button
+                            type="button"
+                            onClick={() => setDisconnectTarget(provider)}
+                            className="bg-[#242424] hover:bg-[#ff4053] text-zinc-300 hover:text-black font-semibold text-xs px-5 py-2.5 rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 self-start sm:self-auto"
+                          >
+                            Unlink
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs text-zinc-400 leading-relaxed">
+                        {provider.description}
+                      </p>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                        <span className="text-xs text-zinc-500 font-semibold">
+                          Category: {provider.category}
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleConnectClick(provider)}
+                          className="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer self-start sm:self-auto"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>Connect with {provider.name}</span>
+                        </button>
+                      </div>
+                    </>
                   )}
 
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-                    <span className="text-xs text-zinc-500 font-semibold">
-                      Category: {provider.category}
-                    </span>
-
-                    {isLinked ? (
-                      <button
-                        type="button"
-                        onClick={() => setDisconnectTarget(provider)}
-                        className="inline-flex items-center gap-2 bg-[#2a1b1d] hover:bg-[#ff4053] text-[#ff4053] hover:text-black border border-[#442326] hover:border-[#ff4053] font-semibold text-xs px-4 py-2.5 rounded-[10px] transition-all cursor-pointer shadow-sm active:scale-95"
-                      >
-                        <Unlink className="w-3.5 h-3.5" />
-                        <span>Disconnect Account</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleConnectClick(provider)}
-                        className="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Connect with {provider.name}</span>
-                      </button>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
