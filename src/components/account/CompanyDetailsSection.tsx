@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { updateCompanyDetailsAction } from '@/actions/accountActions'
 
 interface CompanyDetailsSectionProps {
   user: any
@@ -42,20 +43,16 @@ export const CompanyDetailsSection: React.FC<CompanyDetailsSectionProps> = ({
     if (!user) return
     setSaving(true)
     try {
-      const supabase = getSupabaseBrowserClient()
-      const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
-        email: user.email,
+      const res = await updateCompanyDetailsAction(user.id, {
         company_name: companyName,
-        company_vat: companyVat,
+        company_tax_id: companyVat,
         company_address_line1: companyAddress1,
         company_address_line2: companyAddress2,
         company_city: companyCity,
         company_region: companyRegion,
         company_postal_code: companyPostal,
-        updated_at: new Date().toISOString(),
       })
-      if (!error) {
+      if (res.success) {
         onSaveSuccess()
       }
     } catch (err) {

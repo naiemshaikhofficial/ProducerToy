@@ -6,6 +6,7 @@ import { Edit2 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { CustomInfoTooltip } from './CustomInfoTooltip'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { updatePersonalDetailsAction } from '@/actions/accountActions'
 
 interface PersonalDetailsSectionProps {
   user: any
@@ -47,10 +48,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
     if (!user) return
     setSaving(true)
     try {
-      const supabase = getSupabaseBrowserClient()
-      const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
-        email: user.email,
+      const res = await updatePersonalDetailsAction(user.id, {
         first_name: firstName,
         last_name: lastName,
         address_line1: addressLine1,
@@ -60,9 +58,8 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
         state: region,
         postal_code: postalCode,
         country: country,
-        updated_at: new Date().toISOString(),
       })
-      if (!error) {
+      if (res.success) {
         onSaveSuccess()
       }
     } catch (err) {

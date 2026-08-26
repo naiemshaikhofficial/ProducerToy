@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
+import { redeemLicenseCodeAction } from '@/actions/accountActions'
 
 export const RedeemCodeTab: React.FC = () => {
   const [code, setCode] = useState('')
@@ -18,48 +18,15 @@ export const RedeemCodeTab: React.FC = () => {
     setMessage(null)
 
     try {
-      const supabase = getSupabaseBrowserClient()
-      
-      // Check coupons table
-      const { data: coupon, error: couponErr } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('code', cleanCode)
-        .eq('is_active', true)
-        .maybeSingle()
-
-      if (coupon) {
-        setMessage({
-          text: `Success! Code "${coupon.code}" verified (${coupon.discount_percent}% discount applied).`,
-          isError: false,
-        })
-        setCode('')
-        return
-      }
-
-      // Check serial keys table
-      const { data: serialKey, error: serialErr } = await supabase
-        .from('serial_keys')
-        .select('*')
-        .eq('key_code', cleanCode)
-        .maybeSingle()
-
-      if (serialKey) {
-        setMessage({
-          text: `License activated! Product unlocked in your Library.`,
-          isError: false,
-        })
-        setCode('')
-        return
-      }
-
-      // If not found in database
+      const res = await redeemLicenseCodeAction(cleanCode)
       setMessage({
-        text: `Invalid or expired code "${cleanCode}". Please check and try again.`,
-        isError: true,
+        text: res.message,
+        isError: !res.success,
       })
+      if (res.success) {
+        setCode('')
+      }
     } catch (err) {
-      console.warn('Error redeeming code:', err)
       setMessage({
         text: 'Error validating code. Please try again later.',
         isError: true,

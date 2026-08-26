@@ -16,6 +16,7 @@ import { SecurityTab } from './SecurityTab'
 import { RedeemCodeTab } from './RedeemCodeTab'
 import { TransactionsTab } from './TransactionsTab'
 import { RewardsAndWalletTab } from './RewardsAndWalletTab'
+import { updatePersonalDetailsAction } from '@/actions/accountActions'
 
 export default function EpicAccountClient() {
   const [activeTab, setActiveTab] = useState<AccountTab>('settings')
@@ -74,12 +75,8 @@ export default function EpicAccountClient() {
     if (!user) return
     try {
       const supabase = getSupabaseBrowserClient()
-      await supabase.from('profiles').upsert({
-        id: user.id,
-        email: user.email,
+      await updatePersonalDetailsAction(user.id, {
         display_name: name,
-        full_name: name,
-        updated_at: new Date().toISOString(),
       })
       await supabase.auth.updateUser({
         data: { display_name: name, full_name: name },

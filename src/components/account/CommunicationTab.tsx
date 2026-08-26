@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { updateCommunicationPreferencesAction } from '@/actions/accountActions'
 
 interface CommunicationTabProps {
   user: any
@@ -47,17 +47,15 @@ export const CommunicationTab: React.FC<CommunicationTabProps> = ({
     }
 
     try {
-      const supabase = getSupabaseBrowserClient()
-      await supabase.from('profiles').upsert({
-        id: user.id,
-        email: user.email,
+      const res = await updateCommunicationPreferencesAction(user.id, {
         promo_emails: newPromo,
         order_emails: newOrder,
         reward_emails: newReward,
-        updated_at: new Date().toISOString(),
       })
-      setSavedMsg(true)
-      setTimeout(() => setSavedMsg(false), 2000)
+      if (res.success) {
+        setSavedMsg(true)
+        setTimeout(() => setSavedMsg(false), 2000)
+      }
     } catch (err) {
       console.warn('Error saving communication preferences:', err)
     }
