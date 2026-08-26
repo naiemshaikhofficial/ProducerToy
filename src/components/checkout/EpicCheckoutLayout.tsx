@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Plus,
-  Lock,
   Trash2
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
@@ -115,27 +114,27 @@ export function EpicCheckoutLayout({
   }
 
   return (
-    <div className="w-full max-w-[880px] max-h-[90vh] bg-[#141414] border border-[#262626] rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative">
+    <div className="w-full max-w-[860px] h-[92vh] max-h-[720px] bg-[#161616] border border-[#282828] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none">
       
       {/* ========================================================================= */}
-      {/* LEFT COLUMN: ORDER SUMMARY & PRODUCT DETAILS (md:w-[340px])                */}
+      {/* LEFT COLUMN: ORDER SUMMARY (Exact Epic Games Layout & Colors)             */}
       {/* ========================================================================= */}
-      <div className="w-full md:w-[340px] flex-shrink-0 bg-[#121212] p-5 sm:p-7 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#202020] overflow-y-auto max-h-[35vh] md:max-h-[90vh]">
+      <div className="w-full md:w-[350px] flex-shrink-0 bg-[#121212] p-6 sm:p-7 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#222222] overflow-y-auto">
         
-        <div className="space-y-5">
-          {/* Top Logo + Checkout Title (Exact Epic Games Screenshot Match) */}
-          <div className="flex items-center gap-2">
-            <LogoIcon size={24} />
-            <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">
+        <div className="space-y-6">
+          {/* Top Logo + Checkout Title (Exact Screenshot Match) */}
+          <div className="flex items-center gap-2.5">
+            <LogoIcon size={26} />
+            <h1 className="text-base sm:text-lg font-black text-white tracking-tight">
               Checkout
             </h1>
           </div>
 
           {/* Cart Items List */}
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {items.map((item) => (
-              <div key={item.id} className="flex items-start gap-3 group">
-                <div className="relative w-12 h-12 bg-[#1c1c1c] border border-[#282828] rounded-lg overflow-hidden flex-shrink-0">
+              <div key={item.id} className="flex items-start gap-3.5 group">
+                <div className="relative w-12 h-14 bg-[#1c1c1c] border border-[#282828] rounded-md overflow-hidden flex-shrink-0">
                   <Image
                     src={item.cover_image || '/placeholder.jpg'}
                     alt={item.name}
@@ -146,10 +145,10 @@ export function EpicCheckoutLayout({
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xs text-zinc-100 line-clamp-2 leading-snug">
+                  <h3 className="font-semibold text-xs text-white line-clamp-2 leading-relaxed">
                     {item.name}
                   </h3>
-                  <div className="flex items-center gap-2 mt-0.5 text-[10px] text-zinc-400">
+                  <div className="flex items-center gap-2 mt-1 text-[10.5px] text-zinc-400">
                     <span className="truncate">{item.brand || 'Producer Toy'}</span>
                     {items.length > 1 && (
                       <button
@@ -168,62 +167,61 @@ export function EpicCheckoutLayout({
           </div>
 
           {/* Price Breakdown */}
-          <div className="space-y-2 pt-3 border-t border-[#1e1e1e] text-xs">
-            <div className="flex justify-between items-center text-zinc-400">
+          <div className="space-y-2.5 pt-4 border-t border-[#202020] text-xs">
+            <div className="flex justify-between items-center text-zinc-400 font-medium">
               <span>Subtotal</span>
-              <span className="text-zinc-200 font-medium">
+              <span className="text-zinc-200 font-semibold">
                 {currencySymbol}{currentSubtotal.toFixed(2)}
               </span>
             </div>
 
             {!isFree && (
-              <div className="flex justify-between items-center text-zinc-400">
+              <div className="flex justify-between items-center text-zinc-400 font-medium">
                 <span>VAT included (18%)</span>
-                <span className="text-zinc-200 font-medium">
+                <span className="text-zinc-200 font-semibold">
                   {currencySymbol}{taxAmount}
                 </span>
               </div>
             )}
 
             {/* Total Price Row */}
-            <div className="flex justify-between items-baseline pt-2.5 border-t border-[#1e1e1e]">
-              <span className="text-sm font-semibold text-white">Total</span>
-              <span className="text-xl font-bold text-white tracking-tight">
+            <div className="flex justify-between items-baseline pt-3 border-t border-[#202020]">
+              <span className="text-sm font-bold text-white">Total</span>
+              <span className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 {currencySymbol}{finalTotal.toFixed(2)}
               </span>
             </div>
           </div>
 
-          {/* Producer Rewards Green Badge */}
+          {/* Producer Rewards Green Badge (Exact Screenshot Match) */}
           {!isFree && (
-            <div className="inline-flex items-center gap-2 bg-[#0d2a20] border border-[#14532d]/60 text-[#34d399] px-3 py-1.5 rounded-xl text-[11px] font-semibold select-none w-full">
-              <Sparkles size={13} className="text-[#34d399] flex-shrink-0" />
+            <div className="inline-flex items-center gap-2 bg-[#0e2c22] border border-[#1b5e46] text-[#2ed8a7] px-3.5 py-2 rounded-xl text-[11px] font-semibold select-none w-full shadow-sm">
+              <Sparkles size={13} className="text-[#2ed8a7] flex-shrink-0" />
               <span>Get {currencySymbol}{rewardsAmount} in Producer Rewards.</span>
             </div>
           )}
         </div>
 
-        {/* Bottom Secure Vault Guarantee */}
-        <div className="pt-4 mt-4 border-t border-[#1e1e1e] text-[10px] text-zinc-500 flex items-center gap-1.5">
-          <Lock size={12} className="text-zinc-500 flex-shrink-0" />
-          <span>Instant vault delivery • 256-bit SSL</span>
+        {/* Bottom Notice */}
+        <div className="pt-4 text-[10px] text-zinc-500">
+          Instant vault delivery • 256-bit SSL encrypted
         </div>
       </div>
 
 
       {/* ========================================================================= */}
-      {/* RIGHT COLUMN: PAYMENT DETAILS & ACTIONS (Scrollable flex-1)                */}
+      {/* RIGHT COLUMN: PAYMENT DETAILS & ACTIONS (Exact Epic Games Dark Theme)     */}
       {/* ========================================================================= */}
-      <div className="flex-1 bg-[#141414] p-5 sm:p-7 flex flex-col justify-between overflow-y-auto max-h-[65vh] md:max-h-[90vh] space-y-5">
+      <div className="flex-1 bg-[#161616] p-6 sm:p-7 flex flex-col justify-between overflow-y-auto space-y-5">
         
         <div className="space-y-5">
           {/* Top User Info & Close Button (Exact Screenshot Match) */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300">
-              <div className="w-5 h-5 rounded-full bg-[#242424] border border-[#383838] text-white flex items-center justify-center text-[10px] font-bold">
+              <div className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-white flex items-center justify-center text-[10px] font-bold">
                 {initialLetter}
               </div>
-              <span className="truncate max-w-[180px]">{displayName}</span>
+              <span className="truncate max-w-[200px]">{displayName}</span>
             </div>
 
             {onClose ? (
@@ -249,21 +247,21 @@ export function EpicCheckoutLayout({
 
           {/* Section Title */}
           <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">
+            <h2 className="text-xl font-black text-white tracking-tight">
               Payment Details
             </h2>
           </div>
 
-          {/* Epic Rewards Expandable Pill Box */}
-          <div className="bg-[#181818] border border-[#242424] rounded-xl p-3 transition-all">
+          {/* Epic Rewards Expandable Pill Box (Exact Screenshot Match) */}
+          <div className="bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl p-3.5 transition-all">
             <button
               type="button"
               onClick={() => setIsRewardsExpanded(!isRewardsExpanded)}
               className="w-full flex items-center justify-between text-left cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-4 h-4 rounded-full bg-[#0d2a20] border border-[#14532d] flex items-center justify-center text-[#34d399]">
-                  <Sparkles size={10} />
+                <div className="w-5 h-5 rounded-full bg-[#0e2c22] border border-[#1b5e46] flex items-center justify-center text-[#2ed8a7]">
+                  <Sparkles size={11} />
                 </div>
                 <span className="text-xs font-bold text-white">Producer Rewards</span>
               </div>
@@ -277,7 +275,7 @@ export function EpicCheckoutLayout({
             </button>
 
             {isRewardsExpanded && (
-              <div className="mt-2.5 pt-2.5 border-t border-[#202020] text-xs text-zinc-400 space-y-1 animate-in fade-in duration-150">
+              <div className="mt-2.5 pt-2.5 border-t border-[#2a2a2a] text-xs text-zinc-400 space-y-1 animate-in fade-in duration-150">
                 <div className="flex justify-between">
                   <span>Available Balance:</span>
                   <span className="font-bold text-white">{currencySymbol}0.00</span>
@@ -289,23 +287,23 @@ export function EpicCheckoutLayout({
             )}
           </div>
 
-          {/* Payment Method Radio Selector (Exact Epic Games Store Layout) */}
+          {/* Payment Method Radio Selector (Exact Epic Games Layout) */}
           {!isFree && (
             <div className="space-y-2">
-              <div className="bg-[#161616] border border-[#242424] rounded-xl divide-y divide-[#202020] overflow-hidden">
+              <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl divide-y divide-[#242424] overflow-hidden">
                 
                 {/* Option 1: Credit Card / Debit Card */}
                 <label
                   onClick={() => setSelectedMethod('card')}
-                  className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
-                    selectedMethod === 'card' ? 'bg-[#1b1b1b]' : 'hover:bg-[#181818]'
+                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                    selectedMethod === 'card' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-5 rounded bg-[#202020] border border-[#333333] flex items-center justify-center">
+                    <div className="w-7 h-5 rounded bg-[#242424] border border-[#333333] flex items-center justify-center">
                       <CreditCard size={13} className="text-zinc-300" />
                     </div>
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-bold text-white">
                       Credit Card / Debit Card
                     </span>
                   </div>
@@ -322,8 +320,8 @@ export function EpicCheckoutLayout({
                 {/* Option 2: PayPal */}
                 <label
                   onClick={() => setSelectedMethod('paypal')}
-                  className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
-                    selectedMethod === 'paypal' ? 'bg-[#1b1b1b]' : 'hover:bg-[#181818]'
+                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                    selectedMethod === 'paypal' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -334,7 +332,7 @@ export function EpicCheckoutLayout({
                         className="h-3.5 object-contain"
                       />
                     </div>
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-bold text-white">
                       PayPal
                     </span>
                   </div>
@@ -351,8 +349,8 @@ export function EpicCheckoutLayout({
                 {/* Option 3: Google Pay */}
                 <label
                   onClick={() => setSelectedMethod('gpay')}
-                  className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
-                    selectedMethod === 'gpay' ? 'bg-[#1b1b1b]' : 'hover:bg-[#181818]'
+                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                    selectedMethod === 'gpay' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -363,7 +361,7 @@ export function EpicCheckoutLayout({
                         className="h-3.5 object-contain"
                       />
                     </div>
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-bold text-white">
                       Google Pay
                     </span>
                   </div>
@@ -381,8 +379,8 @@ export function EpicCheckoutLayout({
                 {(isIndia || showAllMethods) && (
                   <label
                     onClick={() => setSelectedMethod('upi')}
-                    className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
-                      selectedMethod === 'upi' ? 'bg-[#1b1b1b]' : 'hover:bg-[#181818]'
+                    className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                      selectedMethod === 'upi' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -393,8 +391,8 @@ export function EpicCheckoutLayout({
                           className="h-3.5 object-contain"
                         />
                       </div>
-                      <span className="text-xs font-semibold text-white">
-                        UPI (PhonePe, Google Pay, Paytm)
+                      <span className="text-xs font-bold text-white">
+                        UPI
                       </span>
                     </div>
 
@@ -410,7 +408,7 @@ export function EpicCheckoutLayout({
 
                 {/* Expanded All payment methods */}
                 {showAllMethods && (
-                  <div className="p-3 bg-[#131313] space-y-2 text-xs text-zinc-400 animate-in fade-in duration-150">
+                  <div className="p-3 bg-[#141414] space-y-2 text-xs text-zinc-400 animate-in fade-in duration-150">
                     <div className="flex items-center gap-2">
                       <img src="/payment-logos/rupay.svg" alt="RuPay" className="h-3.5" />
                       <img src="/payment-logos/visa.svg" alt="Visa" className="h-3.5" />
@@ -422,7 +420,7 @@ export function EpicCheckoutLayout({
                 )}
               </div>
 
-              {/* Show less / Show more toggle button (Exact Epic Games Screenshot) */}
+              {/* Show less / Show more toggle button */}
               <button
                 type="button"
                 onClick={() => setShowAllMethods(!showAllMethods)}
@@ -434,26 +432,26 @@ export function EpicCheckoutLayout({
             </div>
           )}
 
-          {/* Creator / Promo Code Button */}
+          {/* Creator / Promo Code Button (Exact Screenshot Match) */}
           <div>
             {!isCreatorCodeOpen ? (
               <button
                 type="button"
                 onClick={() => setIsCreatorCodeOpen(true)}
-                className="h-9 px-3.5 bg-[#1a1a1a] hover:bg-[#222222] border border-[#2a2a2a] text-white text-xs font-medium rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="h-9 px-4 bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Plus size={13} />
                 <span>Creator Code</span>
               </button>
             ) : (
-              <div className="space-y-2 bg-[#181818] border border-[#262626] p-2.5 rounded-xl animate-in fade-in duration-150">
+              <div className="space-y-2 bg-[#1c1c1c] border border-[#2c2c2c] p-2.5 rounded-xl animate-in fade-in duration-150">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="ENTER CREATOR CODE"
                     value={coupon}
                     onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-                    className="flex-1 h-8 bg-[#141414] border border-[#282828] text-white text-xs px-3 rounded-lg outline-none uppercase font-semibold placeholder:text-zinc-500 focus:border-zinc-400"
+                    className="flex-1 h-8 bg-[#141414] border border-[#2c2c2c] text-white text-xs px-3 rounded-lg outline-none uppercase font-semibold placeholder:text-zinc-500 focus:border-zinc-400"
                   />
                   <button
                     type="button"
@@ -529,18 +527,18 @@ export function EpicCheckoutLayout({
             ) : (
               <Link
                 href="/auth?next=/checkout"
-                className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center cursor-pointer"
+                className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer"
               >
                 Sign In to Pay with PayPal
               </Link>
             )
           ) : (
-            /* Direct Pay Now / Claim Free Button (Solid White, No Blue) */
+            /* Direct Pay Now / Claim Free Button (Solid White Monochrome, No Blue) */
             <button
               type="button"
               onClick={handlePayClick}
               disabled={loading || paymentStatus === 'processing'}
-              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-[0.99]"
+              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-[0.99]"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
