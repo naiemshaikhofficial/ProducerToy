@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext'
 import { validateCouponAction } from '@/actions/couponActions'
 
 export function CartDrawer() {
-  const { items, removeItem, isCartOpen, setIsCartOpen } = useCart()
+  const { items, removeItem, isCartOpen, setIsCartOpen, openCheckout } = useCart()
   const { formatPrice, exchangeRate } = useCurrency()
   const { user } = useAuth()
   const [coupon, setCoupon] = useState('')
@@ -166,15 +166,18 @@ export function CartDrawer() {
                 </div>
               </div>
 
-              {/* Checkout Link */}
-              <Link
-                href={user ? '/checkout' : '/auth?next=/checkout'}
-                onClick={() => setIsCartOpen(false)}
+              {/* Checkout Trigger (Opens In-Place Modal) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCartOpen(false)
+                  openCheckout()
+                }}
                 className="w-full h-10 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
                 <span>Checkout</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              </button>
 
             </div>
           )}

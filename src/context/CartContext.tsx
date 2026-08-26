@@ -20,6 +20,10 @@ interface CartContextType {
   clearCart: () => void
   isCartOpen: boolean
   setIsCartOpen: (open: boolean) => void
+  isCheckoutOpen: boolean
+  setIsCheckoutOpen: (open: boolean) => void
+  openCheckout: (itemToBuyNow?: any) => void
+  closeCheckout: () => void
   isInCart: (id: string) => boolean
 }
 
@@ -28,6 +32,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
 
   const normalizeItem = (item: any): CartItem => {
     const priceUsd = Number(item.price_usd || 0)
@@ -89,10 +94,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     saveCart([])
   }
 
+  const openCheckout = (itemToBuyNow?: any) => {
+    if (itemToBuyNow) {
+      const normalized = normalizeItem(itemToBuyNow)
+      if (!items.some((i) => i.id === normalized.id)) {
+        const updated = [...items, normalized]
+        saveCart(updated)
+      }
+    }
+    setIsCartOpen(false)
+    setIsCheckoutOpen(true)
+  }
+
+  const closeCheckout = () => {
+    setIsCheckoutOpen(false)
+  }
+
   const isInCart = (id: string) => items.some(i => i.id === id)
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, clearCart, isCartOpen, setIsCartOpen, isInCart }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addItem,
+        removeItem,
+        clearCart,
+        isCartOpen,
+        setIsCartOpen,
+        isCheckoutOpen,
+        setIsCheckoutOpen,
+        openCheckout,
+        closeCheckout,
+        isInCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   )

@@ -51,7 +51,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const router = useRouter()
   const { user } = useAuth()
   const { formatPrice } = useCurrency()
-  const { addItem, isInCart } = useCart()
+  const { addItem, isInCart, openCheckout } = useCart()
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
 
   const [activeTab, setActiveTab] = useState<'overview' | 'addons' | 'faq' | 'specs'>('overview')
@@ -68,7 +68,8 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       return
     }
 
-    addItem({
+    // Open Epic Games Checkout Modal in-place in front of the active product page
+    openCheckout({
       id: product.id,
       name: product.name,
       slug: product.slug,
@@ -78,12 +79,6 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       product_type: product.product_type,
       brand: product.brands?.name || product.brand || 'Producer Toy',
     })
-
-    if (!user) {
-      router.push('/auth?next=/checkout')
-    } else {
-      router.push('/checkout')
-    }
   }
 
   const ytVideoId = (() => {

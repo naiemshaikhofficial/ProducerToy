@@ -614,6 +614,7 @@ export default function CheckoutPage() {
         loading={loading}
         paymentStatus={paymentStatus}
         formatPrice={formatPrice}
+        onClose={() => router.back()}
       />
     </div>
   )
