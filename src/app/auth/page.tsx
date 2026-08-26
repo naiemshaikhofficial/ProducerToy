@@ -69,6 +69,8 @@ function AuthForm() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [accountAlreadyExists, setAccountAlreadyExists] = useState(false)
+  const [noAccountFound, setNoAccountFound] = useState(false)
+  const [wrongPassword, setWrongPassword] = useState(false)
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false)
   const [resendingEmail, setResendingEmail] = useState(false)
 
@@ -92,6 +94,24 @@ function AuthForm() {
       setError(err.message || 'Failed to resend confirmation email.')
     } finally {
       setResendingEmail(false)
+    }
+  }
+
+  // Handle Forgot Password
+  const handleForgotPassword = async () => {
+    if (!email.trim()) return
+    try {
+      setLoading(true)
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/auth?mode=reset`,
+      })
+      if (error) throw error
+      setMessage('Password reset link sent! Check your email inbox.')
+      setError('')
+    } catch (err: any) {
+      setError(err.message || 'Failed to send password reset email.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -195,6 +215,10 @@ function AuthForm() {
     setError('')
     setAccountAlreadyExists(false)
 
+    setNoAccountFound(false)
+    setWrongPassword(false)
+    setEmailNotConfirmed(false)
+
     // Password validation for signup
     if (mode === 'signup') {
       if (password.length < 6) {
@@ -245,14 +269,50 @@ function AuthForm() {
           email: email.trim(),
           password,
         })
+
         if (signInError) {
+          const errLower = signInError.message.toLowerCase()
           if (
-            signInError.message.toLowerCase().includes('email not confirmed') ||
-            signInError.message.toLowerCase().includes('not confirmed')
+            errLower.includes('email not confirmed') ||
+            errLower.includes('not confirmed')
           ) {
             setEmailNotConfirmed(true)
             throw new Error('Email not confirmed. Please verify your email before logging in.')
           }
+
+          if (
+            errLower.includes('invalid login credentials') ||
+            errLower.includes('invalid credentials') ||
+            errLower.includes('user not found')
+          ) {
+            // Specifically verify if user exists or if password was wrong
+            try {
+              const res = await fetch('/api/auth/check-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.trim() }),
+              })
+              const checkData = await res.json()
+
+              if (!checkData.exists) {
+                setNoAccountFound(true)
+                throw new Error('No account found with this email. Please sign up.')
+              } else if (!checkData.isConfirmed) {
+                setEmailNotConfirmed(true)
+                throw new Error('Email not confirmed. Please verify your email before logging in.')
+              } else {
+                setWrongPassword(true)
+                throw new Error('Incorrect password. Please verify your password.')
+              }
+            } catch (checkErr: any) {
+              if (checkErr.message && !checkErr.message.includes('fetch')) {
+                throw checkErr
+              }
+              setWrongPassword(true)
+              throw new Error('Incorrect password. Please verify your password.')
+            }
+          }
+
           throw signInError
         }
 
@@ -388,6 +448,20 @@ function AuthForm() {
                   <AlertCircle className="w-4 h-4 text-black flex-shrink-0" />
                   <span className="font-extrabold text-xs leading-snug">{error}</span>
                 </div>
+                {noAccountFound && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signup')
+                      setStep('details')
+                      setError('')
+                      setNoAccountFound(false)
+                    }}
+                    className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                  >
+                    <span>Sign Up with this Email</span>
+                  </button>
+                )}
                 {accountAlreadyExists && (
                   <button
                     type="button"
@@ -635,9 +709,13 @@ function AuthForm() {
 
                 {mode === 'signin' && (
                   <div className="text-right">
-                    <Link href="#" className="text-xs text-zinc-400 hover:text-white transition-colors underline">
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="text-xs text-zinc-400 hover:text-white transition-colors underline font-semibold cursor-pointer"
+                    >
                       Forgot password?
-                    </Link>
+                    </button>
                   </div>
                 )}
 
