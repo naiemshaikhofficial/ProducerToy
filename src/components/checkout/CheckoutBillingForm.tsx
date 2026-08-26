@@ -3,23 +3,14 @@
 import React, { useState, useEffect } from 'react'
 import { Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import 'react-phone-number-input/style.css'
 import { BillingDetails } from './types'
+import { CustomPhoneInput } from './CustomPhoneInput'
 
 const Select = dynamic(() => import('react-select'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-10 bg-[#161616] border border-[#262626] rounded-lg flex items-center px-3 text-zinc-600 text-xs">
       Loading countries...
-    </div>
-  ),
-})
-
-const PhoneInput = dynamic(() => import('react-phone-number-input'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-10 bg-[#161616] border border-[#262626] rounded-lg flex items-center px-3 text-zinc-600 text-xs">
-      Loading phone...
     </div>
   ),
 })
@@ -100,33 +91,17 @@ export function CheckoutBillingForm({
           )}
         </div>
 
-        {/* Phone Number */}
+        {/* Phone Number with Epic Games Dark Dropdown */}
         <div className="space-y-1 md:col-span-2">
           <label className="text-[11px] font-medium text-zinc-400">
             Phone Number
           </label>
-          <div className="phone-input-pt">
-            {mounted ? (
-              <PhoneInput
-                international
-                defaultCountry="IN"
-                placeholder="Mobile number"
-                value={billingDetails.phone}
-                onChange={(val) => onBillingChange('phone', val || '')}
-                className={`w-full h-10 bg-[#181818] border px-3 rounded-lg outline-none transition-colors focus-within:border-zinc-400 ${
-                  formErrors.phone ? 'border-red-500/70 bg-red-950/10' : 'border-[#262626]'
-                }`}
-              />
-            ) : (
-              <input
-                type="tel"
-                placeholder="Mobile number"
-                value={billingDetails.phone}
-                onChange={(e) => onBillingChange('phone', e.target.value)}
-                className="w-full h-10 bg-[#181818] border border-[#262626] text-white text-xs px-3.5 rounded-lg outline-none"
-              />
-            )}
-          </div>
+          <CustomPhoneInput
+            value={billingDetails.phone || ''}
+            onChange={(val) => onBillingChange('phone', val)}
+            error={Boolean(formErrors.phone)}
+            defaultCountryCode="IN"
+          />
           {formErrors.phone && (
             <p className="text-[10px] text-red-400">{formErrors.phone}</p>
           )}
