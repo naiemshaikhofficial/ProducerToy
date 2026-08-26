@@ -252,7 +252,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
           </div>
         </div>
 
-        {/* Mobile Pagination Indicator Dots (Exact Epic Games Store Glowing White Active + Solid Visible Gray Inactive) */}
+        {/* Mobile Pagination Indicator Dots (Solid Pure White Active + Solid Visible Gray Inactive, No Glow) */}
         <div className="relative z-20 flex items-center justify-center gap-2 mt-4">
           {featuredList.map((_, idx) => {
             const isActive = idx === selectedIndex
@@ -262,9 +262,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 type="button"
                 onClick={() => handleSelect(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                className={`w-[5px] h-[5px] rounded-full transition-all duration-300 cursor-pointer ${
+                className={`w-[5px] h-[5px] rounded-full transition-colors duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-white shadow-[0_0_5px_rgba(255,255,255,1),0_0_2px_rgba(255,255,255,0.9)] scale-110'
+                    ? 'bg-white'
                     : 'bg-[#787880] hover:bg-[#9a9aa2]'
                 }`}
               />
