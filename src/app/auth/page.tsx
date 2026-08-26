@@ -380,7 +380,11 @@ function AuthForm() {
                     <span>{mode === 'signup' ? 'Continue with Google' : 'Sign in with Google'}</span>
                   </button>
 
-                  {/* Spotify Login */}
+                  {/* 
+                    [FUTURE USE] Spotify OAuth Login Button
+                    To enable: Uncomment the button below and configure Spotify Provider in Supabase Auth Dashboard.
+                  */}
+                  {/* 
                   <button
                     type="button"
                     onClick={handleSpotifyLogin}
@@ -390,6 +394,7 @@ function AuthForm() {
                     <SpotifyIcon size={18} />
                     <span>{mode === 'signup' ? 'Continue with Spotify' : 'Sign in with Spotify'}</span>
                   </button>
+                  */}
                 </div>
 
                 {/* Divider */}

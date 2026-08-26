@@ -256,25 +256,6 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       return
     }
 
-    if (provider.id === 'spotify') {
-      try {
-        const supabase = getSupabaseBrowserClient()
-        const callbackUrl = `${window.location.origin}/auth/callback?next=/account`
-        if (supabase.auth.linkIdentity && activeUser) {
-          const { error } = await supabase.auth.linkIdentity({
-            provider: 'spotify',
-            options: {
-              redirectTo: callbackUrl,
-              scopes: 'user-read-email playlist-read-private',
-            },
-          })
-          if (!error) return
-        }
-      } catch (spotifyErr) {
-        console.warn('Spotify linkIdentity fallback:', spotifyErr)
-      }
-    }
-
     const defaultHandle =
       activeUser?.user_metadata?.full_name ||
       profile?.display_name ||
