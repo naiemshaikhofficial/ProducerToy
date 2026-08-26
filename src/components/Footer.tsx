@@ -65,6 +65,8 @@ export function Footer() {
               <div><Link href="/terms" prefetch={true} className="hover:text-white transition-colors">Terms and Conditions</Link></div>
               <div><Link href="/privacy" prefetch={true} className="hover:text-white transition-colors">Privacy Policy</Link></div>
               <div><Link href="/refund-policy" prefetch={true} className="hover:text-white transition-colors">Refund Policy</Link></div>
+              <div><Link href="/eula" prefetch={true} className="hover:text-white transition-colors">EULA Agreement</Link></div>
+              <div><Link href="/purchase-policy" prefetch={true} className="hover:text-white transition-colors">Purchase Policy</Link></div>
             </div>
           </div>
 
