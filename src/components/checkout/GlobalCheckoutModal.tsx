@@ -172,9 +172,12 @@ export function GlobalCheckoutModal() {
 
   if (!isCheckoutOpen || items.length === 0) return null
 
-  // Cart Price Calculations
-  const rawSubtotalInr = items.reduce((acc, i) => acc + (i.price_inr || 0), 0)
-  const rawSubtotalUsd = items.reduce((acc, i) => acc + (i.price_usd || 0), 0)
+  // Cart Price Calculations (100% Synchronized with live exchangeRate & formatPrice)
+  const rawSubtotalUsd = items.reduce((acc, i) => acc + (Number(i.price_usd) || 0), 0)
+  const rawSubtotalInr = items.reduce((acc, i) => {
+    if (i.price_inr && Number(i.price_inr) > 0) return acc + Number(i.price_inr)
+    return acc + Math.round((Number(i.price_usd) || 0) * (exchangeRate || 95.0))
+  }, 0)
   const isIndia = currency === 'INR' || billingDetails.country?.toUpperCase() === 'INDIA'
   const currencySymbol = currency === 'INR' ? '₹' : '$'
   const currentSubtotal = currency === 'INR' ? rawSubtotalInr : rawSubtotalUsd

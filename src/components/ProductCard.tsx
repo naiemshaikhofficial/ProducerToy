@@ -55,7 +55,7 @@ export interface Product {
 
 export function ProductCard({ product }: { product: Product }) {
   const router = useRouter()
-  const { formatPrice } = useCurrency()
+  const { formatPrice, convertUsdToInr } = useCurrency()
   const { currentTrack, isPlaying, playTrack } = useAudio()
   const { addItem, isInCart } = useCart()
   const { isWishlisted, toggleWishlist } = useWishlist()
@@ -67,6 +67,10 @@ export function ProductCard({ product }: { product: Product }) {
 
   const brandName = product.brands?.name || product.brand || 'Producer Toy'
   const brandSlug = product.brands?.slug || (product.brand ? product.brand.toLowerCase().trim().replace(/\s+/g, '-') : 'producer-toy')
+
+  const priceUsd = Number(product.price_usd) || 0
+  const priceInr = product.price_inr ? Number(product.price_inr) : convertUsdToInr(priceUsd)
+  const originalPriceInr = product.original_price_usd ? convertUsdToInr(Number(product.original_price_usd)) : undefined
 
   const handleBrandClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -83,10 +87,10 @@ export function ProductCard({ product }: { product: Product }) {
       slug: product.slug,
       brand: brandName,
       product_type: product.product_type,
-      price_inr: product.price_inr || Math.round(product.price_usd * 85),
-      price_usd: product.price_usd,
-      original_price_inr: product.original_price_usd ? Math.round(product.original_price_usd * 85) : undefined,
-      original_price_usd: product.original_price_usd || undefined,
+      price_inr: priceInr,
+      price_usd: priceUsd,
+      original_price_inr: originalPriceInr,
+      original_price_usd: product.original_price_usd ? Number(product.original_price_usd) : undefined,
       cover_image: product.cover_image,
       demo_audio_url: product.demo_audio_url,
       vst_format: product.vst_format,
@@ -102,8 +106,8 @@ export function ProductCard({ product }: { product: Product }) {
       id: product.id,
       name: product.name,
       slug: product.slug,
-      price_inr: product.price_inr || Math.round(product.price_usd * 85),
-      price_usd: product.price_usd,
+      price_inr: priceInr,
+      price_usd: priceUsd,
       cover_image: product.cover_image,
       product_type: product.product_type,
       brand: product.brands?.name || product.brand || 'Producer Toy',

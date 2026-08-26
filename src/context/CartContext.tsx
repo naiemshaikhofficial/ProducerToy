@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useCurrency } from './CurrencyContext'
 
 export interface CartItem {
   id: string
@@ -30,6 +31,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { exchangeRate } = useCurrency()
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -37,9 +39,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const normalizeItem = (item: any): CartItem => {
     const priceUsd = Number(item.price_usd || 0)
     const priceInr = Number(item.price_inr || 0)
+    const rate = exchangeRate > 0 ? exchangeRate : 95.0
 
-    const resolvedInr = priceInr > 0 ? priceInr : (priceUsd > 0 ? Math.round(priceUsd * 85) : 0)
-    const resolvedUsd = priceUsd > 0 ? priceUsd : (priceInr > 0 ? Math.round((priceInr / 85) * 100) / 100 : 0)
+    const resolvedInr = priceInr > 0 ? priceInr : (priceUsd > 0 ? Math.round(priceUsd * rate) : 0)
+    const resolvedUsd = priceUsd > 0 ? priceUsd : (priceInr > 0 ? Math.round((priceInr / rate) * 100) / 100 : 0)
 
     return {
       id: item.id,

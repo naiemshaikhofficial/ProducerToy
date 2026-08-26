@@ -17,7 +17,7 @@ interface EpicHeroCarouselProps {
 export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const { isWishlisted, toggleWishlist } = useWishlist()
-  const { formatPrice } = useCurrency()
+  const { formatPrice, convertUsdToInr } = useCurrency()
   const { addItem, isInCart } = useCart()
 
   // Real-time Touch & Drag Gesture Tracking
@@ -42,14 +42,17 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const handleWishlistToggle = async (e: React.MouseEvent, product: Product) => {
     e.preventDefault()
     e.stopPropagation()
+    const priceUsd = Number(product.price_usd) || 0
+    const priceInr = product.price_inr ? Number(product.price_inr) : convertUsdToInr(priceUsd)
+
     await toggleWishlist({
       id: product.id,
       name: product.name,
       slug: product.slug,
       brand: product.brand,
       product_type: product.product_type,
-      price_inr: product.price_inr || Math.round(product.price_usd * 85),
-      price_usd: product.price_usd,
+      price_inr: priceInr,
+      price_usd: priceUsd,
       cover_image: product.cover_image,
       vst_format: product.vst_format,
       short_description: product.short_description,

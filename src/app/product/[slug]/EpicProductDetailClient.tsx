@@ -51,7 +51,7 @@ function AppleIcon({ className = "w-5 h-5" }: { className?: string }) {
 export function EpicProductDetailClient({ product }: { product: any }) {
   const router = useRouter()
   const { user } = useAuth()
-  const { formatPrice } = useCurrency()
+  const { formatPrice, convertUsdToInr } = useCurrency()
   const { addItem, isInCart, openCheckout } = useCart()
   const { isWishlisted: checkWishlisted, toggleWishlist } = useWishlist()
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
@@ -70,13 +70,16 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       return
     }
 
+    const priceUsd = Number(product.price_usd) || 0
+    const priceInr = product.price_inr ? Number(product.price_inr) : convertUsdToInr(priceUsd)
+
     // Open Epic Games Checkout Modal in-place in front of the active product page
     openCheckout({
       id: product.id,
       name: product.name,
       slug: product.slug,
-      price_inr: product.price_inr || Math.round((product.price_usd || 0) * 85),
-      price_usd: product.price_usd || 0,
+      price_inr: priceInr,
+      price_usd: priceUsd,
       cover_image: product.cover_image,
       product_type: product.product_type,
       brand: product.brands?.name || product.brand || 'Producer Toy',
@@ -561,8 +564,8 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                   slug: product.slug,
                   brand: product.brands?.name || product.brand || 'Producer Toy',
                   product_type: product.product_type || 'plugin',
-                  price_inr: product.price_inr || Math.round((product.price_usd || 0) * 85),
-                  price_usd: product.price_usd || 0,
+                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                  price_usd: Number(product.price_usd) || 0,
                   cover_image: product.cover_image,
                   vst_format: product.vst_format,
                   short_description: product.short_description,
