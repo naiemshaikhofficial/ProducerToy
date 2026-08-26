@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { AccountSidebar, AccountTab } from './AccountSidebar'
+import { MobileAccountBar } from './MobileAccountBar'
 import { AccountInfoSection } from './AccountInfoSection'
 import { PersonalDetailsSection } from './PersonalDetailsSection'
 import { CompanyDetailsSection } from './CompanyDetailsSection'
@@ -109,13 +110,22 @@ export default function EpicAccountClient() {
 
   return (
     <div className="min-h-screen bg-[#121212] text-white">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      {/* ========================================================================= */}
+      {/* 1. MOBILE EDGE-TO-EDGE ACCOUNT SELECTOR BAR (< lg) (Exact Match)          */}
+      {/* ========================================================================= */}
+      <MobileAccountBar
+        activeTab={activeTab}
+        onSelectTab={(tab) => setActiveTab(tab)}
+      />
+
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* ========================================================================= */}
-          {/* 1. MODULAR LEFT SIDEBAR COMPONENT                                          */}
+          {/* 2. DESKTOP PERMANENT LEFT SIDEBAR (>= lg)                                  */}
           {/* ========================================================================= */}
-          <div className="lg:col-span-4 xl:col-span-3">
+          <div className="hidden lg:block lg:col-span-4 xl:col-span-3">
             <AccountSidebar
               activeTab={activeTab}
               onSelectTab={(tab) => setActiveTab(tab)}
@@ -123,14 +133,14 @@ export default function EpicAccountClient() {
           </div>
 
           {/* ========================================================================= */}
-          {/* 2. MODULAR MAIN VIEW CONTENT                                              */}
+          {/* 3. MAIN VIEW CONTENT AREA                                                 */}
           {/* ========================================================================= */}
           <div className="lg:col-span-8 xl:col-span-9 max-w-3xl">
             
             {/* TAB: SETTINGS */}
             {activeTab === 'settings' && (
               <div className="space-y-12">
-                {/* Header Title */}
+                {/* Header Title (Exact Screenshot Match) */}
                 <div>
                   <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight font-sans">
                     Settings
