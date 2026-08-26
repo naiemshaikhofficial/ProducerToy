@@ -25,48 +25,49 @@ export default function EpicAccountClient() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function loadUserData() {
-      try {
-        const supabase = getSupabaseBrowserClient()
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
+  const loadUserData = React.useCallback(async () => {
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-        if (user) {
-          setUser(user)
+      if (user) {
+        setUser(user)
 
-          // Fetch full profile from Supabase
-          const { data: prof } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .maybeSingle()
+        // Fetch full profile from Supabase
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle()
 
-          if (prof) {
-            setProfile(prof)
-            const name =
-              prof.display_name ||
-              prof.full_name ||
-              user.user_metadata?.full_name ||
-              (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
-            setDisplayName(name)
-          } else {
-            const name =
-              user.user_metadata?.full_name ||
-              user.user_metadata?.display_name ||
-              (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
-            setDisplayName(name)
-          }
+        if (prof) {
+          setProfile(prof)
+          const name =
+            prof.display_name ||
+            prof.full_name ||
+            user.user_metadata?.full_name ||
+            (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
+          setDisplayName(name)
+        } else {
+          const name =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.display_name ||
+            (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
+          setDisplayName(name)
         }
-      } catch (err) {
-        console.warn('Error loading account user:', err)
-      } finally {
-        setLoading(false)
       }
+    } catch (err) {
+      console.warn('Error loading account user:', err)
+    } finally {
+      setLoading(false)
     }
-    loadUserData()
   }, [])
+
+  useEffect(() => {
+    loadUserData()
+  }, [loadUserData])
 
   const handleSaveDisplayName = async (name: string) => {
     setDisplayName(name)
@@ -185,7 +186,13 @@ export default function EpicAccountClient() {
             )}
 
             {/* TAB: LINKED ACCOUNTS */}
-            {activeTab === 'linked_accounts' && <LinkedAccountsTab />}
+            {activeTab === 'linked_accounts' && (
+              <LinkedAccountsTab
+                user={user}
+                profile={profile}
+                onProfileUpdate={loadUserData}
+              />
+            )}
 
             {/* TAB: COMMUNICATION PREFERENCES */}
             {activeTab === 'communication' && (
