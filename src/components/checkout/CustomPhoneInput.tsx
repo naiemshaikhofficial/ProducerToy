@@ -127,19 +127,19 @@ export function CustomPhoneInput({
     <div ref={containerRef} className="relative w-full">
       {/* Input Outer Container */}
       <div
-        className={`w-full h-10 bg-[#18181c] border rounded-md flex items-center px-3 transition-colors shadow-sm ${
+        className={`w-full h-10 bg-[#181818] border rounded-md flex items-center px-3 transition-colors shadow-sm ${
           error
             ? 'border-red-500/70 bg-red-950/10'
             : isOpen
             ? 'border-zinc-300 ring-1 ring-zinc-400/20'
-            : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+            : 'border-[#282828] hover:border-[#383838]'
         }`}
       >
         {/* Country Selector Trigger Button */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 pr-2.5 border-r border-[#2a2a2e] text-[13px] font-semibold text-white hover:text-zinc-200 transition-colors cursor-pointer select-none"
+          className="flex items-center gap-2 pr-2.5 border-r border-[#282828] text-[13px] font-semibold text-white hover:text-zinc-200 transition-colors cursor-pointer select-none"
         >
           <CountryFlagIcon code={selectedCountry.code} name={selectedCountry.name} />
           <span className="text-zinc-300 font-medium text-[12.5px] tracking-tight">{selectedCountry.dialCode}</span>
@@ -162,10 +162,10 @@ export function CustomPhoneInput({
 
       {/* Sleek Epic Games Dark Theme Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 bg-[#18181c] border border-[#2a2a2e] rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.85)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 bg-[#181818] border border-[#282828] rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.85)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           
           {/* Search Box */}
-          <div className="p-2.5 border-b border-[#242428] bg-[#141416]">
+          <div className="p-2.5 border-b border-[#242424] bg-[#141414]">
             <div className="relative flex items-center">
               <Search className="absolute left-3 w-3.5 h-3.5 text-zinc-500" />
               <input
@@ -174,7 +174,7 @@ export function CustomPhoneInput({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country or code..."
-                className="w-full h-8 bg-[#1e1e22] border border-[#2c2c30] focus:border-zinc-400 rounded-md pl-8 pr-3 text-xs text-white placeholder:text-zinc-500 outline-none transition-colors"
+                className="w-full h-8 bg-[#1e1e1e] border border-[#2c2c2c] focus:border-zinc-400 rounded-md pl-8 pr-3 text-xs text-white placeholder:text-zinc-500 outline-none transition-colors"
               />
             </div>
           </div>

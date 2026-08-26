@@ -46,8 +46,8 @@ export function CheckoutBillingForm({
             placeholder="Alex Producer"
             value={billingDetails.fullName}
             onChange={(e) => onBillingChange('fullName', e.target.value)}
-            className={`w-full h-10 bg-[#18181c] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.fullName ? 'border-red-500/70 bg-red-950/10' : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+            className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
+              formErrors.fullName ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.fullName && (
@@ -65,8 +65,8 @@ export function CheckoutBillingForm({
             placeholder="producer@studio.com"
             value={billingDetails.email}
             onChange={(e) => onBillingChange('email', e.target.value)}
-            className={`w-full h-10 bg-[#18181c] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.email ? 'border-red-500/70 bg-red-950/10' : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+            className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
+              formErrors.email ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.email && (
@@ -100,8 +100,8 @@ export function CheckoutBillingForm({
             placeholder="Studio / House No, Street name"
             value={billingDetails.address}
             onChange={(e) => onBillingChange('address', e.target.value)}
-            className={`w-full h-10 bg-[#18181c] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.address ? 'border-red-500/70 bg-red-950/10' : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+            className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
+              formErrors.address ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.address && (
@@ -122,7 +122,7 @@ export function CheckoutBillingForm({
             placeholder="Apartment, suite, unit, building, floor, etc."
             value={billingDetails.address2 || ''}
             onChange={(e) => onBillingChange('address2', e.target.value)}
-            className="w-full h-10 bg-[#18181c] border border-[#2a2a2e] hover:border-[#3a3a40] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
+            className="w-full h-10 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
           />
         </div>
 
@@ -136,8 +136,8 @@ export function CheckoutBillingForm({
             placeholder="City"
             value={billingDetails.city}
             onChange={(e) => onBillingChange('city', e.target.value)}
-            className={`w-full h-10 bg-[#18181c] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.city ? 'border-red-500/70 bg-red-950/10' : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+            className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
+              formErrors.city ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.city && (
@@ -156,8 +156,8 @@ export function CheckoutBillingForm({
               placeholder="State"
               value={billingDetails.state}
               onChange={(e) => onBillingChange('state', e.target.value)}
-              className={`w-full h-10 bg-[#18181c] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-                formErrors.state ? 'border-red-500/70 bg-red-950/10' : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+              className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
+                formErrors.state ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
               }`}
             />
             {formErrors.state && (
@@ -174,8 +174,8 @@ export function CheckoutBillingForm({
               placeholder="Zip Code"
               value={billingDetails.zip}
               onChange={(e) => onBillingChange('zip', e.target.value)}
-              className={`w-full h-10 bg-[#18181c] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-                formErrors.zip ? 'border-red-500/70 bg-red-950/10' : 'border-[#2a2a2e] hover:border-[#3a3a40]'
+              className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
+                formErrors.zip ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
               }`}
             />
             {formErrors.zip && (

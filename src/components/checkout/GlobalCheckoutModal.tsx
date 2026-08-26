@@ -397,7 +397,7 @@ export function GlobalCheckoutModal() {
         )}
 
         {paymentStatus === 'success' ? (
-          <div className="w-full bg-[#141416] border border-[#242428] rounded-xl p-8 shadow-2xl">
+          <div className="w-full bg-[#141414] border border-[#242424] rounded-xl p-8 shadow-2xl">
             <CheckoutSuccessView email={billingDetails.email || user?.email} />
           </div>
         ) : (
