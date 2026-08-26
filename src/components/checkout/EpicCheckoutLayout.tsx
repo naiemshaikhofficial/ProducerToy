@@ -84,7 +84,7 @@ export function EpicCheckoutLayout({
 }: EpicCheckoutLayoutProps) {
   const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'gpay' | 'upi'>('upi')
   const [showAllMethods, setShowAllMethods] = useState(false)
-  const [isBillingOpen, setIsBillingOpen] = useState(false)
+  const [isBillingOpen, setIsBillingOpen] = useState(true)
   const [isCreatorCodeOpen, setIsCreatorCodeOpen] = useState(false)
   const [isRewardsExpanded, setIsRewardsExpanded] = useState(false)
 
@@ -114,12 +114,12 @@ export function EpicCheckoutLayout({
   }
 
   return (
-    <div className="w-full max-w-[840px] h-screen max-h-screen bg-[#141416] border-x border-[#26262a] rounded-none shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none font-sans">
+    <div className="w-full max-w-[1080px] lg:max-w-[1120px] h-screen max-h-screen bg-[#141416] border-x border-[#26262a] rounded-none shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none font-sans">
       
       {/* ========================================================================= */}
-      {/* LEFT COLUMN: ORDER SUMMARY (Exact 1:1 Width: 340px)                       */}
+      {/* LEFT COLUMN: ORDER SUMMARY (Wide 420px - 440px)                           */}
       {/* ========================================================================= */}
-      <div className="w-full md:w-[340px] flex-shrink-0 bg-[#18181c] p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#222226] overflow-y-auto">
+      <div className="w-full md:w-[420px] lg:w-[440px] flex-shrink-0 bg-[#18181c] p-8 lg:p-10 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#222226] overflow-y-auto">
         
         <div className="space-y-7">
           {/* Top Logo + Checkout Title */}

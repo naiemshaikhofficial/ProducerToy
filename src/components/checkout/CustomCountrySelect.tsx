@@ -93,24 +93,24 @@ export function CustomCountrySelect({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-10 bg-[#161616] border rounded-lg flex items-center justify-between px-3.5 transition-colors shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] cursor-pointer select-none text-left ${
+        className={`w-full h-10 bg-[#18181c] border rounded-md flex items-center justify-between px-3.5 transition-colors shadow-sm cursor-pointer select-none text-left ${
           error
             ? 'border-red-500/70 bg-red-950/10'
             : isOpen
-            ? 'border-zinc-400 ring-1 ring-zinc-500/20'
-            : 'border-[#262626] hover:border-[#383838]'
+            ? 'border-zinc-300 ring-1 ring-zinc-400/20'
+            : 'border-[#2a2a2e] hover:border-[#3a3a40]'
         }`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
           {selectedCountry ? (
             <>
               <CountryFlagIcon code={selectedCountry.code} name={selectedCountry.name} />
-              <span className="text-xs font-medium text-white truncate">
+              <span className="text-[13px] font-medium text-white truncate">
                 {selectedCountry.name}
               </span>
             </>
           ) : (
-            <span className="text-xs font-medium text-zinc-500">{placeholder}</span>
+            <span className="text-[13px] font-medium text-zinc-500">{placeholder}</span>
           )}
         </div>
 
@@ -123,10 +123,10 @@ export function CustomCountrySelect({
 
       {/* Floating Dark Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 w-full bg-[#141414] border border-[#242424] rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.85)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute left-0 top-full mt-1.5 w-full bg-[#18181c] border border-[#2a2a2e] rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.85)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           
           {/* Search Box */}
-          <div className="p-2.5 border-b border-[#222222] bg-[#161616]">
+          <div className="p-2.5 border-b border-[#242428] bg-[#141416]">
             <div className="relative flex items-center">
               <Search className="absolute left-3 w-3.5 h-3.5 text-zinc-500" />
               <input
@@ -135,7 +135,7 @@ export function CustomCountrySelect({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country..."
-                className="w-full h-8 bg-[#1f1f1f] border border-[#2e2e2e] focus:border-zinc-400 rounded-lg pl-8 pr-3 text-xs text-white placeholder:text-zinc-500 outline-none transition-colors"
+                className="w-full h-8 bg-[#1e1e22] border border-[#2c2c30] focus:border-zinc-400 rounded-md pl-8 pr-3 text-xs text-white placeholder:text-zinc-500 outline-none transition-colors"
               />
             </div>
           </div>

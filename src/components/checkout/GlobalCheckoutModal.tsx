@@ -385,7 +385,7 @@ export function GlobalCheckoutModal() {
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-[2px] flex items-center justify-center select-none overflow-hidden animate-in fade-in duration-150">
-      <div className="relative z-10 w-full max-w-[840px] h-full max-h-screen flex flex-col items-center justify-center">
+      <div className="relative z-10 w-full max-w-[1080px] lg:max-w-[1120px] h-full max-h-screen flex flex-col items-center justify-center">
         {/* Error Notification */}
         {errorMsg && (
           <div className="w-full mb-2 bg-[#241515] border border-red-500/20 text-red-300 px-4 py-2 text-xs rounded-lg flex items-center justify-between shadow-lg">

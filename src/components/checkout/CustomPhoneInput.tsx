@@ -127,22 +127,22 @@ export function CustomPhoneInput({
     <div ref={containerRef} className="relative w-full">
       {/* Input Outer Container */}
       <div
-        className={`w-full h-10 bg-[#161616] border rounded-lg flex items-center px-3 transition-colors shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)] ${
+        className={`w-full h-10 bg-[#18181c] border rounded-md flex items-center px-3 transition-colors shadow-sm ${
           error
             ? 'border-red-500/70 bg-red-950/10'
             : isOpen
-            ? 'border-zinc-400 ring-1 ring-zinc-500/20'
-            : 'border-[#262626] hover:border-[#383838]'
+            ? 'border-zinc-300 ring-1 ring-zinc-400/20'
+            : 'border-[#2a2a2e] hover:border-[#3a3a40]'
         }`}
       >
         {/* Country Selector Trigger Button */}
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 pr-2.5 border-r border-[#262626] text-xs font-semibold text-white hover:text-zinc-200 transition-colors cursor-pointer select-none"
+          className="flex items-center gap-2 pr-2.5 border-r border-[#2a2a2e] text-[13px] font-semibold text-white hover:text-zinc-200 transition-colors cursor-pointer select-none"
         >
           <CountryFlagIcon code={selectedCountry.code} name={selectedCountry.name} />
-          <span className="text-zinc-300 font-medium text-xs tracking-tight">{selectedCountry.dialCode}</span>
+          <span className="text-zinc-300 font-medium text-[12.5px] tracking-tight">{selectedCountry.dialCode}</span>
           <ChevronDown
             className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 ${
               isOpen ? 'rotate-180 text-white' : ''
@@ -156,16 +156,16 @@ export function CustomPhoneInput({
           placeholder="Mobile number"
           value={rawNumber}
           onChange={handleNumberChange}
-          className="flex-1 h-full bg-transparent text-white text-xs px-3 outline-none placeholder:text-zinc-500 font-medium"
+          className="flex-1 h-full bg-transparent text-white text-[13px] px-3 outline-none placeholder:text-zinc-500 font-medium"
         />
       </div>
 
       {/* Sleek Epic Games Dark Theme Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 bg-[#141414] border border-[#242424] rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.85)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute left-0 top-full mt-1.5 w-72 sm:w-80 bg-[#18181c] border border-[#2a2a2e] rounded-xl shadow-[0_20px_40px_rgba(0,0,0,0.85)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           
           {/* Search Box */}
-          <div className="p-2.5 border-b border-[#222222] bg-[#161616]">
+          <div className="p-2.5 border-b border-[#242428] bg-[#141416]">
             <div className="relative flex items-center">
               <Search className="absolute left-3 w-3.5 h-3.5 text-zinc-500" />
               <input
@@ -174,7 +174,7 @@ export function CustomPhoneInput({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search country or code..."
-                className="w-full h-8 bg-[#1f1f1f] border border-[#2e2e2e] focus:border-zinc-400 rounded-lg pl-8 pr-3 text-xs text-white placeholder:text-zinc-500 outline-none transition-colors"
+                className="w-full h-8 bg-[#1e1e22] border border-[#2c2c30] focus:border-zinc-400 rounded-md pl-8 pr-3 text-xs text-white placeholder:text-zinc-500 outline-none transition-colors"
               />
             </div>
           </div>
