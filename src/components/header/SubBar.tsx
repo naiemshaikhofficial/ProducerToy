@@ -13,14 +13,14 @@ interface SubBarProps {
   isProductsMegaOpen: boolean
   onMouseEnterProducts: () => void
   onMouseLeaveProducts: () => void
+  itemCount?: number
+  onOpenCart?: () => void
 }
 
 const NAV_LINKS = [
-  { label: 'Deals', href: '/store?on_sale=true' },
-  { label: 'Brands', href: '/manufacturers' },
-  { label: 'Rent to Own', href: '/store' },
-  { label: 'Blog', href: '/store' },
-  { label: 'Free', href: '/store?free=true' },
+  { label: 'Discover', href: '/store' },
+  { label: 'Browse', href: '/store' },
+  { label: 'News', href: '/store' },
 ]
 
 const MOBILE_DISCOVER_OPTIONS = [
@@ -39,6 +39,8 @@ export const SubBar: React.FC<SubBarProps> = ({
   isProductsMegaOpen,
   onMouseEnterProducts,
   onMouseLeaveProducts,
+  itemCount = 0,
+  onOpenCart,
 }) => {
   const pathname = usePathname()
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
@@ -191,67 +193,72 @@ export const SubBar: React.FC<SubBarProps> = ({
 
 
       {/* ========================================================================= */}
-      {/* 2. DESKTOP SUBBAR (>= 768px): Full Search Bar & Mega Menu Navigation       */}
+      {/* 2. DESKTOP SUBBAR (>= 768px): Exact PC Screenshot Match                    */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-[80px] lg:h-[90px] items-center justify-start gap-8 lg:gap-12">
+      <div className="hidden md:flex w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16 h-[72px] items-center justify-between">
         
-        {/* Exact Epic Games Store Search Pill */}
-        <div className="relative w-56 sm:w-60 lg:w-[240px] flex-shrink-0">
-          <form onSubmit={onSearchSubmit} className="relative w-full">
-            <Search className="w-4 h-4 text-zinc-300 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search store"
-              className="w-full bg-[#242424] text-white text-sm pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:bg-[#303030] focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-300 transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => onSearchChange('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1 rounded-full cursor-pointer"
-                title="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </form>
-        </div>
-
-        {/* Epic Games Store Sub Navigation Links (16px font, centered) */}
-        <nav className="flex items-center gap-8 lg:gap-10 text-base font-normal">
-          
-          {/* Products Mega Dropdown Trigger */}
-          <div 
-            className="relative flex items-center cursor-pointer py-2"
-            onMouseEnter={onMouseEnterProducts}
-            onMouseLeave={onMouseLeaveProducts}
-          >
-            <button 
-              type="button"
-              className={`flex items-center gap-1.5 font-semibold transition-colors cursor-pointer ${
-                isProductsMegaOpen ? 'text-white' : 'text-white hover:text-zinc-200'
-              }`}
-            >
-              <span>Products</span>
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isProductsMegaOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
-            </button>
+        {/* Left Side: Search Bar + Discover / Browse / News Links */}
+        <div className="flex items-center gap-8 lg:gap-10">
+          {/* Epic Search Pill */}
+          <div className="relative w-56 sm:w-60 lg:w-[240px] flex-shrink-0">
+            <form onSubmit={onSearchSubmit} className="relative w-full">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder="Search store"
+                className="w-full bg-[#242424] text-white text-sm pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:bg-[#303030] focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-400 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1 rounded-full cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </form>
           </div>
 
-          {/* Clean Mapped Links */}
-          {NAV_LINKS.map((link) => (
-            <Link 
-              key={link.label} 
-              href={link.href} 
-              prefetch={true}
-              className="text-zinc-300 hover:text-white font-normal transition-colors py-2"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {/* Desktop Sub Navigation Links */}
+          <nav className="flex items-center gap-6 lg:gap-8 text-sm">
+            {NAV_LINKS.map((link, idx) => {
+              const isActive = idx === 0 && pathname === '/store' || (idx > 0 && pathname === link.href)
+              return (
+                <Link 
+                  key={link.label} 
+                  href={link.href} 
+                  prefetch={true}
+                  className={`transition-colors py-2 font-medium ${
+                    isActive 
+                      ? 'text-white font-bold' 
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
 
-        </nav>
+        {/* Right Side: Cart Link (Exact PC Screenshot Match) */}
+        {onOpenCart && (
+          <button
+            onClick={onOpenCart}
+            className="flex items-center gap-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer py-2 px-3 hover:bg-[#1a1a1a] rounded-lg"
+          >
+            <span>Cart</span>
+            {itemCount > 0 && (
+              <span className="bg-white text-black text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                {itemCount}
+              </span>
+            )}
+          </button>
+        )}
 
       </div>
     </div>

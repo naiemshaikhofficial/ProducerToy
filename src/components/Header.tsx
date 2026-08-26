@@ -87,8 +87,8 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      {/* Tier 1 Top Header Bar (Scrolls away naturally) */}
-      <div className="relative z-40 w-full bg-[#121212] select-none">
+      {/* Tier 1 Top Header Bar (Scrolls away naturally, high z-index for popovers) */}
+      <div className="relative z-[60] w-full bg-[#121212] select-none">
         <TopBar
           currency={currency}
           onToggleCurrency={toggleCurrency}
@@ -111,6 +111,8 @@ export const Header: React.FC = () => {
           isProductsMegaOpen={isProductsMegaOpen}
           onMouseEnterProducts={handleMouseEnterMenu}
           onMouseLeaveProducts={handleMouseLeaveMenu}
+          itemCount={items.length}
+          onOpenCart={() => setIsCartOpen(true)}
         />
 
         {/* Desktop Products Mega Dropdown Overlay */}
@@ -128,6 +130,7 @@ export const Header: React.FC = () => {
           currency={currency}
           onToggleCurrency={toggleCurrency}
           user={user}
+          onSignOut={signOut}
         />
       </header>
     </>
