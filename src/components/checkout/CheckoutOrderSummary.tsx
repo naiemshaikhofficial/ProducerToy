@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Tag, CheckCircle2, ShieldCheck } from 'lucide-react'
 import { PayPalPaymentButton } from './PayPalPaymentButton'
 import { BillingDetails } from './types'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
 // --- ANIMATED COUNTER HOOK ---
 function useAnimatedCounter(targetValue: number, prefix: string = '') {
@@ -173,9 +174,9 @@ export function CheckoutOrderSummary({
             type="button"
             onClick={onApplyCoupon}
             disabled={couponLoading || !coupon.trim()}
-            className="px-3.5 h-9 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-lg text-xs font-medium transition-colors disabled:opacity-40 cursor-pointer"
+            className="px-3.5 h-9 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-lg text-xs font-medium transition-colors disabled:opacity-40 cursor-pointer flex items-center justify-center min-w-[54px]"
           >
-            {couponLoading ? '...' : 'Apply'}
+            {couponLoading ? <ButtonSpinner size={14} variant="light" /> : 'Apply'}
           </button>
         </div>
 
@@ -213,7 +214,7 @@ export function CheckoutOrderSummary({
           >
             {loading ? (
               <div className="flex items-center gap-2">
-                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <ButtonSpinner size={16} variant="dark" />
                 <span>Claiming License...</span>
               </div>
             ) : (
@@ -230,7 +231,7 @@ export function CheckoutOrderSummary({
           >
             {loading ? (
               <div className="flex items-center gap-2">
-                <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <ButtonSpinner size={16} variant="dark" />
                 <span>Opening Payment Gateway...</span>
               </div>
             ) : (

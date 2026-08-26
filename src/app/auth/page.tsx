@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogoIcon } from '@/components/Logo'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { ChevronLeft, Eye, EyeOff, Mail, CheckCircle2, Lock, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -374,10 +375,16 @@ function AuthForm() {
                     type="button"
                     onClick={handleGoogleLogin}
                     disabled={loading}
-                    className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
+                    className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer disabled:opacity-70"
                   >
-                    <GoogleIcon size={18} />
-                    <span>{mode === 'signup' ? 'Continue with Google' : 'Sign in with Google'}</span>
+                    {loading ? (
+                      <ButtonSpinner size={16} variant="light" />
+                    ) : (
+                      <>
+                        <GoogleIcon size={18} />
+                        <span>{mode === 'signup' ? 'Continue with Google' : 'Sign in with Google'}</span>
+                      </>
+                    )}
                   </button>
 
                   {/* 
@@ -576,10 +583,10 @@ function AuthForm() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2"
+                  className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-75"
                 >
                   {loading ? (
-                    <span className="animate-pulse">Processing...</span>
+                    <ButtonSpinner size={16} variant="dark" />
                   ) : (
                     <span>{mode === 'signup' ? 'Create Account' : 'Sign In'}</span>
                   )}

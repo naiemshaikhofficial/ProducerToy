@@ -3,12 +3,14 @@
 import React, { useState } from 'react'
 import { ShieldCheck, CheckCircle2 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
 export const SecurityTab: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordMsg, setPasswordMsg] = useState<string | null>(null)
+  const [isUpdating, setIsUpdating] = useState(false)
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
   const [twoFactorMsg, setTwoFactorMsg] = useState(false)
 
@@ -22,6 +24,7 @@ export const SecurityTab: React.FC = () => {
       setPasswordMsg('Passwords do not match.')
       return
     }
+    setIsUpdating(true)
     try {
       const supabase = getSupabaseBrowserClient()
       const { error } = await supabase.auth.updateUser({
@@ -37,6 +40,8 @@ export const SecurityTab: React.FC = () => {
       }
     } catch (err: any) {
       setPasswordMsg('Failed to update password. Please try again.')
+    } finally {
+      setIsUpdating(false)
     }
   }
 
@@ -111,9 +116,10 @@ export const SecurityTab: React.FC = () => {
 
           <button
             type="submit"
-            className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-xs px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
+            disabled={isUpdating}
+            className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-xs px-5 py-2.5 rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-2 min-w-[130px] disabled:opacity-60"
           >
-            Update Password
+            {isUpdating ? <ButtonSpinner size={14} variant="light" /> : <span>Update Password</span>}
           </button>
         </form>
       </div>

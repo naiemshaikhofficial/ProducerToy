@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { CustomConfirmModal } from './CustomConfirmModal'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
 interface LinkedAccountsTabProps {
   user?: any
@@ -592,13 +593,10 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                 type="button"
                 disabled={oauthConnecting}
                 onClick={handleInitiateGoogleLink}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60 min-w-[150px]"
               >
                 {oauthConnecting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Connecting to Google...</span>
-                  </>
+                  <ButtonSpinner size={16} variant="dark" />
                 ) : (
                   <span>Continue to Google</span>
                 )}
@@ -685,13 +683,10 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                 type="button"
                 disabled={oauthConnecting}
                 onClick={handleAuthorizeOAuth}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60 min-w-[140px]"
               >
                 {oauthConnecting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Connecting OAuth...</span>
-                  </>
+                  <ButtonSpinner size={16} variant="dark" />
                 ) : (
                   <span>Authorize & Link</span>
                 )}

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Edit2 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { CustomInfoTooltip } from './CustomInfoTooltip'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
 interface PersonalDetailsSectionProps {
   user: any
@@ -243,9 +244,13 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
         <button
           type="submit"
           disabled={saving}
-          className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60"
+          className="bg-[#262626] hover:bg-[#343434] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 min-w-[130px]"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? (
+            <ButtonSpinner size={16} variant="light" />
+          ) : (
+            <span>Save Changes</span>
+          )}
         </button>
       </div>
     </form>

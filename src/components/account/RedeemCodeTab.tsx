@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
 export const RedeemCodeTab: React.FC = () => {
   const [code, setCode] = useState('')
@@ -108,9 +109,9 @@ export const RedeemCodeTab: React.FC = () => {
         <button
           type="submit"
           disabled={loading || !code.trim()}
-          className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50"
+          className="w-full bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? 'Validating...' : 'Redeem Code'}
+          {loading ? <ButtonSpinner size={16} variant="dark" /> : <span>Redeem Code</span>}
         </button>
       </form>
     </div>
