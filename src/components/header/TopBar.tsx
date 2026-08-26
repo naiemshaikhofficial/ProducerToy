@@ -127,7 +127,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
             {/* Desktop Account Popover (Solid Minimalist Dark, No Glassmorphism) */}
             {isAccountMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#181818] border border-[#262626] rounded-[16px] shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#181818] border border-[#262626] rounded-[16px] shadow-2xl p-3 z-[100] animate-in fade-in zoom-in-95 duration-100">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 pt-1 block mb-1">
                   STORE
                 </span>
@@ -184,7 +184,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   </Link>
 
                   <Link
-                    href="/library"
+                    href="/account"
                     prefetch={true}
                     onClick={() => setIsAccountMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
