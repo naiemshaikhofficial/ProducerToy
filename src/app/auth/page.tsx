@@ -7,6 +7,7 @@ import { LogoIcon } from '@/components/Logo'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { ChevronLeft, Eye, EyeOff, Mail, CheckCircle2, Lock, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { checkUserStatusAction } from '@/actions/authActions'
 
 // Sleek Monochrome Google Icon SVG
 function GoogleIcon({ size = 20 }: { size?: number }) {
@@ -285,14 +286,9 @@ function AuthForm() {
             errLower.includes('invalid credentials') ||
             errLower.includes('user not found')
           ) {
-            // Specifically verify if user exists or if password was wrong
+            // Lightning fast Server Action verification
             try {
-              const res = await fetch('/api/auth/check-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.trim() }),
-              })
-              const checkData = await res.json()
+              const checkData = await checkUserStatusAction(email.trim())
 
               if (!checkData.exists) {
                 setNoAccountFound(true)
