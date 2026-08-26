@@ -153,6 +153,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   onProfileUpdate,
 }) => {
   const [expandedId, setExpandedId] = useState<string | null>('google')
+  const [internalUser, setInternalUser] = useState<any>(user || null)
   const [linkedAccounts, setLinkedAccounts] = useState<Record<string, any>>({})
   const [oauthModalProvider, setOauthModalProvider] = useState<MusicProvider | null>(null)
   const [googleLinkModalOpen, setGoogleLinkModalOpen] = useState(false)
@@ -163,28 +164,35 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   const [feedback, setFeedback] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // Ensure active user is loaded from Supabase if not passed via props
+  useEffect(() => {
+    if (user) {
+      setInternalUser(user)
+    } else {
+      const supabase = getSupabaseBrowserClient()
+      supabase.auth.getUser().then(({ data }) => {
+        if (data?.user) {
+          setInternalUser(data.user)
+        }
+      })
+    }
+  }, [user])
+
+  const activeUser = user || internalUser
+
   useEffect(() => {
     const existing = profile?.linked_accounts || {}
     const merged = { ...existing }
 
-    // Auto-detect Google connection from Supabase Auth session
-    const googleIdentity = user?.identities?.find((id: any) => id.provider === 'google')
-    const isGoogleAuth =
-      Boolean(user) &&
-      (Boolean(googleIdentity) ||
-        user?.app_metadata?.provider === 'google' ||
-        user?.app_metadata?.providers?.includes('google') ||
-        Boolean(user?.email && (user.email.includes('@gmail.com') || user.user_metadata?.iss?.includes('google'))) ||
-        Boolean(user?.user_metadata?.full_name) ||
-        Boolean(existing.google))
-
-    if (isGoogleAuth) {
-      const googleEmail = googleIdentity?.identity_data?.email || user?.email || existing.google?.email || ''
+    // If active user is present, automatically configure Google linked details
+    if (activeUser) {
+      const googleIdentity = activeUser.identities?.find((id: any) => id.provider === 'google')
+      const googleEmail = googleIdentity?.identity_data?.email || activeUser.email || existing.google?.email || ''
       const googleName =
         googleIdentity?.identity_data?.full_name ||
         googleIdentity?.identity_data?.name ||
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
+        activeUser.user_metadata?.full_name ||
+        activeUser.user_metadata?.name ||
         profile?.full_name ||
         profile?.display_name ||
         existing.google?.handle ||
@@ -193,34 +201,28 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       merged.google = {
         handle: googleName,
         email: googleEmail,
-        connected_at: existing.google?.connected_at || user?.created_at || new Date().toISOString(),
+        connected_at: existing.google?.connected_at || activeUser.created_at || new Date().toISOString(),
         is_permanent: true,
         ...existing.google,
       }
     }
 
     setLinkedAccounts(merged)
-  }, [profile, user])
+  }, [profile, activeUser])
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
   }
 
-  // Handle Google Connection with Email Matching Validation & One-Time Rule
+  // Handle Google Connection with Direct OAuth Authentication
   const handleInitiateGoogleLink = async () => {
-    if (!user?.email) {
-      setErrorMessage('Please make sure you are logged in to link your Google account.')
-      return
-    }
-
     setOauthConnecting(true)
     setErrorMessage(null)
 
     try {
       const supabase = getSupabaseBrowserClient()
       
-      // Execute Google OAuth linking
-      if (supabase.auth.linkIdentity) {
+      if (supabase.auth.linkIdentity && activeUser) {
         const { error } = await supabase.auth.linkIdentity({
           provider: 'google',
           options: {
@@ -253,9 +255,9 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     }
 
     const defaultHandle =
-      user?.user_metadata?.full_name ||
+      activeUser?.user_metadata?.full_name ||
       profile?.display_name ||
-      user?.email?.split('@')[0] ||
+      activeUser?.email?.split('@')[0] ||
       'producer'
     setOauthHandleInput(defaultHandle)
     setOauthModalProvider(provider)
@@ -263,16 +265,16 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
 
   // Execute OAuth Authorization & Link Account for Music Providers
   const handleAuthorizeOAuth = async () => {
-    if (!user || !oauthModalProvider) return
+    if (!activeUser || !oauthModalProvider) return
     setOauthConnecting(true)
 
     const cleanHandle =
-      oauthHandleInput.trim() || user.email?.split('@')[0] || 'connected_artist'
+      oauthHandleInput.trim() || activeUser.email?.split('@')[0] || 'connected_artist'
     const updated = {
       ...linkedAccounts,
       [oauthModalProvider.id]: {
         handle: cleanHandle,
-        email: user.email,
+        email: activeUser.email,
         authorized_scopes: oauthModalProvider.scopes,
         connected_at: new Date().toISOString(),
       },
@@ -283,8 +285,8 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          id: user.id,
-          email: user.email,
+          id: activeUser.id,
+          email: activeUser.email,
           linked_accounts: updated,
           updated_at: new Date().toISOString(),
         })
@@ -304,8 +306,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   }
 
   const handleConfirmDisconnect = async () => {
-    if (!user || !disconnectTarget) return
-    // Prevent disconnecting Google
+    if (!activeUser || !disconnectTarget) return
     if (disconnectTarget.id === 'google') return
 
     setSaving(true)
@@ -317,8 +318,8 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          id: user.id,
-          email: user.email,
+          id: activeUser.id,
+          email: activeUser.email,
           linked_accounts: updated,
           updated_at: new Date().toISOString(),
         })
@@ -367,10 +368,24 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       {/* Provider List (Accordion Cards matching Screenshot 2) */}
       <div className="space-y-3.5">
         {MUSIC_PROVIDERS.map((provider) => {
-          const isLinked = Boolean(linkedAccounts[provider.id])
-          const handle = linkedAccounts[provider.id]?.handle || 'Not connected'
-          const isExpanded = expandedId === provider.id
           const isGoogle = provider.id === 'google'
+          const isLinked = isGoogle
+            ? Boolean(activeUser) || Boolean(linkedAccounts.google) || Boolean(profile?.linked_accounts?.google)
+            : Boolean(linkedAccounts[provider.id])
+
+          const googleHandle =
+            linkedAccounts.google?.handle ||
+            profile?.display_name ||
+            profile?.full_name ||
+            activeUser?.user_metadata?.full_name ||
+            activeUser?.user_metadata?.name ||
+            (activeUser?.email ? activeUser.email.split('@')[0] : 'Naiem Shaikh')
+
+          const handle = isGoogle
+            ? (isLinked ? googleHandle : 'Not connected')
+            : (linkedAccounts[provider.id]?.handle || 'Not connected')
+
+          const isExpanded = expandedId === provider.id
 
           const linkedDateFormatted = linkedAccounts[provider.id]?.connected_at
             ? new Date(linkedAccounts[provider.id].connected_at).toLocaleDateString('en-US', {
@@ -550,7 +565,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                     Your Google Account email must match your registered account email:
                   </span>
                   <span className="block text-white font-mono font-bold mt-1 bg-[#202020] px-2.5 py-1 rounded-lg border border-[#303030]">
-                    {user?.email || 'Registered Email'}
+                    {activeUser?.email || 'Registered Email'}
                   </span>
                 </div>
               </div>
