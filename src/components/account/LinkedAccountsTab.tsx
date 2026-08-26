@@ -159,30 +159,63 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
   const [feedback, setFeedback] = useState<string | null>(null)
 
   useEffect(() => {
-    if (profile?.linked_accounts && Object.keys(profile.linked_accounts).length > 0) {
-      setLinkedAccounts(profile.linked_accounts)
-    } else if (user) {
-      // Check user identities (e.g. Google OAuth login)
-      const isGoogleLinked = user.app_metadata?.provider === 'google' || user.email
-      const initial: Record<string, any> = {}
-      if (isGoogleLinked) {
-        initial.google = {
-          handle: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Naiem Shaikh',
-          email: user.email,
-          connected_at: user.created_at || new Date().toISOString(),
-        }
+    const existing = profile?.linked_accounts || {}
+    const merged = { ...existing }
+
+    // Auto-detect Google connection from Supabase Auth identities or Google email
+    const isGoogleAuth =
+      user?.app_metadata?.provider === 'google' ||
+      user?.app_metadata?.providers?.includes('google') ||
+      user?.identities?.some((id: any) => id.provider === 'google') ||
+      Boolean(user?.email && user.email.includes('@gmail.com')) ||
+      Boolean(user?.user_metadata?.iss?.includes('google'))
+
+    if (isGoogleAuth && !merged.google) {
+      merged.google = {
+        handle:
+          user?.user_metadata?.full_name ||
+          user?.user_metadata?.name ||
+          profile?.full_name ||
+          user?.email?.split('@')[0] ||
+          'Google Account',
+        email: user?.email,
+        connected_at: user?.created_at || new Date().toISOString(),
       }
-      setLinkedAccounts(initial)
     }
+
+    setLinkedAccounts(merged)
   }, [profile, user])
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
   }
 
-  // Open the OAuth Connection Modal
-  const openOAuthModal = (provider: MusicProvider) => {
-    const defaultHandle = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'producer'
+  // Open the OAuth Connection Modal or initiate Google OAuth
+  const handleConnectClick = async (provider: MusicProvider) => {
+    if (provider.id === 'google') {
+      try {
+        const supabase = getSupabaseBrowserClient()
+        // If supabase supports linkIdentity
+        if (supabase.auth.linkIdentity) {
+          const { error } = await supabase.auth.linkIdentity({
+            provider: 'google',
+            options: {
+              redirectTo: `${window.location.origin}/account`,
+            },
+          })
+          if (!error) return
+        }
+      } catch (err) {
+        console.warn('Google linkIdentity note:', err)
+      }
+    }
+
+    // Open the OAuth Permissions Modal
+    const defaultHandle =
+      user?.user_metadata?.full_name ||
+      profile?.display_name ||
+      user?.email?.split('@')[0] ||
+      'producer'
     setOauthHandleInput(defaultHandle)
     setOauthModalProvider(provider)
   }
@@ -192,25 +225,9 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     if (!user || !oauthModalProvider) return
     setOauthConnecting(true)
 
-    // For Supabase-native OAuth providers like Google:
-    if (oauthModalProvider.id === 'google' && typeof window !== 'undefined') {
-      try {
-        const supabase = getSupabaseBrowserClient()
-        if (supabase.auth.linkIdentity) {
-          await supabase.auth.linkIdentity({
-            provider: 'google',
-            options: {
-              redirectTo: `${window.location.origin}/account`,
-            },
-          })
-        }
-      } catch (oauthErr) {
-        console.warn('OAuth linkIdentity fallback:', oauthErr)
-      }
-    }
-
     // Persist verified linked connection into Supabase profiles
-    const cleanHandle = oauthHandleInput.trim() || user.email?.split('@')[0] || 'connected_artist'
+    const cleanHandle =
+      oauthHandleInput.trim() || user.email?.split('@')[0] || 'connected_artist'
     const updated = {
       ...linkedAccounts,
       [oauthModalProvider.id]: {
@@ -378,7 +395,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                     ) : (
                       <button
                         type="button"
-                        onClick={() => openOAuthModal(provider)}
+                        onClick={() => handleConnectClick(provider)}
                         className="inline-flex items-center gap-2 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer"
                       >
                         <Plus className="w-4 h-4" />
