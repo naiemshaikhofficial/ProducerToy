@@ -158,16 +158,17 @@ export function GlobalCheckoutModal() {
     loadData()
   }, [isCheckoutOpen, supabase, setCurrency])
 
-  // Close on Escape
+  // Freeze background scrolling completely when modal is open
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isCheckoutOpen) {
-        closeCheckout()
+    if (isCheckoutOpen) {
+      const scrollY = window.scrollY
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = ''
+        window.scrollTo(0, scrollY)
       }
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isCheckoutOpen, closeCheckout])
+  }, [isCheckoutOpen])
 
   if (!isCheckoutOpen || items.length === 0) return null
 
@@ -383,14 +384,11 @@ export function GlobalCheckoutModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in duration-150">
-      {/* Background click to close */}
-      <div className="absolute inset-0" onClick={closeCheckout} />
-
-      <div className="relative z-10 w-full max-w-[880px] flex flex-col items-center">
+    <div className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-[2px] flex items-center justify-center select-none overflow-hidden animate-in fade-in duration-150">
+      <div className="relative z-10 w-full max-w-[940px] h-full max-h-screen flex flex-col items-center justify-center">
         {/* Error Notification */}
         {errorMsg && (
-          <div className="w-full mb-3 bg-[#241515] border border-red-500/20 text-red-300 px-4 py-2.5 text-xs rounded-xl flex items-center justify-between shadow-lg">
+          <div className="w-full mb-2 bg-[#241515] border border-red-500/20 text-red-300 px-4 py-2 text-xs rounded-lg flex items-center justify-between shadow-lg">
             <span>{errorMsg}</span>
             <button onClick={() => setErrorMsg('')} className="text-red-400 hover:text-white font-bold ml-4">
               &times;
@@ -399,7 +397,7 @@ export function GlobalCheckoutModal() {
         )}
 
         {paymentStatus === 'success' ? (
-          <div className="w-full bg-[#141414] border border-[#242424] rounded-2xl p-8 shadow-2xl">
+          <div className="w-full bg-[#141416] border border-[#242428] rounded-xl p-8 shadow-2xl">
             <CheckoutSuccessView email={billingDetails.email || user?.email} />
           </div>
         ) : (

@@ -114,7 +114,7 @@ export function EpicCheckoutLayout({
   }
 
   return (
-    <div className="w-full max-w-[940px] h-[94vh] max-h-[740px] bg-[#141416] border border-[#26262a] rounded-xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none font-sans">
+    <div className="w-full max-w-[940px] h-full max-h-screen bg-[#141416] border-x border-[#26262a] rounded-none shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none font-sans">
       
       {/* ========================================================================= */}
       {/* LEFT COLUMN: ORDER SUMMARY (Exact 1:1 Match from Screenshot)               */}
