@@ -11,6 +11,7 @@ import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { validateCouponAction } from '@/actions/couponActions'
 import { processCheckoutOrderAction } from '@/actions/checkoutActions'
+import { saveBillingAddressAction } from '@/actions/accountActions'
 import {
   BillingDetails,
   PaymentStatus,
@@ -210,7 +211,7 @@ export default function CheckoutPage() {
     }
   }, [items, supabase])
 
-  // Handle Billing Input Change (and auto-switch currency if country changes)
+  // Handle Billing Input Change (and auto-switch currency if country changes & sync to Supabase profile)
   const handleBillingChange = (field: keyof BillingDetails, value: string) => {
     const updated = { ...billingDetails, [field]: value }
     setBillingDetails(updated)
@@ -227,6 +228,13 @@ export default function CheckoutPage() {
       localStorage.setItem('pt_billing_details', JSON.stringify(updated))
     } catch {
       // Local storage fallback
+    }
+
+    // Auto-save to Supabase profiles table
+    if (user?.id) {
+      saveBillingAddressAction(user.id, updated).catch((e) => {
+        console.warn('Background profile sync note:', e)
+      })
     }
 
     if (formErrors[field]) {
@@ -364,6 +372,9 @@ export default function CheckoutPage() {
     setPaymentStatus('processing')
 
     try {
+      // Save billing address to Supabase profile
+      await saveBillingAddressAction(user.id, billingDetails).catch(() => {})
+
       const res = await processCheckoutOrderAction(
         items.map((i) => ({
           id: i.id,
@@ -414,6 +425,9 @@ export default function CheckoutPage() {
 
     setLoading(true)
     setErrorMsg('')
+
+    // Save billing address to Supabase profile
+    await saveBillingAddressAction(user.id, billingDetails).catch(() => {})
 
     const sdkLoaded = await loadRazorpay()
     if (!sdkLoaded) {
@@ -536,6 +550,10 @@ export default function CheckoutPage() {
       }
       throw new Error('Please fill in required billing details')
     }
+
+    // Save billing address to Supabase profile
+    saveBillingAddressAction(user.id, billingDetails).catch(() => {})
+
     setPaymentStatus('processing')
   }
 
@@ -642,8 +660,8 @@ export default function CheckoutPage() {
             />
           </div>
 
-          {/* ================= RIGHT COLUMN: ORDER SUMMARY & TRUST ================= */}
-          <div className="lg:col-span-5 space-y-5">
+          {/* ================= RIGHT COLUMN: ORDER SUMMARY (STICKY & CLEAN) ================= */}
+          <div className="lg:col-span-5 space-y-5 lg:sticky lg:top-24">
             {/* Order Summary Component with Location-Based Gateways */}
             <CheckoutOrderSummary
               itemCount={items.length}
@@ -672,15 +690,6 @@ export default function CheckoutPage() {
               billingDetails={billingDetails}
               items={items}
               userId={user?.id}
-            />
-
-            {/* Trust Badges & Guarantees */}
-            <CheckoutTrustBadges />
-
-            {/* Frequently Bought Together / Upsells */}
-            <CheckoutUpsells
-              upsellProducts={upsellProducts}
-              formatPrice={formatPrice}
             />
           </div>
         </div>

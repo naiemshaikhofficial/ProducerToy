@@ -70,6 +70,85 @@ export async function updatePersonalDetailsAction(userId: string, data: ProfileU
 }
 
 /**
+ * Ultra-fast server action to immediately save full billing address into profiles table.
+ */
+export async function saveBillingAddressAction(
+  userId: string,
+  details: {
+    fullName?: string
+    email?: string
+    phone?: string
+    address?: string
+    address2?: string
+    city?: string
+    state?: string
+    zip?: string
+    country?: string
+  }
+) {
+  if (!userId) return { success: false, error: 'User ID required' }
+
+  try {
+    const admin = getAdminClient()
+    const nameParts = (details.fullName || '').trim().split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ') || ''
+
+    // 1. Sync into unified profiles table
+    const { error } = await admin.from('profiles').upsert(
+      {
+        id: userId,
+        email: details.email || undefined,
+        first_name: firstName,
+        last_name: lastName,
+        full_name: details.fullName || '',
+        display_name: details.fullName || '',
+        phone_number: details.phone || '',
+        address_line1: details.address || '',
+        address_line2: details.address2 || '',
+        city: details.city || '',
+        state: details.state || '',
+        region: details.state || '',
+        postal_code: details.zip || '',
+        country: details.country || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'id' }
+    )
+
+    if (error) throw error
+
+    // 2. Sync into Supabase Auth user metadata
+    await admin.auth.admin.updateUserById(userId, {
+      user_metadata: {
+        full_name: details.fullName,
+        first_name: firstName,
+        last_name: lastName,
+        phone: details.phone,
+        phone_number: details.phone,
+        address: details.address,
+        address2: details.address2,
+        address_line1: details.address,
+        address_line2: details.address2,
+        city: details.city,
+        state: details.state,
+        region: details.state,
+        zip: details.zip,
+        postal_code: details.zip,
+        country: details.country,
+      },
+    })
+
+    revalidatePath('/account')
+    revalidatePath('/checkout')
+    return { success: true }
+  } catch (err: any) {
+    console.error('saveBillingAddressAction error:', err)
+    return { success: false, error: err.message || 'Failed to save billing address' }
+  }
+}
+
+/**
  * Ultra-fast server action to update company details.
  */
 export async function updateCompanyDetailsAction(userId: string, data: CompanyUpdateData) {
