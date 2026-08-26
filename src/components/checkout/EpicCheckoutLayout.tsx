@@ -98,8 +98,8 @@ export function EpicCheckoutLayout({
       user.user_metadata?.name ||
       billingDetails.fullName ||
       (user.email ? user.email.split('@')[0] : 'Producer')
-    : billingDetails.fullName || 'Producer Toy'
-  const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
+    : billingDetails.fullName || 'Naiem Shaikh'
+  const initialLetter = displayName ? displayName[0].toUpperCase() : 'N'
 
   const handlePayClick = () => {
     if (isFree) {
@@ -114,41 +114,41 @@ export function EpicCheckoutLayout({
   }
 
   return (
-    <div className="w-full max-w-[860px] h-[92vh] max-h-[720px] bg-[#161616] border border-[#282828] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none">
+    <div className="w-full max-w-[940px] h-[94vh] max-h-[740px] bg-[#141416] border border-[#26262a] rounded-xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none font-sans">
       
       {/* ========================================================================= */}
-      {/* LEFT COLUMN: ORDER SUMMARY (Exact Epic Games Layout & Colors)             */}
+      {/* LEFT COLUMN: ORDER SUMMARY (Exact 1:1 Match from Screenshot)               */}
       {/* ========================================================================= */}
-      <div className="w-full md:w-[350px] flex-shrink-0 bg-[#121212] p-6 sm:p-7 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#222222] overflow-y-auto">
+      <div className="w-full md:w-[380px] flex-shrink-0 bg-[#18181c] p-7 sm:p-8 flex flex-col justify-between border-b md:border-b-0 md:border-r border-[#222226] overflow-y-auto">
         
-        <div className="space-y-6">
-          {/* Top Logo + Checkout Title (Exact Screenshot Match) */}
-          <div className="flex items-center gap-2.5">
+        <div className="space-y-7">
+          {/* Top Logo + Checkout Title */}
+          <div className="flex items-center gap-3">
             <LogoIcon size={26} />
-            <h1 className="text-base sm:text-lg font-black text-white tracking-tight">
+            <h1 className="text-[17px] font-black text-white tracking-wide">
               Checkout
             </h1>
           </div>
 
           {/* Cart Items List */}
-          <div className="space-y-3.5">
+          <div className="space-y-4">
             {items.map((item) => (
               <div key={item.id} className="flex items-start gap-3.5 group">
-                <div className="relative w-12 h-14 bg-[#1c1c1c] border border-[#282828] rounded-md overflow-hidden flex-shrink-0">
+                <div className="relative w-[54px] h-[72px] bg-[#1c1c20] border border-[#2a2a30] rounded-md overflow-hidden flex-shrink-0 shadow-sm">
                   <Image
                     src={item.cover_image || '/placeholder.jpg'}
                     alt={item.name}
                     fill
-                    sizes="48px"
+                    sizes="54px"
                     className="object-cover"
                   />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xs text-white line-clamp-2 leading-relaxed">
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <h3 className="font-semibold text-[13px] text-white line-clamp-2 leading-snug">
                     {item.name}
                   </h3>
-                  <div className="flex items-center gap-2 mt-1 text-[10.5px] text-zinc-400">
+                  <div className="flex items-center gap-2 mt-1 text-[11px] text-zinc-400">
                     <span className="truncate">{item.brand || 'Producer Toy'}</span>
                     {items.length > 1 && (
                       <button
@@ -167,8 +167,8 @@ export function EpicCheckoutLayout({
           </div>
 
           {/* Price Breakdown */}
-          <div className="space-y-2.5 pt-4 border-t border-[#202020] text-xs">
-            <div className="flex justify-between items-center text-zinc-400 font-medium">
+          <div className="space-y-2 pt-5 border-t border-[#242428] text-xs">
+            <div className="flex justify-between items-center text-zinc-400 font-normal">
               <span>Subtotal</span>
               <span className="text-zinc-200 font-semibold">
                 {currencySymbol}{currentSubtotal.toFixed(2)}
@@ -176,7 +176,7 @@ export function EpicCheckoutLayout({
             </div>
 
             {!isFree && (
-              <div className="flex justify-between items-center text-zinc-400 font-medium">
+              <div className="flex justify-between items-center text-zinc-400 font-normal">
                 <span>VAT included (18%)</span>
                 <span className="text-zinc-200 font-semibold">
                   {currencySymbol}{taxAmount}
@@ -185,40 +185,40 @@ export function EpicCheckoutLayout({
             )}
 
             {/* Total Price Row */}
-            <div className="flex justify-between items-baseline pt-3 border-t border-[#202020]">
+            <div className="flex justify-between items-baseline pt-3 border-t border-[#242428]">
               <span className="text-sm font-bold text-white">Total</span>
-              <span className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              <span className="text-2xl font-black text-white tracking-tight">
                 {currencySymbol}{finalTotal.toFixed(2)}
               </span>
             </div>
           </div>
 
-          {/* Producer Rewards Green Badge (Exact Screenshot Match) */}
+          {/* Producer Rewards Green Badge (Exact 1:1 Pill) */}
           {!isFree && (
             <div className="inline-flex items-center gap-2 bg-[#0e2c22] border border-[#1b5e46] text-[#2ed8a7] px-3.5 py-2 rounded-xl text-[11px] font-semibold select-none w-full shadow-sm">
               <Sparkles size={13} className="text-[#2ed8a7] flex-shrink-0" />
-              <span>Get {currencySymbol}{rewardsAmount} in Producer Rewards.</span>
+              <span>Get {currencySymbol}{rewardsAmount} in Epic Rewards.</span>
             </div>
           )}
         </div>
 
-        {/* Bottom Notice */}
-        <div className="pt-4 text-[10px] text-zinc-500">
+        {/* Bottom Secure Vault Notice */}
+        <div className="pt-4 text-[10px] text-zinc-500 select-none">
           Instant vault delivery • 256-bit SSL encrypted
         </div>
       </div>
 
 
       {/* ========================================================================= */}
-      {/* RIGHT COLUMN: PAYMENT DETAILS & ACTIONS (Exact Epic Games Dark Theme)     */}
+      {/* RIGHT COLUMN: PAYMENT DETAILS & ACTIONS (Exact 1:1 Match from Screenshot) */}
       {/* ========================================================================= */}
-      <div className="flex-1 bg-[#161616] p-6 sm:p-7 flex flex-col justify-between overflow-y-auto space-y-5">
+      <div className="flex-1 bg-[#141416] p-7 sm:p-8 flex flex-col justify-between overflow-y-auto space-y-6">
         
-        <div className="space-y-5">
-          {/* Top User Info & Close Button (Exact Screenshot Match) */}
+        <div className="space-y-6">
+          {/* Top User Avatar & Close ✕ Button (Exact Match) */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold text-zinc-300">
-              <div className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-white flex items-center justify-center text-[10px] font-bold">
+            <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-300">
+              <div className="w-5 h-5 rounded-full bg-[#26262a] border border-[#38383e] text-white flex items-center justify-center text-[10.5px] font-bold">
                 {initialLetter}
               </div>
               <span className="truncate max-w-[200px]">{displayName}</span>
@@ -247,13 +247,13 @@ export function EpicCheckoutLayout({
 
           {/* Section Title */}
           <div>
-            <h2 className="text-xl font-black text-white tracking-tight">
+            <h2 className="text-xl font-bold text-white tracking-tight">
               Payment Details
             </h2>
           </div>
 
-          {/* Epic Rewards Expandable Pill Box (Exact Screenshot Match) */}
-          <div className="bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl p-3.5 transition-all">
+          {/* Epic Rewards Box (Exact Match) */}
+          <div className="bg-[#1e1e22] border border-[#2c2c30] rounded-xl p-3.5 transition-all">
             <button
               type="button"
               onClick={() => setIsRewardsExpanded(!isRewardsExpanded)}
@@ -263,19 +263,19 @@ export function EpicCheckoutLayout({
                 <div className="w-5 h-5 rounded-full bg-[#0e2c22] border border-[#1b5e46] flex items-center justify-center text-[#2ed8a7]">
                   <Sparkles size={11} />
                 </div>
-                <span className="text-xs font-bold text-white">Producer Rewards</span>
+                <span className="text-xs font-bold text-white">Epic Rewards</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-zinc-400">
-                <span>{isRewardsExpanded ? 'Show less' : 'View balance'}</span>
+                <span>{isRewardsExpanded ? 'Show less' : ''}</span>
                 <ChevronDown
-                  size={13}
+                  size={14}
                   className={`transition-transform duration-200 ${isRewardsExpanded ? 'rotate-180' : ''}`}
                 />
               </div>
             </button>
 
             {isRewardsExpanded && (
-              <div className="mt-2.5 pt-2.5 border-t border-[#2a2a2a] text-xs text-zinc-400 space-y-1 animate-in fade-in duration-150">
+              <div className="mt-2.5 pt-2.5 border-t border-[#2a2a2e] text-xs text-zinc-400 space-y-1 animate-in fade-in duration-150">
                 <div className="flex justify-between">
                   <span>Available Balance:</span>
                   <span className="font-bold text-white">{currencySymbol}0.00</span>
@@ -287,23 +287,23 @@ export function EpicCheckoutLayout({
             )}
           </div>
 
-          {/* Payment Method Radio Selector (Exact Epic Games Layout) */}
+          {/* Payment Methods Group Box (Exact 1:1 Screenshot Layout) */}
           {!isFree && (
             <div className="space-y-2">
-              <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl divide-y divide-[#242424] overflow-hidden">
+              <div className="bg-[#18181c] border border-[#2a2a2e] rounded-xl divide-y divide-[#242428] overflow-hidden">
                 
                 {/* Option 1: Credit Card / Debit Card */}
                 <label
                   onClick={() => setSelectedMethod('card')}
                   className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                    selectedMethod === 'card' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
+                    selectedMethod === 'card' ? 'bg-[#202026]' : 'hover:bg-[#1c1c20]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-5 rounded bg-[#242424] border border-[#333333] flex items-center justify-center">
+                    <div className="w-8 h-5 rounded bg-[#26262a] border border-[#36363c] flex items-center justify-center">
                       <CreditCard size={13} className="text-zinc-300" />
                     </div>
-                    <span className="text-xs font-bold text-white">
+                    <span className="text-xs font-semibold text-white">
                       Credit Card / Debit Card
                     </span>
                   </div>
@@ -311,7 +311,7 @@ export function EpicCheckoutLayout({
                   <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                     selectedMethod === 'card'
                       ? 'border-white bg-white'
-                      : 'border-[#444444] bg-transparent'
+                      : 'border-[#44444a] bg-transparent'
                   }`}>
                     {selectedMethod === 'card' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
                   </div>
@@ -321,18 +321,18 @@ export function EpicCheckoutLayout({
                 <label
                   onClick={() => setSelectedMethod('paypal')}
                   className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                    selectedMethod === 'paypal' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
+                    selectedMethod === 'paypal' ? 'bg-[#202026]' : 'hover:bg-[#1c1c20]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-5 flex items-center justify-center">
+                    <div className="w-8 h-5 flex items-center justify-center">
                       <img
                         src="/payment-logos/paypal.svg"
                         alt="PayPal"
                         className="h-3.5 object-contain"
                       />
                     </div>
-                    <span className="text-xs font-bold text-white">
+                    <span className="text-xs font-semibold text-white">
                       PayPal
                     </span>
                   </div>
@@ -340,7 +340,7 @@ export function EpicCheckoutLayout({
                   <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                     selectedMethod === 'paypal'
                       ? 'border-white bg-white'
-                      : 'border-[#444444] bg-transparent'
+                      : 'border-[#44444a] bg-transparent'
                   }`}>
                     {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
                   </div>
@@ -350,18 +350,18 @@ export function EpicCheckoutLayout({
                 <label
                   onClick={() => setSelectedMethod('gpay')}
                   className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                    selectedMethod === 'gpay' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
+                    selectedMethod === 'gpay' ? 'bg-[#202026]' : 'hover:bg-[#1c1c20]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-7 h-5 flex items-center justify-center">
+                    <div className="w-8 h-5 flex items-center justify-center">
                       <img
                         src="/payment-logos/gpay.svg"
                         alt="Google Pay"
                         className="h-3.5 object-contain"
                       />
                     </div>
-                    <span className="text-xs font-bold text-white">
+                    <span className="text-xs font-semibold text-white">
                       Google Pay
                     </span>
                   </div>
@@ -369,46 +369,44 @@ export function EpicCheckoutLayout({
                   <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                     selectedMethod === 'gpay'
                       ? 'border-white bg-white'
-                      : 'border-[#444444] bg-transparent'
+                      : 'border-[#44444a] bg-transparent'
                   }`}>
                     {selectedMethod === 'gpay' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
                   </div>
                 </label>
 
-                {/* Option 4: UPI (When in India or expanded) */}
-                {(isIndia || showAllMethods) && (
-                  <label
-                    onClick={() => setSelectedMethod('upi')}
-                    className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                      selectedMethod === 'upi' ? 'bg-[#222222]' : 'hover:bg-[#1e1e1e]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-7 h-5 flex items-center justify-center">
-                        <img
-                          src="/payment-logos/upi.svg"
-                          alt="UPI"
-                          className="h-3.5 object-contain"
-                        />
-                      </div>
-                      <span className="text-xs font-bold text-white">
-                        UPI
-                      </span>
+                {/* Option 4: UPI (Always in list matching exact Screenshot) */}
+                <label
+                  onClick={() => setSelectedMethod('upi')}
+                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                    selectedMethod === 'upi' ? 'bg-[#202026]' : 'hover:bg-[#1c1c20]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-5 flex items-center justify-center">
+                      <img
+                        src="/payment-logos/upi.svg"
+                        alt="UPI"
+                        className="h-3.5 object-contain"
+                      />
                     </div>
+                    <span className="text-xs font-semibold text-white">
+                      UPI
+                    </span>
+                  </div>
 
-                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
-                      selectedMethod === 'upi'
-                        ? 'border-white bg-white'
-                        : 'border-[#444444] bg-transparent'
-                    }`}>
-                      {selectedMethod === 'upi' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
-                    </div>
-                  </label>
-                )}
+                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                    selectedMethod === 'upi'
+                      ? 'border-white bg-white'
+                      : 'border-[#44444a] bg-transparent'
+                  }`}>
+                    {selectedMethod === 'upi' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                  </div>
+                </label>
 
-                {/* Expanded All payment methods */}
+                {/* Expanded methods if opened */}
                 {showAllMethods && (
-                  <div className="p-3 bg-[#141414] space-y-2 text-xs text-zinc-400 animate-in fade-in duration-150">
+                  <div className="p-3.5 bg-[#141418] space-y-2 text-xs text-zinc-400 animate-in fade-in duration-150">
                     <div className="flex items-center gap-2">
                       <img src="/payment-logos/rupay.svg" alt="RuPay" className="h-3.5" />
                       <img src="/payment-logos/visa.svg" alt="Visa" className="h-3.5" />
@@ -420,44 +418,44 @@ export function EpicCheckoutLayout({
                 )}
               </div>
 
-              {/* Show less / Show more toggle button */}
+              {/* All payment methods accordion toggle (Exact Screenshot) */}
               <button
                 type="button"
                 onClick={() => setShowAllMethods(!showAllMethods)}
-                className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 hover:text-white transition-colors cursor-pointer py-1"
+                className="inline-flex items-center gap-1 text-xs font-bold text-zinc-300 hover:text-white transition-colors cursor-pointer py-1.5"
               >
                 <span>{showAllMethods ? 'Show less' : 'All payment methods'}</span>
-                {showAllMethods ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                {showAllMethods ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
             </div>
           )}
 
-          {/* Creator / Promo Code Button (Exact Screenshot Match) */}
+          {/* + Creator Code Button (Exact Screenshot Match) */}
           <div>
             {!isCreatorCodeOpen ? (
               <button
                 type="button"
                 onClick={() => setIsCreatorCodeOpen(true)}
-                className="h-9 px-4 bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="h-9 px-4 bg-[#242428] hover:bg-[#2e2e34] border border-[#303036] text-white text-xs font-semibold rounded-[6px] flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Plus size={13} />
                 <span>Creator Code</span>
               </button>
             ) : (
-              <div className="space-y-2 bg-[#1c1c1c] border border-[#2c2c2c] p-2.5 rounded-xl animate-in fade-in duration-150">
+              <div className="space-y-2 bg-[#1c1c20] border border-[#2a2a30] p-2.5 rounded-xl animate-in fade-in duration-150">
                 <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="ENTER CREATOR CODE"
                     value={coupon}
                     onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-                    className="flex-1 h-8 bg-[#141414] border border-[#2c2c2c] text-white text-xs px-3 rounded-lg outline-none uppercase font-semibold placeholder:text-zinc-500 focus:border-zinc-400"
+                    className="flex-1 h-8 bg-[#141416] border border-[#2c2c30] text-white text-xs px-3 rounded-md outline-none uppercase font-semibold placeholder:text-zinc-500 focus:border-zinc-400"
                   />
                   <button
                     type="button"
                     onClick={onApplyCoupon}
                     disabled={couponLoading || !coupon.trim()}
-                    className="px-3.5 h-8 bg-white hover:bg-zinc-200 text-black text-xs font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-40"
+                    className="px-3.5 h-8 bg-white hover:bg-zinc-200 text-black text-xs font-bold rounded-md transition-colors cursor-pointer disabled:opacity-40"
                   >
                     {couponLoading ? <ButtonSpinner size={12} variant="dark" /> : 'Apply'}
                   </button>
@@ -509,7 +507,7 @@ export function EpicCheckoutLayout({
         </div>
 
         {/* Bottom Action Area (Pay Now Button + Compliance Text) */}
-        <div className="pt-4 space-y-2.5">
+        <div className="pt-4 space-y-3">
           
           {/* If International PayPal is explicitly selected */}
           {selectedMethod === 'paypal' && !isFree ? (
@@ -527,7 +525,7 @@ export function EpicCheckoutLayout({
             ) : (
               <Link
                 href="/auth?next=/checkout"
-                className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer"
+                className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-[6px] transition-all shadow-md flex items-center justify-center cursor-pointer"
               >
                 Sign In to Pay with PayPal
               </Link>
@@ -538,7 +536,7 @@ export function EpicCheckoutLayout({
               type="button"
               onClick={handlePayClick}
               disabled={loading || paymentStatus === 'processing'}
-              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-[0.99]"
+              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-[6px] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-[0.99]"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
@@ -553,13 +551,13 @@ export function EpicCheckoutLayout({
             </button>
           )}
 
-          {/* Legal & Compliance Disclaimer (Exact Epic Games Match) */}
-          <p className="text-[9.5px] text-zinc-500 leading-relaxed select-none">
+          {/* Legal & Compliance Disclaimer (Exact 1:1 Screenshot Match) */}
+          <p className="text-[10px] text-zinc-400 leading-relaxed select-none">
             By selecting &lsquo;Pay Now&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
-            <Link href="/terms" className="text-zinc-400 hover:underline">
+            <Link href="/terms" className="text-zinc-200 hover:underline">
               End User License Agreement
             </Link>. You are paying for a digital license for this product; for terms, see{' '}
-            <Link href="/terms" className="text-zinc-400 hover:underline">
+            <Link href="/terms" className="text-zinc-200 hover:underline">
               purchase policy
             </Link>.
           </p>
