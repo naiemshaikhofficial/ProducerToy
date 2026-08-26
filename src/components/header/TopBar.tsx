@@ -69,18 +69,18 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <div className="w-full bg-[#121212]">
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-14 h-[56px] flex items-center justify-between">
+      <div className="w-full max-w-[1600px] mx-auto px-6 sm:px-8 md:px-10 lg:px-12 h-[58px] flex items-center justify-between">
         
-        {/* Left Section: Logo + STORE Name + Support + Distribute (Exact Epic Games Store Layout) */}
-        <div className="flex items-center gap-4 sm:gap-7">
-          <Link href="/" prefetch={true} className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
-            <LogoIcon size={30} />
+        {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
+        <div className="flex items-center gap-6 sm:gap-9">
+          <Link href="/" prefetch={true} className="flex items-center hover:opacity-90 transition-opacity">
+            <LogoIcon size={32} />
           </Link>
 
           <Link 
             href="/store" 
             prefetch={true}
-            className="text-white font-black text-[17px] tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
+            className="text-white font-extrabold text-[15px] tracking-widest uppercase font-sans hover:text-zinc-200 transition-colors"
           >
             STORE
           </Link>
@@ -88,29 +88,28 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link 
             href="/store" 
             prefetch={true}
-            className="hidden md:block text-zinc-400 hover:text-white text-[14px] font-medium transition-colors"
+            className="hidden md:block text-zinc-400 hover:text-white text-[13.5px] font-normal transition-colors"
           >
             Support
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1 text-zinc-400 hover:text-white text-[14px] font-medium cursor-pointer transition-colors">
+          <div className="hidden lg:flex items-center gap-1 text-zinc-400 hover:text-white text-[13.5px] font-normal cursor-pointer transition-colors">
             <span>Distribute</span>
             <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
           </div>
         </div>
 
-        {/* Right Section Desktop (Exact PC Screenshot Match) */}
-        <div className="hidden md:flex items-center gap-5">
+        {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}
+        <div className="hidden md:flex items-center gap-6">
 
-          {/* Globe Currency Toggle */}
+          {/* Globe Language / Currency Toggle */}
           <button
             type="button"
             onClick={onToggleCurrency}
-            className="p-1.5 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
-            title="Toggle Currency"
+            className="p-1.5 text-zinc-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+            title={`Switch currency (Current: ${currency})`}
           >
-            <Globe className="w-4 h-4 text-zinc-300" />
-            <span className="text-zinc-300 font-medium">{currency}</span>
+            <Globe className="w-[19px] h-[19px]" />
           </button>
 
           {/* Account Popover Trigger or Sign In Button */}
@@ -119,17 +118,17 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                className="flex items-center gap-2.5 py-1 px-2 hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 py-1 px-1.5 hover:bg-[#1c1c1c] rounded-lg transition-colors cursor-pointer"
               >
-                <div className="w-6 h-6 rounded-full bg-[#242424] text-white text-[11px] font-bold flex items-center justify-center border border-[#333333] shadow-sm flex-shrink-0">
+                <div className="w-7 h-7 rounded-full bg-[#2a2a2a] text-white text-[11.5px] font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm flex-shrink-0">
                   {initialLetter}
                 </div>
-                <span className="text-[13.5px] font-semibold text-zinc-200 hover:text-white truncate max-w-[140px]">
+                <span className="text-[13px] font-normal text-zinc-300 hover:text-white truncate max-w-[140px]">
                   {displayName}
                 </span>
               </button>
 
-              {/* Desktop Account Popover (Solid Minimalist Dark, No Glassmorphism) */}
+              {/* Desktop Account Popover (Solid Minimalist Dark) */}
               {isAccountMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#181818] border border-[#262626] rounded-[16px] shadow-2xl p-3 z-[100] animate-in fade-in zoom-in-95 duration-100">
                   <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest px-3 pt-1 block mb-1">
@@ -147,124 +146,123 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <span>My Achievements</span>
                     </Link>
 
-                  <Link
-                    href="/store"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <Sparkles className="w-4 h-4 text-zinc-400" />
-                    <span>Producer Rewards</span>
-                  </Link>
+                    <Link
+                      href="/store"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4 text-zinc-400" />
+                      <span>Producer Rewards</span>
+                    </Link>
 
-                  <Link
-                    href="/library"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <CreditCard className="w-4 h-4 text-zinc-400" />
-                    <span>Account Balance</span>
-                  </Link>
+                    <Link
+                      href="/library"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <CreditCard className="w-4 h-4 text-zinc-400" />
+                      <span>Account Balance</span>
+                    </Link>
 
-                  <Link
-                    href="/store"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <Gift className="w-4 h-4 text-zinc-400" />
-                    <span>Gifts</span>
-                  </Link>
+                    <Link
+                      href="/store"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <Gift className="w-4 h-4 text-zinc-400" />
+                      <span>Gifts</span>
+                    </Link>
 
-                  <Link
-                    href="/store"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <Tag className="w-4 h-4 text-zinc-400" />
-                    <span>Coupons</span>
-                  </Link>
+                    <Link
+                      href="/store?on_sale=true"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <Tag className="w-4 h-4 text-zinc-400" />
+                      <span>Coupons</span>
+                    </Link>
 
-                  <Link
-                    href="/account"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <User className="w-4 h-4 text-zinc-400" />
-                    <span>Account</span>
-                  </Link>
+                    <Link
+                      href="/library"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <Key className="w-4 h-4 text-zinc-400" />
+                      <span>Redeem Code</span>
+                    </Link>
 
-                  <Link
-                    href="/library"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <Key className="w-4 h-4 text-zinc-400" />
-                    <span>Redeem Code</span>
-                  </Link>
+                    <Link
+                      href="/library"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <Bookmark className="w-4 h-4 text-zinc-400" />
+                      <span>Wishlist</span>
+                    </Link>
 
-                  <Link
-                    href="/library"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <Bookmark className="w-4 h-4 text-zinc-400" />
-                    <span>Wishlist</span>
-                  </Link>
-                </div>
-
-                <div className="my-1.5 border-t border-[#242424]" />
-
-                <div className="flex flex-col space-y-0.5">
-                  <Link
-                    href="/store"
-                    prefetch={true}
-                    onClick={() => setIsAccountMenuOpen(false)}
-                    className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
+                    <Link
+                      href="/contact"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
                       <HelpCircle className="w-4 h-4 text-zinc-400" />
                       <span>Support</span>
-                    </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
-                  </Link>
+                    </Link>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAccountMenuOpen(false)
-                      if (onSignOut) onSignOut()
-                    }}
-                    className="flex items-center gap-3 px-3 py-2 text-[13px] text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 rounded-lg transition-colors w-full text-left cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </button>
+                  {/* Account Settings / Sign Out */}
+                  <div className="pt-2 mt-2 border-t border-[#262626] flex flex-col space-y-0.5">
+                    <Link
+                      href="/account"
+                      prefetch={true}
+                      onClick={() => setIsAccountMenuOpen(false)}
+                      className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <User className="w-4 h-4 text-zinc-400" />
+                        <span>Account</span>
+                      </div>
+                      <ExternalLink className="w-3.5 h-3.5 text-zinc-500" />
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsAccountMenuOpen(false)
+                        if (onSignOut) onSignOut()
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 rounded-lg transition-colors w-full text-left cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <Link
-            href="/auth"
-            prefetch={true}
-            className="flex items-center gap-2 py-1.5 px-3 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
-          >
-            <User className="w-4 h-4 text-zinc-400" />
-            <span>Sign In</span>
-          </Link>
-        )}
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/auth"
+              prefetch={true}
+              className="flex items-center gap-2 py-1.5 px-3 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
+            >
+              <User className="w-4 h-4 text-zinc-400" />
+              <span>Sign In</span>
+            </Link>
+          )}
 
-          {/* Download Button (Exact 1:1 Epic Games Style) */}
+          {/* Download Button (Exact 1:1 Epic Games Cyan Blue Style) */}
           <Link
             href="/store"
             prefetch={true}
-            className="bg-[#0074e4] hover:bg-[#0060c0] text-white font-bold text-[12px] px-4 py-2 rounded-md active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
+            className="bg-[#0074e4] hover:bg-[#0060c0] text-white font-bold text-[12px] px-4 py-2 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-normal"
           >
             Download
           </Link>
@@ -276,7 +274,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link
             href="/store"
             prefetch={true}
-            className="bg-[#0074e4] hover:bg-[#0060c0] text-white font-bold text-[11px] px-3.5 py-1.5 rounded-md active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-wider"
+            className="bg-[#0074e4] hover:bg-[#0060c0] text-white font-bold text-[11px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
           >
             Download
           </Link>

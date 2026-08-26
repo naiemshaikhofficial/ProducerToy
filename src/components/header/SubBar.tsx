@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Search, ChevronDown, X, Check, ShoppingCart } from 'lucide-react'
+import { Search, ChevronDown, X, ShoppingCart } from 'lucide-react'
 
 interface SubBarProps {
   searchQuery: string
@@ -148,13 +148,11 @@ export const SubBar: React.FC<SubBarProps> = ({
               {/* Exact Epic Games Store Mobile Dropdown Menu (Centered in the middle) */}
               {isDiscoverMenuOpen && (
                 <>
-                  {/* Dark Solid Backdrop (No Blur) */}
                   <div 
                     className="fixed inset-0 top-0 bg-black/75 z-40"
                     onClick={() => setIsDiscoverMenuOpen(false)}
                   />
 
-                  {/* Dropdown Container (Dead Center in the Middle) */}
                   <div className="absolute left-1/2 -translate-x-1/2 top-full w-[90vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020]">
                     <div className="flex flex-col">
                       {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
@@ -193,15 +191,15 @@ export const SubBar: React.FC<SubBarProps> = ({
 
 
       {/* ========================================================================= */}
-      {/* 2. DESKTOP SUBBAR (>= 768px): Exact PC Screenshot Match                    */}
+      {/* 2. DESKTOP SUBBAR (>= 768px): Exact 1:1 PC Screenshot Match                */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-14 h-[68px] items-center justify-between">
+      <div className="hidden md:flex w-full max-w-[1600px] mx-auto px-6 sm:px-8 md:px-10 lg:px-12 h-[76px] items-center justify-between">
         
-        {/* Left Side: Search Bar + Discover / Browse / News Links */}
-        <div className="flex items-center gap-7 lg:gap-9">
+        {/* Left Side: Search Capsule + Discover / Browse / News Tabs */}
+        <div className="flex items-center">
           
-          {/* Epic Search Pill (Clean & Prominent) */}
-          <div className="relative w-60 lg:w-[250px] flex-shrink-0">
+          {/* Epic Search Pill (Exact 1:1 Size & Radius) */}
+          <div className="relative w-[230px] lg:w-[250px] flex-shrink-0">
             <form onSubmit={onSearchSubmit} className="relative w-full">
               <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -209,7 +207,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store"
-                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#282828] text-white text-[13.5px] pl-11 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-400 transition-all font-sans"
+                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#2a2a2a] text-white text-[13px] pl-10 pr-8 h-[42px] rounded-full border border-transparent focus:outline-none focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-400 transition-all font-sans"
               />
               {searchQuery && (
                 <button
@@ -224,8 +222,8 @@ export const SubBar: React.FC<SubBarProps> = ({
             </form>
           </div>
 
-          {/* Desktop Sub Navigation Links */}
-          <nav className="flex items-center gap-6 lg:gap-7 text-[14px]">
+          {/* Desktop Sub Navigation Links (Discover, Browse, News) */}
+          <nav className="flex items-center gap-7 lg:gap-8 ml-8 text-[14px]">
             {NAV_LINKS.map((link, idx) => {
               const isActive = idx === 0 && pathname === '/store' || (idx > 0 && pathname === link.href)
               return (
@@ -236,7 +234,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                   className={`transition-colors py-2 ${
                     isActive 
                       ? 'text-white font-bold' 
-                      : 'text-zinc-400 font-medium hover:text-white'
+                      : 'text-zinc-400 font-normal hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -246,12 +244,12 @@ export const SubBar: React.FC<SubBarProps> = ({
           </nav>
         </div>
 
-        {/* Right Side: Wishlist, Gifts, Cart (Exact PC Screenshot Match) */}
-        <div className="flex items-center gap-6 text-[14px]">
+        {/* Right Side: Wishlist, Gifts, Cart (Exact 1:1 Match) */}
+        <div className="flex items-center gap-7 text-[14px]">
           <Link
             href="/library"
             prefetch={true}
-            className="text-zinc-400 hover:text-white font-medium transition-colors"
+            className="text-zinc-400 hover:text-white font-normal transition-colors"
           >
             Wishlist
           </Link>
@@ -259,7 +257,7 @@ export const SubBar: React.FC<SubBarProps> = ({
           <Link
             href="/store?on_sale=true"
             prefetch={true}
-            className="text-zinc-400 hover:text-white font-medium transition-colors"
+            className="text-zinc-400 hover:text-white font-normal transition-colors"
           >
             Gifts
           </Link>
@@ -268,12 +266,12 @@ export const SubBar: React.FC<SubBarProps> = ({
             <button
               type="button"
               onClick={onOpenCart}
-              className="flex items-center gap-2 text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer py-1.5 px-2.5 hover:bg-[#1a1a1a] rounded-lg group"
+              className="flex items-center gap-2 text-zinc-400 hover:text-white font-normal transition-colors cursor-pointer py-1.5 px-2 rounded-lg group"
             >
               <ShoppingCart className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
               <span>Cart</span>
               {itemCount > 0 && (
-                <span className="bg-white text-black text-[10.5px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="bg-white text-black text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                   {itemCount}
                 </span>
               )}
