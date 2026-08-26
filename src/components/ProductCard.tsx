@@ -174,14 +174,14 @@ export function ProductCard({ product }: { product: Product }) {
         <button 
           type="button"
           onClick={handleWishlistToggle}
-          className={`absolute top-3 right-3 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
+          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
             isSaved
               ? 'bg-white text-black opacity-100 scale-105'
-              : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80 opacity-0 group-hover:opacity-100'
+              : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80 opacity-100 sm:opacity-0 group-hover:opacity-100'
           }`}
           title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
         >
-          <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-current' : ''}`} />
         </button>
 
         {/* Audio Audition Play Button Overlay */}
@@ -189,13 +189,13 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             type="button"
             onClick={handlePlayToggle}
-            className="absolute bottom-3 right-3 bg-black/80 hover:bg-white hover:text-black text-white p-2.5 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all z-20 shadow-xl transform hover:scale-110 border border-white/10"
+            className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 bg-black/80 hover:bg-white hover:text-black text-white p-2 sm:p-2.5 rounded-full backdrop-blur-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all z-20 shadow-xl transform active:scale-95 border border-white/10"
             aria-label="Audition audio"
           >
             {isCurrentPlaying ? (
-              <Pause className="w-4 h-4 fill-current" />
+              <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
             ) : (
-              <Play className="w-4 h-4 fill-current translate-x-0.5" />
+              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current translate-x-0.5" />
             )}
           </button>
         )}

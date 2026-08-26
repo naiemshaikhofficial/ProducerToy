@@ -29,7 +29,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 top-[100px] z-40 bg-[#101014] flex flex-col md:hidden animate-in slide-in-from-right-full duration-200 overflow-y-auto">
+    <div className="fixed inset-0 top-[60px] sm:top-[72px] z-50 bg-[#101014] flex flex-col md:hidden animate-in slide-in-from-right-full duration-200 overflow-y-auto">
       <div className="p-6 flex flex-col gap-6 flex-1">
         
         {/* Accordion Categories */}

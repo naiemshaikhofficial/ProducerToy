@@ -29,19 +29,19 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   return (
     <div className="w-full bg-[#121212]">
-      <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 lg:px-16 h-[72px] flex items-center justify-between">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16 h-[60px] sm:h-[72px] flex items-center justify-between">
         
-        {/* Left Section: Epic Style Logo + Store Name + Support/Distribute */}
-        <div className="flex items-center gap-4 sm:gap-8">
+        {/* Left Section: Epic Style Logo + Store Name */}
+        <div className="flex items-center gap-3 sm:gap-8">
           <Link href="/" prefetch={true} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <LogoIcon size={38} />
+            <LogoIcon size={34} />
             <ChevronDown className="w-4 h-4 text-zinc-400 hidden sm:block" />
           </Link>
 
           <Link 
             href="/store" 
             prefetch={true}
-            className="text-white font-black text-base sm:text-lg tracking-widest uppercase font-sans hover:text-zinc-200 transition-colors"
+            className="text-white font-black text-sm sm:text-lg tracking-widest uppercase font-sans hover:text-zinc-200 transition-colors"
           >
             STORE
           </Link>
@@ -49,7 +49,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link 
             href="/library" 
             prefetch={true}
-            className="text-zinc-300 hover:text-white text-sm font-semibold transition-colors uppercase tracking-wider"
+            className="hidden sm:block text-zinc-300 hover:text-white text-sm font-semibold transition-colors uppercase tracking-wider"
           >
             LIBRARY
           </Link>
