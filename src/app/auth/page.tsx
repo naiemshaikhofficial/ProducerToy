@@ -69,6 +69,26 @@ function AuthForm() {
   const [message, setMessage] = useState('')
   const [accountAlreadyExists, setAccountAlreadyExists] = useState(false)
 
+  // Catch URL error params from Supabase redirects
+  useEffect(() => {
+    const errorDesc = searchParams.get('error_description')
+    const errorCode = searchParams.get('error_code')
+    const genericError = searchParams.get('error')
+
+    if (errorDesc || errorCode || genericError) {
+      const raw = errorDesc || genericError || ''
+      if (
+        errorCode === 'over_email_send_rate_limit' ||
+        raw.toLowerCase().includes('rate_limit') ||
+        raw.toLowerCase().includes('security purposes')
+      ) {
+        setError('For security purposes, please wait 60 seconds before requesting another confirmation email.')
+      } else {
+        setError(raw || 'Authentication request failed. Please try again.')
+      }
+    }
+  }, [searchParams])
+
   // Calculate Password Strength (0 to 4)
   const getPasswordStrength = (pass: string) => {
     if (!pass) return 0
