@@ -61,16 +61,18 @@ export function CustomPhoneInput({
   const containerRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Sync state if external value changes significantly
+  // Sync state if external value changes (mount, async load, or updates)
   useEffect(() => {
     if (!value) {
       setRawNumber('')
       return
     }
     const matched = COUNTRY_PHONE_DATA.find((c) => value.startsWith(c.dialCode))
-    if (matched && matched.code !== selectedCountry.code) {
+    if (matched) {
       setSelectedCountry(matched)
       setRawNumber(value.slice(matched.dialCode.length).trim())
+    } else {
+      setRawNumber(value.replace(/^\+\d+\s*/, '').trim())
     }
   }, [value])
 

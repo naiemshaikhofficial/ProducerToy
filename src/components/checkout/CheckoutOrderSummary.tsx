@@ -277,11 +277,12 @@ export function CheckoutOrderSummary({
         </p>
 
         {/* Accepted Payment Methods Vector Logos */}
-        {!isFree && (
-          <div className="pt-3 border-t border-[#222222]/80 mt-3">
-            <PaymentAccepted isIndia={isIndia} />
-          </div>
-        )}
+        <div className="pt-3 border-t border-[#222222]/80 mt-3 space-y-2">
+          <p className="text-[9px] text-zinc-500 font-semibold uppercase tracking-wider text-center select-none">
+            We Accept Domestic &amp; Global Payments
+          </p>
+          <PaymentAccepted isIndia={isIndia} />
+        </div>
       </div>
     </div>
   )

@@ -96,12 +96,23 @@ export default function CheckoutPage() {
     }
 
     const loadData = async () => {
+      let loadedFullName = ''
+      let loadedEmail = ''
+      let loadedPhone = ''
+      let loadedAddress = ''
+      let loadedAddress2 = ''
+      let loadedCity = ''
+      let loadedState = ''
+      let loadedZip = ''
+      let loadedCountry = ''
+
       // Step A: Fetch Supabase authenticated user
       const {
         data: { user: currentUser },
       } = await supabase.auth.getUser()
 
       if (currentUser) {
+        loadedEmail = currentUser.email || ''
         // Fetch saved profile from unified profiles table
         try {
           const { data: profile } = await supabase
@@ -112,74 +123,73 @@ export default function CheckoutPage() {
 
           if (profile) {
             const nameParts = [profile.first_name, profile.last_name].filter(Boolean).join(' ')
-            const fullName = profile.full_name || nameParts || profile.display_name || ''
+            loadedFullName = profile.full_name || nameParts || profile.display_name || ''
+            loadedEmail = profile.email || currentUser.email || ''
+            loadedPhone = profile.phone_number || profile.phone || ''
+            loadedAddress = profile.address_line1 || profile.address || ''
+            loadedAddress2 = profile.address_line2 || profile.address2 || ''
+            loadedCity = profile.city || ''
+            loadedState = profile.state || profile.region || ''
+            loadedZip = profile.postal_code || profile.zip || ''
+            loadedCountry = profile.country || ''
 
-            const dbDetails: BillingDetails = {
-              fullName: fullName || '',
-              email: profile.email || currentUser.email || '',
-              phone: ensureE164(profile.phone_number || profile.phone || ''),
-              address: profile.address_line1 || profile.address || '',
-              address2: profile.address_line2 || profile.address2 || '',
-              city: profile.city || '',
-              state: profile.state || profile.region || '',
-              zip: profile.postal_code || profile.zip || '',
-              country: profile.country || '',
-            }
-            setBillingDetails(dbDetails)
-            if (profile.country?.toUpperCase() === 'INDIA') setCurrency('INR')
-            else if (profile.country) setCurrency('USD')
-
-            localStorage.setItem('pt_billing_details', JSON.stringify(dbDetails))
             if (profile.newsletter !== undefined && profile.newsletter !== null) {
               setNewsletterOptIn(Boolean(profile.newsletter))
             }
-            return
           }
         } catch (dbErr) {
           console.warn('profiles fetch note:', dbErr)
         }
+
+        // Fallback from Auth user metadata
+        const meta = currentUser.user_metadata || {}
+        const clean = (val: any) => (val === '0' || val === 0 ? '' : val || '')
+        if (!loadedFullName) loadedFullName = clean(meta.full_name) || clean(meta.name) || clean(meta.display_name)
+        if (!loadedPhone) loadedPhone = clean(meta.phone) || clean(meta.phone_number)
+        if (!loadedAddress) loadedAddress = clean(meta.address) || clean(meta.address_line1)
+        if (!loadedAddress2) loadedAddress2 = clean(meta.address2) || clean(meta.address_line2)
+        if (!loadedCity) loadedCity = clean(meta.city)
+        if (!loadedState) loadedState = clean(meta.state) || clean(meta.region)
+        if (!loadedZip) loadedZip = clean(meta.zip) || clean(meta.postal_code)
+        if (!loadedCountry) loadedCountry = clean(meta.country)
       }
 
-      // Step B: Load from localStorage if available
+      // Step B: Fallback from localStorage
       try {
         const saved = localStorage.getItem('pt_billing_details')
         if (saved) {
           const parsed = JSON.parse(saved)
-          setBillingDetails((prev) => ({
-            ...prev,
-            ...parsed,
-            phone: ensureE164(parsed.phone),
-            country: parsed.country || '',
-          }))
-          if (parsed.country === 'India') setCurrency('INR')
-          else if (parsed.country) setCurrency('USD')
-          return
+          if (!loadedFullName) loadedFullName = parsed.fullName || ''
+          if (!loadedEmail && parsed.email) loadedEmail = parsed.email || ''
+          if (!loadedPhone) loadedPhone = parsed.phone || ''
+          if (!loadedAddress) loadedAddress = parsed.address || ''
+          if (!loadedAddress2) loadedAddress2 = parsed.address2 || ''
+          if (!loadedCity) loadedCity = parsed.city || ''
+          if (!loadedState) loadedState = parsed.state || ''
+          if (!loadedZip) loadedZip = parsed.zip || ''
+          if (!loadedCountry) loadedCountry = parsed.country || ''
         }
       } catch (e) {
         console.warn('Could not read saved billing details:', e)
       }
 
-      // Step C: Fallback to Auth user metadata
-      if (currentUser) {
-        const meta = currentUser.user_metadata || {}
-        const clean = (val: any) => (val === '0' || val === 0 ? '' : val || '')
-
-        const metaCountry = clean(meta.country)
-        const metaName = clean(meta.full_name) || clean(meta.name) || clean(meta.display_name)
-        setBillingDetails((prev) => ({
-          fullName: prev.fullName || metaName || '',
-          email: prev.email || currentUser.email || '',
-          phone: prev.phone || ensureE164(clean(meta.phone) || clean(meta.phone_number)),
-          address: prev.address || clean(meta.address) || clean(meta.address_line1),
-          address2: prev.address2 || clean(meta.address2) || clean(meta.address_line2),
-          city: prev.city || clean(meta.city),
-          state: prev.state || clean(meta.state) || clean(meta.region),
-          zip: prev.zip || clean(meta.zip) || clean(meta.postal_code),
-          country: prev.country || metaCountry || '',
-        }))
-        if (metaCountry === 'India') setCurrency('INR')
-        else if (metaCountry) setCurrency('USD')
+      const finalDetails: BillingDetails = {
+        fullName: loadedFullName,
+        email: loadedEmail,
+        phone: ensureE164(loadedPhone),
+        address: loadedAddress,
+        address2: loadedAddress2,
+        city: loadedCity,
+        state: loadedState,
+        zip: loadedZip,
+        country: loadedCountry,
       }
+
+      setBillingDetails(finalDetails)
+      if (finalDetails.country?.toUpperCase() === 'INDIA') setCurrency('INR')
+      else if (finalDetails.country) setCurrency('USD')
+
+      localStorage.setItem('pt_billing_details', JSON.stringify(finalDetails))
     }
 
     loadData()
