@@ -76,11 +76,13 @@ const MUSIC_PROVIDERS: MusicProvider[] = [
     category: 'Streaming & Artist Profile',
     description: 'Connect Spotify for Artists to showcase your discography and stream preview tracks.',
     scopes: ['user-read-private', 'user-read-email', 'playlist-read-private', 'artist-discography-sync'],
-    iconBg: 'bg-[#1DB954] text-black',
+    iconBg: 'bg-[#181818] border border-[#2e2e2e]',
     icon: (
-      <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.485 17.306c-.215.353-.674.464-1.026.249-2.81-1.718-6.348-2.107-10.514-1.155-.403.092-.807-.156-.899-.558-.093-.402.155-.807.558-.899 4.562-1.041 8.483-.598 11.632 1.337.353.215.464.674.249 1.026zm1.464-3.256c-.27.441-.849.58-1.29.31-3.217-1.977-8.121-2.55-11.926-1.395-.497.151-1.03-.134-1.181-.631-.151-.498.134-1.03.631-1.181 4.354-1.321 9.771-.682 13.456 1.583.441.27.58.849.31 1.29zm.126-3.39c-3.858-2.29-10.222-2.502-13.899-1.386-.59.179-1.222-.162-1.401-.752-.179-.59.162-1.222.752-1.401 4.237-1.286 11.266-1.035 15.698 1.597.532.316.705 1.004.389 1.536-.316.531-1.004.704-1.539.388z" />
-      </svg>
+      <img
+        src="/Logo/icons8-spotify-100.png"
+        alt="Spotify"
+        className="w-7 h-7 object-contain"
+      />
     ),
   },
   {
@@ -247,11 +249,30 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
     }
   }
 
-  // Open the OAuth Connection Modal for other providers
+  // Open the OAuth Connection Modal or initiate provider OAuth
   const handleConnectClick = async (provider: MusicProvider) => {
     if (provider.id === 'google') {
       setGoogleLinkModalOpen(true)
       return
+    }
+
+    if (provider.id === 'spotify') {
+      try {
+        const supabase = getSupabaseBrowserClient()
+        const callbackUrl = `${window.location.origin}/auth/callback?next=/account`
+        if (supabase.auth.linkIdentity && activeUser) {
+          const { error } = await supabase.auth.linkIdentity({
+            provider: 'spotify',
+            options: {
+              redirectTo: callbackUrl,
+              scopes: 'user-read-email playlist-read-private',
+            },
+          })
+          if (!error) return
+        }
+      } catch (spotifyErr) {
+        console.warn('Spotify linkIdentity fallback:', spotifyErr)
+      }
     }
 
     const defaultHandle =

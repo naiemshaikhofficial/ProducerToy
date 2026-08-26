@@ -31,6 +31,19 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
   )
 }
 
+// Spotify Icon
+function SpotifyIcon({ size = 20 }: { size?: number }) {
+  return (
+    <img
+      src="/Logo/icons8-spotify-100.png"
+      alt="Spotify"
+      width={size}
+      height={size}
+      className="flex-shrink-0 object-contain"
+    />
+  )
+}
+
 function AuthForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -84,6 +97,26 @@ function AuthForm() {
       if (error) throw error
     } catch (err: any) {
       setError(err.message || 'Google authentication failed.')
+      setLoading(false)
+    }
+  }
+
+  // Handle Spotify OAuth Login
+  const handleSpotifyLogin = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'spotify',
+        options: {
+          redirectTo: callbackUrl,
+          scopes: 'user-read-email playlist-read-private',
+        },
+      })
+      if (error) throw error
+    } catch (err: any) {
+      setError(err.message || 'Spotify authentication failed.')
       setLoading(false)
     }
   }
@@ -309,16 +342,30 @@ function AuthForm() {
             {step === 'email' && (
               <div className="space-y-5">
 
-                {/* Google Login */}
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  disabled={loading}
-                  className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
-                >
-                  <GoogleIcon size={18} />
-                  <span>{mode === 'signup' ? 'Continue with Google' : 'Sign in with Google'}</span>
-                </button>
+                {/* OAuth Login Buttons */}
+                <div className="space-y-2.5">
+                  {/* Google Login */}
+                  <button
+                    type="button"
+                    onClick={handleGoogleLogin}
+                    disabled={loading}
+                    className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
+                  >
+                    <GoogleIcon size={18} />
+                    <span>{mode === 'signup' ? 'Continue with Google' : 'Sign in with Google'}</span>
+                  </button>
+
+                  {/* Spotify Login */}
+                  <button
+                    type="button"
+                    onClick={handleSpotifyLogin}
+                    disabled={loading}
+                    className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
+                  >
+                    <SpotifyIcon size={18} />
+                    <span>{mode === 'signup' ? 'Continue with Spotify' : 'Sign in with Spotify'}</span>
+                  </button>
+                </div>
 
                 {/* Divider */}
                 <div className="relative flex items-center justify-center my-4">

@@ -13,44 +13,68 @@ export async function GET(request: Request) {
     if (!error && data?.user) {
       const user = data.user
 
-      // If Google identity is linked, persist into profiles.linked_accounts
-      const googleIdentity = user.identities?.find((id) => id.provider === 'google')
-      if (googleIdentity) {
-        const googleEmail = googleIdentity.identity_data?.email || user.email || ''
-        const googleName =
-          googleIdentity.identity_data?.full_name ||
-          googleIdentity.identity_data?.name ||
-          user.user_metadata?.full_name ||
-          user.user_metadata?.name ||
-          (googleEmail ? googleEmail.split('@')[0] : 'Google Account')
+      try {
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle()
 
-        try {
-          const { data: prof } = await supabase
-            .from('profiles')
-            .select('linked_accounts')
-            .eq('id', user.id)
-            .maybeSingle()
+        const currentLinked = prof?.linked_accounts || {}
+        let updatedLinked = { ...currentLinked }
+        let needsUpdate = false
 
-          const currentLinked = prof?.linked_accounts || {}
-          if (!currentLinked.google) {
-            await supabase
-              .from('profiles')
-              .update({
-                linked_accounts: {
-                  ...currentLinked,
-                  google: {
-                    handle: googleName,
-                    email: googleEmail,
-                    connected_at: new Date().toISOString(),
-                    is_permanent: true,
-                  },
-                },
-              })
-              .eq('id', user.id)
+        // Sync Google identity
+        const googleIdentity = user.identities?.find((id) => id.provider === 'google')
+        if (googleIdentity && !currentLinked.google) {
+          const googleEmail = googleIdentity.identity_data?.email || user.email || ''
+          const googleName =
+            googleIdentity.identity_data?.full_name ||
+            googleIdentity.identity_data?.name ||
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            (googleEmail ? googleEmail.split('@')[0] : 'Google Account')
+
+          updatedLinked.google = {
+            handle: googleName,
+            email: googleEmail,
+            connected_at: new Date().toISOString(),
+            is_permanent: true,
           }
-        } catch (syncErr) {
-          console.warn('Google identity profile sync note:', syncErr)
+          needsUpdate = true
         }
+
+        // Sync Spotify identity
+        const spotifyIdentity = user.identities?.find((id) => id.provider === 'spotify')
+        if (spotifyIdentity && !currentLinked.spotify) {
+          const spotifyEmail = spotifyIdentity.identity_data?.email || user.email || ''
+          const spotifyName =
+            spotifyIdentity.identity_data?.full_name ||
+            spotifyIdentity.identity_data?.name ||
+            spotifyIdentity.identity_data?.user_name ||
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            'Spotify Artist'
+
+          updatedLinked.spotify = {
+            handle: spotifyName,
+            email: spotifyEmail,
+            connected_at: new Date().toISOString(),
+          }
+          needsUpdate = true
+        }
+
+        if (needsUpdate) {
+          await supabase
+            .from('profiles')
+            .update({
+              linked_accounts: updatedLinked,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id)
+        }
+      } catch (syncErr) {
+        console.warn('OAuth callback profile sync note:', syncErr)
       }
 
       return NextResponse.redirect(`${requestUrl.origin}${next}`)
