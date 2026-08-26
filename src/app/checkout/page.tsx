@@ -598,7 +598,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Page Title */}
-        <div className="space-y-0.5 border-b border-[#202020] pb-4">
+        <div className="space-y-0.5 pb-2">
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
             Checkout
           </h1>

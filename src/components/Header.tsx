@@ -99,7 +99,7 @@ export const Header: React.FC = () => {
   return (
     <>
       {/* Tier 1 Top Header Bar (Sticky on non-shop pages like /account, /library, /checkout, etc.) */}
-      <div className={`${isShopPage ? 'relative' : 'sticky top-0'} z-[60] w-full bg-[#121212] select-none ${!isShopPage ? 'border-b border-[#202020]' : ''}`}>
+      <div className={`${isShopPage ? 'relative' : 'sticky top-0'} z-[60] w-full bg-[#121212] select-none border-none`}>
         <TopBar
           currency={currency}
           onToggleCurrency={toggleCurrency}

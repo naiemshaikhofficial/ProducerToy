@@ -261,11 +261,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           </Link>
         )}
 
-          {/* Download Button */}
+          {/* Download Button (Epic Games Monochrome Theme) */}
           <Link
             href="/store"
             prefetch={true}
-            className="bg-[#0074e4] hover:bg-[#006bd6] text-white font-bold text-xs px-4 py-2 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer"
+            className="bg-white hover:bg-zinc-200 text-black font-bold text-xs px-4 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
           >
             Download
           </Link>
@@ -277,7 +277,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link
             href="/store"
             prefetch={true}
-            className="bg-[#0074e4] hover:bg-[#006bd6] text-white font-bold text-[13px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center"
+            className="bg-white hover:bg-zinc-200 text-black font-bold text-xs px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-wider"
           >
             Download
           </Link>
