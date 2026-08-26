@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Tag, CheckCircle2, ShieldCheck } from 'lucide-react'
+import { Tag, CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react'
 import { PayPalPaymentButton } from './PayPalPaymentButton'
 import { BillingDetails } from './types'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
@@ -181,12 +181,16 @@ export function CheckoutOrderSummary({
         </div>
 
         {couponError && (
-          <p className="text-[10px] text-red-400">{couponError}</p>
+          <div className="bg-[#ff4053] text-black font-extrabold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1.5 shadow-sm">
+            <AlertCircle size={13} className="text-black flex-shrink-0" />
+            <span>{couponError}</span>
+          </div>
         )}
         {couponSuccessMsg && (
-          <p className="text-[10px] text-zinc-300 flex items-center gap-1">
-            <CheckCircle2 size={11} className="text-white" /> {couponSuccessMsg}
-          </p>
+          <div className="bg-[#00df81] text-black font-extrabold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1.5 shadow-sm">
+            <CheckCircle2 size={13} className="text-black flex-shrink-0" />
+            <span>{couponSuccessMsg}</span>
+          </div>
         )}
       </div>
 

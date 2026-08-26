@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ShieldCheck, CheckCircle2 } from 'lucide-react'
+import { ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
@@ -103,15 +103,20 @@ export const SecurityTab: React.FC = () => {
           </div>
 
           {passwordMsg && (
-            <p
-              className={`text-xs font-semibold ${
+            <div
+              className={`p-3.5 rounded-2xl text-xs font-extrabold flex items-center gap-2 shadow-md ${
                 passwordMsg.includes('must') || passwordMsg.includes('match') || passwordMsg.includes('Failed')
-                  ? 'text-[#ff4053]'
-                  : 'text-green-400'
+                  ? 'bg-[#ff4053] text-black'
+                  : 'bg-[#00df81] text-black'
               }`}
             >
-              {passwordMsg}
-            </p>
+              {passwordMsg.includes('must') || passwordMsg.includes('match') || passwordMsg.includes('Failed') ? (
+                <AlertCircle className="w-4 h-4 flex-shrink-0 text-black" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-black" />
+              )}
+              <span>{passwordMsg}</span>
+            </div>
           )}
 
           <button

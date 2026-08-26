@@ -335,12 +335,12 @@ function AuthForm() {
               )}
             </div>
 
-            {/* Epic Games Dark Theme Error Container (No ugly green/white borders) */}
+            {/* Epic Games Vibrant Coral-Red Error Pill */}
             {error && (
-              <div className="bg-[#241818] border border-[#ff4053]/30 text-[#ff4053] p-3.5 rounded-xl text-xs text-center space-y-2 animate-in fade-in">
-                <div className="flex items-center justify-center gap-1.5 font-bold">
-                  <AlertCircle className="w-4 h-4 text-[#ff4053]" />
-                  <span>{error}</span>
+              <div className="bg-[#ff4053] text-black font-extrabold p-3.5 rounded-2xl text-xs text-center space-y-2 shadow-lg animate-in fade-in">
+                <div className="flex items-center justify-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-black flex-shrink-0" />
+                  <span className="font-extrabold text-xs leading-snug">{error}</span>
                 </div>
                 {accountAlreadyExists && (
                   <button
@@ -350,7 +350,7 @@ function AuthForm() {
                       setError('')
                       setAccountAlreadyExists(false)
                     }}
-                    className="w-full mt-2 py-2 bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] rounded-lg uppercase tracking-wider transition-all"
+                    className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm"
                   >
                     Switch to Sign In
                   </button>
@@ -359,8 +359,9 @@ function AuthForm() {
             )}
 
             {message && (
-              <div className="bg-[#1e241e] border border-[#203420] text-zinc-200 p-3.5 rounded-xl text-xs text-center animate-in fade-in">
-                {message}
+              <div className="bg-[#00df81] text-black font-extrabold p-3.5 rounded-2xl text-xs text-center shadow-lg animate-in fade-in flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0" />
+                <span>{message}</span>
               </div>
             )}
 

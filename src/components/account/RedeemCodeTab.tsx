@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export const RedeemCodeTab: React.FC = () => {
   const [code, setCode] = useState('')
@@ -97,13 +98,20 @@ export const RedeemCodeTab: React.FC = () => {
         </div>
 
         {message && (
-          <p
-            className={`text-xs font-semibold ${
-              message.isError ? 'text-[#ff4053]' : 'text-green-400'
+          <div
+            className={`px-4 py-3 rounded-2xl text-xs font-extrabold flex items-center gap-2 shadow-md ${
+              message.isError
+                ? 'bg-[#ff4053] text-black'
+                : 'bg-[#00df81] text-black'
             }`}
           >
-            {message.text}
-          </p>
+            {message.isError ? (
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-black" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-black" />
+            )}
+            <span>{message.text}</span>
+          </div>
         )}
 
         <button
