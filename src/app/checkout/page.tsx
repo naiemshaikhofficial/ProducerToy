@@ -10,6 +10,7 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { validateCouponAction } from '@/actions/couponActions'
+import { processCheckoutOrderAction } from '@/actions/checkoutActions'
 import {
   BillingDetails,
   PaymentStatus,
@@ -337,7 +338,7 @@ export default function CheckoutPage() {
     })
   }
 
-  // --- 1. HANDLE FREE CHECKOUT ---
+  // --- 1. HANDLE FREE CHECKOUT (Direct High-Speed Server Action) ---
   const handleFreeCheckout = async () => {
     if (!user) {
       router.push('/auth?next=/checkout')
@@ -357,28 +358,33 @@ export default function CheckoutPage() {
     setPaymentStatus('processing')
 
     try {
-      const verifyRes = await fetch('/api/razorpay/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          isFree: true,
-          items: items.map((i) => ({ id: i.id })),
-          userId: user.id,
-          billingDetails: billingDetails,
+      const res = await processCheckoutOrderAction(
+        items.map((i) => ({
+          id: i.id,
+          name: i.name,
+          slug: i.slug,
+          price_usd: Number(i.price_usd || 0),
+          price_inr: Number(i.price_inr || 0),
+          product_type: i.product_type,
+        })),
+        billingDetails,
+        user.email || billingDetails.email,
+        user.id,
+        {
           couponCode: coupon,
-        }),
-      })
+          currency: currency,
+        }
+      )
 
-      const verifyData = await verifyRes.json()
-      if (verifyData.success) {
+      if (res.success) {
         clearCart()
         setPaymentStatus('success')
       } else {
-        setErrorMsg(verifyData.error || 'Failed to claim free download')
+        setErrorMsg(res.error || 'Failed to claim free download')
         setPaymentStatus('idle')
       }
     } catch (err: any) {
-      setErrorMsg('Network error during free checkout')
+      setErrorMsg('Error during free checkout processing')
       setPaymentStatus('idle')
     } finally {
       setLoading(false)
@@ -415,7 +421,14 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: items.map((i) => ({ id: i.id })),
+          items: items.map((i) => ({
+            id: i.id,
+            name: i.name,
+            slug: i.slug,
+            price_usd: i.price_usd,
+            price_inr: i.price_inr,
+            product_type: i.product_type,
+          })),
           couponCode: coupon,
         }),
       })
@@ -450,7 +463,14 @@ export default function CheckoutPage() {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 ...response,
-                items: items.map((i) => ({ id: i.id })),
+                items: items.map((i) => ({
+                  id: i.id,
+                  name: i.name,
+                  slug: i.slug,
+                  price_usd: i.price_usd,
+                  price_inr: i.price_inr,
+                  product_type: i.product_type,
+                })),
                 userId: user.id,
                 billingDetails: billingDetails,
                 couponCode: coupon,
