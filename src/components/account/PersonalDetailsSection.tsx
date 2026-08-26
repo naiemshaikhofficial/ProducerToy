@@ -7,6 +7,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { CustomInfoTooltip } from './CustomInfoTooltip'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { updatePersonalDetailsAction } from '@/actions/accountActions'
+import { CustomCountrySelect } from '@/components/checkout/CustomCountrySelect'
 
 interface PersonalDetailsSectionProps {
   user: any
@@ -214,23 +215,15 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
           </div>
 
           {isEditingCountry && (
-            <div className="mt-2 p-3 bg-[#181818] border border-[#2c2c2c] rounded-xl flex items-center gap-3">
-              <select
+            <div className="mt-2">
+              <CustomCountrySelect
                 value={country}
-                onChange={(e) => {
-                  setCountry(e.target.value)
+                onChange={(cName) => {
+                  setCountry(cName.toUpperCase())
                   setIsEditingCountry(false)
                 }}
-                className="bg-[#202020] text-white text-sm rounded-lg px-3 py-2 border border-[#333333] focus:outline-none w-full"
-              >
-                <option value="INDIA">INDIA</option>
-                <option value="UNITED STATES">UNITED STATES</option>
-                <option value="UNITED KINGDOM">UNITED KINGDOM</option>
-                <option value="GERMANY">GERMANY</option>
-                <option value="CANADA">CANADA</option>
-                <option value="AUSTRALIA">AUSTRALIA</option>
-                <option value="JAPAN">JAPAN</option>
-              </select>
+                placeholder="Search and select country..."
+              />
             </div>
           )}
         </div>

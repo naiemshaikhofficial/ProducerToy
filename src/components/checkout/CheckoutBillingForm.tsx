@@ -2,18 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { Lock } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { BillingDetails } from './types'
 import { CustomPhoneInput } from './CustomPhoneInput'
-
-const Select = dynamic(() => import('react-select'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-10 bg-[#161616] border border-[#262626] rounded-lg flex items-center px-3 text-zinc-600 text-xs">
-      Loading countries...
-    </div>
-  ),
-})
+import { CustomCountrySelect } from './CustomCountrySelect'
 
 interface CheckoutBillingFormProps {
   billingDetails: BillingDetails
@@ -201,113 +192,17 @@ export function CheckoutBillingForm({
           </div>
         </div>
 
-        {/* Country Dropdown */}
+        {/* Country Dropdown with Search and SVG Flags */}
         <div className="space-y-1 md:col-span-2">
           <label className="text-[11px] font-medium text-zinc-400">
             Country
           </label>
-          {mounted ? (
-            <Select
-              options={countryOptions}
-              value={countryOptions.find((opt) => opt.label === billingDetails.country) || null}
-              onChange={(val: any) => onBillingChange('country', val?.label || '')}
-              placeholder="Select Country"
-              className="react-select-container"
-              classNamePrefix="react-select"
-              styles={{
-                control: (base: any, state: any) => ({
-                  ...base,
-                  backgroundColor: '#161616',
-                  borderColor: formErrors.country ? '#ef4444' : state.isFocused ? '#a1a1aa' : '#262626',
-                  borderRadius: '0.5rem',
-                  minHeight: '2.5rem',
-                  height: '2.5rem',
-                  fontSize: '0.75rem',
-                  boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    borderColor: '#383838',
-                  },
-                }),
-                indicatorSeparator: () => ({
-                  display: 'none',
-                }),
-                dropdownIndicator: (base: any, state: any) => ({
-                  ...base,
-                  color: state.isFocused ? '#ffffff' : '#71717a',
-                  padding: '6px 8px',
-                  '&:hover': {
-                    color: '#ffffff',
-                  },
-                }),
-                menu: (base: any) => ({
-                  ...base,
-                  backgroundColor: '#141414',
-                  border: '1px solid #242424',
-                  borderRadius: '0.75rem',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.85)',
-                  zIndex: 50,
-                  overflow: 'hidden',
-                  padding: '4px 0',
-                }),
-                menuList: (base: any) => ({
-                  ...base,
-                  padding: 0,
-                  maxHeight: '240px',
-                }),
-                option: (base: any, state: any) => ({
-                  ...base,
-                  backgroundColor: state.isSelected
-                    ? '#222222'
-                    : state.isFocused
-                    ? '#1a1a1a'
-                    : 'transparent',
-                  color: state.isSelected ? '#ffffff' : '#d4d4d8',
-                  fontWeight: state.isSelected ? '700' : '500',
-                  fontSize: '0.8125rem',
-                  padding: '12px 16px',
-                  borderBottom: '1px solid #202020',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  '&:last-child': {
-                    borderBottom: 'none',
-                  },
-                  '&:hover': {
-                    backgroundColor: '#1c1c1c',
-                    color: '#ffffff',
-                  },
-                }),
-                singleValue: (base: any) => ({
-                  ...base,
-                  color: '#ffffff',
-                  fontWeight: '500',
-                }),
-                input: (base: any) => ({
-                  ...base,
-                  color: '#ffffff',
-                }),
-                placeholder: (base: any) => ({
-                  ...base,
-                  color: '#71717a',
-                }),
-              }}
-            />
-          ) : (
-            <select
-              value={billingDetails.country || ''}
-              onChange={(e) => onBillingChange('country', e.target.value)}
-              className="w-full h-10 bg-[#161616] border border-[#262626] text-white text-xs px-3 rounded-lg outline-none"
-            >
-              <option value="" className="bg-[#161616] text-zinc-500">
-                Select Country
-              </option>
-              {countryOptions.map((opt) => (
-                <option key={opt.value} value={opt.label} className="bg-[#161616] text-white">
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          )}
+          <CustomCountrySelect
+            value={billingDetails.country || ''}
+            onChange={(countryName) => onBillingChange('country', countryName)}
+            error={Boolean(formErrors.country)}
+            placeholder="Select Country"
+          />
           {formErrors.country && (
             <p className="text-[10px] text-red-400">{formErrors.country}</p>
           )}
