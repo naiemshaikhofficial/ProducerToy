@@ -26,8 +26,8 @@ const NAV_LINKS = [
 const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Discover', href: '/store' },
   { label: 'Browse', href: '/store' },
+  { label: 'News', href: '/store' },
   { label: 'Deals', href: '/store?on_sale=true' },
-  { label: 'Free', href: '/store?free=true' },
   { label: 'Brands', href: '/manufacturers' },
 ]
 
@@ -75,7 +75,7 @@ export const SubBar: React.FC<SubBarProps> = ({
   })()
 
   return (
-    <div className="w-full bg-[#121212] border-b border-[#1c1c1c] md:border-transparent relative z-30">
+    <div className="w-full bg-[#121212] relative z-30">
       
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
@@ -132,28 +132,28 @@ export const SubBar: React.FC<SubBarProps> = ({
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Discover ▾ Selector Dropdown (Exact Epic Games Store Mobile Feature) */}
-            <div className="relative" ref={discoverMenuRef}>
+            {/* Discover ▾ Selector Dropdown */}
+            <div ref={discoverMenuRef}>
               <button
                 type="button"
                 onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1.5 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors py-1.5 px-3 rounded-lg active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors py-1.5 px-2.5 rounded-lg cursor-pointer"
               >
                 <span>{currentSectionLabel}</span>
-                <ChevronDown className={`w-4 h-4 text-white transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
               </button>
 
-              {/* Exact Epic Games Store Mobile Dropdown Menu (Screenshot 2 Match) */}
+              {/* Exact Epic Games Store Mobile Dropdown Menu (Centered in the middle) */}
               {isDiscoverMenuOpen && (
                 <>
-                  {/* Backdrop Overlay */}
+                  {/* Dark Solid Backdrop (No Blur) */}
                   <div 
-                    className="fixed inset-0 top-0 bg-black/60 backdrop-blur-sm z-40"
+                    className="fixed inset-0 top-0 bg-black/75 z-40"
                     onClick={() => setIsDiscoverMenuOpen(false)}
                   />
 
-                  {/* Dropdown Container directly below SubBar */}
-                  <div className="absolute left-0 right-0 top-full bg-[#121212] border-b border-[#242424] shadow-2xl px-6 py-2 z-50 animate-in slide-in-from-top-2 duration-150">
+                  {/* Dropdown Container (Dead Center in the Middle) */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-[90vw] max-w-[400px] bg-[#121214] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150">
                     <div className="flex flex-col">
                       {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                         const isSelected = item.label === currentSectionLabel
@@ -164,15 +164,15 @@ export const SubBar: React.FC<SubBarProps> = ({
                               href={item.href}
                               prefetch={true}
                               onClick={() => setIsDiscoverMenuOpen(false)}
-                              className={`block py-4 text-[16px] transition-colors ${
+                              className={`block py-4 text-[18px] sm:text-[19px] tracking-wide transition-colors ${
                                 isSelected
-                                  ? 'text-white font-semibold'
-                                  : 'text-zinc-400 font-normal hover:text-white'
+                                  ? 'text-white font-bold'
+                                  : 'text-[#909098] font-normal hover:text-white'
                               }`}
                             >
                               {item.label}
                             </Link>
-                            {!isLast && <div className="w-full h-[1px] bg-[#222224]" />}
+                            {!isLast && <div className="w-full h-[1px] bg-[#2a2a2e]" />}
                           </div>
                         )
                       })}
