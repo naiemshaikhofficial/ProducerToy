@@ -249,33 +249,52 @@ export function CheckoutBillingForm({
                   height: '2.5rem',
                   fontSize: '0.75rem',
                   boxShadow: 'none',
+                  cursor: 'pointer',
                   '&:hover': {
                     borderColor: '#52525b',
                   },
                 }),
                 menu: (base: any) => ({
                   ...base,
-                  backgroundColor: '#181818',
-                  border: '1px solid #2e2e2e',
-                  borderRadius: '0.5rem',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+                  backgroundColor: '#141414',
+                  border: '1px solid #242424',
+                  borderRadius: '0.75rem',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.85)',
                   zIndex: 50,
                   overflow: 'hidden',
+                  padding: '4px 0',
+                }),
+                menuList: (base: any) => ({
+                  ...base,
+                  padding: 0,
+                  maxHeight: '240px',
                 }),
                 option: (base: any, state: any) => ({
                   ...base,
                   backgroundColor: state.isSelected
-                    ? '#282828'
+                    ? '#222222'
                     : state.isFocused
-                    ? '#202020'
+                    ? '#1a1a1a'
                     : 'transparent',
-                  color: '#ffffff',
-                  fontSize: '0.75rem',
+                  color: state.isSelected ? '#ffffff' : '#d4d4d8',
+                  fontWeight: state.isSelected ? '700' : '500',
+                  fontSize: '0.8125rem',
+                  padding: '12px 16px',
+                  borderBottom: '1px solid #222222',
                   cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  '&:last-child': {
+                    borderBottom: 'none',
+                  },
+                  '&:hover': {
+                    backgroundColor: '#1c1c1c',
+                    color: '#ffffff',
+                  },
                 }),
                 singleValue: (base: any) => ({
                   ...base,
                   color: '#ffffff',
+                  fontWeight: '500',
                 }),
                 input: (base: any) => ({
                   ...base,
