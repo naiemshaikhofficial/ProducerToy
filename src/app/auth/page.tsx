@@ -69,6 +69,31 @@ function AuthForm() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [accountAlreadyExists, setAccountAlreadyExists] = useState(false)
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false)
+  const [resendingEmail, setResendingEmail] = useState(false)
+
+  // Resend confirmation email
+  const handleResendConfirmation = async () => {
+    if (!email.trim()) return
+    try {
+      setResendingEmail(true)
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`,
+        },
+      })
+      if (error) throw error
+      setMessage('Confirmation link sent! Please check your email inbox.')
+      setError('')
+      setEmailNotConfirmed(false)
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend confirmation email.')
+    } finally {
+      setResendingEmail(false)
+    }
+  }
 
   // Catch URL error params and hash fragment from Supabase redirects
   useEffect(() => {
@@ -88,7 +113,10 @@ function AuthForm() {
         raw.toLowerCase().includes('rate limit') ||
         raw.toLowerCase().includes('security purposes')
       ) {
-        setError('Supabase email confirmation rate limit reached. In Supabase Dashboard -> Auth -> Providers -> Email, please disable "Confirm email" to enable instant login.')
+        setError('Security rate limit reached. Please wait a few seconds before requesting another email.')
+      } else if (raw.toLowerCase().includes('not confirmed') || raw.toLowerCase().includes('email_not_confirmed')) {
+        setEmailNotConfirmed(true)
+        setError('Please confirm your email address before logging in. Check your email for the confirmation link.')
       } else {
         setError(decodeURIComponent(raw.replace(/\+/g, ' ')) || 'Authentication request failed. Please try again.')
       }
@@ -184,9 +212,10 @@ function AuthForm() {
     try {
       if (mode === 'signup') {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`,
             data: {
               display_name: displayName,
             },
@@ -212,11 +241,28 @@ function AuthForm() {
 
         setIsEmailSent(true)
       } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
           password,
         })
-        if (signInError) throw signInError
+        if (signInError) {
+          if (
+            signInError.message.toLowerCase().includes('email not confirmed') ||
+            signInError.message.toLowerCase().includes('not confirmed')
+          ) {
+            setEmailNotConfirmed(true)
+            throw new Error('Email not confirmed. Please verify your email before logging in.')
+          }
+          throw signInError
+        }
+
+        // Strict security safeguard: if email is not confirmed, sign out immediately
+        if (signInData?.user && !signInData.user.email_confirmed_at && !signInData.user.confirmed_at) {
+          await supabase.auth.signOut()
+          setEmailNotConfirmed(true)
+          throw new Error('Please confirm your email address before logging in.')
+        }
+
         router.push(nextUrl)
         router.refresh()
       }
@@ -353,6 +399,20 @@ function AuthForm() {
                     className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm"
                   >
                     Switch to Sign In
+                  </button>
+                )}
+                {emailNotConfirmed && (
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    disabled={resendingEmail}
+                    className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    {resendingEmail ? (
+                      <ButtonSpinner size={14} variant="light" />
+                    ) : (
+                      <span>Resend Confirmation Email</span>
+                    )}
                   </button>
                 )}
               </div>
