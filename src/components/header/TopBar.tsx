@@ -29,19 +29,19 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   return (
     <div className="w-full bg-[#121212]">
-      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16 h-[60px] sm:h-[72px] flex items-center justify-between">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16 h-[52px] sm:h-[70px] flex items-center justify-between">
         
-        {/* Left Section: Epic Style Logo + Store Name */}
-        <div className="flex items-center gap-3 sm:gap-8">
-          <Link href="/" prefetch={true} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-            <LogoIcon size={34} />
-            <ChevronDown className="w-4 h-4 text-zinc-400 hidden sm:block" />
+        {/* Left Section: Logo + Chevron + STORE Name (Exact Epic Games Store Mobile Layout) */}
+        <div className="flex items-center gap-3 sm:gap-6">
+          <Link href="/" prefetch={true} className="flex items-center gap-1 hover:opacity-90 transition-opacity">
+            <LogoIcon size={28} />
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
           </Link>
 
           <Link 
             href="/store" 
             prefetch={true}
-            className="text-white font-black text-sm sm:text-lg tracking-widest uppercase font-sans hover:text-zinc-200 transition-colors"
+            className="text-white font-black text-[16px] sm:text-lg tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
           >
             STORE
           </Link>
@@ -123,47 +123,19 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         </div>
 
-        {/* Mobile Right Controls */}
+        {/* Mobile Right Controls: Download Button + Menu Hamburger (Exact Screenshot Match) */}
         <div className="flex md:hidden items-center gap-3">
-          <button
-            onClick={onOpenCart}
-            className="relative p-2 text-white hover:text-zinc-300 transition-colors"
+          <Link
+            href="/store"
+            prefetch={true}
+            className="bg-[#0074e4] hover:bg-[#006bd6] text-white font-bold text-[13px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center"
           >
-            <Image
-              src="/icons8-cart-96.png"
-              alt="Cart"
-              width={24}
-              height={24}
-              className="w-6 h-6 object-contain filter brightness-0 invert"
-            />
-            {itemCount > 0 && (
-              <span className="absolute top-1 right-1 bg-white text-black text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </button>
-
-          {user ? (
-            <button
-              onClick={onSignOut}
-              className="bg-[#26262c] hover:bg-[#e50914] text-zinc-300 hover:text-white p-2 rounded-[6px] transition-all duration-200 flex items-center justify-center"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          ) : (
-            <Link 
-              href="/auth" 
-              prefetch={true}
-              className="bg-[#26262c] hover:bg-[#32323a] text-white text-xs font-semibold px-3 py-1.5 rounded-[6px] transition-colors"
-            >
-              Sign in
-            </Link>
-          )}
+            Download
+          </Link>
 
           <button
             onClick={onToggleMobileMenu}
-            className="p-2 text-white hover:text-zinc-300 transition-colors focus:outline-none"
+            className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

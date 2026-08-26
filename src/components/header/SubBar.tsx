@@ -80,7 +80,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
-      <div className="flex md:hidden w-full px-4 sm:px-6 h-[54px] items-center justify-between relative">
+      <div className="flex md:hidden w-full px-4 sm:px-6 h-[46px] items-center justify-between relative">
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
@@ -99,7 +99,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store..."
-                className="w-full bg-[#202024] text-white text-sm pl-10 pr-8 h-[38px] rounded-full border border-zinc-700 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-400"
+                className="w-full bg-[#202024] text-white text-sm pl-10 pr-8 h-[36px] rounded-full border border-zinc-700 focus:outline-none focus:border-zinc-400 placeholder:text-zinc-400"
               />
               {searchQuery && (
                 <button
@@ -126,10 +126,10 @@ export const SubBar: React.FC<SubBarProps> = ({
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(true)}
-              className="p-2 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center justify-center"
+              className="p-1.5 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center justify-center"
               aria-label="Open search"
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-4 h-4" />
             </button>
 
             {/* Discover ▾ Selector Dropdown */}
@@ -137,7 +137,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1.5 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors py-1.5 px-2.5 rounded-lg cursor-pointer"
+                className="flex items-center gap-1 text-[15px] font-semibold text-white hover:text-zinc-200 transition-colors py-1 px-2 cursor-pointer"
               >
                 <span>{currentSectionLabel}</span>
                 <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />

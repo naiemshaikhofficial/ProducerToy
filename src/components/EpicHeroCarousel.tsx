@@ -136,8 +136,8 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
             className="flex pl-4 sm:pl-6"
             style={{
               transform: isDragging 
-                ? `translateX(calc(-${selectedIndex} * (80vw + 14px) + ${dragOffset}px))`
-                : `translateX(calc(-${selectedIndex} * (80vw + 14px)))`,
+                ? `translateX(calc(-${selectedIndex} * (84vw + 14px) + ${dragOffset}px))`
+                : `translateX(calc(-${selectedIndex} * (84vw + 14px)))`,
               transition: isDragging ? 'none' : 'transform 450ms cubic-bezier(0.2, 1, 0.3, 1)',
               gap: '14px',
             }}
@@ -150,9 +150,13 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               return (
                 <div
                   key={product.id}
-                  className="flex-shrink-0 w-[80vw] sm:w-[400px] max-w-[420px]"
+                  className="flex-shrink-0 w-[84vw] sm:w-[410px] max-w-[420px]"
                 >
-                  <div className="relative w-full h-[510px] sm:h-[530px] rounded-[22px] overflow-hidden border border-[#242424] bg-[#141414] shadow-2xl group flex flex-col justify-end">
+                  <Link
+                    href={`/product/${product.slug}`}
+                    prefetch={true}
+                    className="block relative w-full h-[520px] sm:h-[540px] rounded-[20px] overflow-hidden border border-[#222224] bg-[#141414] shadow-2xl group flex flex-col justify-end"
+                  >
                     
                     {/* Background Product Artwork */}
                     <Image
@@ -165,61 +169,46 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     />
 
                     {/* Dark Dramatic Epic Gradient Overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/65 to-transparent pointer-events-none" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none" />
 
                     {/* Top Right Wishlist Bookmark Button (Glass Pill) */}
                     <button
                       type="button"
                       onClick={(e) => handleWishlistToggle(e, product.id)}
-                      className={`absolute top-4 right-4 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
+                      className={`absolute top-4 right-4 w-8 h-8 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                         isSaved
                           ? 'bg-white text-black border-white'
-                          : 'bg-black/50 text-white/90 border-white/20 hover:bg-black/70'
+                          : 'bg-black/40 text-white/90 border-white/20 hover:bg-black/60'
                       }`}
                       title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
                     >
-                      <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                      <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
                     </button>
 
-                    {/* Card Content Overlay */}
+                    {/* Card Content Overlay (Exact Epic Games Store Mobile Typography) */}
                     <div className="relative z-10 p-5 sm:p-6 flex flex-col gap-2 pointer-events-auto">
                       
                       {/* Product Type / Brand Tag */}
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300">
                         {product.brand || 'Producer Toy'} • {product.product_type?.replace('_', ' ') || 'Audio Tool'}
                       </span>
 
                       {/* Main Product Title */}
-                      <Link 
-                        href={`/product/${product.slug}`}
-                        prefetch={true}
-                        className="block text-[22px] sm:text-2xl font-black uppercase tracking-tight text-white leading-tight font-sans drop-shadow-md hover:underline"
-                      >
+                      <h2 className="text-[22px] sm:text-[24px] font-black uppercase tracking-tight text-white leading-tight font-sans drop-shadow-md">
                         {product.name}
-                      </Link>
+                      </h2>
 
                       {/* Subtitle / Short Description */}
-                      <p className="text-[13px] text-zinc-200 font-normal leading-relaxed line-clamp-3 drop-shadow-sm">
+                      <p className="text-[13px] text-white/90 font-medium leading-[1.35] line-clamp-3 drop-shadow-sm">
                         {product.short_description || 'Professional audio tools, presets, and sample packs designed for elite music producers.'}
                       </p>
 
-                      {/* Price Tag (Exact Epic Clean White) */}
-                      <div className="pt-0.5">
+                      {/* Bottom Row: Price & Subtle Cart Icon */}
+                      <div className="pt-2 flex items-center justify-between">
                         <span className="text-base font-bold text-white drop-shadow">
                           {isFree ? 'Free' : formatPrice(product.price_inr, product.price_usd)}
                         </span>
-                      </div>
-
-                      {/* CTA Action Buttons Row */}
-                      <div className="pt-2 flex items-center gap-2">
-                        <Link
-                          href={`/product/${product.slug}`}
-                          prefetch={true}
-                          className="flex-1 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-4 rounded-xl text-center uppercase tracking-wider shadow-lg active:scale-95 transition-all"
-                        >
-                          {isFree ? 'Get Free' : 'Buy Now'}
-                        </Link>
 
                         <button
                           type="button"
@@ -237,15 +226,15 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                               brand: product.brand,
                             })
                           }}
-                          className="bg-[#1e1e1e]/90 hover:bg-[#282828] text-white border border-white/15 p-3 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center"
+                          className="bg-[#1e1e22]/90 hover:bg-[#282830] text-white border border-white/15 p-2 rounded-lg transition-all shadow-md active:scale-95 flex items-center justify-center"
                           title={inCart ? "In Cart" : "Add to Cart"}
                         >
-                          {inCart ? <Check className="w-4 h-4 text-green-400" /> : <Plus className="w-4 h-4" />}
+                          {inCart ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Plus className="w-3.5 h-3.5" />}
                         </button>
                       </div>
 
                     </div>
-                  </div>
+                  </Link>
                 </div>
               )
             })}
@@ -253,7 +242,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
         </div>
 
         {/* Mobile Pagination Indicator Dots (Solid Pure White Active + Solid Visible Gray Inactive, No Glow) */}
-        <div className="relative z-20 flex items-center justify-center gap-2 mt-4">
+        <div className="relative z-20 flex items-center justify-center gap-2 mt-4 mb-4">
           {featuredList.map((_, idx) => {
             const isActive = idx === selectedIndex
             return (
