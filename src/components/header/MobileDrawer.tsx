@@ -196,7 +196,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                       if (onSignOut) onSignOut()
                       onClose()
                     }}
-                    className="flex items-center gap-3.5 text-[15px] text-red-400 hover:text-red-300 py-1.5 transition-colors w-full text-left cursor-pointer"
+                    className="flex items-center gap-3.5 text-[15px] text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 py-1.5 px-2 rounded-lg transition-colors w-full text-left cursor-pointer"
                   >
                     <LogOut className="w-5 h-5" />
                     <span>Sign Out</span>

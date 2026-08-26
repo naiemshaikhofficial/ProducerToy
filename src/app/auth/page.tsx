@@ -278,9 +278,9 @@ function AuthForm() {
 
             {/* Epic Games Dark Theme Error Container (No ugly green/white borders) */}
             {error && (
-              <div className="bg-[#241818] border border-[#382020] text-red-300 p-3.5 rounded-xl text-xs text-center space-y-2 animate-in fade-in">
+              <div className="bg-[#241818] border border-[#ff4053]/30 text-[#ff4053] p-3.5 rounded-xl text-xs text-center space-y-2 animate-in fade-in">
                 <div className="flex items-center justify-center gap-1.5 font-bold">
-                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <AlertCircle className="w-4 h-4 text-[#ff4053]" />
                   <span>{error}</span>
                 </div>
                 {accountAlreadyExists && (

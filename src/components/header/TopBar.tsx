@@ -237,7 +237,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         setIsAccountMenuOpen(false)
                         if (onSignOut) onSignOut()
                       }}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-red-400 hover:text-red-300 hover:bg-[#222222] rounded-lg transition-colors w-full text-left cursor-pointer"
+                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 rounded-lg transition-colors w-full text-left cursor-pointer"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>
