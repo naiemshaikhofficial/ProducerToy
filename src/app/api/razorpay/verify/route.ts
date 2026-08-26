@@ -140,32 +140,17 @@ export async function POST(request: Request) {
 
     // 7. Sync user account & billing details
     if (billingDetails) {
-      try {
-        await adminSupabase.from('user_accounts').upsert(
-          {
-            user_id: userId,
-            full_name: billingDetails.fullName || '',
-            email: targetEmail,
-            phone_number: billingDetails.phone || '',
-            address_line1: billingDetails.address || '',
-            city: billingDetails.city || '',
-            state: billingDetails.state || '',
-            postal_code: billingDetails.zip || '',
-            country: billingDetails.country || null,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        )
-
         await adminSupabase.from('profiles').upsert(
           {
             id: userId,
             email: targetEmail,
             full_name: billingDetails.fullName || '',
+            display_name: billingDetails.fullName || '',
             phone_number: billingDetails.phone || '',
             address_line1: billingDetails.address || '',
             city: billingDetails.city || '',
             state: billingDetails.state || '',
+            region: billingDetails.state || '',
             postal_code: billingDetails.zip || '',
             country: billingDetails.country || null,
             updated_at: new Date().toISOString(),

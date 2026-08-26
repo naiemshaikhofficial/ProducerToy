@@ -93,34 +93,18 @@ export async function processCheckoutAction(
           },
         })
 
-        // Upsert into user_accounts table
-        await adminSupabase.from('user_accounts').upsert(
-          {
-            user_id: targetUserId,
-            full_name: billingDetails.fullName,
-            email: targetEmail,
-            phone_number: billingDetails.phone,
-            address_line1: billingDetails.address,
-            city: billingDetails.city,
-            state: billingDetails.state,
-            postal_code: billingDetails.zip,
-            country: billingDetails.country || null,
-            newsletter: options?.newsletterOptIn ?? true,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id' }
-        )
-
-        // Upsert into profiles table
+        // Upsert into unified profiles table
         await adminSupabase.from('profiles').upsert(
           {
             id: targetUserId,
             email: targetEmail,
             full_name: billingDetails.fullName,
+            display_name: billingDetails.fullName,
             phone_number: billingDetails.phone,
             address_line1: billingDetails.address,
             city: billingDetails.city,
             state: billingDetails.state,
+            region: billingDetails.state,
             postal_code: billingDetails.zip,
             country: billingDetails.country || null,
             newsletter: options?.newsletterOptIn ?? true,

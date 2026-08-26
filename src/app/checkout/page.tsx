@@ -99,38 +99,37 @@ export default function CheckoutPage() {
         data: { user: currentUser },
       } = await supabase.auth.getUser()
 
-      if (currentUser) {
-        // Try fetching saved profile from user_accounts table first
+        // Fetch saved profile from unified profiles table
         try {
-          const { data: account } = await supabase
-            .from('user_accounts')
+          const { data: profile } = await supabase
+            .from('profiles')
             .select('*')
-            .eq('user_id', currentUser.id)
+            .eq('id', currentUser.id)
             .maybeSingle()
 
-          if (account && account.address_line1) {
+          if (profile && (profile.address_line1 || profile.full_name || profile.display_name)) {
             const dbDetails = {
-              fullName: account.full_name || '',
-              email: account.email || currentUser.email || '',
-              phone: ensureE164(account.phone_number || ''),
-              address: account.address_line1 || '',
-              city: account.city || '',
-              state: account.state || '',
-              zip: account.postal_code || '',
-              country: account.country || '',
+              fullName: profile.full_name || profile.display_name || '',
+              email: profile.email || currentUser.email || '',
+              phone: ensureE164(profile.phone_number || ''),
+              address: profile.address_line1 || '',
+              city: profile.city || '',
+              state: profile.state || profile.region || '',
+              zip: profile.postal_code || '',
+              country: profile.country || '',
             }
             setBillingDetails(dbDetails)
-            if (account.country === 'India') setCurrency('INR')
-            else if (account.country) setCurrency('USD')
+            if (profile.country?.toUpperCase() === 'INDIA') setCurrency('INR')
+            else if (profile.country) setCurrency('USD')
 
             localStorage.setItem('pt_billing_details', JSON.stringify(dbDetails))
-            if (account.newsletter !== undefined && account.newsletter !== null) {
-              setNewsletterOptIn(Boolean(account.newsletter))
+            if (profile.newsletter !== undefined && profile.newsletter !== null) {
+              setNewsletterOptIn(Boolean(profile.newsletter))
             }
             return
           }
         } catch (dbErr) {
-          console.warn('user_accounts fetch note:', dbErr)
+          console.warn('profiles fetch note:', dbErr)
         }
       }
 
