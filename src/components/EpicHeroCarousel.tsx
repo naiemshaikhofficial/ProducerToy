@@ -416,14 +416,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     : 'bg-[#121212]/90 hover:bg-[#181818] border-transparent hover:border-[#222222]'
                 }`}
               >
-                {/* Progress Fill Layer */}
+                {/* Active Highlight Layer */}
                 {isActive && (
-                  <div 
-                    className="absolute inset-0 bg-[#2d2d2d] transition-all duration-75 ease-linear origin-left"
-                    style={{ 
-                      width: `${progress}%`
-                    }}
-                  />
+                  <div className="absolute inset-0 bg-[#282828] transition-all origin-left" />
                 )}
 
                 {/* SQUARE Thumbnail Box */}
