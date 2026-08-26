@@ -75,7 +75,7 @@ export default function PurchasePolicyPage() {
               Prices on Producer Toy are listed in <strong>Indian Rupees (INR ₹)</strong> for Indian customers and <strong>US Dollars (USD $)</strong> for international buyers.
             </p>
             <p className="text-zinc-400">
-              Applicable Goods and Services Tax (GST 18%) or international VAT is itemized clearly in the order summary before payment completion. Creator codes, store coupons, and Producer Rewards are automatically calculated in real-time.
+              Applicable Goods and Services Tax (GST 18%) or international VAT is itemized clearly in the order summary before payment completion. Creator codes, store coupons, and Toywards are automatically calculated in real-time.
             </p>
           </section>
 

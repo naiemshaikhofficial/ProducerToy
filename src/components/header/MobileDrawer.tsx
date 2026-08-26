@@ -19,6 +19,7 @@ import {
   HelpCircle,
   ExternalLink
 } from 'lucide-react'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { categoryData, CategoryKey } from './categoryData'
 
 interface MobileDrawerProps {
@@ -115,8 +116,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 onClick={onClose}
                 className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
               >
-                <Sparkles className="w-5 h-5 text-zinc-400" />
-                <span>Producer Rewards</span>
+                <ToywardsIcon size={18} />
+                <span>Toywards</span>
               </Link>
 
               <Link

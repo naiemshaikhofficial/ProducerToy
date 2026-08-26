@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Sparkles, Coins, Gift, ArrowUpRight } from 'lucide-react'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 
 interface RewardsAndWalletTabProps {
   type: 'rewards' | 'currency'
@@ -21,8 +22,9 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-black text-white tracking-tight">
-          {isRewards ? 'Producer Rewards' : 'Account Balance / Wallet'}
+        <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+          {isRewards && <ToywardsIcon size={28} />}
+          <span>{isRewards ? 'Toywards' : 'Account Balance / Wallet'}</span>
         </h1>
         <p className="text-sm text-zinc-400 mt-1">
           {isRewards
@@ -36,7 +38,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-[#242424] flex items-center justify-center border border-[#333333]">
             {isRewards ? (
-              <Sparkles className="w-6 h-6 text-white" />
+              <ToywardsIcon size={24} />
             ) : (
               <Coins className="w-6 h-6 text-white" />
             )}
