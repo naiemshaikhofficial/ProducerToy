@@ -193,7 +193,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 2. DESKTOP SUBBAR (>= 768px): Exact 1:1 PC Screenshot Match                */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex w-full max-w-[1600px] mx-auto px-6 sm:px-8 md:px-10 lg:px-12 h-[76px] items-center justify-between">
+      <div className="hidden md:flex w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
         
         {/* Left Side: Search Capsule + Discover / Browse / News Tabs */}
         <div className="flex items-center">

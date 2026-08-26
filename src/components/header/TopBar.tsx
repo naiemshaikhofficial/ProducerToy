@@ -69,18 +69,18 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <div className="w-full bg-[#121212]">
-      <div className="w-full max-w-[1600px] mx-auto px-6 sm:px-8 md:px-10 lg:px-12 h-[58px] flex items-center justify-between">
+      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-[60px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
-        <div className="flex items-center gap-6 sm:gap-9">
+        <div className="flex items-center gap-6 sm:gap-8">
           <Link href="/" prefetch={true} className="flex items-center hover:opacity-90 transition-opacity">
-            <LogoIcon size={32} />
+            <LogoIcon size={34} />
           </Link>
 
           <Link 
             href="/store" 
             prefetch={true}
-            className="text-white font-extrabold text-[15px] tracking-widest uppercase font-sans hover:text-zinc-200 transition-colors"
+            className="text-white font-black text-[16px] tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
           >
             STORE
           </Link>
@@ -88,12 +88,12 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link 
             href="/store" 
             prefetch={true}
-            className="hidden md:block text-zinc-400 hover:text-white text-[13.5px] font-normal transition-colors"
+            className="hidden md:block text-zinc-300 hover:text-white text-[14px] font-medium transition-colors"
           >
             Support
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1 text-zinc-400 hover:text-white text-[13.5px] font-normal cursor-pointer transition-colors">
+          <div className="hidden lg:flex items-center gap-1 text-zinc-300 hover:text-white text-[14px] font-medium cursor-pointer transition-colors">
             <span>Distribute</span>
             <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
           </div>
