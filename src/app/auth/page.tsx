@@ -69,22 +69,27 @@ function AuthForm() {
   const [message, setMessage] = useState('')
   const [accountAlreadyExists, setAccountAlreadyExists] = useState(false)
 
-  // Catch URL error params from Supabase redirects
+  // Catch URL error params and hash fragment from Supabase redirects
   useEffect(() => {
-    const errorDesc = searchParams.get('error_description')
-    const errorCode = searchParams.get('error_code')
-    const genericError = searchParams.get('error')
+    let raw = searchParams.get('error_description') || searchParams.get('error') || ''
+    let code = searchParams.get('error_code') || ''
 
-    if (errorDesc || errorCode || genericError) {
-      const raw = errorDesc || genericError || ''
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      if (hashParams.get('error_description')) raw = hashParams.get('error_description') || ''
+      if (hashParams.get('error_code')) code = hashParams.get('error_code') || ''
+    }
+
+    if (raw || code) {
       if (
-        errorCode === 'over_email_send_rate_limit' ||
+        code === 'over_email_send_rate_limit' ||
         raw.toLowerCase().includes('rate_limit') ||
+        raw.toLowerCase().includes('rate limit') ||
         raw.toLowerCase().includes('security purposes')
       ) {
-        setError('For security purposes, please wait 60 seconds before requesting another confirmation email.')
+        setError('Supabase email confirmation rate limit reached. In Supabase Dashboard -> Auth -> Providers -> Email, please disable "Confirm email" to enable instant login.')
       } else {
-        setError(raw || 'Authentication request failed. Please try again.')
+        setError(decodeURIComponent(raw.replace(/\+/g, ' ')) || 'Authentication request failed. Please try again.')
       }
     }
   }, [searchParams])
