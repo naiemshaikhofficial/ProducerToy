@@ -197,7 +197,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/library"
+                      href="/wishlist"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"

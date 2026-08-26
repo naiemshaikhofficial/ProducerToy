@@ -8,7 +8,7 @@ import { Play, Pause, Bookmark, ShoppingBag, Check } from 'lucide-react'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAudio } from '@/context/AudioContext'
 import { useCart } from '@/context/CartContext'
-import { toggleWishlistAction } from '@/actions/wishlistActions'
+import { useWishlist } from '@/context/WishlistContext'
 import { getCdnImageUrl } from '@/lib/cdn'
 
 export interface Product {
@@ -58,9 +58,10 @@ export function ProductCard({ product }: { product: Product }) {
   const { formatPrice } = useCurrency()
   const { currentTrack, isPlaying, playTrack } = useAudio()
   const { addItem, isInCart } = useCart()
-  const [isSaved, setIsSaved] = useState(false)
+  const { isWishlisted, toggleWishlist } = useWishlist()
   const [isCartAdded, setIsCartAdded] = useState(false)
 
+  const isSaved = isWishlisted(product.id)
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
   const added = isInCart(product.id) || isCartAdded
 
@@ -76,9 +77,22 @@ export function ProductCard({ product }: { product: Product }) {
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Optimistic UI update immediately for instant 0ms feedback
-    setIsSaved(prev => !prev)
-    await toggleWishlistAction(product.id)
+    await toggleWishlist({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      brand: brandName,
+      product_type: product.product_type,
+      price_inr: product.price_inr || Math.round(product.price_usd * 85),
+      price_usd: product.price_usd,
+      original_price_inr: product.original_price_usd ? Math.round(product.original_price_usd * 85) : undefined,
+      original_price_usd: product.original_price_usd || undefined,
+      cover_image: product.cover_image,
+      demo_audio_url: product.demo_audio_url,
+      vst_format: product.vst_format,
+      short_description: product.short_description,
+      is_featured: product.is_featured,
+    })
   }
 
   const handleQuickAdd = (e: React.MouseEvent) => {

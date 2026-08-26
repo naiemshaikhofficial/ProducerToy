@@ -7,7 +7,7 @@ import { Plus, Bookmark, Check } from 'lucide-react'
 import { Product } from '@/components/ProductCard'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
-import { toggleWishlistAction } from '@/actions/wishlistActions'
+import { useWishlist } from '@/context/WishlistContext'
 import { getCdnImageUrl } from '@/lib/cdn'
 
 interface EpicHeroCarouselProps {
@@ -16,7 +16,7 @@ interface EpicHeroCarouselProps {
 
 export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [savedIds, setSavedIds] = useState<Record<string, boolean>>({})
+  const { isWishlisted, toggleWishlist } = useWishlist()
   const { formatPrice } = useCurrency()
   const { addItem, isInCart } = useCart()
 
@@ -39,11 +39,21 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
     setSelectedIndex(index)
   }
 
-  const handleWishlistToggle = async (e: React.MouseEvent, productId: string) => {
+  const handleWishlistToggle = async (e: React.MouseEvent, product: Product) => {
     e.preventDefault()
     e.stopPropagation()
-    setSavedIds((prev) => ({ ...prev, [productId]: !prev[productId] }))
-    await toggleWishlistAction(productId)
+    await toggleWishlist({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      brand: product.brand,
+      product_type: product.product_type,
+      price_inr: product.price_inr || Math.round(product.price_usd * 85),
+      price_usd: product.price_usd,
+      cover_image: product.cover_image,
+      vst_format: product.vst_format,
+      short_description: product.short_description,
+    })
   }
 
   // --- Real-Time Touch Gestures ---
@@ -144,7 +154,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
           >
             {featuredList.map((product, idx) => {
               const isFree = Number(product.price_usd) === 0
-              const isSaved = !!savedIds[product.id]
+              const isSaved = isWishlisted(product.id)
               const inCart = isInCart(product.id)
 
               return (
@@ -175,7 +185,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     {/* Top Right Wishlist Bookmark Button (Glass Pill) */}
                     <button
                       type="button"
-                      onClick={(e) => handleWishlistToggle(e, product.id)}
+                      onClick={(e) => handleWishlistToggle(e, product)}
                       className={`absolute top-4 right-4 w-8 h-8 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                         isSaved
                           ? 'bg-white text-black border-white'
@@ -286,7 +296,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
           >
             {featuredList.map((product) => {
               const isFree = Number(product.price_usd) === 0
-              const isSaved = !!savedIds[product.id]
+              const isSaved = isWishlisted(product.id)
 
               return (
                 <Link 
@@ -328,7 +338,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   {/* Top Right Wishlist Button for Desktop */}
                   <button
                     type="button"
-                    onClick={(e) => handleWishlistToggle(e, product.id)}
+                    onClick={(e) => handleWishlistToggle(e, product)}
                     className={`absolute top-4 right-4 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                       isSaved
                         ? 'bg-white text-black border-white'

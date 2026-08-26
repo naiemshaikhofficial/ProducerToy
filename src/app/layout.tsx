@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { CurrencyProvider } from '@/context/CurrencyContext'
 import { CartProvider } from '@/context/CartContext'
+import { WishlistProvider } from '@/context/WishlistContext'
 import { AudioProvider } from '@/context/AudioContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { Header } from '@/components/Header'
@@ -44,22 +45,24 @@ export default function RootLayout({
         <AuthProvider>
           <CurrencyProvider>
             <CartProvider>
-              <AudioProvider>
-                <ImageProtection />
-                <ContentProtection />
-                
-                <Header />
-                
-                <main className="flex-1 pb-24">
-                  {children}
-                </main>
-                
-                <Footer />
-                
-                <AudioPlayer />
-                <CartDrawer />
+              <WishlistProvider>
+                <AudioProvider>
+                  <ImageProtection />
+                  <ContentProtection />
+                  
+                  <Header />
+                  
+                  <main className="flex-1 pb-24">
+                    {children}
+                  </main>
+                  
+                  <Footer />
+                  
+                  <AudioPlayer />
+                  <CartDrawer />
 
-              </AudioProvider>
+                </AudioProvider>
+              </WishlistProvider>
             </CartProvider>
           </CurrencyProvider>
         </AuthProvider>

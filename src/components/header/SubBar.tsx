@@ -247,9 +247,11 @@ export const SubBar: React.FC<SubBarProps> = ({
         {/* Right Side: Wishlist, Gifts, Cart (Exact 1:1 Match) */}
         <div className="flex items-center gap-7 text-[14px]">
           <Link
-            href="/library"
+            href="/wishlist"
             prefetch={true}
-            className="text-zinc-400 hover:text-white font-normal transition-colors"
+            className={`transition-colors font-normal ${
+              pathname === '/wishlist' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+            }`}
           >
             Wishlist
           </Link>
