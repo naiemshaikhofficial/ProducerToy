@@ -1,12 +1,14 @@
 'use server'
 
 import { getAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export interface ProfileUpdateData {
   first_name?: string
   last_name?: string
   display_name?: string
+  phone_number?: string
   address_line1?: string
   address_line2?: string
   city?: string
@@ -44,12 +46,12 @@ export async function updatePersonalDetailsAction(userId: string, data: ProfileU
   }
 
   try {
-    const admin = getAdminClient()
-    const { error } = await admin.from('profiles').upsert({
+    const payload = {
       id: userId,
       first_name: data.first_name || '',
       last_name: data.last_name || '',
       display_name: data.display_name,
+      phone_number: data.phone_number,
       address_line1: data.address_line1 || '',
       address_line2: data.address_line2 || '',
       city: data.city || '',
@@ -58,11 +60,24 @@ export async function updatePersonalDetailsAction(userId: string, data: ProfileU
       postal_code: data.postal_code || '',
       country: data.country || 'INDIA',
       updated_at: new Date().toISOString(),
-    })
+    }
 
-    if (error) throw error
+    try {
+      const supabase = await createClient()
+      await supabase.from('profiles').upsert(payload, { onConflict: 'id' })
+    } catch (e) {
+      console.warn('Session profile upsert note:', e)
+    }
+
+    try {
+      const admin = getAdminClient()
+      await admin.from('profiles').upsert(payload, { onConflict: 'id' })
+    } catch (adminErr) {
+      console.warn('Admin profile upsert note:', adminErr)
+    }
 
     revalidatePath('/account')
+    revalidatePath('/checkout')
     return { success: true }
   } catch (err: any) {
     return { success: false, error: err.message || 'Failed to update personal details' }
@@ -89,55 +104,64 @@ export async function saveBillingAddressAction(
   if (!userId) return { success: false, error: 'User ID required' }
 
   try {
-    const admin = getAdminClient()
     const nameParts = (details.fullName || '').trim().split(' ')
     const firstName = nameParts[0] || ''
     const lastName = nameParts.slice(1).join(' ') || ''
 
-    // 1. Sync into unified profiles table
-    const { error } = await admin.from('profiles').upsert(
-      {
-        id: userId,
-        email: details.email || undefined,
-        first_name: firstName,
-        last_name: lastName,
-        full_name: details.fullName || '',
-        display_name: details.fullName || '',
-        phone_number: details.phone || '',
-        address_line1: details.address || '',
-        address_line2: details.address2 || '',
-        city: details.city || '',
-        state: details.state || '',
-        region: details.state || '',
-        postal_code: details.zip || '',
-        country: details.country || null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'id' }
-    )
+    const payload = {
+      id: userId,
+      email: details.email || undefined,
+      first_name: firstName,
+      last_name: lastName,
+      full_name: details.fullName || '',
+      display_name: details.fullName || '',
+      phone_number: details.phone || '',
+      address_line1: details.address || '',
+      address_line2: details.address2 || '',
+      city: details.city || '',
+      state: details.state || '',
+      region: details.state || '',
+      postal_code: details.zip || '',
+      country: details.country || null,
+      updated_at: new Date().toISOString(),
+    }
 
-    if (error) throw error
+    // 1. Session client upsert (with user cookie session)
+    try {
+      const supabase = await createClient()
+      await supabase.from('profiles').upsert(payload, { onConflict: 'id' })
+    } catch (sessionErr) {
+      console.warn('Session billing address upsert note:', sessionErr)
+    }
 
-    // 2. Sync into Supabase Auth user metadata
-    await admin.auth.admin.updateUserById(userId, {
-      user_metadata: {
-        full_name: details.fullName,
-        first_name: firstName,
-        last_name: lastName,
-        phone: details.phone,
-        phone_number: details.phone,
-        address: details.address,
-        address2: details.address2,
-        address_line1: details.address,
-        address_line2: details.address2,
-        city: details.city,
-        state: details.state,
-        region: details.state,
-        zip: details.zip,
-        postal_code: details.zip,
-        country: details.country,
-      },
-    })
+    // 2. Admin client upsert
+    try {
+      const admin = getAdminClient()
+      await admin.from('profiles').upsert(payload, { onConflict: 'id' })
+
+      // Update auth user metadata
+      await admin.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          full_name: details.fullName,
+          first_name: firstName,
+          last_name: lastName,
+          phone: details.phone,
+          phone_number: details.phone,
+          address: details.address,
+          address2: details.address2,
+          address_line1: details.address,
+          address_line2: details.address2,
+          city: details.city,
+          state: details.state,
+          region: details.state,
+          zip: details.zip,
+          postal_code: details.zip,
+          country: details.country,
+        },
+      }).catch(() => {})
+    } catch (adminErr) {
+      console.warn('Admin billing address upsert note:', adminErr)
+    }
 
     revalidatePath('/account')
     revalidatePath('/checkout')

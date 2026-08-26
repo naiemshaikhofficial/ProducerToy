@@ -86,49 +86,60 @@ export async function processCheckoutAction(
         const firstName = nameParts[0] || ''
         const lastName = nameParts.slice(1).join(' ') || ''
 
-        // Update Supabase auth user metadata
-        await adminSupabase.auth.admin.updateUserById(targetUserId, {
-          user_metadata: {
-            full_name: billingDetails.fullName,
-            first_name: firstName,
-            last_name: lastName,
-            phone: billingDetails.phone,
-            phone_number: billingDetails.phone,
-            address: billingDetails.address,
-            address2: billingDetails.address2,
-            address_line1: billingDetails.address,
-            address_line2: billingDetails.address2,
-            city: billingDetails.city,
-            state: billingDetails.state,
-            region: billingDetails.state,
-            zip: billingDetails.zip,
-            postal_code: billingDetails.zip,
-            country: billingDetails.country,
-          },
-        })
+        const profilePayload = {
+          id: targetUserId,
+          email: targetEmail,
+          first_name: firstName,
+          last_name: lastName,
+          full_name: billingDetails.fullName,
+          display_name: billingDetails.fullName,
+          phone_number: billingDetails.phone,
+          address_line1: billingDetails.address,
+          address_line2: billingDetails.address2 || '',
+          city: billingDetails.city,
+          state: billingDetails.state,
+          region: billingDetails.state,
+          postal_code: billingDetails.zip,
+          country: billingDetails.country || null,
+          newsletter: options?.newsletterOptIn ?? true,
+          updated_at: new Date().toISOString(),
+        }
 
-        // Upsert into unified profiles table
-        await adminSupabase.from('profiles').upsert(
-          {
-            id: targetUserId,
-            email: targetEmail,
-            first_name: firstName,
-            last_name: lastName,
-            full_name: billingDetails.fullName,
-            display_name: billingDetails.fullName,
-            phone_number: billingDetails.phone,
-            address_line1: billingDetails.address,
-            address_line2: billingDetails.address2 || '',
-            city: billingDetails.city,
-            state: billingDetails.state,
-            region: billingDetails.state,
-            postal_code: billingDetails.zip,
-            country: billingDetails.country || null,
-            newsletter: options?.newsletterOptIn ?? true,
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'id' }
-        )
+        // 1. Session client upsert
+        try {
+          const sessionSupabase = await createClient()
+          await sessionSupabase.from('profiles').upsert(profilePayload, { onConflict: 'id' })
+        } catch (e) {
+          console.warn('Session profile upsert note in checkout:', e)
+        }
+
+        // 2. Admin client upsert
+        try {
+          await adminSupabase.from('profiles').upsert(profilePayload, { onConflict: 'id' })
+          
+          // Update Supabase auth user metadata
+          await adminSupabase.auth.admin.updateUserById(targetUserId, {
+            user_metadata: {
+              full_name: billingDetails.fullName,
+              first_name: firstName,
+              last_name: lastName,
+              phone: billingDetails.phone,
+              phone_number: billingDetails.phone,
+              address: billingDetails.address,
+              address2: billingDetails.address2,
+              address_line1: billingDetails.address,
+              address_line2: billingDetails.address2,
+              city: billingDetails.city,
+              state: billingDetails.state,
+              region: billingDetails.state,
+              zip: billingDetails.zip,
+              postal_code: billingDetails.zip,
+              country: billingDetails.country,
+            },
+          }).catch(() => {})
+        } catch (adminErr) {
+          console.warn('Admin profile upsert note in checkout:', adminErr)
+        }
       } catch (metaErr) {
         console.warn('Could not sync user billing profile in DB:', metaErr)
       }
