@@ -1,11 +1,11 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
-import { ArrowLeft, ShieldCheck, Scale, FileText, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'End User License Agreement (EULA) | Producer Toy',
-  description: 'Official End User License Agreement (EULA) governing software, VST/AU plugins, sample packs, synth presets, and DAW templates on Producer Toy.',
+  title: 'End User License Agreement (EULA) | Producer Toy Store',
+  description: 'Official End User License Agreement (EULA), 100% Royalty-Free Commercial Usage, and Sound Licensing Terms for Producer Toy.',
 }
 
 export default function EulaPage() {
@@ -13,7 +13,7 @@ export default function EulaPage() {
     <div className="min-h-screen bg-[#121212] text-white py-14 px-6 sm:px-10 lg:px-16">
       <div className="max-w-4xl mx-auto space-y-10 font-sans">
         
-        {/* Back Link & Header */}
+        {/* Back Link & Minimal Header */}
         <div className="space-y-4 pb-6 border-b border-zinc-800/60">
           <Link
             href="/"
@@ -25,102 +25,83 @@ export default function EulaPage() {
           </Link>
 
           <div>
-            <div className="flex items-center gap-2 text-[#2ed8a7] text-xs font-bold uppercase tracking-wider mb-2">
-              <Scale className="w-4 h-4" />
-              <span>Legal Document</span>
-            </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
               End User License Agreement (EULA)
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 mt-2">
-              Last updated: February 2026 • Producer Toy Marketplace (Global Distribution)
+              Last updated: February 2026 • Producer Toy Store (India Operations & Global Distribution)
             </p>
           </div>
         </div>
 
-        {/* Content Body */}
-        <div className="space-y-8 text-sm text-zinc-300 leading-relaxed">
+        {/* Minimalist Content Body */}
+        <div className="space-y-10 text-sm text-zinc-300 leading-relaxed">
           
-          <div className="p-4 bg-[#18181c] border border-[#2a2a2e] rounded-xl text-xs text-zinc-300 leading-relaxed">
-            <p className="font-semibold text-white mb-1">IMPORTANT NOTICE:</p>
-            Please read this End User License Agreement (&ldquo;EULA&rdquo;) carefully before purchasing, downloading, or using any digital sound libraries, VST/AU plugins, sample packs, presets, or templates from <strong>Producer Toy</strong>. By downloading or installing these assets, you agree to be bound by the terms of this license.
-          </div>
-
-          {/* Section 1 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <FileText className="w-4 h-4 text-zinc-400" />
-              <span>1. Grant of License</span>
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              1. Grant of License
             </h2>
             <p className="text-zinc-400">
-              All sound assets, virtual instruments, audio plugins, sample packs, synthesizer soundbanks, and digital audio workstation (DAW) project files purchased or claimed from Producer Toy are licensed, not sold, to you (&ldquo;Licensee&rdquo;).
+              All sound assets, virtual instruments, audio plugins, sample packs, synthesizer soundbanks, and digital audio workstation (DAW) templates available on <strong>Producer Toy</strong> (producertoy.com) are licensed, not sold, to you (&ldquo;Licensee&rdquo;).
             </p>
             <p className="text-zinc-400">
-              Producer Toy grants you a non-exclusive, non-transferable, worldwide, perpetual commercial license to use the sounds and tools in your original musical compositions, film scores, commercial audio productions, broadcasts, video games, and multimedia projects.
+              Producer Toy grants you a non-exclusive, non-transferable, worldwide, perpetual commercial license to use the downloaded sounds and software tools in your musical compositions, film scores, commercial audio productions, broadcasts, streaming releases, video games, and multimedia productions.
             </p>
           </section>
 
-          {/* Section 2 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>2. 100% Royalty-Free Commercial Usage</span>
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              2. 100% Royalty-Free Commercial Usage
             </h2>
             <p className="text-zinc-400">
-              You are permitted to:
+              Under this license, you are entitled to:
             </p>
-            <ul className="list-disc pl-5 space-y-2 text-zinc-400">
-              <li>Use all purchased samples, one-shots, loops, and presets in commercial music releases (Spotify, Apple Music, YouTube, TV/Film synchronization, radio airplay) without paying additional royalties or clearance fees to Producer Toy.</li>
-              <li>Modify, chop, time-stretch, pitch-shift, and process audio files for inclusion in your creative compositions.</li>
-              <li>Install plugins on up to two (2) machines owned and operated solely by the primary licensee.</li>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li><strong className="text-zinc-200">Commercial Music Releases:</strong> Release songs, albums, and soundtracks containing purchased samples, one-shots, loops, or synth presets on Spotify, Apple Music, YouTube, Beatport, Radio, and TV synchronization without paying additional royalties or clearance fees.</li>
+              <li><strong className="text-zinc-200">Creative Manipulation:</strong> Chop, loop, pitch-shift, time-stretch, process, and layer audio files freely within your creative arrangements.</li>
+              <li><strong className="text-zinc-200">Multi-Device Installation:</strong> Install software plugins and presets on up to two (2) computers owned and operated solely by you.</li>
             </ul>
           </section>
 
-          {/* Section 3 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-400" />
-              <span>3. Strict Restrictions & Prohibited Uses</span>
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              3. Strict Restrictions & Prohibited Uses
             </h2>
             <p className="text-zinc-400">
-              You are strictly PROHIBITED from:
+              The Licensee is strictly PROHIBITED from engaging in any of the following activities:
             </p>
-            <ul className="list-disc pl-5 space-y-2 text-zinc-400">
-              <li><strong>Re-selling or Re-distributing:</strong> Distributing, sharing, sub-licensing, uploading to file-sharing networks, torrent trackers, Discord servers, or selling any raw samples, presets, or software code in any format.</li>
-              <li><strong>Competitive Sample Libraries:</strong> Using the raw audio samples or synthesizer presets to create competitive sample libraries, virtual instruments, sound packs, or AI training datasets.</li>
-              <li><strong>Reverse Engineering:</strong> Decompiling, reverse engineering, disassembling, or modifying the binary code of proprietary VST/AU plugins sold on the marketplace.</li>
-              <li><strong>Account Sharing:</strong> Sharing your Producer Toy login credentials with third parties or purchasing products on disposable/temporary burner email accounts.</li>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li><strong className="text-zinc-200">Re-Distribution & Resale:</strong> Reselling, sub-licensing, sharing, renting, uploading to cloud file-sharing sites, torrent networks, or distributing raw audio files and presets in isolation.</li>
+              <li><strong className="text-zinc-200">Competitive Sample Libraries:</strong> Using purchased samples or presets to construct competitive sample packs, loop kits, sound design bundles, virtual instruments, or AI training datasets.</li>
+              <li><strong className="text-zinc-200">Reverse Engineering:</strong> Decompiling, disassembling, reverse engineering, or modifying binary files and DSP code of proprietary VST/AU plugins.</li>
+              <li><strong className="text-zinc-200">Account Sharing:</strong> Transferring or sharing Producer Toy login credentials, or obtaining licenses using disposable/temporary burner email accounts.</li>
             </ul>
           </section>
 
-          {/* Section 4 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-zinc-400" />
-              <span>4. Intellectual Property & Ownership</span>
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              4. Intellectual Property & Ownership
             </h2>
             <p className="text-zinc-400">
-              Producer Toy and its verified partner brands/developers retain all intellectual property rights, copyrights, patents, and trademarks associated with the software code, graphical user interfaces, presets, and audio recordings. This license does not grant you ownership of the original audio recordings.
+              Producer Toy and its respective developer partners retain all title, copyright, intellectual property rights, and source code ownership in the software, audio masters, and artwork. You own the copyright to the original musical works created using these licensed assets.
             </p>
           </section>
 
-          {/* Section 5 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight">
               5. Termination of License
             </h2>
             <p className="text-zinc-400">
-              This license is effective until terminated. Your rights under this EULA will terminate automatically without notice if you fail to comply with any of its terms. Upon termination, you must cease all use of the software and destroy all copies in your possession.
+              This agreement is effective until terminated. Breach of any terms specified in this EULA will result in automatic termination of your license without prior notice, upon which all digital copies and derived standalone library assets must be permanently deleted.
             </p>
           </section>
 
-          {/* Section 6 */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight">
-              6. Contact for Commercial Clearance & Questions
+              6. Licensing Inquiries & Clearance Support
             </h2>
             <p className="text-zinc-400">
-              For enterprise licensing, master clearance inquiries, or custom usage rights, please contact our legal licensing desk at{' '}
+              For custom enterprise licensing, film master clearances, or legal questions, contact our licensing desk at{' '}
               <a href="mailto:support@producertoy.com" className="text-zinc-200 hover:underline font-semibold">
                 support@producertoy.com
               </a>.
