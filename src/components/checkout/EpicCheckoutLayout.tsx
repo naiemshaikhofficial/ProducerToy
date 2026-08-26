@@ -15,6 +15,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { CartItem } from '@/context/CartContext'
 import { BillingDetails, PaymentStatus } from './types'
 import { CheckoutBillingForm } from './CheckoutBillingForm'
@@ -193,13 +194,11 @@ export function EpicCheckoutLayout({
             </div>
           </div>
 
-          {/* Producer Rewards Light Orange Badge (Exact Match) */}
+          {/* Toywards Light Orange Badge (Exact Match) */}
           {!isFree && (
-            <div className="inline-flex items-center gap-2.5 bg-[#FA742B]/10 border border-[#FA742B]/30 text-[#FA742B] px-3.5 py-2.5 rounded-xl text-[12px] font-semibold select-none w-full shadow-sm">
-              <div className="w-4 h-4 rounded-full bg-[#FA742B]/20 flex items-center justify-center text-[#FA742B] flex-shrink-0">
-                <Sparkles size={10} />
-              </div>
-              <span>Get {currencySymbol}{rewardsAmount} in Producer Rewards.</span>
+            <div className="inline-flex items-center gap-2 bg-[#FA742B]/10 border border-[#FA742B]/30 text-[#FA742B] px-3.5 py-2.5 rounded-xl text-[12px] font-semibold select-none w-full shadow-sm">
+              <ToywardsIcon size={16} />
+              <span>Get {currencySymbol}{rewardsAmount} in Toywards.</span>
             </div>
           )}
         </div>
@@ -249,7 +248,7 @@ export function EpicCheckoutLayout({
             </h2>
           </div>
 
-          {/* Producer Rewards Box (Exact Match) */}
+          {/* Toywards Box (Exact Match) */}
           <div className="bg-[#1c1c1c] border border-[#282828] rounded-xl p-3.5 transition-all">
             <button
               type="button"
@@ -257,10 +256,8 @@ export function EpicCheckoutLayout({
               className="w-full flex items-center justify-between text-left cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-[#FA742B]/15 border border-[#FA742B]/30 flex items-center justify-center text-[#FA742B]">
-                  <Sparkles size={11} />
-                </div>
-                <span className="text-[13.5px] font-bold text-white">Producer Rewards</span>
+                <ToywardsIcon size={18} />
+                <span className="text-[13.5px] font-bold text-white">Toywards</span>
               </div>
               <div className="flex items-center gap-1 text-[12.5px] text-zinc-400">
                 <ChevronDown

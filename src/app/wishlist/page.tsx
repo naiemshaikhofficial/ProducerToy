@@ -23,6 +23,7 @@ import {
 import { useWishlist } from '@/context/WishlistContext'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { getCdnImageUrl } from '@/lib/cdn'
 
 type SortOption = 'on_sale' | 'recently_added' | 'price_low' | 'price_high' | 'alphabetical'
@@ -122,7 +123,8 @@ export default function WishlistPage() {
               prefetch={true}
               className="text-[13px] font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 transition-colors"
             >
-              <span>Producer Rewards</span>
+              <ToywardsIcon size={16} />
+              <span>Toywards</span>
               <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
             </Link>
 
@@ -363,11 +365,11 @@ export default function WishlistPage() {
                           </span>
                         </div>
 
-                        {/* Producer Rewards Note */}
+                        {/* Toywards Note */}
                         {!isFree && (
                           <div className="flex items-center gap-1.5 text-[11.5px] text-zinc-400 mt-3 font-medium">
-                            <Sparkles className="w-3.5 h-3.5 text-[#20d693]" />
-                            <span>Earn 5% back in Producer Rewards</span>
+                            <ToywardsIcon size={14} />
+                            <span>Earn 5% back in Toywards</span>
                           </div>
                         )}
                       </div>
