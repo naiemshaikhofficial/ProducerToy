@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Info, Edit2, Check } from 'lucide-react'
+import { Edit2, Check } from 'lucide-react'
+import { CustomInfoTooltip } from './CustomInfoTooltip'
 
 interface AccountInfoSectionProps {
   accountId: string
@@ -36,7 +37,7 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-        {/* Display Name Input with Edit Pencil */}
+        {/* Display Name Input with Edit Pencil & Custom Tooltip */}
         <div>
           <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
             Display name
@@ -50,8 +51,10 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
                 disabled={!isEditing}
                 className="bg-transparent text-white text-sm focus:outline-none w-full disabled:opacity-90 font-medium"
               />
-              <div className="text-zinc-500 hover:text-zinc-300 cursor-pointer ml-2" title="Display Name Info">
-                <Info className="w-4 h-4" />
+              <div className="ml-2">
+                <CustomInfoTooltip
+                  content="Please note: If you change your ProducerToy Display Name, you can't change it again for 2 weeks after you confirm this change."
+                />
               </div>
             </div>
             <button
@@ -62,14 +65,13 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
                   ? 'bg-white text-black border-white'
                   : 'bg-[#222222] hover:bg-[#2c2c2c] text-white border-[#333333]'
               }`}
-              title={isEditing ? "Save Display Name" : "Edit Display Name"}
             >
               {isEditing ? <Check className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
-        {/* Email Address (LOCKED / READ-ONLY - NO EDIT OPTION AS REQUIRED) */}
+        {/* Email Address (LOCKED / READ-ONLY WITH CUSTOM TOOLTIP) */}
         <div>
           <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
             Email address
@@ -78,9 +80,9 @@ export const AccountInfoSection: React.FC<AccountInfoSectionProps> = ({
             <span className="text-sm text-zinc-200 font-mono select-all">
               {maskedEmail}
             </span>
-            <div className="text-zinc-500 hover:text-zinc-300 cursor-help" title="Email address is permanently verified and locked.">
-              <Info className="w-4 h-4" />
-            </div>
+            <CustomInfoTooltip
+              content="Email address is permanently verified and cannot be edited directly for account security."
+            />
           </div>
         </div>
       </div>

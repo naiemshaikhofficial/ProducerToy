@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Info, Edit2 } from 'lucide-react'
+import { Edit2 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
+import { CustomInfoTooltip } from './CustomInfoTooltip'
 
 interface PersonalDetailsSectionProps {
   user: any
@@ -196,9 +197,9 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
               <span className="text-sm font-bold text-white uppercase tracking-wider">
                 {country}
               </span>
-              <div className="text-zinc-500 hover:text-zinc-300 cursor-pointer" title="Country is determined by your billing profile.">
-                <Info className="w-4 h-4" />
-              </div>
+              <CustomInfoTooltip
+                content="Country / Region is determined by your billing and payment details."
+              />
             </div>
             <button
               type="button"
