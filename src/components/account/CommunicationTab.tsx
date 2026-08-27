@@ -127,7 +127,7 @@ export const CommunicationTab: React.FC<CommunicationTabProps> = ({
           />
           <div>
             <span className="text-sm font-bold text-white block">
-              Epic rewards & loyalty cashback balance
+              Toywards & loyalty cashback balance
             </span>
             <span className="text-xs text-zinc-400 block mt-0.5">
               Receive monthly statements of your cashback points and store credits.

@@ -15,7 +15,7 @@ import {
   ChevronDown,
   X,
 } from 'lucide-react'
-import { EpicRewardsIcon } from './RewardsAndWalletTab'
+import { ToywardsSparkleIcon } from './RewardsAndWalletTab'
 import { AccountTab } from './AccountSidebar'
 
 interface MobileAccountBarProps {
@@ -33,7 +33,7 @@ const TAB_CONFIG: Record<AccountTab, { label: string; icon: React.ReactNode }> =
   transactions: { label: 'Transactions', icon: <Clock className="w-4 h-4 text-zinc-400" /> },
   subscriptions: { label: 'Subscriptions', icon: <Tag className="w-4 h-4 text-zinc-400" /> },
   currency: { label: 'In-game currency', icon: <Coins className="w-4 h-4 text-zinc-400" /> },
-  rewards: { label: 'Epic rewards', icon: <EpicRewardsIcon size={16} className="text-zinc-400" /> },
+  rewards: { label: 'Toywards', icon: <ToywardsSparkleIcon size={16} className="text-zinc-400" /> },
   redeem: { label: 'Redeem code', icon: <Key className="w-4 h-4 text-zinc-400" /> },
 }
 

@@ -14,7 +14,7 @@ import {
   Key,
   ChevronDown,
 } from 'lucide-react'
-import { EpicRewardsIcon } from './RewardsAndWalletTab'
+import { ToywardsSparkleIcon } from './RewardsAndWalletTab'
 
 export type AccountTab =
   | 'settings'
@@ -184,11 +184,11 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
                 : 'text-zinc-400 hover:text-white hover:bg-[#1c1c1c]'
             }`}
           >
-            <EpicRewardsIcon
+            <ToywardsSparkleIcon
               size={16}
               className={activeTab === 'rewards' ? 'text-white' : 'text-zinc-400'}
             />
-            <span>Epic rewards</span>
+            <span>Toywards</span>
           </button>
 
           <button
