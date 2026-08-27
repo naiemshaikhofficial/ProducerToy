@@ -6,69 +6,132 @@ import Link from 'next/link'
 import {
   Play,
   Pause,
-  ShoppingBag,
   Check,
   ExternalLink,
   Share2,
   Flag,
-  Heart,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  Laptop,
   Bookmark,
-  ShoppingCart
+  ShoppingCart,
+  Gift,
+  Info,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
+import { useWishlist } from '@/context/WishlistContext'
 import { useAudio } from '@/context/AudioContext'
-import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
+import { useAuth } from '@/context/AuthContext'
+import { ToywardsSparkleIcon } from '@/components/account/RewardsAndWalletTab'
+import { ProductSpecsOverview } from '@/components/ProductTypeSpecs'
+
 function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 88 88" fill="currentColor">
-      <path d="M0 12.402l35.687-4.86.016 34.423-35.67.203zm35.67 33.529l.028 34.453L0 75.544l.033-29.41zm4.326-39.043L87.994 0v41.527l-47.998.376zm47.998 39.085v41.977l-47.998-6.758-.024-35.219z"/>
-    </svg>
+    <Image
+      src="/icons8-windows-100.png"
+      alt="Windows"
+      width={20}
+      height={20}
+      className={`${className} object-contain inline-block`}
+    />
   )
 }
 
 function AppleIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 170 170" fill="currentColor">
-      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.14-1.9-14.4-6.07-3.69-3.03-7.6-7.85-11.73-14.46-7.84-12.44-13.62-26.7-17.34-42.79-3.72-16.09-5.58-31.5-5.58-46.24 0-17.51 4.34-32.32 13.02-44.43 8.68-12.11 19.8-18.3 33.37-18.57 5.08 0 10.45 1.25 16.11 3.75 5.66 2.5 9.77 3.75 12.33 3.75 2.12 0 6.29-1.28 12.51-3.84 6.22-2.56 11.45-3.8 15.68-3.74 12.12.53 22.39 5.37 30.82 14.51-10.97 6.64-16.32 15.82-16.05 27.53.27 11.71 5.92 21.05 16.96 28.02-4.12 11.97-9.76 23.47-16.92 34.5zm-30.82-114.73c0 7.37-2.76 14.42-8.28 21.15-5.52 6.73-12.22 10.8-20.1 12.21-.13-1.06-.2-1.99-.2-2.78 0-7.37 2.87-14.58 8.61-21.63 5.74-7.05 12.58-11.19 20.52-12.42.13 1.19.2 2.35.2 3.47z"/>
-    </svg>
+    <Image
+      src="/icons8-apple-100.png"
+      alt="macOS"
+      width={20}
+      height={20}
+      className={`${className} object-contain inline-block`}
+    />
   )
 }
 
 export function EpicProductDetailClient({ product }: { product: any }) {
-  const { formatPrice } = useCurrency()
-  const { addItem, isInCart } = useCart()
+  const router = useRouter()
+  const { user } = useAuth()
+  const { formatPrice, convertUsdToInr } = useCurrency()
+  const { addItem, isInCart, openCheckout } = useCart()
+  const { isWishlisted: checkWishlisted, toggleWishlist } = useWishlist()
   const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio()
 
   const [activeTab, setActiveTab] = useState<'overview' | 'addons' | 'faq' | 'specs'>('overview')
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [isWishlisted, setIsWishlisted] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [isDescExpanded, setIsDescExpanded] = useState(false)
+  const [giftModalOpen, setGiftModalOpen] = useState(false)
+  const [giftRecipient, setGiftRecipient] = useState('')
+  const [giftSaved, setGiftSaved] = useState(false)
 
+  const isSaved = checkWishlisted(product.id)
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
   const added = isInCart(product.id)
 
-  // Real DB gallery images: if product has gallery_images or images array in DB, include them. Otherwise, ONLY 1 photo.
+  const handleGetNow = () => {
+    if (product.external_url) {
+      window.open(product.external_url, '_blank')
+      return
+    }
+
+    const priceUsd = Number(product.price_usd) || 0
+    const priceInr = product.price_inr ? Number(product.price_inr) : convertUsdToInr(priceUsd)
+
+    // Open Instant In-Place Checkout Modal
+    openCheckout({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price_inr: priceInr,
+      price_usd: priceUsd,
+      cover_image: product.cover_image,
+      product_type: product.product_type,
+      brand: product.brands?.name || product.brand || 'Producer Toy',
+    })
+  }
+
+  const ytVideoId = (() => {
+    const url = product.youtube_url || product.video_url
+    if (!url) return null
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+    const match = url.match(regExp)
+    return match && match[2].length === 11 ? match[2] : null
+  })()
+
   const dbExtraImages: string[] = Array.isArray(product.gallery_images)
     ? product.gallery_images
     : Array.isArray(product.images)
     ? product.images
     : []
 
-  const galleryImages = [
+  const mediaItems: Array<{ type: 'video' | 'image'; url: string; videoId?: string }> = []
+
+  if (ytVideoId) {
+    mediaItems.push({
+      type: 'video',
+      url: `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`,
+      videoId: ytVideoId
+    })
+  }
+
+  const rawImages = [
     product.cover_image,
     ...dbExtraImages.filter((url: string) => url && url !== product.cover_image)
   ].filter(Boolean)
 
-  if (galleryImages.length === 0 && product.cover_image) {
-    galleryImages.push(product.cover_image)
+  if (rawImages.length === 0 && product.cover_image) {
+    rawImages.push(product.cover_image)
   }
 
-  const activeImage = galleryImages[selectedImageIndex] || galleryImages[0] || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop'
+  rawImages.forEach((img: string) => {
+    mediaItems.push({ type: 'image', url: img })
+  })
+
+  const activeMedia = mediaItems[selectedImageIndex] || mediaItems[0] || { type: 'image', url: product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop' }
 
   const handleAudition = () => {
     if (!product.demo_audio_url) return
@@ -95,34 +158,67 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   }
 
   const handlePrevThumb = () => {
-    setSelectedImageIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))
+    setSelectedImageIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1))
   }
 
   const handleNextThumb = () => {
-    setSelectedImageIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))
+    setSelectedImageIndex((prev) => (prev === mediaItems.length - 1 ? 0 : prev + 1))
   }
 
   const formattedType = (type: string) => {
     switch (type) {
-      case 'plugin': return 'VST Plugin'
+      case 'plugin': return 'Audio Plugin'
       case 'sample_pack': return 'Sample Pack'
       case 'preset': return 'Synth Preset'
-      case 'template': return 'DAW Template'
-      default: return 'Audio Tool'
+      case 'template': return 'DAW Project'
+      case 'sound_kit': return 'Sound Kit'
+      default: return 'Sound Tool'
     }
   }
 
-  // Dynamic DB fields with automatic fallback defaults if not filled in Supabase
-  const supportedDaws = product.supported_daws || 'FL Studio, Ableton Live, Logic Pro, Cubase, Studio One, Reaper'
-  const availableFormats = product.vst_format || product.format || 'VST3, AU, AAX (64-Bit)'
-  const operatingSystem = product.operating_system || product.os || 'Windows 10/11 & macOS 11+ (Apple Silicon M1/M2 Native)'
-  const deliveryMethod = product.delivery_method || 'Instant Encrypted Cloud Download'
+  const availableFormats = product.vst_format || product.format || (product.product_type === 'sample_pack' ? '24-Bit WAV / STEMS' : 'VST3, AU, AAX (64-Bit)')
   const publisherName = product.publisher || 'Producer Toy'
   const releaseYear = product.release_year || product.release_date || (product.created_at ? new Date(product.created_at).getFullYear().toString() : '2026')
-  const platformName = product.platform || 'Windows / macOS'
-  const licenseType = product.license_type || '100% Royalty Free'
-  const developerName = product.brands?.name || product.brand || 'Slate Digital'
-  const badgeFormat = availableFormats.split(',')[0]?.trim() || 'VST3'
+  const developerName = product.brands?.name || product.brand || 'Producer Toy'
+
+  const licenseType = (() => {
+    if (product.license_type) return product.license_type
+    const type = (product.product_type || '').toLowerCase()
+    const isFree = Number(product.price_usd) === 0
+
+    if (type === 'plugin' || type === 'vst' || product.vst_format) {
+      if (isFree) return 'Freeware (Free License)'
+      return product.is_rent_to_own ? 'Rent-to-Own / Perpetual' : 'Lifetime Commercial License'
+    }
+
+    return '100% Royalty-Free Commercial License'
+  })()
+
+  const getProductFeaturesList = (prod: any): string[] => {
+    const type = (prod.product_type || '').toLowerCase()
+    const name = (prod.name || '').toLowerCase()
+
+    if (type === 'plugin' || name.includes('plugin') || name.includes('vst')) {
+      const fmt = (prod.vst_format || prod.format || 'VST3, AU, AAX').split(',')[0]?.trim() || 'VST3'
+      return [fmt, '64-Bit DSP', 'Universal DAW']
+    }
+
+    if (type === 'preset' || name.includes('preset')) {
+      return ['Synth Presets', '100% Royalty Free', 'Universal DAW']
+    }
+
+    if (type === 'midi' || name.includes('midi')) {
+      return ['.MID Format', 'Key & Scale Tagged', '100% Royalty Free']
+    }
+
+    if (type === 'template' || name.includes('template')) {
+      return ['DAW Project File', 'Mixed & Mastered', '100% Royalty Free']
+    }
+
+    return ['24-Bit / 44.1kHz WAV', 'Key & BPM Tagged', '100% Royalty Free']
+  }
+
+  const featurePills = getProductFeaturesList(product)
 
   const subCategoryList = product.subcategories?.name
     ? [product.subcategories.name]
@@ -130,43 +226,39 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       ? (product.sub_category || product.subcategory || product.tags)
       : typeof (product.sub_category || product.subcategory || product.tags || product.categories?.name) === 'string'
         ? (product.sub_category || product.subcategory || product.tags || product.categories?.name).split(',')
-        : ['Saturation']
+        : ['Sound Kits']
 
   return (
-    <div className="space-y-6 text-white max-w-[1400px] mx-auto font-sans">
+    <div className="space-y-6 text-white max-w-[1240px] mx-auto font-sans select-none pb-20">
       
-      {/* 1. Epic Games Product Title Header & Sub-Category Pill */}
-      <div className="flex items-center gap-3.5 flex-wrap">
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+      {/* ========================================================================= */}
+      {/* 1. TOP TITLE HEADER (Exact 1:1 Match)                                     */}
+      {/* ========================================================================= */}
+      <div>
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
           {product.name}
         </h1>
-        {subCategoryList.map((subCat: string, idx: number) => (
-          <span
-            key={idx}
-            className="bg-[#202028] text-zinc-300 border border-[#2e2e3a] text-xs font-semibold px-3 py-1.5 rounded-md self-center"
-          >
-            {subCat.trim()}
-          </span>
-        ))}
       </div>
 
-      {/* 2. Epic Games Sub-Navigation Bar (Overview, Add-Ons, FAQ, Specs) */}
-      <div className="border-b border-[#24242c]">
-        <div className="flex items-center gap-8 text-sm font-semibold overflow-x-auto">
+      {/* ========================================================================= */}
+      {/* 2. SUB-NAVIGATION BAR (Exact 1:1 Match)                                   */}
+      {/* ========================================================================= */}
+      <div className="border-b border-[#202020]">
+        <div className="flex items-center gap-8 text-sm font-semibold overflow-x-auto custom-scrollbar">
           {[
             { id: 'overview', label: 'Overview' },
-            { id: 'addons', label: 'Add-Ons' },
-            { id: 'faq', label: 'FAQ' },
+            { id: 'addons', label: 'Presets & Sounds' },
             { id: 'specs', label: 'Specs & Compatibility' },
+            { id: 'faq', label: 'FAQ' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-3 relative transition-colors cursor-pointer whitespace-nowrap ${
-                activeTab === tab.id ? 'text-white' : 'text-zinc-400 hover:text-white'
+              className={`py-3 relative transition-colors cursor-pointer whitespace-nowrap text-[14px] ${
+                activeTab === tab.id ? 'text-white font-bold' : 'text-zinc-400 hover:text-white font-normal'
               }`}
             >
-              {tab.label}
+              <span>{tab.label}</span>
               {activeTab === tab.id && (
                 <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white rounded-full" />
               )}
@@ -175,76 +267,356 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         </div>
       </div>
 
-      {/* 3. Main 2-Column Epic Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start pt-2">
+      {/* ========================================================================= */}
+      {/* 3. MOBILE HERO & CTA SECTION (< lg ONLY - EXACT SCREENSHOT 1 & 2 MATCH)   */}
+      {/* ========================================================================= */}
+      <div className="block lg:hidden space-y-5">
         
-        {/* ================= LEFT COLUMN (SHOWCASE) ================= */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-          
-          {/* Main Hero Showcase Media Viewer */}
-          <div className="space-y-3">
-            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-[#101014] border border-[#202028] shadow-2xl flex items-center justify-center group">
-              <Image
-                src={activeImage}
-                alt={product.name}
-                fill
-                unoptimized
-                className="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.01]"
-                priority
-              />
+        {/* A. Mobile Hero Poster (16:9 aspect) */}
+        <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#141414] border border-[#262626]">
+          <Image
+            src={product.cover_image}
+            alt={product.name}
+            fill
+            unoptimized
+            priority
+            className="object-cover"
+          />
+        </div>
 
-              {/* Audio Audition Quick Overlay Button */}
-              {product.demo_audio_url && (
+        {/* B. Certification / License Rating Box (Exact Screenshot Match) */}
+        <div className="bg-[#181818] border border-[#262626] rounded-xl p-4 flex items-center gap-3.5 shadow-sm">
+          <div className="w-12 h-12 rounded-lg bg-[#222222] border border-[#333333] flex flex-col items-center justify-center text-center flex-shrink-0">
+            <span className="text-[10px] font-bold text-[#FA742B] uppercase leading-none">AUDIO</span>
+            <span className="text-sm font-black text-white leading-tight">100%</span>
+          </div>
+          <div>
+            <div className="text-sm font-bold text-white leading-tight">
+              100% Royalty-Free
+            </div>
+            <div className="text-xs text-zinc-400 mt-0.5">
+              Commercial Sync & Master Clearance Included
+            </div>
+          </div>
+        </div>
+
+        {/* C. Category Tag Pill (Centered) */}
+        <div className="flex justify-center">
+          <span className="bg-[#242424] text-zinc-300 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-lg border border-[#303030]">
+            {formattedType(product.product_type)}
+          </span>
+        </div>
+
+        {/* D. Price Display */}
+        <div className="space-y-1 text-left">
+          <div className="flex items-center gap-3 flex-wrap">
+            {Number(product.price_usd) === 0 ? (
+              <span className="text-3xl font-black text-white">FREE</span>
+            ) : (
+              <>
+                {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
+                  <>
+                    <span className="text-xs bg-[#FA742B] text-white font-extrabold px-2 py-0.5 rounded">
+                      -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
+                    </span>
+                    <span className="text-base text-zinc-500 line-through">
+                      {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
+                    </span>
+                  </>
+                )}
+                <span className="text-3xl font-black text-white">
+                  {formatPrice(product.price_inr, product.price_usd)}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* E. CTA Action Buttons (Exact Screenshot 1 Stack: Buy Now + Cart, Gift, Wishlist) */}
+        <div className="space-y-3 pt-1">
+          {/* Row 1: Buy Now (Orange) + Cart Button */}
+          {product.external_url ? (
+            <a
+              href={product.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-4 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>{product.button_text || 'Get Now'}</span>
+            </a>
+          ) : (
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleGetNow}
+                className="flex-1 py-4 px-6 text-sm font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.98] shadow-lg shadow-[#FA742B]/20"
+              >
+                <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => addItem(product, true)}
+                className={`w-14 h-14 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
+                  added
+                    ? 'bg-[#282828] hover:bg-[#303030] border-[#383838] text-white'
+                    : 'bg-[#202020] hover:bg-[#2c2c2c] border-[#303030] text-zinc-200 hover:text-white'
+                }`}
+                aria-label="Add to cart"
+                title={added ? 'In Cart' : 'Add to Cart'}
+              >
+                {added ? (
+                  <Check className="w-5 h-5 text-white" />
+                ) : (
+                  <ShoppingCart className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Row 2: Gift Button (with 'New!' Badge on right) */}
+          <button
+            type="button"
+            onClick={() => setGiftModalOpen(true)}
+            className="w-full py-3.5 px-5 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
+          >
+            <Gift className="w-4 h-4 text-zinc-300" />
+            <span>Gift</span>
+            <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
+              New!
+            </span>
+          </button>
+
+          {/* Row 3: Wishlist Button */}
+          <button
+            type="button"
+            onClick={() =>
+              toggleWishlist({
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                brand: product.brands?.name || product.brand || 'Producer Toy',
+                product_type: product.product_type || 'plugin',
+                price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                price_usd: Number(product.price_usd) || 0,
+                cover_image: product.cover_image,
+                vst_format: product.vst_format,
+                short_description: product.short_description,
+              })
+            }
+            className={`w-full py-3.5 px-5 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+              isSaved
+                ? 'bg-rose-950/40 border-rose-600 text-rose-400'
+                : 'bg-[#202020] hover:bg-[#282828] border-[#2c2c2c] text-zinc-200 hover:text-white'
+            }`}
+          >
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-400' : ''}`} />
+            <span>{isSaved ? 'In Wishlist' : 'Wishlist'}</span>
+          </button>
+
+          {/* Audition Demo Button (if demo audio exists) */}
+          {product.demo_audio_url && (
+            <button
+              type="button"
+              onClick={handleAudition}
+              className="w-full bg-[#1c1c1c] hover:bg-[#252525] text-white border border-[#303030] py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              {isCurrentPlaying ? (
+                <>
+                  <Pause className="w-4 h-4 fill-white" />
+                  <span>Pause Audition</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>Audition Demo</span>
+                </>
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* F. Metadata Specs List (Screenshot 2 Exact Match Table) */}
+        <div className="border-t border-b border-[#222222] py-3 space-y-3 text-xs">
+          
+          {/* Toywards Row */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Toywards</span>
+            <Link
+              href="/features/toywards"
+              target="_blank"
+              className="font-bold text-zinc-200 hover:text-white flex items-center gap-1.5 transition-colors"
+            >
+              <span>Earn <strong className="text-[#FA742B]">Toywards</strong></span>
+              <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
+            </Link>
+          </div>
+
+          {/* Refund Type Row */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Refund Type</span>
+            <div className="flex items-center gap-1 font-semibold text-zinc-200">
+              <span>Instant Cloud Delivery</span>
+              <Info className="w-3.5 h-3.5 text-zinc-500" />
+            </div>
+          </div>
+
+          {/* Developer */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Developer</span>
+            <span className="font-semibold text-white">{developerName}</span>
+          </div>
+
+          {/* Publisher */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Publisher</span>
+            <span className="font-semibold text-white">{publisherName}</span>
+          </div>
+
+          {/* Release Date */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Release Date</span>
+            <span className="font-semibold text-white">{releaseYear}</span>
+          </div>
+
+          {/* Platform */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Platform</span>
+            <div className="flex items-center gap-2">
+              <span className="p-1 bg-[#222222] text-zinc-200 rounded border border-[#333333]" title="Windows">
+                <WindowsIcon className="w-3.5 h-3.5" />
+              </span>
+              <span className="p-1 bg-[#222222] text-zinc-200 rounded border border-[#333333]" title="macOS">
+                <AppleIcon className="w-3.5 h-3.5" />
+              </span>
+            </div>
+          </div>
+
+          {/* Format */}
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400">Format</span>
+            <span className="font-semibold text-white">{availableFormats}</span>
+          </div>
+
+        </div>
+
+        {/* G. Social Actions: Share & Report (Side by Side) */}
+        <div className="flex items-center gap-3 pt-1">
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex-1 py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          >
+            <Share2 className="w-4 h-4 text-zinc-400" />
+            <span>{copied ? 'Link Copied!' : 'Share'}</span>
+          </button>
+
+          <Link
+            href="/contact"
+            prefetch={true}
+            className="flex-1 py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+          >
+            <Flag className="w-4 h-4 text-zinc-400" />
+            <span>Report</span>
+          </Link>
+        </div>
+
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 4. MAIN 2-COLUMN GRID (DESKTOP >= lg & SHARED BODY CONTENT)               */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start pt-2">
+        
+        {/* ================= LEFT COLUMN (MEDIA & DETAILS) ================= */}
+        <div className="lg:col-span-8 space-y-8 w-full">
+          
+          {/* Media Showcase (Audio/Video Trailer + Thumbnails) */}
+          <div className="space-y-3 w-full">
+            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
+              {activeMedia.type === 'video' && activeMedia.videoId ? (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${activeMedia.videoId}?autoplay=1&mute=0&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&showinfo=0&autohide=1&fs=0&playsinline=1&loop=1&playlist=${activeMedia.videoId}`}
+                  title={`${product.name} Video Demo`}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <Image
+                  src={activeMedia.url}
+                  alt={product.name}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  priority
+                />
+              )}
+
+              {/* Audition Demo Button Overlay */}
+              {product.demo_audio_url && activeMedia.type !== 'video' && (
                 <button
+                  type="button"
                   onClick={handleAudition}
-                  className="absolute bottom-4 right-4 bg-black/80 hover:bg-white hover:text-black text-white px-4 py-2.5 rounded-full backdrop-blur-md transition-all z-20 flex items-center gap-2 text-xs font-bold shadow-2xl border border-white/10 cursor-pointer"
+                  className="absolute bottom-4 right-4 bg-black/80 hover:bg-[#FA742B] text-white px-4 py-2.5 rounded-full backdrop-blur-md transition-all z-20 flex items-center gap-2 text-xs font-bold shadow-2xl border border-white/10 cursor-pointer"
                 >
                   {isCurrentPlaying ? (
                     <>
                       <Pause className="w-4 h-4 fill-current" />
-                      <span>Pause Audition</span>
+                      <span>Pause Demo</span>
                     </>
                   ) : (
                     <>
                       <Play className="w-4 h-4 fill-current translate-x-0.5" />
-                      <span>Audition Demo</span>
+                      <span>Audition Audio</span>
                     </>
                   )}
                 </button>
               )}
             </div>
 
-            {/* Thumbnail Carousel Strip - Only show if > 1 image in DB */}
-            {galleryImages.length > 1 && (
-              <div className="flex items-center gap-2 pt-1">
+            {/* Thumbnail Carousel Strip (Supports Video Trailers + Images) */}
+            {mediaItems.length > 1 && (
+              <div className="flex items-center gap-2 pt-1 w-full">
                 <button
+                  type="button"
                   onClick={handlePrevThumb}
-                  className="p-2.5 rounded-xl bg-[#1c1c24] hover:bg-[#262632] border border-[#282834] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                  aria-label="Previous image"
+                  className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Previous media"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <div className="flex-1 flex items-center gap-2.5 overflow-x-auto py-1">
-                  {galleryImages.map((img, idx) => (
+                <div className="flex-1 flex items-center gap-2.5 overflow-x-auto py-1 custom-scrollbar">
+                  {mediaItems.map((item, idx) => (
                     <button
                       key={idx}
+                      type="button"
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`relative w-24 sm:w-28 h-14 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
+                      className={`relative w-24 sm:w-28 h-14 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer group ${
                         selectedImageIndex === idx
-                          ? 'border-white shadow-lg scale-105'
-                          : 'border-[#24242e] opacity-60 hover:opacity-100'
+                          ? 'border-[#FA742B] shadow-lg scale-105'
+                          : 'border-[#262626] opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <Image src={img} alt={`Thumbnail ${idx + 1}`} fill unoptimized className="object-cover" />
+                      <Image src={item.url} alt={`Media ${idx + 1}`} fill unoptimized className="object-cover" />
+                      {item.type === 'video' && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/20 transition-colors">
+                          <div className="w-7 h-7 bg-red-600 rounded-lg flex items-center justify-center shadow-lg">
+                            <Play className="w-4 h-4 text-white fill-white translate-x-0.5" />
+                          </div>
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>
 
                 <button
+                  type="button"
                   onClick={handleNextThumb}
-                  className="p-2.5 rounded-xl bg-[#1c1c24] hover:bg-[#262632] border border-[#282834] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                  aria-label="Next image"
+                  className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Next media"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -252,73 +624,124 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             )}
           </div>
 
-          {/* Product Tagline / Main Description (Frameless natural text) */}
-          <div className="space-y-6">
-            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal">
-              {product.short_description || product.full_description || 'High-precision DSP processing and studio-grade sound quality designed for professional audio production.'}
-            </p>
+          {/* Lead Hook Tagline / Description (Screenshot 3 Match) */}
+          <div className="space-y-6 w-full">
+            {product.short_description && (
+              <p className="text-base sm:text-lg text-zinc-200 leading-relaxed font-medium">
+                {product.short_description}
+              </p>
+            )}
 
-            {/* Detailed Description Section */}
+            {/* Genres & Features Badges (2-column layout with vertical divider - Screenshot 3 Match) */}
+            {activeTab === 'overview' && (
+              <div className="grid grid-cols-2 gap-6 pt-5 pb-2 border-t border-[#202020]">
+                {/* Genres / Categories (Left Column) */}
+                <div className="space-y-2.5 pr-4 border-r border-[#262626]">
+                  <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                    Genres
+                  </span>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
+                    <span className="bg-[#202020] text-zinc-200 border border-[#2c2c2c] text-xs font-semibold px-3 py-1.5 rounded-lg">
+                      {formattedType(product.product_type)}
+                    </span>
+                    {subCategoryList.map((subCat: string, idx: number) => (
+                      <span
+                        key={idx}
+                        className="bg-[#202020] text-zinc-200 border border-[#2c2c2c] text-xs font-semibold px-3 py-1.5 rounded-lg"
+                      >
+                        {subCat.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Features (Right Column) */}
+                <div className="space-y-2.5 pl-2">
+                  <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                    Features
+                  </span>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
+                    {featurePills.map((feat: string, idx: number) => (
+                      <span
+                        key={idx}
+                        className="bg-[#202020] text-zinc-200 border border-[#2c2c2c] text-xs font-semibold px-3 py-1.5 rounded-lg"
+                      >
+                        {feat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Highlight Promo Card: Producer Toy Club / Toywards (Screenshot 3 Match) */}
+            <div className="p-6 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-4 shadow-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center">
+                  <ToywardsSparkleIcon size={20} className="text-[#FA742B]" />
+                </div>
+                <div>
+                  <h4 className="text-base font-extrabold text-white tracking-tight">
+                    Earn with Toywards Rewards
+                  </h4>
+                  <p className="text-xs text-zinc-300 mt-0.5">
+                    Earn up to 20% cashback in Toywards balance on eligible purchases. Spend 1:1 on plugins and sound kits at checkout.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <Link
+                  href="/features/toywards"
+                  prefetch={true}
+                  className="inline-flex items-center justify-center px-5 py-2 rounded-xl bg-[#242424] hover:bg-[#2c2c2c] text-white border border-[#383838] text-xs font-bold uppercase tracking-wider transition-colors"
+                >
+                  Explore Toywards
+                </Link>
+              </div>
+            </div>
+
+            {/* Detailed Description & Read More (Screenshot 4 Match) */}
             {activeTab === 'overview' && product.full_description && (
-              <div className="space-y-3 pt-4 border-t border-[#202028]">
-                <h3 className="text-lg font-bold text-white">About {product.name}</h3>
-                <div className="text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal">
+              <div className="space-y-3 pt-2">
+                <h3 className="text-xl font-black text-white tracking-tight">About {product.name}</h3>
+                <div
+                  className={`text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal transition-all ${
+                    !isDescExpanded ? 'max-h-48 overflow-hidden relative' : ''
+                  }`}
+                >
                   {product.full_description}
+                  {!isDescExpanded && (
+                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#121212] to-transparent pointer-events-none" />
+                  )}
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsDescExpanded(!isDescExpanded)}
+                  className="text-xs font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 pt-1 cursor-pointer transition-colors"
+                >
+                  <span>{isDescExpanded ? 'Show less' : 'Show more'}</span>
+                  {isDescExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                </button>
               </div>
             )}
 
-            {/* Specs Tab Content */}
+            {/* Specs & Compatibility */}
             {(activeTab === 'specs' || activeTab === 'overview') && (
-              <div className="space-y-4 pt-4 border-t border-[#202028]">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                  <span>System Requirements & Compatibility</span>
-                </h3>
-
-                <div className="bg-[#16161c] border border-[#262632] rounded-xl p-5 space-y-4 text-xs">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-4 border-b border-[#242430]">
-                    <div>
-                      <span className="text-zinc-400 block mb-1 font-medium">Supported DAWs</span>
-                      <span className="text-white font-semibold">{supportedDaws}</span>
-                    </div>
-                    <div>
-                      <span className="text-zinc-400 block mb-1 font-medium">Available Formats</span>
-                      <span className="text-white font-semibold">{availableFormats}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-zinc-400 block mb-1.5 font-medium">Operating System</span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="p-2 bg-[#202028] text-blue-400 rounded-lg border border-[#2c2c38] flex items-center justify-center" title="Windows Supported">
-                          <WindowsIcon className="w-4.5 h-4.5" />
-                        </span>
-                        <span className="p-2 bg-[#202028] text-zinc-200 rounded-lg border border-[#2c2c38] flex items-center justify-center" title="macOS Supported">
-                          <AppleIcon className="w-4.5 h-4.5" />
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-zinc-400 block mb-1 font-medium">Delivery Method</span>
-                      <span className="text-white font-semibold">{deliveryMethod}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ProductSpecsOverview product={product} />
             )}
 
-            {/* FAQ Tab Content */}
+            {/* FAQ Tab */}
             {activeTab === 'faq' && (
-              <div className="space-y-4 pt-4 border-t border-[#202028]">
+              <div className="space-y-4 pt-4">
                 <h3 className="text-lg font-bold text-white">Frequently Asked Questions</h3>
                 <div className="space-y-3">
-                  <div className="bg-[#16161c] border border-[#262632] p-4 rounded-xl space-y-1">
+                  <div className="bg-[#161616] border border-[#262626] p-4 rounded-xl space-y-1">
                     <h4 className="font-semibold text-white text-sm">How do I download my purchase?</h4>
                     <p className="text-xs text-zinc-400">Once purchased, your file is instantly available under &quot;My Purchases&quot; with direct high-speed download links.</p>
                   </div>
-                  <div className="bg-[#16161c] border border-[#262632] p-4 rounded-xl space-y-1">
+                  <div className="bg-[#161616] border border-[#262626] p-4 rounded-xl space-y-1">
                     <h4 className="font-semibold text-white text-sm">Are these sounds royalty-free?</h4>
                     <p className="text-xs text-zinc-400">Yes, 100% of products on Producer Toy Store are cleared for commercial use.</p>
                   </div>
@@ -330,59 +753,59 @@ export function EpicProductDetailClient({ product }: { product: any }) {
 
         </div>
 
-        {/* ================= RIGHT COLUMN (EPIC GAMES STICKY SIDEBAR) ================= */}
-        <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 space-y-5">
+        {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
+        <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-4 w-full">
           
-          {/* Main Cover Art Image */}
-          <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#16161c] border border-[#242432] shadow-xl flex items-center justify-center p-3">
+          {/* Direct Prominent Brand Logo */}
+          <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image
-              src={product.cover_image}
-              alt={product.name}
-              fill
+              src={product.brands?.logo_url || product.brand_logo || '/logo-white.png'}
+              alt={developerName}
+              width={360}
+              height={144}
               unoptimized
-              className="object-contain p-2"
+              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto filter brightness-200 contrast-200 drop-shadow-xl"
             />
           </div>
 
-          {/* Age Rating / Compatibility Badge Box (Matching Epic IARC Box) */}
-          <div className="border border-[#282834] bg-[#16161c] p-3.5 rounded-xl flex items-center gap-3.5">
-            <div className="w-10 h-10 bg-[#22222c] border border-[#30303e] rounded-lg flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
-              {badgeFormat}
-            </div>
-            <div>
-              <span className="text-xs font-bold text-white block">Universal Studio Standard</span>
-              <span className="text-[11px] text-zinc-400 block">64-Bit DAW Compatible • Direct Delivery</span>
-            </div>
-          </div>
-
-          {/* Base Product Type Tag */}
           <div>
-            <span className="bg-[#202028] text-zinc-200 text-xs font-medium px-3 py-1 rounded-md inline-block">
+            <span className="bg-[#242424] text-zinc-200 text-xs font-bold px-3 py-1 rounded-md inline-block uppercase tracking-wider border border-[#303030]">
               {formattedType(product.product_type)}
             </span>
           </div>
 
-          {/* Price Header */}
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              {product.price_usd === 0 ? (
-                <span className="text-2xl sm:text-3xl font-extrabold text-[#00ff88]">FREE</span>
+            <div className="flex items-center gap-3 flex-wrap">
+              {Number(product.price_usd) === 0 ? (
+                <span className="text-3xl font-black text-white">FREE</span>
               ) : (
-                <span className="text-2xl sm:text-3xl font-extrabold text-white">
-                  {formatPrice(undefined, product.price_usd)}
-                </span>
+                <>
+                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
+                    <>
+                      <span className="text-xs bg-[#FA742B] text-white font-extrabold px-2 py-1 rounded">
+                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
+                      </span>
+                      <span className="text-base text-zinc-500 line-through">
+                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
+                      </span>
+                    </>
+                  )}
+                  <span className="text-3xl font-black text-white">
+                    {formatPrice(product.price_inr, product.price_usd)}
+                  </span>
+                </>
               )}
             </div>
 
-            {/* Toywards Rewards Pill (Dual-Tone Orange & White) */}
-            {product.price_usd > 0 && (
+            {/* Toywards Rewards Pill */}
+            {Number(product.price_usd) > 0 && (
               <Link
                 href="/features/toywards"
                 target="_blank"
                 className="inline-flex items-center gap-2 bg-[#26150b] hover:bg-[#321b0f] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-xs select-none shadow-xs transition-colors group cursor-pointer"
                 title="Learn more about Toywards"
               >
-                <ToywardsIcon size={14} />
+                <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
                 <span className="text-zinc-300">
                   Earn <span className="text-[#FA742B] font-bold">Toywards Rewards</span> on this purchase
                 </span>
@@ -390,44 +813,31 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             )}
           </div>
 
-          {/* Action Buttons (Buy Now + Cart Icon + Wishlist) */}
-          <div className="space-y-2.5">
+          {/* Desktop CTA Action Buttons */}
+          <div className="space-y-2.5 pt-1">
             {product.external_url ? (
               <a
                 href={product.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>{product.button_text || `GET ON ${developerName.toUpperCase()}`}</span>
+                <span>{product.button_text || 'Get'}</span>
               </a>
             ) : (
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => addItem(product)}
-                  disabled={added}
-                  className={`flex-1 py-3.5 px-6 text-sm font-bold uppercase tracking-wide rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
-                    added
-                      ? 'bg-zinc-800 text-zinc-400 cursor-default'
-                      : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20'
-                  }`}
+                  type="button"
+                  onClick={handleGetNow}
+                  className="flex-1 py-3.5 px-6 text-sm font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
                 >
-                  {added ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>In Cart</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>{(product.price_usd === 0 || product.price_inr === 0) ? 'Get Now' : 'Buy Now'}</span>
-                    </>
-                  )}
+                  <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
                 </button>
 
                 <button
-                  onClick={() => addItem(product)}
+                  type="button"
+                  onClick={() => addItem(product, true)}
                   className={`w-12 h-12 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
                     added
                       ? 'bg-[#282828] hover:bg-[#303030] border-[#383838] text-white'
@@ -445,64 +855,72 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               </div>
             )}
 
-            {/* Audition Demo Button */}
-            {product.demo_audio_url && (
-              <button
-                onClick={handleAudition}
-                className="w-full bg-[#202028] hover:bg-[#2a2a34] text-white border border-[#2e2e3a] py-3 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                {isCurrentPlaying ? (
-                  <>
-                    <Pause className="w-4 h-4 fill-white" />
-                    <span>Pause Audition</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 fill-white" />
-                    <span>Audition Demo</span>
-                  </>
-                )}
-              </button>
-            )}
+            {/* Gift Button */}
+            <button
+              type="button"
+              onClick={() => setGiftModalOpen(true)}
+              className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
+            >
+              <Gift className="w-4 h-4 text-zinc-300" />
+              <span>Gift</span>
+              <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
+                New!
+              </span>
+            </button>
 
             {/* Wishlist Button */}
             <button
-              onClick={() => setIsWishlisted(!isWishlisted)}
-              className={`w-full py-3 px-4 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                isWishlisted
+              type="button"
+              onClick={() =>
+                toggleWishlist({
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  brand: product.brands?.name || product.brand || 'Producer Toy',
+                  product_type: product.product_type || 'plugin',
+                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                  price_usd: Number(product.price_usd) || 0,
+                  cover_image: product.cover_image,
+                  vst_format: product.vst_format,
+                  short_description: product.short_description,
+                })
+              }
+              className={`w-full py-3 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                isSaved
                   ? 'bg-rose-950/40 border-rose-600 text-rose-400'
-                  : 'bg-[#202028] hover:bg-[#2a2a34] border-[#2e2e3a] text-white'
+                  : 'bg-[#222222] hover:bg-[#2a2a2a] border-[#333333] text-white'
               }`}
             >
-              <Bookmark className={`w-4 h-4 ${isWishlisted ? 'fill-rose-400' : ''}`} />
-              <span>{isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}</span>
+              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-400' : ''}`} />
+              <span>{isSaved ? 'In Wishlist' : 'Add to Wishlist'}</span>
             </button>
 
-            {/* Separate Windows & macOS Static Compatibility Badges */}
+            {/* OS Compatibility Grid */}
             <div className="grid grid-cols-2 gap-2.5 pt-1">
               <div
                 title="Compatible with Windows"
-                className="bg-[#1c1c26] border border-[#2a2a3a] text-white py-3 px-4 rounded-xl flex items-center justify-center shadow-sm select-none"
+                className="bg-[#1c1c1c] border border-[#2e2e2e] text-white py-3 px-4 rounded-xl flex items-center justify-center shadow-sm select-none"
               >
                 <WindowsIcon className="w-5 h-5 text-zinc-200" />
               </div>
 
               <div
                 title="Compatible with macOS"
-                className="bg-[#1c1c26] border border-[#2a2a3a] text-white py-3 px-4 rounded-xl flex items-center justify-center shadow-sm select-none"
+                className="bg-[#1c1c1c] border border-[#2e2e2e] text-white py-3 px-4 rounded-xl flex items-center justify-center shadow-sm select-none"
               >
                 <AppleIcon className="w-5 h-5 text-zinc-200" />
               </div>
             </div>
           </div>
 
-          {/* Key Specifications Grid (Exact Epic Key-Value Specs) */}
-          <div className="space-y-3 pt-3 text-xs">
-            <div className="flex items-center justify-between border-b border-[#202028] pb-2.5">
+          {/* Desktop Metadata Specs Table */}
+          <div className="space-y-3 pt-3 text-xs border-t border-[#222222]">
+            <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">Developer</span>
               {(product.brands?.slug || product.brand) ? (
                 <Link
                   href={`/store/${product.brands?.slug || (product.brand ? product.brand.toLowerCase().replace(/\s+/g, '-') : '')}`}
+                  prefetch={true}
                   className="font-semibold text-white hover:underline transition-colors"
                 >
                   {developerName}
@@ -512,55 +930,122 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               )}
             </div>
 
-            <div className="flex items-center justify-between border-b border-[#202028] pb-2.5">
-              <span className="text-zinc-400">Publisher</span>
-              <span className="font-semibold text-white">{publisherName}</span>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-[#202028] pb-2.5">
+            <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">Release Date</span>
               <span className="font-semibold text-white">{releaseYear}</span>
             </div>
 
-            <div className="flex items-center justify-between border-b border-[#202028] pb-2.5">
+            <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">Platform</span>
               <div className="flex items-center gap-2">
-                <span className="p-1.5 bg-[#202028] text-blue-400 rounded-md border border-[#2c2c38] flex items-center justify-center" title="Windows">
+                <span className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center" title="Windows">
                   <WindowsIcon className="w-4 h-4" />
                 </span>
-                <span className="p-1.5 bg-[#202028] text-zinc-200 rounded-md border border-[#2c2c38] flex items-center justify-center" title="macOS">
+                <span className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center" title="macOS">
                   <AppleIcon className="w-4 h-4" />
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-b border-[#202028] pb-2.5">
+            {Number(product.price_usd) > 0 && (
+              <div className="flex items-center justify-between pb-1">
+                <span className="text-zinc-400">Toywards</span>
+                <Link
+                  href="/features/toywards"
+                  target="_blank"
+                  className="font-semibold text-zinc-200 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Learn more about Toywards"
+                >
+                  <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
+                  <span>Earn <span className="text-[#FA742B] font-bold">Toywards</span></span>
+                </Link>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">License Type</span>
-              <span className="font-semibold text-emerald-400">{licenseType}</span>
+              <span className="font-semibold text-white">{licenseType}</span>
             </div>
           </div>
 
-          {/* Share & Report Footer Buttons */}
-          <div className="flex items-center gap-3 pt-2">
+          <div className="pt-2">
             <button
+              type="button"
               onClick={handleShare}
-              className="flex-1 bg-[#16161c] hover:bg-[#202028] border border-[#242430] text-zinc-300 hover:text-white py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full bg-[#161616] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>{copied ? 'Copied!' : 'Share'}</span>
-            </button>
-
-            <button
-              className="flex-1 bg-[#16161c] hover:bg-[#202028] border border-[#242430] text-zinc-300 hover:text-white py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <Flag className="w-3.5 h-3.5" />
-              <span>Report</span>
             </button>
           </div>
 
         </div>
 
       </div>
+
+      {/* ========================================================================= */}
+      {/* GIFT MODAL POPUP                                                          */}
+      {/* ========================================================================= */}
+      {giftModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-xs animate-in fade-in"
+            onClick={() => setGiftModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-md bg-[#181818] border border-[#2c2c2c] rounded-2xl p-6 space-y-4 shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Gift className="w-5 h-5 text-[#FA742B]" />
+                <span>Gift this Product</span>
+              </h3>
+              <button
+                onClick={() => setGiftModalOpen(false)}
+                className="text-zinc-400 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-xs text-zinc-300">
+              Send <strong className="text-white">{product.name}</strong> as a digital gift license directly to a fellow producer or friend's email.
+            </p>
+
+            <input
+              type="email"
+              placeholder="recipient@example.com"
+              value={giftRecipient}
+              onChange={(e) => setGiftRecipient(e.target.value)}
+              className="w-full bg-[#141414] border border-[#2c2c2c] text-white text-xs px-3.5 py-3 rounded-xl outline-none focus:border-[#FA742B]"
+            />
+
+            {giftSaved && (
+              <p className="text-xs font-bold text-green-400">
+                Gift details saved! Complete checkout to send the gift key.
+              </p>
+            )}
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#242424]">
+              <button
+                type="button"
+                onClick={() => setGiftModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-[#242424] text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setGiftSaved(true)
+                  setTimeout(() => setGiftModalOpen(false), 1200)
+                }}
+                className="px-5 py-2 rounded-xl bg-[#FA742B] hover:bg-[#E05A18] text-white text-xs font-extrabold uppercase cursor-pointer"
+              >
+                Save Gift Info
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
