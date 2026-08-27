@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { X } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
@@ -237,7 +238,6 @@ export function GlobalCheckoutModal() {
     if (!validateForm()) return
     setLoading(true)
     setErrorMsg('')
-    setPaymentStatus('processing')
     try {
       if (user?.id) {
         await saveBillingAddressAction(user.id, billingDetails).catch(() => {})
@@ -326,7 +326,7 @@ export function GlobalCheckoutModal() {
         handler: async (response: any) => {
           setPaymentStatus('processing')
           try {
-            const verifyRes = await fetch('/api/razorpay/verify-payment', {
+            const verifyRes = await fetch('/api/razorpay/verify', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -334,6 +334,7 @@ export function GlobalCheckoutModal() {
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
                 items,
+                userId: user?.id,
                 billingDetails,
                 couponCode: coupon,
                 newsletterOptIn,
@@ -398,8 +399,34 @@ export function GlobalCheckoutModal() {
           </div>
         )}
 
-        {paymentStatus === 'success' ? (
-          <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl">
+        {/* 1. PROCESSING MODAL STATE: Exact Epic Games Store Dark Screen + Large Orange Rotating Spinner */}
+        {paymentStatus === 'processing' ? (
+          <div className="relative w-full max-w-[1080px] lg:max-w-[1120px] h-screen max-h-screen bg-[#141414] border-x border-[#242424] shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col items-center justify-center select-none animate-in fade-in duration-150">
+            {/* Top-Right Fixed Close ✕ */}
+            <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-50">
+              <button
+                type="button"
+                onClick={closeCheckout}
+                className="text-zinc-500 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+                title="Cancel and close"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Exact Epic Games Centered Rotating Orange Circular Loader */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16">
+                {/* Background Dark Track */}
+                <div className="w-full h-full rounded-full border-4 border-[#222222]" />
+                {/* Producer Toy Brand Orange Spinner Arc */}
+                <div className="absolute inset-0 w-full h-full rounded-full border-4 border-transparent border-t-[#FA742B] animate-spin duration-700 ease-linear" />
+              </div>
+            </div>
+          </div>
+        ) : paymentStatus === 'success' ? (
+          <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200">
             <CheckoutSuccessView email={billingDetails.email || user?.email} onClose={closeCheckout} />
           </div>
         ) : (

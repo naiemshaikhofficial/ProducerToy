@@ -17,11 +17,26 @@ export async function POST(request: Request) {
       isFree,
     } = body
 
-    if (!userId || !items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Invalid order parameters' }, { status: 400 })
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: 'Invalid order parameters: items array required' }, { status: 400 })
     }
 
     const adminSupabase = createAdminClient()
+
+    let targetUserId = userId || null
+    if (!targetUserId && billingDetails?.email) {
+      try {
+        const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+        const existingUser = usersData?.users?.find(
+          (u: any) => u.email?.toLowerCase() === billingDetails.email.toLowerCase()
+        )
+        if (existingUser) {
+          targetUserId = existingUser.id
+        }
+      } catch (err) {
+        console.warn('User lookup note:', err)
+      }
+    }
 
     // 1. Resilient product records & prices from database
     const productIds = items.map((i: any) => i.id).filter(Boolean)
@@ -151,17 +166,18 @@ export async function POST(request: Request) {
       }
     }
 
-    // 6. Fetch target user
-    const {
-      data: { user: targetUser },
-      error: userErr,
-    } = await adminSupabase.auth.admin.getUserById(userId)
-
-    if (userErr || !targetUser) {
-      return NextResponse.json({ error: 'Target user not found' }, { status: 404 })
+    // 6. Resolve target user
+    let targetUser: any = null
+    if (targetUserId) {
+      try {
+        const { data } = await adminSupabase.auth.admin.getUserById(targetUserId)
+        targetUser = data?.user || null
+      } catch (err) {
+        console.warn('Target user lookup note:', err)
+      }
     }
 
-    const targetEmail = billingDetails?.email || targetUser.email || ''
+    const targetEmail = billingDetails?.email || targetUser?.email || ''
     const finalOrderId = isFree ? `PT_FREE_${Date.now()}` : razorpay_order_id
     const finalPaymentId = isFree ? `PAY_FREE_${Date.now()}` : razorpay_payment_id
     const orderNumber = `PT-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`

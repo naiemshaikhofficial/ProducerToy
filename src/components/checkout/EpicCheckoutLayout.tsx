@@ -580,12 +580,12 @@ export function EpicCheckoutLayout({
               type="button"
               onClick={handlePayClick}
               disabled={loading || paymentStatus === 'processing'}
-              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-[6px] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-[0.99]"
+              className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-[6px] transition-all shadow-md flex items-center justify-center cursor-pointer disabled:opacity-60 active:scale-[0.99]"
             >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <ButtonSpinner size={15} variant="dark" />
-                  <span>Processing Order...</span>
+              {loading || paymentStatus === 'processing' ? (
+                <div className="relative w-5 h-5 flex items-center justify-center">
+                  <div className="w-full h-full rounded-full border-2 border-black/20" />
+                  <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-[#FA742B] animate-spin duration-700 ease-linear" />
                 </div>
               ) : (
                 <span>
