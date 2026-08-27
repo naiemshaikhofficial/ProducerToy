@@ -168,17 +168,15 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                   className="w-[calc(100%-48px)] sm:w-[320px] lg:w-[calc(50%-8px)] flex-shrink-0 snap-start flex flex-col gap-3.5"
                 >
                   {colItems.map((item) => {
-                    const isFree = Number(item.price_usd) === 0
+                    const priceUsd = Number(item.price_usd) || 0
+                    const priceInr = item.price_inr ? Number(item.price_inr) : convertUsdToInr(priceUsd)
+                    const originalPriceUsd = item.original_price_usd ? Number(item.original_price_usd) : 0
+                    const originalPriceInr = item.original_price_inr ? Number(item.original_price_inr) : (originalPriceUsd ? convertUsdToInr(originalPriceUsd) : undefined)
+                    const isFree = priceUsd === 0
                     const isSaved = isWishlisted(item.id)
-                    const hasDiscount =
-                      item.original_price_usd &&
-                      Number(item.original_price_usd) > Number(item.price_usd)
+                    const hasDiscount = originalPriceUsd > priceUsd
                     const discountPercent = hasDiscount
-                      ? Math.round(
-                          ((Number(item.original_price_usd) - Number(item.price_usd)) /
-                            Number(item.original_price_usd)) *
-                            100
-                        )
+                      ? Math.round(((originalPriceUsd - priceUsd) / originalPriceUsd) * 100)
                       : 0
 
                     return (
@@ -239,15 +237,15 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                                   -{discountPercent}%
                                 </span>
                                 <span className="line-through text-zinc-500 text-[11px] sm:text-xs font-normal">
-                                  {formatPrice(item.original_price_inr, Number(item.original_price_usd))}
+                                  {formatPrice(originalPriceInr, originalPriceUsd)}
                                 </span>
                                 <span className="text-white font-extrabold text-xs sm:text-sm">
-                                  {formatPrice(item.price_inr, item.price_usd)}
+                                  {formatPrice(priceInr, priceUsd)}
                                 </span>
                               </div>
                             ) : (
                               <span className="text-white font-extrabold text-xs sm:text-sm">
-                                {formatPrice(item.price_inr, item.price_usd)}
+                                {formatPrice(priceInr, priceUsd)}
                               </span>
                             )}
                           </div>

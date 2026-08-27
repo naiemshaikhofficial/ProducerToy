@@ -43,6 +43,7 @@ export interface Product {
   product_type: 'plugin' | 'sample_pack' | 'preset' | 'template' | string
   price_inr?: number
   price_usd: number
+  original_price_inr?: number | null
   original_price_usd?: number | null
   cover_image: string
   demo_audio_url?: string
@@ -51,6 +52,7 @@ export interface Product {
   external_url?: string
   button_text?: string
   is_featured?: boolean
+  created_at?: string | null
 }
 
 export function ProductCard({ product }: { product: Product }) {
