@@ -1,8 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getAdminClient } from '@/lib/supabase/admin'
 import { Product } from '@/components/ProductCard'
+import { getHomepageProducts } from '@/lib/data/products'
 
 import { EpicHeroCarousel } from '@/components/EpicHeroCarousel'
 import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
@@ -10,29 +10,10 @@ import { FreeProducerToys } from '@/components/FreeProducerToys'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
-export const revalidate = 1800 // Cache homepage with ISR for 30 minutes (0ms instant page loads, background revalidation)
+export const revalidate = 86400 // 24-hour Edge Cache (instant on-demand revalidation via /api/revalidate & Server Actions)
 
 export default async function HomePage() {
-  const supabase = getAdminClient()
-
-  let products: Product[] = []
-  try {
-    const { data } = await supabase
-      .from('products')
-      .select('*, brands(name, slug), subcategories(name, slug)')
-      .eq('is_active', true)
-      .order('is_featured', { ascending: false })
-      .order('created_at', { ascending: false })
-    
-    if (data && data.length > 0) {
-      products = data.map((item: any) => ({
-        ...item,
-        brand: item.brands?.name || item.brand || 'Producer Toy'
-      })) as Product[]
-    }
-  } catch (error) {
-    console.error('Failed to fetch products:', error)
-  }
+  let products: Product[] = await getHomepageProducts()
 
   if (products.length === 0) {
     products = [
