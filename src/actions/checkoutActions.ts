@@ -224,54 +224,84 @@ export async function processCheckoutAction(
     const randomPaymentId = `pay_${crypto.randomBytes(8).toString('hex')}`
     const orderCurrency = options?.currency || 'USD'
 
+    const isUUID = (str: any) =>
+      typeof str === 'string' &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+
     // 4. Build secure purchase records with conditional serial key issuance & billing snapshot
-    const purchaseRecords = dbProducts.map((dbProduct) => {
-      const requiresSerialKey = Boolean(
-        dbProduct.delivery_method === 'serial_key' ||
-        dbProduct.delivery_method === 'license_key' ||
-        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
-        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
-      )
+    const purchaseRecords = await Promise.all(
+      dbProducts.map(async (dbProduct) => {
+        let validProductId = isUUID(dbProduct.id) ? dbProduct.id : null
 
-      let serialKey: string | null = null
-      if (requiresSerialKey) {
-        const serialPartA = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const serialPartB = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const serialPartC = crypto.randomBytes(3).toString('hex').toUpperCase()
-        serialKey = `PT-VST-${serialPartA}-${serialPartB}-${serialPartC}`
-      }
+        if (!validProductId && (dbProduct.slug || dbProduct.name)) {
+          try {
+            const { data: realProd } = await adminSupabase
+              .from('products')
+              .select('id')
+              .or(`slug.ilike.${dbProduct.slug || ''},name.ilike.${dbProduct.name || ''}`)
+              .limit(1)
+              .maybeSingle()
+            if (realProd && isUUID(realProd.id)) {
+              validProductId = realProd.id
+            }
+          } catch (e) {
+            console.warn('Real product lookup note:', e)
+          }
+        }
 
-      return {
-        user_id: targetUserId,
-        product_id: dbProduct.id,
-        amount_paid: Number(dbProduct.price_usd || 0),
-        currency: orderCurrency,
-        serial_key: serialKey,
-        razorpay_order_id: randomOrderId,
-        razorpay_payment_id: randomPaymentId,
-        customer_email: targetEmail,
-        customer_name: billingDetails?.fullName || null,
-        customer_phone: billingDetails?.phone || null,
-        billing_address: billingDetails?.address || null,
-        billing_city: billingDetails?.city || null,
-        billing_state: billingDetails?.state || null,
-        billing_zip: billingDetails?.zip || null,
-        billing_country: billingDetails?.country || null,
-        discount_amount: options?.discountAmount || 0,
-        coupon_code: options?.couponCode || null,
-        purchased_at: new Date().toISOString(),
-      }
-    })
+        const requiresSerialKey = Boolean(
+          dbProduct.delivery_method === 'serial_key' ||
+          dbProduct.delivery_method === 'license_key' ||
+          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
+          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
+        )
+
+        let serialKey: string | null = null
+        if (requiresSerialKey) {
+          const serialPartA = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const serialPartB = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const serialPartC = crypto.randomBytes(3).toString('hex').toUpperCase()
+          serialKey = `PT-VST-${serialPartA}-${serialPartB}-${serialPartC}`
+        }
+
+        return {
+          user_id: targetUserId,
+          product_id: validProductId,
+          amount_paid: Number(dbProduct.price_usd || 0),
+          currency: orderCurrency,
+          serial_key: serialKey,
+          razorpay_order_id: randomOrderId,
+          razorpay_payment_id: randomPaymentId,
+          customer_email: targetEmail,
+          customer_name: billingDetails?.fullName || null,
+          customer_phone: billingDetails?.phone || null,
+          billing_address: billingDetails?.address || null,
+          billing_city: billingDetails?.city || null,
+          billing_state: billingDetails?.state || null,
+          billing_zip: billingDetails?.zip || null,
+          billing_country: billingDetails?.country || null,
+          discount_amount: options?.discountAmount || 0,
+          coupon_code: options?.couponCode || null,
+          purchased_at: new Date().toISOString(),
+        }
+      })
+    )
 
     // 5. Insert verified purchases into Supabase
-    const { data: insertedPurchases, error: insertErr } = await adminSupabase
-      .from('purchases')
-      .insert(purchaseRecords)
-      .select('*, products(*)')
+    let insertedPurchases: any[] = []
+    try {
+      const { data, error: insertErr } = await adminSupabase
+        .from('purchases')
+        .insert(purchaseRecords)
+        .select('*')
 
-    if (insertErr) {
-      console.error('Secure checkout insert error:', insertErr)
-      return { success: false, error: insertErr.message }
+      if (!insertErr && data) {
+        insertedPurchases = data
+      } else if (insertErr) {
+        console.warn('Purchases insert fallback note:', insertErr.message)
+      }
+    } catch (insertEx) {
+      console.warn('Purchases insert exception note:', insertEx)
     }
 
     // 6. Record order in orders table

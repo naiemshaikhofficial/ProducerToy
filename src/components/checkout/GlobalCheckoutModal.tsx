@@ -171,7 +171,9 @@ export function GlobalCheckoutModal() {
     }
   }, [isCheckoutOpen])
 
-  if (!isCheckoutOpen || items.length === 0) return null
+  if (!isCheckoutOpen || (items.length === 0 && paymentStatus !== 'success' && paymentStatus !== 'processing')) {
+    return null
+  }
 
   // Cart Price Calculations (100% Synchronized with live exchangeRate & formatPrice)
   const rawSubtotalUsd = items.reduce((acc, i) => acc + (Number(i.price_usd) || 0), 0)
