@@ -16,9 +16,6 @@ interface FreeItemDisplay {
   name: string
   slug: string
   cover_image: string
-  status: 'free_now' | 'coming_soon'
-  badge_text: string
-  subtitle: string
   brand?: string
 }
 
@@ -35,9 +32,6 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
       name: 'TDR Nova Dynamic Precision EQ',
       slug: 'tdr-nova',
       cover_image: 'https://imagizer.imageshack.com/img922/4266/oEGOCb.png',
-      status: 'free_now',
-      badge_text: 'FREE NOW',
-      subtitle: 'Free Now - 100% Royalty Free',
       brand: 'Tokyo Dawn Labs',
     },
     {
@@ -45,9 +39,6 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
       name: 'Valhalla Supermassive Space Echo',
       slug: 'supermassive',
       cover_image: 'https://imagizer.imageshack.com/img924/8785/ZZlWA9.png',
-      status: 'free_now',
-      badge_text: 'FREE NOW',
-      subtitle: 'Free Now - Instant Download',
       brand: 'Valhalla DSP',
     },
     {
@@ -55,9 +46,6 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
       name: 'Fresh Air Dynamic High Exciter',
       slug: 'fresh-air',
       cover_image: 'https://imagizer.imageshack.com/img921/4770/lbZQ86.png',
-      status: 'coming_soon',
-      badge_text: 'COMING SOON',
-      subtitle: 'Free Next Week - Studio Grade',
       brand: 'Slate Digital',
     },
     {
@@ -65,9 +53,6 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
       name: 'Ample Guitar M Lite Acoustic VST',
       slug: 'Ample-Guitar-M-Lite-II',
       cover_image: 'https://imagizer.imageshack.com/img924/3264/Qym6pY.png',
-      status: 'coming_soon',
-      badge_text: 'COMING SOON',
-      subtitle: 'Free Next Week - Multi-Sampled',
       brand: 'Ample Sound',
     },
   ]
@@ -75,27 +60,21 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
   // Merge DB free products with showcase items to ensure exactly 4 cards
   const displayItems: FreeItemDisplay[] = (() => {
     if (freeProductsFromDb.length >= 4) {
-      return freeProductsFromDb.slice(0, 4).map((p, idx) => ({
+      return freeProductsFromDb.slice(0, 4).map((p) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,
         cover_image: p.cover_image,
-        status: idx >= 2 ? 'coming_soon' : 'free_now',
-        badge_text: idx >= 2 ? 'COMING SOON' : 'FREE NOW',
-        subtitle: idx >= 2 ? 'Free Next Week' : 'Free Now - Always Free',
         brand: p.brand || 'Producer Toy',
       }))
     }
 
     // Fill in from default showcase
-    const items: FreeItemDisplay[] = freeProductsFromDb.map((p, idx) => ({
+    const items: FreeItemDisplay[] = freeProductsFromDb.map((p) => ({
       id: p.id,
       name: p.name,
       slug: p.slug,
       cover_image: p.cover_image,
-      status: (idx >= 2 ? 'coming_soon' : 'free_now') as 'free_now' | 'coming_soon',
-      badge_text: idx >= 2 ? 'COMING SOON' : 'FREE NOW',
-      subtitle: idx >= 2 ? 'Free Next Week' : 'Free Now - Always Free',
       brand: p.brand || 'Producer Toy',
     }))
 
@@ -136,55 +115,39 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
           </Link>
         </div>
 
-        {/* 4 Cards Grid (Exact Epic Games Store Layout) */}
+        {/* 4 Cards Grid (Static Clean Cards, Orange FREE Badge) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {displayItems.map((item) => {
-            const isFreeNow = item.status === 'free_now'
+          {displayItems.map((item) => (
+            <Link
+              key={item.id}
+              href={`/product/${item.slug}`}
+              prefetch={true}
+              className="flex flex-col select-none cursor-pointer"
+            >
+              {/* 3:4 Poster Image Container (Static) */}
+              <div className="relative w-full aspect-[3/4] rounded-t-xl overflow-hidden bg-[#202020] border-t border-x border-[#282828]">
+                <Image
+                  src={getCdnImageUrl(item.cover_image, { width: 600 })}
+                  alt={item.name}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover object-center"
+                />
+              </div>
 
-            return (
-              <Link
-                key={item.id}
-                href={`/product/${item.slug}`}
-                prefetch={true}
-                className="group flex flex-col select-none cursor-pointer"
-              >
-                {/* 3:4 Poster Image Container */}
-                <div className="relative w-full aspect-[3/4] rounded-t-xl overflow-hidden bg-[#202020] border-t border-x border-[#282828]">
-                  <Image
-                    src={getCdnImageUrl(item.cover_image, { width: 600 })}
-                    alt={item.name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-300 ease-out"
-                  />
+              {/* Flush Bottom Action Bar (Static Brand Orange FREE) */}
+              <div className="bg-[#FA742B] text-black font-black text-xs sm:text-[13px] py-2 px-3 text-center uppercase tracking-wider rounded-b-xl shadow-md">
+                FREE
+              </div>
 
-                  {/* Subtle Light Glow on Hover */}
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-                </div>
-
-                {/* Flush Bottom Action Bar (Brand Orange for FREE NOW, Dark for COMING SOON) */}
-                {isFreeNow ? (
-                  <div className="bg-[#FA742B] group-hover:bg-[#FC6301] text-black font-black text-[11.5px] sm:text-[12px] py-2 px-3 text-center uppercase tracking-wider rounded-b-xl shadow-md transition-colors">
-                    {item.badge_text || 'FREE NOW'}
-                  </div>
-                ) : (
-                  <div className="bg-[#111111] text-zinc-400 font-bold text-[11.5px] sm:text-[12px] py-2 px-3 text-center uppercase tracking-wider rounded-b-xl border border-t-0 border-[#262626]">
-                    {item.badge_text || 'COMING SOON'}
-                  </div>
-                )}
-
-                {/* Product Title & Timing/Subtitle Details */}
-                <div className="flex flex-col mt-2.5 px-0.5">
-                  <h3 className="font-bold text-white text-sm sm:text-[15px] tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
-                    {item.name}
-                  </h3>
-                  <p className="text-xs text-zinc-400 mt-1 line-clamp-1 font-medium">
-                    {item.subtitle}
-                  </p>
-                </div>
-              </Link>
-            )
-          })}
+              {/* Product Title (Static) */}
+              <div className="flex flex-col mt-2.5 px-0.5">
+                <h3 className="font-bold text-white text-sm sm:text-[15px] tracking-tight leading-snug line-clamp-1">
+                  {item.name}
+                </h3>
+              </div>
+            </Link>
+          ))}
         </div>
 
       </div>
