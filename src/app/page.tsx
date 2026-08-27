@@ -6,6 +6,7 @@ import { Product } from '@/components/ProductCard'
 
 import { EpicHeroCarousel } from '@/components/EpicHeroCarousel'
 import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
+import { FreeProducerToys } from '@/components/FreeProducerToys'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
@@ -103,6 +104,11 @@ export default async function HomePage() {
         
         {/* Centered Epic Hero Carousel (Starts immediately on mobile) */}
         <EpicHeroCarousel products={products} />
+
+        {/* 2nd Section: Free Producer Toys (Exact 1:1 Epic Games Store Free Games Section) */}
+        <div className="px-4 sm:px-0">
+          <FreeProducerToys products={products} />
+        </div>
 
         {/* 3rd Section: Producer Toy Originals Row */}
         <div className="px-4 sm:px-0">
