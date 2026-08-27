@@ -4,7 +4,7 @@ import { getAdminClient } from '@/lib/supabase/admin'
 export const revalidate = 21600 // Revalidate sitemap every 6 hours automatically
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://producertoy.com'
+  const baseUrl = 'https://producertoy.com'
   const supabase = getAdminClient()
 
   // 1. Core Static Pages & High-Value SEO Hub Pages
