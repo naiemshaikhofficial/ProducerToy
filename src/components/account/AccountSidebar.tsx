@@ -172,7 +172,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
             }`}
           >
             <Coins className={`w-4 h-4 ${activeTab === 'currency' ? 'text-white' : 'text-zinc-400'}`} />
-            <span>In-game currency</span>
+            <span>Wallet & Credits</span>
           </button>
 
           <button

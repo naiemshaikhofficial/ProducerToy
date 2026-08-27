@@ -32,7 +32,7 @@ const TAB_CONFIG: Record<AccountTab, { label: string; icon: React.ReactNode }> =
   payment: { label: 'Payment settings', icon: <CreditCard className="w-4 h-4 text-zinc-400" /> },
   transactions: { label: 'Transactions', icon: <Clock className="w-4 h-4 text-zinc-400" /> },
   subscriptions: { label: 'Subscriptions', icon: <Tag className="w-4 h-4 text-zinc-400" /> },
-  currency: { label: 'In-game currency', icon: <Coins className="w-4 h-4 text-zinc-400" /> },
+  currency: { label: 'Wallet & Credits', icon: <Coins className="w-4 h-4 text-zinc-400" /> },
   rewards: { label: 'Toywards', icon: <ToywardsSparkleIcon size={16} className="text-zinc-400" /> },
   redeem: { label: 'Redeem code', icon: <Key className="w-4 h-4 text-zinc-400" /> },
 }

@@ -114,13 +114,13 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
       {/* 1. Header Section (Toywards Branding with Clean Typography) */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
-          {isRewards ? 'Toywards' : 'In-game currency / Wallet'}
+          {isRewards ? 'Toywards' : 'Wallet & Store Credits'}
         </h1>
         <p className="text-sm sm:text-[15px] text-zinc-400 mt-2 leading-relaxed max-w-3xl">
           {isRewards ? (
             <>
               Earn up to 20% back on purchases using ProducerToy's payment system. Plus, enjoy instant rewards
-              for virtual currency and subscriptions.{' '}
+              for sound kits, synth presets, and audio plugins.{' '}
               <Link
                 href="/features/toywards"
                 className="text-white underline hover:text-[#FA742B] transition-colors inline-block"
@@ -129,7 +129,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
               </Link>
             </>
           ) : (
-            'Store balance and wallet credits available for instant digital purchases and subscription billing.'
+            'Store balance and credits available for instant sound kits, presets, and audio plugin purchases.'
           )}
         </p>
       </div>
