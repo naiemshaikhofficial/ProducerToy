@@ -326,25 +326,25 @@ export const TopBar: React.FC<TopBarProps> = ({
             </Link>
           )}
 
-          {/* Download Button (Producer Toy Light Orange Accent) */}
+          {/* Library Button (Producer Toy Light Orange Accent) */}
           <Link
-            href="/store"
+            href="/library"
             prefetch={true}
             className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[12px] px-4 py-2 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-normal"
           >
-            Download
+            Library
           </Link>
 
         </div>
 
-        {/* Mobile Right Controls: Download Button + Menu Hamburger */}
+        {/* Mobile Right Controls: Library Button + Menu Hamburger */}
         <div className="flex md:hidden items-center gap-3">
           <Link
-            href="/store"
+            href="/library"
             prefetch={true}
             className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[11px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
           >
-            Download
+            Library
           </Link>
 
           <button

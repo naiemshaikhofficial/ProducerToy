@@ -82,7 +82,7 @@ export function EpicLibraryClient({
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
   const [installedOnly, setInstalledOnly] = useState(false)
 
-  // Install Modal State
+  // Download Modal State
   const [installProduct, setInstallProduct] = useState<PurchaseItem | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'windows' | 'mac' | 'universal'>('windows')
 
@@ -461,7 +461,7 @@ export function EpicLibraryClient({
                         {/* 3:4 Poster Image Container */}
                         <div
                           className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#242424] shadow-md mb-2 block cursor-pointer transition-transform duration-200 group-hover:scale-[1.01]"
-                          title={`Click to Install ${product.name}`}
+                          title={`Click to Download ${product.name}`}
                         >
                           <Image
                             src={product.cover_image}
@@ -485,7 +485,7 @@ export function EpicLibraryClient({
                           </button>
                         </div>
 
-                        {/* Title and Install bar */}
+                        {/* Title and Download bar */}
                         <div className="flex items-start justify-between gap-1 px-0.5">
                           <div className="flex-1 min-w-0">
                             <span className="text-sm font-bold text-white truncate leading-snug block group-hover:text-zinc-200">
@@ -494,7 +494,7 @@ export function EpicLibraryClient({
 
                             <div className="text-[11px] font-semibold text-zinc-400 group-hover:text-white flex items-center gap-1 mt-0.5 transition-colors">
                               <Download className="w-3 h-3 text-zinc-400" />
-                              <span>Install</span>
+                              <span>Download</span>
                             </div>
                           </div>
 
@@ -542,7 +542,7 @@ export function EpicLibraryClient({
                                   className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-[#242424] text-zinc-200 hover:text-white transition-colors cursor-pointer text-left"
                                 >
                                   <Download className="w-3.5 h-3.5 text-zinc-400" />
-                                  <span>Install Options</span>
+                                  <span>Download Options</span>
                                 </button>
 
                                 <Link
@@ -612,7 +612,7 @@ export function EpicLibraryClient({
 
                           <div className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-2 px-4 rounded-xl uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-sm">
                             <Download className="w-3.5 h-3.5" />
-                            <span>Install</span>
+                            <span>Download</span>
                           </div>
                         </div>
                       </div>
@@ -659,7 +659,7 @@ export function EpicLibraryClient({
                   />
                 </div>
 
-                {/* Installed Option */}
+                {/* Downloaded Option */}
                 <div className="pt-1">
                   <label className="flex items-center gap-2 text-xs text-zinc-300 hover:text-white cursor-pointer select-none">
                     <input
@@ -668,7 +668,7 @@ export function EpicLibraryClient({
                       onChange={(e) => setInstalledOnly(e.target.checked)}
                       className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
                     />
-                    <span>Installed</span>
+                    <span>Downloaded</span>
                   </label>
                 </div>
 
@@ -840,7 +840,7 @@ export function EpicLibraryClient({
           </div>
         )}
 
-        {/* ================= EXACT EPIC GAMES LAUNCHER INSTALL MODAL ================= */}
+        {/* ================= EXACT EPIC GAMES LAUNCHER DOWNLOAD MODAL ================= */}
         {installProduct && (() => {
           const product = installProduct.products
           const isSamplePack =
