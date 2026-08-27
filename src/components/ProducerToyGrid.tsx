@@ -69,7 +69,7 @@ export function ProducerToyGrid({ products, title = "Producer Toy Originals" }: 
         {displayProducts.map((product) => (
           <div 
             key={product.id} 
-            className="flex-none w-[200px] sm:w-[220px] lg:w-[235px] snap-start"
+            className="flex-none w-[140px] sm:w-[175px] lg:w-[210px] snap-start"
           >
             <ProductCard product={product} />
           </div>

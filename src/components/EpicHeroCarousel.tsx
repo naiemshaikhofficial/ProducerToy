@@ -19,7 +19,6 @@ const ROTATION_DURATION = 6500 // 6.5 seconds auto-advance on PC
 export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [progress, setProgress] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
   const [isDesktop, setIsDesktop] = useState(false)
 
   const { isWishlisted, toggleWishlist } = useWishlist()
@@ -51,9 +50,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
     return () => window.removeEventListener('resize', checkDesktop)
   }, [])
 
-  // Hook 1: PC ONLY - Smoothly tick progress from 0 to 100% for the current slide
+  // Hook 1: PC ONLY - Smoothly tick progress from 0 to 100% for the current slide (Never pauses on hover)
   useEffect(() => {
-    if (!isDesktop || featuredList.length <= 1 || isHovered) return
+    if (!isDesktop || featuredList.length <= 1) return
 
     const intervalMs = 50
     const step = (intervalMs / ROTATION_DURATION) * 100
@@ -66,7 +65,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
     }, intervalMs)
 
     return () => clearInterval(timer)
-  }, [selectedIndex, featuredList.length, isDesktop, isHovered])
+  }, [selectedIndex, featuredList.length, isDesktop])
 
   // Hook 2: PC ONLY - Trigger slide transition strictly when progress hits 100%
   useEffect(() => {
@@ -192,7 +191,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
           <div 
             className="flex"
             style={{
-              transform: `translateX(calc(11% - ${selectedIndex * 78}% + ${dragOffset}px))`,
+              transform: `translateX(calc(12% - ${selectedIndex * 76}% + ${dragOffset}px))`,
               transition: isDragging ? 'none' : 'transform 350ms cubic-bezier(0.25, 1, 0.5, 1)',
             }}
           >
@@ -206,12 +205,12 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               return (
                 <div
                   key={product.id}
-                  className="w-[78%] flex-shrink-0 px-1.5 sm:px-2"
+                  className="w-[76%] flex-shrink-0 px-2"
                 >
                   <Link
                     href={`/product/${product.slug}`}
                     prefetch={true}
-                    className="block relative w-full aspect-[3/4.2] sm:aspect-[3/4] rounded-2xl overflow-hidden border border-[#222222] shadow-2xl bg-[#121212] cursor-pointer"
+                    className="block relative w-full aspect-[3/4.3] sm:aspect-[3/4] rounded-2xl overflow-hidden border border-[#222222] shadow-2xl bg-[#121212] cursor-pointer"
                   >
                     {/* Background Artwork */}
                     <Image
@@ -316,11 +315,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       {/* ========================================================================= */}
       {/* 2. DESKTOP LAYOUT (>= 1024px): PC-Only Auto-Rotation Animated Carousel    */}
       {/* ========================================================================= */}
-      <div 
-        className="hidden lg:grid grid-cols-12 gap-3 lg:gap-4 items-stretch"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <div className="hidden lg:grid grid-cols-12 gap-3 lg:gap-4 items-stretch">
         
         {/* Main Hero Banner Container (Left 9 out of 12 columns) */}
         <div 

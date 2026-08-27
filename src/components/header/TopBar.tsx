@@ -81,18 +81,18 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <div className="w-full bg-[#121212] border-none">
-      <div className="w-full px-5 sm:px-7 lg:px-8 h-[58px] flex items-center justify-between">
+      <div className="w-full px-4 sm:px-7 lg:px-8 h-[52px] sm:h-[58px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
-        <div className="flex items-center gap-6 sm:gap-8">
+        <div className="flex items-center gap-3 sm:gap-6">
           <Link href="/" prefetch={true} className="flex items-center hover:opacity-90 transition-opacity">
-            <LogoIcon size={34} />
+            <LogoIcon size={28} />
           </Link>
 
           <Link 
             href="/" 
             prefetch={true}
-            className="text-white font-black text-[16px] tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
+            className="text-white font-black text-[14px] sm:text-[16px] tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
           >
             STORE
           </Link>
