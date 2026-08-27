@@ -80,7 +80,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
           <Link
             href="/store?sort=newest"
             prefetch={true}
-            className="relative w-full h-[320px] sm:h-[380px] lg:h-full min-h-[360px] rounded-2xl overflow-hidden p-6 sm:p-8 flex flex-col justify-between items-center text-center shadow-2xl select-none cursor-pointer"
+            className="relative w-full h-[240px] sm:h-[320px] lg:h-full min-h-0 lg:min-h-[360px] rounded-xl sm:rounded-2xl overflow-hidden p-5 sm:p-8 flex flex-col justify-between items-center text-center shadow-2xl select-none cursor-pointer"
             style={{
               background: 'linear-gradient(135deg, #180902 0%, #301305 25%, #5e2105 60%, #180902 100%)',
             }}
@@ -92,18 +92,18 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
 
             {/* Glowing Polygonal Prisms Decor */}
             <div className="relative z-10 w-full flex-1 flex items-center justify-center">
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {/* 3D-Style Bold Typography (Exact Epic Games Match) */}
-                <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black uppercase tracking-wider text-white leading-none drop-shadow-[0_8px_24px_rgba(0,0,0,0.85)] font-sans">
+                <h2 className="text-2xl sm:text-4xl lg:text-[42px] font-black uppercase tracking-wider text-white leading-none drop-shadow-[0_8px_24px_rgba(0,0,0,0.85)] font-sans">
                   NEW<br />RELEASES
                 </h2>
-                <div className="w-14 h-1 bg-gradient-to-r from-[#FA742B] to-[#FFB074] mx-auto rounded-full shadow-[0_0_10px_#FA742B]" />
+                <div className="w-10 sm:w-14 h-0.5 sm:h-1 bg-gradient-to-r from-[#FA742B] to-[#FFB074] mx-auto rounded-full shadow-[0_0_10px_#FA742B]" />
               </div>
             </div>
 
             {/* "See All" Action Button (Exact Epic Games Style Solid White Pill) */}
-            <div className="relative z-10 w-full flex justify-center pt-4">
-              <span className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-8 py-2.5 rounded-lg shadow-xl transition-colors active:scale-95">
+            <div className="relative z-10 w-full flex justify-center pt-2 sm:pt-4">
+              <span className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-6 sm:px-8 py-2 sm:py-2.5 rounded-lg shadow-xl transition-colors active:scale-95">
                 See All
               </span>
             </div>

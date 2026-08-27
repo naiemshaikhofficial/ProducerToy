@@ -91,16 +91,16 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
   return (
     <section className="w-full select-none">
       {/* Outer Epic Games Container Box */}
-      <div className="w-full bg-[#181818] border border-[#262626] rounded-2xl p-5 sm:p-7 md:p-8 shadow-2xl">
+      <div className="w-full bg-[#181818] border border-[#262626] rounded-xl sm:rounded-2xl p-3.5 sm:p-6 md:p-8 shadow-2xl">
         
         {/* Section Header: Gift Icon + Free Producer Toys + View More */}
-        <div className="flex items-center justify-between mb-5 sm:mb-6">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between mb-3.5 sm:mb-6">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* White Line Art Gift Box Icon */}
             <div className="text-white flex-shrink-0">
-              <Gift className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2]" />
+              <Gift className="w-5 h-5 sm:w-7 sm:h-7 stroke-[2]" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-lg sm:text-2xl font-bold text-white tracking-tight">
               Free Producer Toys
             </h2>
           </div>
@@ -109,14 +109,14 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
           <Link
             href="/store?free=true"
             prefetch={true}
-            className="px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white hover:text-white bg-transparent hover:bg-white/10 border border-white/20 hover:border-white rounded-lg transition-all cursor-pointer inline-flex items-center justify-center active:scale-95"
+            className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white hover:text-white bg-transparent hover:bg-white/10 border border-white/20 hover:border-white rounded-lg transition-all cursor-pointer inline-flex items-center justify-center active:scale-95"
           >
             View More
           </Link>
         </div>
 
-        {/* 4 Cards Grid (Static Clean Cards with Subtle Hover Brightness, Orange FREE Badge) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* 4 Cards Grid (Exact 1:1 Epic Games Match: 2-Cols on Mobile, 4-Cols on Desktop) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
           {displayItems.map((item) => (
             <Link
               key={item.id}
@@ -125,25 +125,25 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
               className="group flex flex-col select-none cursor-pointer"
             >
               {/* 3:4 Poster Image Container (Static + Brightness on Hover) */}
-              <div className="relative w-full aspect-[3/4] rounded-t-xl overflow-hidden bg-[#202020] border-t border-x border-[#282828]">
+              <div className="relative w-full aspect-[3/4] rounded-t-lg sm:rounded-t-xl overflow-hidden bg-[#202020] border-t border-x border-[#282828]">
                 <Image
                   src={getCdnImageUrl(item.cover_image, { width: 600 })}
                   alt={item.name}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
                 />
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
               </div>
 
               {/* Flush Bottom Action Bar (Static Brand Orange FREE) */}
-              <div className="bg-[#FA742B] group-hover:brightness-105 text-black font-black text-xs sm:text-[13px] py-2 px-3 text-center uppercase tracking-wider rounded-b-xl shadow-md transition-all duration-200">
+              <div className="bg-[#FA742B] group-hover:brightness-105 text-black font-black text-[10px] sm:text-[13px] py-1 sm:py-2 px-2 text-center uppercase tracking-wider rounded-b-lg sm:rounded-b-xl shadow-md transition-all duration-200">
                 FREE
               </div>
 
               {/* Product Title (Static Solid White Text) */}
-              <div className="flex flex-col mt-2.5 px-0.5">
-                <h3 className="font-bold text-white text-sm sm:text-[15px] tracking-tight leading-snug line-clamp-1">
+              <div className="flex flex-col mt-2 px-0.5">
+                <h3 className="font-bold text-white text-xs sm:text-[15px] tracking-tight leading-snug line-clamp-1">
                   {item.name}
                 </h3>
               </div>
