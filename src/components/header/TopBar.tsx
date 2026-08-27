@@ -8,6 +8,7 @@ import {
   LogOut,
   User,
   Globe,
+  Check,
   Trophy,
   Sparkles,
   CreditCard,
@@ -21,6 +22,7 @@ import {
 import { LogoIcon } from '@/components/Logo'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { useAuth } from '@/context/AuthContext'
+import { useCurrency } from '@/context/CurrencyContext'
 
 interface TopBarProps {
   currency: string
@@ -43,23 +45,29 @@ export const TopBar: React.FC<TopBarProps> = ({
   isMobileMenuOpen,
   onToggleMobileMenu,
 }) => {
+  const { region, setRegion, regions } = useCurrency()
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
+  const [isGlobeMenuOpen, setIsGlobeMenuOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
+  const globeMenuRef = useRef<HTMLDivElement>(null)
 
-  // Click outside to close desktop account menu
+  // Click outside to close desktop menus
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
         setIsAccountMenuOpen(false)
       }
+      if (globeMenuRef.current && !globeMenuRef.current.contains(event.target as Node)) {
+        setIsGlobeMenuOpen(false)
+      }
     }
-    if (isAccountMenuOpen) {
+    if (isAccountMenuOpen || isGlobeMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isAccountMenuOpen])
+  }, [isAccountMenuOpen, isGlobeMenuOpen])
 
   // Derive initial and display name only when user is present
   const displayName = user
@@ -102,17 +110,70 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-5">
 
-          {/* Globe Language / Currency Toggle */}
-          <button
-            type="button"
-            onClick={onToggleCurrency}
-            className="p-1.5 text-zinc-400 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
-            title={`Switch currency (Current: ${currency})`}
-          >
-            <Globe className="w-[19px] h-[19px]" />
-          </button>
+          {/* Globe Language / Region Selector Trigger (Exact 1:1 Epic Games Match) */}
+          <div className="relative" ref={globeMenuRef}>
+            <button
+              type="button"
+              onClick={() => setIsGlobeMenuOpen(!isGlobeMenuOpen)}
+              className={`p-2 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
+                isGlobeMenuOpen ? 'text-white bg-[#222222]' : 'text-zinc-400 hover:text-white hover:bg-[#1a1a1a]'
+              }`}
+              title={`Select Region & Currency (Current: ${region?.name || 'India'} - ${currency})`}
+              aria-label="Select Region and Currency"
+            >
+              <Globe className="w-[19px] h-[19px]" />
+            </button>
+
+            {/* Epic Games Region / Currency Dropdown Menu */}
+            {isGlobeMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-[275px] bg-[#181818] border border-[#282828] rounded-2xl shadow-2xl py-2 z-[100] animate-in fade-in zoom-in-95 duration-100 divide-y divide-[#222222]">
+                <div className="px-4 py-2">
+                  <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                    Select Region & Currency
+                  </p>
+                </div>
+
+                <div className="py-1 max-h-[340px] overflow-y-auto custom-scrollbar">
+                  {regions.map((r) => {
+                    const isSelected = region?.id === r.id
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() => {
+                          setRegion(r.id)
+                          setIsGlobeMenuOpen(false)
+                        }}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-colors text-left cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#242424] text-white font-semibold'
+                            : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-[17px] leading-none">{r.flag}</span>
+                          <span className="truncate">{r.name}</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <span className="text-[11px] text-zinc-400 font-medium">
+                            {r.currency} ({r.symbol})
+                          </span>
+                          {isSelected ? (
+                            <Check className="w-4 h-4 text-white flex-shrink-0" />
+                          ) : (
+                            <div className="w-4 h-4" />
+                          )}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Account Popover Trigger or Sign In Button */}
           {user ? (

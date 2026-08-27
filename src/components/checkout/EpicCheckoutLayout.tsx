@@ -83,11 +83,20 @@ export function EpicCheckoutLayout({
   formatPrice,
   onClose,
 }: EpicCheckoutLayoutProps) {
-  const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'gpay' | 'upi'>('upi')
+  const [selectedMethod, setSelectedMethod] = useState<'card' | 'paypal' | 'gpay' | 'upi'>(() => isIndia ? 'upi' : 'paypal')
   const [showAllMethods, setShowAllMethods] = useState(false)
   const [isBillingOpen, setIsBillingOpen] = useState(true)
   const [isCreatorCodeOpen, setIsCreatorCodeOpen] = useState(false)
   const [isRewardsExpanded, setIsRewardsExpanded] = useState(false)
+
+  // Sync selected payment method with region / currency
+  useEffect(() => {
+    if (isIndia && selectedMethod === 'paypal') {
+      setSelectedMethod('upi')
+    } else if (!isIndia && selectedMethod === 'upi') {
+      setSelectedMethod('paypal')
+    }
+  }, [isIndia])
 
   const isFree = finalTotal <= 0
   const rewardsAmount = (finalTotal * 0.05).toFixed(2)
@@ -292,7 +301,69 @@ export function EpicCheckoutLayout({
             <div className="space-y-2">
               <div className="bg-[#181818] border border-[#282828] rounded-xl divide-y divide-[#222222] overflow-hidden">
                 
-                {/* Option 1: Credit Card / Debit Card */}
+                {/* Option: UPI (Shown first for India) */}
+                {isIndia && (
+                  <label
+                    onClick={() => setSelectedMethod('upi')}
+                    className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                      selectedMethod === 'upi' ? 'bg-[#222222]' : 'hover:bg-[#1d1d1d]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-5 flex items-center justify-center">
+                        <img
+                          src="/payment-logos/upi.svg"
+                          alt="UPI"
+                          className="h-3.5 object-contain"
+                        />
+                      </div>
+                      <span className="text-[13.5px] font-semibold text-white">
+                        UPI (Google Pay, PhonePe, Paytm, BHIM)
+                      </span>
+                    </div>
+
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                      selectedMethod === 'upi'
+                        ? 'border-white bg-white'
+                        : 'border-[#404040] bg-transparent'
+                    }`}>
+                      {selectedMethod === 'upi' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                    </div>
+                  </label>
+                )}
+
+                {/* Option: PayPal (Shown first for International, or 4th for India) */}
+                {!isIndia && (
+                  <label
+                    onClick={() => setSelectedMethod('paypal')}
+                    className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                      selectedMethod === 'paypal' ? 'bg-[#222222]' : 'hover:bg-[#1d1d1d]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-5 flex items-center justify-center">
+                        <img
+                          src="/payment-logos/paypal.svg"
+                          alt="PayPal"
+                          className="h-3.5 object-contain"
+                        />
+                      </div>
+                      <span className="text-[13.5px] font-semibold text-white">
+                        PayPal (International Instant Checkout)
+                      </span>
+                    </div>
+
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                      selectedMethod === 'paypal'
+                        ? 'border-white bg-white'
+                        : 'border-[#404040] bg-transparent'
+                    }`}>
+                      {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                    </div>
+                  </label>
+                )}
+
+                {/* Option: Credit Card / Debit Card */}
                 <label
                   onClick={() => setSelectedMethod('card')}
                   className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
@@ -304,7 +375,7 @@ export function EpicCheckoutLayout({
                       <CreditCard size={14} className="text-zinc-300" />
                     </div>
                     <span className="text-[13.5px] font-semibold text-white">
-                      Credit Card / Debit Card
+                      {isIndia ? 'Credit Card / Debit Card (RuPay, Visa, Master)' : 'International Credit / Debit Card'}
                     </span>
                   </div>
 
@@ -317,36 +388,7 @@ export function EpicCheckoutLayout({
                   </div>
                 </label>
 
-                {/* Option 2: PayPal */}
-                <label
-                  onClick={() => setSelectedMethod('paypal')}
-                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                    selectedMethod === 'paypal' ? 'bg-[#222222]' : 'hover:bg-[#1d1d1d]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-5 flex items-center justify-center">
-                      <img
-                        src="/payment-logos/paypal.svg"
-                        alt="PayPal"
-                        className="h-3.5 object-contain"
-                      />
-                    </div>
-                    <span className="text-[13.5px] font-semibold text-white">
-                      PayPal
-                    </span>
-                  </div>
-
-                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
-                    selectedMethod === 'paypal'
-                      ? 'border-white bg-white'
-                      : 'border-[#404040] bg-transparent'
-                  }`}>
-                    {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
-                  </div>
-                </label>
-
-                {/* Option 3: Google Pay */}
+                {/* Option: Google Pay */}
                 <label
                   onClick={() => setSelectedMethod('gpay')}
                   className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
@@ -375,34 +417,36 @@ export function EpicCheckoutLayout({
                   </div>
                 </label>
 
-                {/* Option 4: UPI (Always in list matching exact Screenshot) */}
-                <label
-                  onClick={() => setSelectedMethod('upi')}
-                  className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
-                    selectedMethod === 'upi' ? 'bg-[#222222]' : 'hover:bg-[#1d1d1d]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-5 flex items-center justify-center">
-                      <img
-                        src="/payment-logos/upi.svg"
-                        alt="UPI"
-                        className="h-3.5 object-contain"
-                      />
+                {/* PayPal option for India (Secondary) */}
+                {isIndia && (
+                  <label
+                    onClick={() => setSelectedMethod('paypal')}
+                    className={`flex items-center justify-between p-3.5 cursor-pointer transition-colors ${
+                      selectedMethod === 'paypal' ? 'bg-[#222222]' : 'hover:bg-[#1d1d1d]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-5 flex items-center justify-center">
+                        <img
+                          src="/payment-logos/paypal.svg"
+                          alt="PayPal"
+                          className="h-3.5 object-contain"
+                        />
+                      </div>
+                      <span className="text-[13.5px] font-semibold text-white">
+                        PayPal
+                      </span>
                     </div>
-                    <span className="text-[13.5px] font-semibold text-white">
-                      UPI
-                    </span>
-                  </div>
 
-                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
-                    selectedMethod === 'upi'
-                      ? 'border-white bg-white'
-                      : 'border-[#404040] bg-transparent'
-                  }`}>
-                    {selectedMethod === 'upi' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
-                  </div>
-                </label>
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+                      selectedMethod === 'paypal'
+                        ? 'border-white bg-white'
+                        : 'border-[#404040] bg-transparent'
+                    }`}>
+                      {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
+                    </div>
+                  </label>
+                )}
 
                 {/* Expanded methods if opened */}
                 {showAllMethods && (
