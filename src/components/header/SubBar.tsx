@@ -137,12 +137,12 @@ export const SubBar: React.FC<SubBarProps> = ({
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Discover ▾ Selector Dropdown */}
-            <div ref={discoverMenuRef}>
+            {/* Discover ▾ Selector Dropdown (Exact True Screen Center) */}
+            <div ref={discoverMenuRef} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-30">
               <button
                 type="button"
                 onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1 text-[15px] font-semibold text-white hover:text-zinc-200 transition-colors py-1 px-2 cursor-pointer"
+                className="flex items-center gap-1 text-[15px] font-semibold text-white hover:text-zinc-200 transition-colors py-1 px-2 cursor-pointer select-none"
               >
                 <span>{currentSectionLabel}</span>
                 <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
@@ -156,7 +156,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                     onClick={() => setIsDiscoverMenuOpen(false)}
                   />
 
-                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-[90vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020]">
+                  <div className="fixed left-1/2 -translate-x-1/2 top-[104px] w-[90vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020]">
                     <div className="flex flex-col">
                       {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                         const isSelected = item.label === currentSectionLabel
