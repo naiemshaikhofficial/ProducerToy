@@ -10,6 +10,7 @@ import { FreeProducerToys } from '@/components/FreeProducerToys'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
+import { EpicTrending } from '@/components/EpicTrending'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
 export const revalidate = 86400 // 24-hour Edge Cache (instant on-demand revalidation via /api/revalidate & Server Actions)
@@ -106,6 +107,11 @@ export default async function HomePage() {
         {/* 5th Section: 1:1 Epic Games Tri-Column Lists (Top Sellers, Coming Soon, Top Deals) */}
         <div className="px-4 sm:px-0">
           <EpicStorefrontLists products={products} />
+        </div>
+
+        {/* 6th Section: 1:1 Epic Games Trending Row (High Demand & Latest Products) */}
+        <div className="px-4 sm:px-0">
+          <EpicTrending products={products} />
         </div>
 
       </div>
