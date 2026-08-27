@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { CheckCircle2 } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 import { AccountSidebar, AccountTab } from './AccountSidebar'
@@ -19,12 +20,51 @@ import { RewardsAndWalletTab } from './RewardsAndWalletTab'
 import { updatePersonalDetailsAction } from '@/actions/accountActions'
 
 export default function EpicAccountClient() {
-  const [activeTab, setActiveTab] = useState<AccountTab>('settings')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  
+  const validTabs: AccountTab[] = [
+    'settings',
+    'linked_accounts',
+    'communication',
+    'security',
+    'legal',
+    'payment',
+    'transactions',
+    'subscriptions',
+    'currency',
+    'rewards',
+    'redeem',
+    'parental',
+    'programs',
+    'publisher',
+  ]
+
+  const tabQuery = searchParams.get('tab') as AccountTab
+  const initialTab: AccountTab = (tabQuery && validTabs.includes(tabQuery)) ? tabQuery : 'settings'
+
+  const [activeTab, setActiveTabState] = useState<AccountTab>(initialTab)
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [displayName, setDisplayName] = useState('Naiem Shaikh')
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  // Keep activeTab in sync if URL query changes (e.g. browser back/forward or navigation from navbar)
+  useEffect(() => {
+    if (tabQuery && validTabs.includes(tabQuery) && tabQuery !== activeTab) {
+      setActiveTabState(tabQuery)
+    }
+  }, [tabQuery])
+
+  const setActiveTab = (tab: AccountTab) => {
+    setActiveTabState(tab)
+    if (tab === 'settings') {
+      router.replace('/account', { scroll: false })
+    } else {
+      router.replace(`/account?tab=${tab}`, { scroll: false })
+    }
+  }
 
   const loadUserData = React.useCallback(async () => {
     try {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Metadata } from 'next'
 import EpicAccountClient from '@/components/account/EpicAccountClient'
 
@@ -12,5 +12,10 @@ export const metadata: Metadata = {
 }
 
 export default function AccountPage() {
-  return <EpicAccountClient />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#121212]" />}>
+      <EpicAccountClient />
+    </Suspense>
+  )
 }
+

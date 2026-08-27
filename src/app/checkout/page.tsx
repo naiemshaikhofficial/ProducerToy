@@ -49,6 +49,10 @@ export default function CheckoutPage() {
   // Newsletter preference
   const [newsletterOptIn, setNewsletterOptIn] = useState(true)
 
+  // Toywards Loyalty Rewards state
+  const [availableRewards, setAvailableRewards] = useState(0)
+  const [useRewards, setUseRewards] = useState(false)
+
   // Upsell recommended products
   const [upsellProducts, setUpsellProducts] = useState<any[]>([])
 
@@ -131,6 +135,10 @@ export default function CheckoutPage() {
 
             if (profile.newsletter !== undefined && profile.newsletter !== null) {
               setNewsletterOptIn(Boolean(profile.newsletter))
+            }
+
+            if (profile.reward_balance !== undefined && profile.reward_balance !== null) {
+              setAvailableRewards(Number(profile.reward_balance || 0))
             }
           }
         } catch (dbErr) {
@@ -326,7 +334,21 @@ export default function CheckoutPage() {
         ? Math.round((currentSubtotal * discountPercent) / 100)
         : Math.round((currentSubtotal * discountPercent) / 100 * 100) / 100
       : 0
-  const finalTotal = Math.max(0, currentSubtotal - discountAmount)
+
+  const amountAfterCoupon = Math.max(0, currentSubtotal - discountAmount)
+  const liveExchange = exchangeRate || 95.0
+  const availableRewardsInCurrentCurrency = isIndia
+    ? Math.round(availableRewards * liveExchange)
+    : availableRewards
+
+  const rewardDiscountAmount = useRewards
+    ? Math.min(amountAfterCoupon, availableRewardsInCurrentCurrency)
+    : 0
+
+  const finalTotal = Math.max(0, amountAfterCoupon - rewardDiscountAmount)
+  const rewardAmountUsedUsd = isIndia
+    ? Math.round((rewardDiscountAmount / liveExchange) * 100) / 100
+    : rewardDiscountAmount
 
   // Handle Apply Coupon
   const handleApplyCoupon = async () => {
@@ -404,6 +426,8 @@ export default function CheckoutPage() {
         {
           couponCode: coupon,
           currency: currency,
+          applyRewards: useRewards,
+          rewardAmountUsed: rewardAmountUsedUsd,
         }
       )
 
@@ -464,6 +488,8 @@ export default function CheckoutPage() {
             product_type: i.product_type,
           })),
           couponCode: coupon,
+          applyRewards: useRewards,
+          rewardAmountUsed: rewardAmountUsedUsd,
         }),
       })
 
@@ -508,6 +534,8 @@ export default function CheckoutPage() {
                 userId: user.id,
                 billingDetails: billingDetails,
                 couponCode: coupon,
+                applyRewards: useRewards,
+                rewardAmountUsed: rewardAmountUsedUsd,
               }),
             })
 
@@ -623,6 +651,10 @@ export default function CheckoutPage() {
         couponLoading={couponLoading}
         couponError={couponError}
         couponSuccessMsg={couponSuccessMsg}
+        availableRewards={availableRewards}
+        useRewards={useRewards}
+        onToggleRewards={setUseRewards}
+        rewardDiscountAmount={rewardDiscountAmount}
         onRazorpayCheckout={handleRazorpayCheckout}
         onFreeCheckout={handleFreeCheckout}
         onPayPalSuccess={handlePayPalSuccess}
@@ -633,6 +665,8 @@ export default function CheckoutPage() {
         formatPrice={formatPrice}
         onClose={() => router.back()}
       />
+    </div>
+  )
     </div>
   )
 }

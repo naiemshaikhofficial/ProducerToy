@@ -213,7 +213,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/features/toywards"
+                      href="/account?tab=rewards"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
@@ -228,7 +228,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/library"
+                      href="/account?tab=currency"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
@@ -258,7 +258,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/library"
+                      href="/account?tab=redeem"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"

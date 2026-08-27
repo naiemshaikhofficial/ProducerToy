@@ -42,9 +42,13 @@ interface EpicCheckoutLayoutProps {
   couponLoading: boolean
   couponError: string
   couponSuccessMsg: string
+  availableRewards?: number
+  useRewards?: boolean
+  onToggleRewards?: (val: boolean) => void
+  rewardDiscountAmount?: number
   onRazorpayCheckout: () => void
   onFreeCheckout: () => void
-  onPayPalSuccess: () => void
+  onPayPalSuccess: (orderNumber?: string) => void
   onPayPalError: (msg: string) => void
   onPayPalProcessing: () => void
   loading: boolean
@@ -73,6 +77,10 @@ export function EpicCheckoutLayout({
   couponLoading,
   couponError,
   couponSuccessMsg,
+  availableRewards = 0,
+  useRewards = false,
+  onToggleRewards,
+  rewardDiscountAmount = 0,
   onRazorpayCheckout,
   onFreeCheckout,
   onPayPalSuccess,
@@ -209,11 +217,25 @@ export function EpicCheckoutLayout({
               </span>
             </div>
 
-            {finalTotal < currentSubtotal && (
+            {/* Regular / Coupon Discount */}
+            {currentSubtotal - finalTotal - rewardDiscountAmount > 0.01 && (
               <div className="flex justify-between items-center text-[#FA742B] font-medium">
-                <span>Discount Applied</span>
+                <span>{coupon ? `Coupon Discount (${coupon})` : 'Sale Discount'}</span>
                 <span className="font-semibold">
-                  -{currencySymbol}{(currentSubtotal - finalTotal).toFixed(2)}
+                  -{currencySymbol}{(currentSubtotal - finalTotal - rewardDiscountAmount).toFixed(2)}
+                </span>
+              </div>
+            )}
+
+            {/* Toywards Applied Discount */}
+            {rewardDiscountAmount > 0 && (
+              <div className="flex justify-between items-center text-[#FA742B] font-medium animate-in fade-in">
+                <span className="flex items-center gap-1.5">
+                  <ToywardsIcon size={13} />
+                  <span>Toywards Applied</span>
+                </span>
+                <span className="font-semibold">
+                  -{currencySymbol}{rewardDiscountAmount.toFixed(2)}
                 </span>
               </div>
             )}
@@ -261,7 +283,7 @@ export function EpicCheckoutLayout({
             </h2>
           </div>
 
-          {/* Toywards Box (Exact Match) */}
+          {/* Toywards Box (Exact Match & Interactive Apply) */}
           <div className="bg-[#1c1c1c] border border-[#282828] rounded-xl p-3.5 transition-all">
             <button
               type="button"
@@ -271,6 +293,11 @@ export function EpicCheckoutLayout({
               <div className="flex items-center gap-2.5">
                 <ToywardsIcon size={18} />
                 <span className="text-[13.5px] font-bold text-white">Toywards</span>
+                {availableRewards > 0 && (
+                  <span className="text-[10.5px] font-bold bg-[#26150b] text-[#FA742B] border border-[#4a2412] px-2 py-0.5 rounded-full">
+                    {currencySymbol}{isIndia ? Math.round(availableRewards * 95) : availableRewards.toFixed(2)} Available
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1 text-[12.5px] text-zinc-400">
                 <ChevronDown
@@ -281,17 +308,40 @@ export function EpicCheckoutLayout({
             </button>
 
             {isRewardsExpanded && (
-              <div className="mt-3 pt-3 border-t border-[#262626] text-[12.5px] text-zinc-400 space-y-1.5 animate-in fade-in duration-150">
-                <p className="text-zinc-300">
-                  Start collecting 5% to 20% with every purchase.
-                </p>
-                <Link
-                  href="/features/toywards"
-                  target="_blank"
-                  className="inline-block text-[11.5px] text-zinc-400 hover:text-white underline font-medium"
-                >
-                  Learn more
-                </Link>
+              <div className="mt-3 pt-3 border-t border-[#262626] text-[12.5px] text-zinc-400 space-y-2.5 animate-in fade-in duration-150">
+                {availableRewards > 0 ? (
+                  <div className="space-y-2">
+                    <label className="flex items-start gap-2.5 cursor-pointer bg-[#222222] hover:bg-[#262626] p-2.5 rounded-lg border border-[#333333] transition-colors select-none">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(useRewards)}
+                        onChange={(e) => onToggleRewards && onToggleRewards(e.target.checked)}
+                        className="mt-0.5 accent-[#FA742B] w-4 h-4 rounded cursor-pointer"
+                      />
+                      <div className="space-y-0.5">
+                        <span className="text-xs font-bold text-white block">
+                          Apply Toywards Balance ({currencySymbol}{isIndia ? Math.round(availableRewards * 95) : availableRewards.toFixed(2)})
+                        </span>
+                        <p className="text-[11px] text-zinc-400 leading-tight">
+                          Deduct rewards directly from your order total. Can be combined with sales and coupons per EULA Section 11.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <p className="text-zinc-300">
+                      Earn 5% (up to 20%) cashback with Toywards on this purchase. Credited to your account upon payment.
+                    </p>
+                    <Link
+                      href="/features/toywards"
+                      target="_blank"
+                      className="inline-block text-[11.5px] text-[#FA742B] hover:underline font-medium"
+                    >
+                      Learn more
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>

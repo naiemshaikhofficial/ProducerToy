@@ -9,6 +9,8 @@ interface PayPalPaymentButtonProps {
   couponCode: string
   userId: string
   billingDetails: any
+  applyRewards?: boolean
+  rewardAmountUsed?: number
   onSuccess: (orderNumber: string) => void
   onError: (errorMsg: string) => void
   onProcessing: () => void
@@ -19,6 +21,8 @@ export function PayPalPaymentButton({
   couponCode,
   userId,
   billingDetails,
+  applyRewards,
+  rewardAmountUsed,
   onSuccess,
   onError,
   onProcessing,
@@ -55,6 +59,8 @@ export function PayPalPaymentButton({
                   body: JSON.stringify({
                     items: items.map((i) => ({ id: i.id })),
                     couponCode: couponCode,
+                    applyRewards: Boolean(applyRewards),
+                    rewardAmountUsed: Number(rewardAmountUsed || 0),
                   }),
                 })
 
@@ -78,6 +84,8 @@ export function PayPalPaymentButton({
                     userId: userId,
                     billingDetails: billingDetails,
                     couponCode: couponCode,
+                    applyRewards: Boolean(applyRewards),
+                    rewardAmountUsed: Number(rewardAmountUsed || 0),
                   }),
                 })
 

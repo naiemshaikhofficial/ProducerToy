@@ -309,3 +309,98 @@ export async function deleteUserAccountAction(userId: string) {
     return { success: false, error: err.message || 'Failed to delete account' }
   }
 }
+
+/**
+ * Fetch all Toywards transactions (earned, redeemed, expired) for authenticated user.
+ */
+export async function getUserRewardTransactionsAction(userId: string) {
+  if (!userId) {
+    return { success: false, transactions: [] }
+  }
+
+  try {
+    const admin = getAdminClient()
+    const { data, error } = await admin
+      .from('reward_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    if (error) {
+      console.warn('Error fetching reward transactions:', error)
+      return { success: false, transactions: [] }
+    }
+
+    return { success: true, transactions: data || [] }
+  } catch (err: any) {
+    console.warn('Exception in getUserRewardTransactionsAction:', err)
+    return { success: false, transactions: [] }
+  }
+}
+
+/**
+ * Fetch complete Toywards loyalty stats, balance, and history for user.
+ */
+export async function getToywardsDataAction(userId: string) {
+  if (!userId) {
+    return {
+      success: false,
+      rewardBalance: 0,
+      totalEarned: 0,
+      totalRedeemed: 0,
+      maxCap: 500,
+      transactions: [],
+    }
+  }
+
+  try {
+    const admin = getAdminClient()
+
+    // 1. Get profile reward_balance
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('reward_balance, wallet_balance')
+      .eq('id', userId)
+      .maybeSingle()
+
+    const rewardBalance = Number(profile?.reward_balance || 0)
+
+    // 2. Get transaction history
+    const { data: transactions } = await admin
+      .from('reward_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50)
+
+    const list = transactions || []
+    const totalEarned = list
+      .filter((t: any) => t.type === 'earned' || t.type === 'bonus')
+      .reduce((acc: number, t: any) => acc + Number(t.amount || 0), 0)
+
+    const totalRedeemed = list
+      .filter((t: any) => t.type === 'redeemed')
+      .reduce((acc: number, t: any) => acc + Math.abs(Number(t.amount || 0)), 0)
+
+    return {
+      success: true,
+      rewardBalance,
+      totalEarned: totalEarned || rewardBalance,
+      totalRedeemed,
+      maxCap: 500,
+      transactions: list,
+    }
+  } catch (err: any) {
+    console.warn('Exception in getToywardsDataAction:', err)
+    return {
+      success: false,
+      rewardBalance: 0,
+      totalEarned: 0,
+      totalRedeemed: 0,
+      maxCap: 500,
+      transactions: [],
+    }
+  }
+}
+

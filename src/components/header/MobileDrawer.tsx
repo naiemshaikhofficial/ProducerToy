@@ -114,7 +114,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
-                href="/features/toywards"
+                href="/account?tab=rewards"
                 prefetch={true}
                 onClick={onClose}
                 className="flex items-center justify-between text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
@@ -129,7 +129,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
-                href="/library"
+                href="/account?tab=currency"
                 prefetch={true}
                 onClick={onClose}
                 className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
@@ -149,7 +149,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
-                href="/store"
+                href="/store?on_sale=true"
                 prefetch={true}
                 onClick={onClose}
                 className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
@@ -169,7 +169,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
-                href="/library"
+                href="/account?tab=redeem"
                 prefetch={true}
                 onClick={onClose}
                 className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
@@ -179,7 +179,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
-                href="/library"
+                href="/wishlist"
                 prefetch={true}
                 onClick={onClose}
                 className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
