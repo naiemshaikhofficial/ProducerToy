@@ -142,7 +142,7 @@ export default function ManufacturersClient({ initialBrands }: ManufacturersClie
               return (
                 <Link
                   key={brand.id}
-                  href={`/store?brand=${brand.slug}`}
+                  href={`/manufacturers/${brand.slug}`}
                   prefetch={true}
                   className="group relative bg-[#161616] hover:bg-[#1f1f1f] rounded-2xl p-5 flex flex-col items-center justify-between transition-all duration-200 hover:-translate-y-1 overflow-hidden min-h-[140px]"
                 >
