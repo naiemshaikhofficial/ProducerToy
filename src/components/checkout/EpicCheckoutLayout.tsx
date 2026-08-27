@@ -91,7 +91,6 @@ export function EpicCheckoutLayout({
 
   const isFree = finalTotal <= 0
   const rewardsAmount = (finalTotal * 0.05).toFixed(2)
-  const taxAmount = (finalTotal * 0.18 / 1.18).toFixed(2)
 
   // Derive User Display Name and Initial
   const displayName = user
@@ -201,15 +200,6 @@ export function EpicCheckoutLayout({
               </span>
             </div>
 
-            {!isFree && (
-              <div className="flex justify-between items-center text-zinc-400 font-normal">
-                <span>VAT included (18%)</span>
-                <span className="text-zinc-200 font-semibold">
-                  {currencySymbol}{taxAmount}
-                </span>
-              </div>
-            )}
-
             {/* Total Price Row */}
             <div className="flex justify-between items-baseline pt-4 border-t border-[#262626]">
               <span className="text-[16px] font-bold text-white">Total</span>
@@ -219,11 +209,13 @@ export function EpicCheckoutLayout({
             </div>
           </div>
 
-          {/* Toywards Rewards Pill Badge (Exact 1:1 Epic Games Match) */}
+          {/* Toywards Rewards Pill Badge (Dual-Tone Orange & White) */}
           {!isFree && (
-            <div className="inline-flex items-center gap-2 bg-[#122820] border border-[#1d4638] text-[#1cd18c] px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold select-none w-fit shadow-xs">
+            <div className="inline-flex items-center gap-2 bg-[#26150b] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-[12.5px] select-none w-fit shadow-xs">
               <ToywardsIcon size={15} />
-              <span>Get {currencySymbol}{rewardsAmount} in Toywards.</span>
+              <span className="text-zinc-200 font-medium">
+                Get <strong className="text-white font-bold">{currencySymbol}{rewardsAmount}</strong> in <span className="text-[#FA742B] font-bold">Toywards</span>.
+              </span>
             </div>
           )}
         </div>
@@ -276,7 +268,7 @@ export function EpicCheckoutLayout({
                   Start collecting 5% to 20% with every purchase.
                 </p>
                 <Link
-                  href="/terms"
+                  href="/features/toywards"
                   target="_blank"
                   className="inline-block text-[11.5px] text-zinc-400 hover:text-white underline font-medium"
                 >

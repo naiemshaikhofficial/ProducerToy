@@ -23,7 +23,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="w-full bg-[#141414] text-white border-t border-[#26262b] mt-24 select-none font-sans">
+    <footer className="w-full bg-[#141414] text-white border-none mt-24 select-none font-sans">
       <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-16">
         
         {/* Main Grid with Vertical Dividers matching Plugin Boutique Layout */}
@@ -145,7 +145,7 @@ export function Footer() {
 
               <div className="pt-1">
                 <Link
-                  href="/store"
+                  href="/features/toywards"
                   prefetch={true}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#FC6301] transition-colors group"
                 >

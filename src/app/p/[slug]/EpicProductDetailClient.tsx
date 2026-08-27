@@ -373,14 +373,19 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               )}
             </div>
 
-            {/* Toywards 5% Rewards Pill */}
+            {/* Toywards 5% Rewards Pill (Dual-Tone Orange & White) */}
             {product.price_usd > 0 && (
-              <div className="inline-flex items-center gap-2 bg-[#122820] border border-[#1d4638] text-[#1cd18c] px-3 py-1 rounded-full text-xs font-semibold select-none shadow-xs">
+              <Link
+                href="/features/toywards"
+                target="_blank"
+                className="inline-flex items-center gap-2 bg-[#26150b] hover:bg-[#321b0f] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-xs select-none shadow-xs transition-colors group cursor-pointer"
+                title="Learn more about Toywards"
+              >
                 <ToywardsIcon size={14} />
-                <span>
-                  Get {formatPrice(undefined, Number((product.price_usd * 0.05).toFixed(2)))} in Toywards (5% Back)
+                <span className="text-zinc-300">
+                  Get <strong className="text-white font-bold">{formatPrice(undefined, Number((product.price_usd * 0.05).toFixed(2)))}</strong> in <span className="text-[#FA742B] font-bold">Toywards (5% Back)</span>
                 </span>
-              </div>
+              </Link>
             )}
           </div>
 

@@ -70,7 +70,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
-    <div className="w-full bg-[#121212] border-b border-[#202020]/50">
+    <div className="w-full bg-[#121212] border-none">
       <div className="w-full px-5 sm:px-7 lg:px-8 h-[58px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
@@ -149,7 +149,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/store"
+                      href="/features/toywards"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
@@ -158,7 +158,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         <ToywardsIcon size={16} />
                         <span>Toywards</span>
                       </div>
-                      <span className="text-[10px] font-bold bg-[#122820] text-[#1cd18c] border border-[#1d4638] px-1.5 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold bg-[#26150b] text-[#FA742B] border border-[#4a2412] px-2 py-0.5 rounded-full">
                         5% Back
                       </span>
                     </Link>

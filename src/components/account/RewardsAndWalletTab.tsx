@@ -74,14 +74,25 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
           </p>
         </div>
 
-        <div className="bg-[#161616] border border-[#222222] p-4 rounded-xl space-y-1.5">
-          <span className="text-sm font-bold text-white block">
-            No Expiration
-          </span>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Your earned credits and loyalty points never expire as long as your account remains active.
-          </p>
-        </div>
+        {isRewards && (
+          <div className="sm:col-span-2 bg-[#161616] border border-[#222222] p-4 rounded-xl flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-sm font-bold text-white block">
+                Want to learn all program details?
+              </span>
+              <p className="text-xs text-zinc-400">
+                Explore how earning, redeeming, and special up to 20% creator multipliers work.
+              </p>
+            </div>
+            <Link
+              href="/features/toywards"
+              className="text-xs font-bold text-[#FA742B] hover:underline flex items-center gap-1 flex-shrink-0 ml-4"
+            >
+              <span>Learn More</span>
+              <ArrowUpRight size={14} />
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
