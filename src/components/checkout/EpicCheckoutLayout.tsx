@@ -200,6 +200,15 @@ export function EpicCheckoutLayout({
               </span>
             </div>
 
+            {finalTotal < currentSubtotal && (
+              <div className="flex justify-between items-center text-[#FA742B] font-medium">
+                <span>Discount Applied</span>
+                <span className="font-semibold">
+                  -{currencySymbol}{(currentSubtotal - finalTotal).toFixed(2)}
+                </span>
+              </div>
+            )}
+
             {/* Total Price Row */}
             <div className="flex justify-between items-baseline pt-4 border-t border-[#262626]">
               <span className="text-[16px] font-bold text-white">Total</span>

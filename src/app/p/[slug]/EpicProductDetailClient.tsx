@@ -16,7 +16,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Laptop,
-  Bookmark
+  Bookmark,
+  ShoppingCart
 } from 'lucide-react'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
@@ -425,17 +426,21 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                   )}
                 </button>
 
-                {/* Cart Toggle Icon Button */}
                 <button
                   onClick={() => addItem(product)}
-                  className={`p-3.5 rounded-xl border transition-colors cursor-pointer flex items-center justify-center ${
+                  className={`w-12 h-12 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
                     added
-                      ? 'bg-emerald-950/40 border-emerald-600 text-emerald-400'
-                      : 'bg-[#202028] hover:bg-[#2a2a34] border-[#2e2e3a] text-white'
+                      ? 'bg-[#282828] hover:bg-[#303030] border-[#383838] text-white'
+                      : 'bg-[#222222] hover:bg-[#2c2c2c] border-[#303030] text-zinc-200 hover:text-white'
                   }`}
                   aria-label="Add to cart"
+                  title={added ? 'In Cart' : 'Add to Cart'}
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  {added ? (
+                    <Check className="w-5 h-5 text-white" />
+                  ) : (
+                    <ShoppingCart className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             )}

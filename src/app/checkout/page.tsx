@@ -302,21 +302,20 @@ export default function CheckoutPage() {
   // Calculations with Real-Time Conversion
   const isIndia = billingDetails.country === 'India' || (!billingDetails.country && currency === 'INR')
 
-  const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || (item.price_inr ? item.price_inr / exchangeRate : 0)), 0)
-  const rawSubtotalInr = Math.round(rawSubtotalUsd * exchangeRate)
+  const rawSubtotalUsd = items.reduce((sum, item) => sum + (Number(item.price_usd) || 0), 0)
+  const rawSubtotalInr = items.reduce((sum, item) => {
+    if (item.price_inr && Number(item.price_inr) > 0) return sum + Number(item.price_inr)
+    return sum + Math.round((Number(item.price_usd) || 0) * (exchangeRate || 95.0))
+  }, 0)
 
   const currentSubtotal = isIndia ? rawSubtotalInr : rawSubtotalUsd
   const currencySymbol = isIndia ? '₹' : '$'
 
-  // Bundle discount (10% on 3+ items)
-  const bundleDiscountPercent = items.length >= 3 ? 10 : 0
-  const effectiveDiscountPercent = Math.max(discountPercent, bundleDiscountPercent)
-
   const discountAmount =
-    effectiveDiscountPercent > 0
+    discountPercent > 0
       ? isIndia
-        ? Math.round((currentSubtotal * effectiveDiscountPercent) / 100)
-        : Math.round((currentSubtotal * effectiveDiscountPercent) / 100 * 100) / 100
+        ? Math.round((currentSubtotal * discountPercent) / 100)
+        : Math.round((currentSubtotal * discountPercent) / 100 * 100) / 100
       : 0
   const finalTotal = Math.max(0, currentSubtotal - discountAmount)
 

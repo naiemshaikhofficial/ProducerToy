@@ -190,8 +190,10 @@ export async function processCheckoutAction(
       }))
     }
 
-    // 3.1 Verify server-side total and coupons to prevent unpaid bypass
+    // 3.1 Verify server-side total and coupons strictly against database to prevent unpaid bypass
     const rawSubtotalUsd = dbProducts.reduce((sum, p) => sum + Number(p.price_usd || 0), 0)
+    const rawSubtotalInr = dbProducts.reduce((sum, p) => sum + Number(p.price_inr || 0), 0)
+
     let verifiedDiscountPercent = 0
     if (options?.couponCode) {
       const { data: couponData } = await adminSupabase
@@ -207,11 +209,10 @@ export async function processCheckoutAction(
       }
     }
 
-    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
-    const totalDiscountPercent = Math.min(100, bundleDiscountPercent + verifiedDiscountPercent)
-    const expectedTotal = Math.max(0, rawSubtotalUsd - (rawSubtotalUsd * totalDiscountPercent) / 100)
+    const expectedTotalUsd = Math.max(0, rawSubtotalUsd * (1 - verifiedDiscountPercent / 100))
+    const expectedTotalInr = Math.max(0, rawSubtotalInr * (1 - verifiedDiscountPercent / 100))
 
-    if (expectedTotal > 0) {
+    if (expectedTotalUsd > 0 || (rawSubtotalInr > 0 && verifiedDiscountPercent < 100)) {
       return {
         success: false,
         error: 'Paid orders must be completed through Razorpay or PayPal payment gateway.',

@@ -54,11 +54,6 @@ export async function POST(request: Request) {
       return sum
     }, 0)
 
-    // Bundle discount: 10% off for 3+ items
-    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
-    const bundleDiscountInr = Math.round((rawSubtotalInr * bundleDiscountPercent) / 100)
-    const subtotalAfterBundle = rawSubtotalInr - bundleDiscountInr
-
     // Coupon discount verification
     let couponDiscountPercent = 0
     if (couponCode) {
@@ -75,8 +70,8 @@ export async function POST(request: Request) {
       }
     }
 
-    const couponDiscountInr = Math.round((subtotalAfterBundle * couponDiscountPercent) / 100)
-    const finalTotalInr = Math.max(0, subtotalAfterBundle - couponDiscountInr)
+    const couponDiscountInr = Math.round((rawSubtotalInr * couponDiscountPercent) / 100)
+    const finalTotalInr = Math.max(0, rawSubtotalInr - couponDiscountInr)
 
     // 3. Create Razorpay order in INR (amount in paise)
     const amountInPaise = Math.round(finalTotalInr * 100)
@@ -89,7 +84,6 @@ export async function POST(request: Request) {
         userId: user.id,
         userEmail: user.email || '',
         itemCount: items.length,
-        bundleDiscountPercent,
         couponDiscountPercent,
       },
     })

@@ -182,9 +182,8 @@ export function GlobalCheckoutModal() {
   const currencySymbol = currency === 'INR' ? '₹' : '$'
   const currentSubtotal = currency === 'INR' ? rawSubtotalInr : rawSubtotalUsd
 
-  const bundleDiscountPercent = items.length >= 3 ? 15 : items.length === 2 ? 10 : 0
-  const activeDiscountPercent = Math.max(discountPercent, bundleDiscountPercent)
-  const finalTotal = Math.max(0, currentSubtotal * (1 - activeDiscountPercent / 100))
+  const discountAmount = discountPercent > 0 ? (currentSubtotal * discountPercent) / 100 : 0
+  const finalTotal = Math.max(0, currentSubtotal - discountAmount)
 
   const handleBillingChange = (field: keyof BillingDetails, value: string) => {
     setBillingDetails((prev) => {

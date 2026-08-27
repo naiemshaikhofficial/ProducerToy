@@ -38,12 +38,23 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Verify products in database
+    // 3. Verify products in database & ensure no paid products can be claimed for free
     const productIds = items.map((i: any) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
       .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type')
       .in('id', productIds)
+
+    // Check if any product in database is paid
+    const hasPaidProduct = (dbProducts || []).some(
+      (p) => Number(p.price_usd || 0) > 0 || Number(p.price_inr || 0) > 0
+    )
+    if (hasPaidProduct) {
+      return NextResponse.json(
+        { error: 'Paid products must be purchased through payment gateway' },
+        { status: 400 }
+      )
+    }
 
     const productMap = new Map((dbProducts || []).map((p) => [p.id, p]))
 
