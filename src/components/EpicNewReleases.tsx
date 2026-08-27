@@ -74,36 +74,36 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
         {/* ========================================================================= */}
-        {/* LEFT COLUMN: Featured "NEW RELEASES" Visual Card                          */}
+        {/* LEFT COLUMN: Featured "NEW RELEASES" Visual Card (Static Orange Theme)    */}
         {/* ========================================================================= */}
         <div className="lg:col-span-4 xl:col-span-4 flex flex-col">
           <Link
             href="/store?sort=newest"
             prefetch={true}
-            className="group relative w-full h-[320px] sm:h-[380px] lg:h-full min-h-[360px] rounded-2xl overflow-hidden p-6 sm:p-8 flex flex-col justify-between items-center text-center shadow-2xl transition-transform hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            className="relative w-full h-[320px] sm:h-[380px] lg:h-full min-h-[360px] rounded-2xl overflow-hidden p-6 sm:p-8 flex flex-col justify-between items-center text-center shadow-2xl select-none cursor-pointer"
             style={{
-              background: 'linear-gradient(135deg, #1b0c36 0%, #2a164d 30%, #172a5a 70%, #0c1836 100%)',
+              background: 'linear-gradient(135deg, #180902 0%, #301305 25%, #5e2105 60%, #180902 100%)',
             }}
           >
-            {/* Background Futuristic Crystal & Flare Accents */}
-            <div className="absolute inset-0 opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500/30 via-purple-500/20 to-transparent pointer-events-none" />
-            <div className="absolute -top-12 -left-12 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-purple-500/25 rounded-full blur-3xl pointer-events-none" />
+            {/* Background Producer Toy Brand Fiery / Crystal Accents */}
+            <div className="absolute inset-0 opacity-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#FA742B]/35 via-[#E05A18]/20 to-transparent pointer-events-none" />
+            <div className="absolute -top-12 -left-12 w-48 h-48 bg-[#FA742B]/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-[#FF9933]/25 rounded-full blur-3xl pointer-events-none" />
 
             {/* Glowing Polygonal Prisms Decor */}
             <div className="relative z-10 w-full flex-1 flex items-center justify-center">
               <div className="space-y-3">
                 {/* 3D-Style Bold Typography (Exact Epic Games Match) */}
-                <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black uppercase tracking-wider text-white leading-none drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] font-sans">
+                <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black uppercase tracking-wider text-white leading-none drop-shadow-[0_8px_24px_rgba(0,0,0,0.85)] font-sans">
                   NEW<br />RELEASES
                 </h2>
-                <div className="w-12 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full opacity-80" />
+                <div className="w-14 h-1 bg-gradient-to-r from-[#FA742B] to-[#FFB074] mx-auto rounded-full shadow-[0_0_10px_#FA742B]" />
               </div>
             </div>
 
             {/* "See All" Action Button (Exact Epic Games Style Solid White Pill) */}
             <div className="relative z-10 w-full flex justify-center pt-4">
-              <span className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-8 py-2.5 rounded-lg shadow-xl transition-all group-hover:shadow-white/20">
+              <span className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-8 py-2.5 rounded-lg shadow-xl transition-colors active:scale-95">
                 See All
               </span>
             </div>
@@ -111,7 +111,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
         </div>
 
         {/* ========================================================================= */}
-        {/* RIGHT COLUMN: 2-Column x 3-Row List (6 Items Total)                       */}
+        {/* RIGHT COLUMN: 2-Column x 3-Row List (Static Clean Cards, Exact Epic Match)*/}
         {/* ========================================================================= */}
         <div className="lg:col-span-8 xl:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 sm:gap-y-4">
           {currentItems.map((item) => {
@@ -132,23 +132,23 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                 key={item.id}
                 href={`/product/${item.slug}`}
                 prefetch={true}
-                className="group flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-[#181818] border border-transparent hover:border-[#262626] transition-all cursor-pointer"
+                className="flex items-center gap-3.5 p-2.5 rounded-xl hover:bg-[#202020] transition-colors duration-150 cursor-pointer select-none"
               >
-                {/* 3:4 or Square Thumbnail */}
+                {/* 3:4 or Square Thumbnail (Static, Exact 1:1 Epic Games Match) */}
                 <div className="relative w-14 h-16 sm:w-16 sm:h-20 rounded-xl overflow-hidden bg-[#202020] border border-[#282828] flex-shrink-0 shadow-md">
                   <Image
                     src={getCdnImageUrl(item.cover_image, { width: 240 })}
                     alt={item.name}
                     fill
                     sizes="80px"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover object-center"
                   />
                 </div>
 
-                {/* Meta & Price Info */}
+                {/* Meta & Price Info (Static Solid White Text, No Color Change on Hover) */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center space-y-1">
                   {/* Product Title */}
-                  <h3 className="font-bold text-white text-sm sm:text-[15px] group-hover:text-[#FA742B] transition-colors leading-snug line-clamp-1">
+                  <h3 className="font-bold text-white text-sm sm:text-[15px] leading-snug line-clamp-1">
                     {item.name}
                   </h3>
 

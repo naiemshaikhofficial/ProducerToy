@@ -115,32 +115,33 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
           </Link>
         </div>
 
-        {/* 4 Cards Grid (Static Clean Cards, Orange FREE Badge) */}
+        {/* 4 Cards Grid (Static Clean Cards with Subtle Hover Brightness, Orange FREE Badge) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {displayItems.map((item) => (
             <Link
               key={item.id}
               href={`/product/${item.slug}`}
               prefetch={true}
-              className="flex flex-col select-none cursor-pointer"
+              className="group flex flex-col select-none cursor-pointer"
             >
-              {/* 3:4 Poster Image Container (Static) */}
+              {/* 3:4 Poster Image Container (Static + Brightness on Hover) */}
               <div className="relative w-full aspect-[3/4] rounded-t-xl overflow-hidden bg-[#202020] border-t border-x border-[#282828]">
                 <Image
                   src={getCdnImageUrl(item.cover_image, { width: 600 })}
                   alt={item.name}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover object-center"
+                  className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
                 />
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
               </div>
 
               {/* Flush Bottom Action Bar (Static Brand Orange FREE) */}
-              <div className="bg-[#FA742B] text-black font-black text-xs sm:text-[13px] py-2 px-3 text-center uppercase tracking-wider rounded-b-xl shadow-md">
+              <div className="bg-[#FA742B] group-hover:brightness-105 text-black font-black text-xs sm:text-[13px] py-2 px-3 text-center uppercase tracking-wider rounded-b-xl shadow-md transition-all duration-200">
                 FREE
               </div>
 
-              {/* Product Title (Static) */}
+              {/* Product Title (Static Solid White Text) */}
               <div className="flex flex-col mt-2.5 px-0.5">
                 <h3 className="font-bold text-white text-sm sm:text-[15px] tracking-tight leading-snug line-clamp-1">
                   {item.name}
