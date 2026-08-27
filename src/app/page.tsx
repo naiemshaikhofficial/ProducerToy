@@ -10,6 +10,7 @@ import { FreeProducerToys } from '@/components/FreeProducerToys'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
+import { EpicMostPopular } from '@/components/EpicMostPopular'
 import { EpicTrending } from '@/components/EpicTrending'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
@@ -109,7 +110,12 @@ export default async function HomePage() {
           <EpicStorefrontLists products={products} />
         </div>
 
-        {/* 6th Section: 1:1 Epic Games Trending Row (High Demand & Latest Products) */}
+        {/* 6th Section: 1:1 Epic Games Most Popular (Highly Purchased Products with Carousel Arrows) */}
+        <div className="px-4 sm:px-0">
+          <EpicMostPopular products={products} />
+        </div>
+
+        {/* 7th Section: 1:1 Epic Games Trending Row (High Demand & Latest Products) */}
         <div className="px-4 sm:px-0">
           <EpicTrending products={products} />
         </div>
