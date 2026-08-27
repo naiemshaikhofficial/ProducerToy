@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Plus,
-  Trash2
+  Trash2,
+  Gift
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
