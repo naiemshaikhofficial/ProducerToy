@@ -37,11 +37,6 @@ export async function POST(request: Request) {
       0
     )
 
-    // Bundle discount: 10% off for 3+ items
-    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
-    const bundleDiscountUsd = (rawSubtotalUsd * bundleDiscountPercent) / 100
-    const subtotalAfterBundle = rawSubtotalUsd - bundleDiscountUsd
-
     // Coupon discount verification
     let couponDiscountPercent = 0
     if (couponCode) {
@@ -58,8 +53,8 @@ export async function POST(request: Request) {
       }
     }
 
-    const couponDiscountUsd = (subtotalAfterBundle * couponDiscountPercent) / 100
-    const finalTotalUsd = Math.max(0, subtotalAfterBundle - couponDiscountUsd)
+    const couponDiscountUsd = (rawSubtotalUsd * couponDiscountPercent) / 100
+    const finalTotalUsd = Math.max(0, rawSubtotalUsd - couponDiscountUsd)
 
     // 3. Create PayPal order
     const paypalOrder = await createPayPalOrderOnServer(

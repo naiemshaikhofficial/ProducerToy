@@ -129,15 +129,7 @@ export function CheckoutOrderSummary({
           </span>
         </div>
 
-        {bundleDiscountPercent > 0 && (
-          <div className="flex justify-between text-zinc-300">
-            <span>Bundle Discount (10%)</span>
-            <span>
-              -{currencySymbol}
-              {(currentSubtotal * 0.1).toFixed(2)}
-            </span>
-          </div>
-        )}
+
 
         {discountPercent > 0 && (
           <div className="flex justify-between text-zinc-300">

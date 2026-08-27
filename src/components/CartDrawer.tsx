@@ -26,15 +26,11 @@ export function CartDrawer() {
   const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || 0), 0)
   const rawSubtotalInr = Math.round(rawSubtotalUsd * exchangeRate)
 
-  // Bundle Discount: 10% off for 3+ items
-  const bundleDiscountUsd = items.length >= 3 ? rawSubtotalUsd * 0.1 : 0
-  const bundleDiscountInr = Math.round(bundleDiscountUsd * exchangeRate)
-
-  const couponDiscountUsd = (rawSubtotalUsd - bundleDiscountUsd) * (discountPercent / 100)
+  const couponDiscountUsd = rawSubtotalUsd * (discountPercent / 100)
   const couponDiscountInr = Math.round(couponDiscountUsd * exchangeRate)
 
-  const finalTotalUsd = Math.max(0, rawSubtotalUsd - bundleDiscountUsd - couponDiscountUsd)
-  const finalTotalInr = Math.max(0, rawSubtotalInr - bundleDiscountInr - couponDiscountInr)
+  const finalTotalUsd = Math.max(0, rawSubtotalUsd - couponDiscountUsd)
+  const finalTotalInr = Math.max(0, rawSubtotalInr - couponDiscountInr)
 
   const applyCoupon = async () => {
     const res = await validateCouponAction(coupon)
@@ -123,13 +119,6 @@ export function CartDrawer() {
           {items.length > 0 && (
             <div className="p-4 border-t border-[#222222] bg-[#141414] space-y-3">
               
-              {/* Bundle Discount Banner */}
-              {items.length >= 3 && (
-                <div className="bg-[#181818] text-zinc-300 text-[11px] p-2 text-center rounded-lg border border-[#282828]">
-                  10% Bundle Discount Applied
-                </div>
-              )}
-
               {/* Coupon Box */}
               <div className="flex gap-2">
                 <input
@@ -154,12 +143,6 @@ export function CartDrawer() {
                   <span>Subtotal</span>
                   <span className="text-zinc-200">{formatPrice(rawSubtotalInr, rawSubtotalUsd)}</span>
                 </div>
-                {bundleDiscountInr > 0 && (
-                  <div className="flex justify-between text-zinc-300">
-                    <span>Bundle Discount (10%)</span>
-                    <span>-{formatPrice(bundleDiscountInr, bundleDiscountUsd)}</span>
-                  </div>
-                )}
                 {discountPercent > 0 && (
                   <div className="flex justify-between text-zinc-300">
                     <span>Coupon ({discountPercent}%)</span>

@@ -70,10 +70,6 @@ export async function POST(request: Request) {
       0
     )
 
-    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
-    const bundleDiscountUsd = (rawSubtotalUsd * bundleDiscountPercent) / 100
-    const subtotalAfterBundle = rawSubtotalUsd - bundleDiscountUsd
-
     // Verified coupon discount calculation
     let verifiedCouponDiscountPercent = 0
     if (couponCode) {
@@ -90,8 +86,8 @@ export async function POST(request: Request) {
       }
     }
 
-    const couponDiscountUsd = (subtotalAfterBundle * verifiedCouponDiscountPercent) / 100
-    const expectedTotalUsd = Math.max(0, subtotalAfterBundle - couponDiscountUsd)
+    const couponDiscountUsd = (rawSubtotalUsd * verifiedCouponDiscountPercent) / 100
+    const expectedTotalUsd = Math.max(0, rawSubtotalUsd - couponDiscountUsd)
 
     // 3. SECURITY DEFENSE: Capture order via official PayPal Server API
     const captureData = await capturePayPalOrderOnServer(orderId)
@@ -242,7 +238,7 @@ export async function POST(request: Request) {
       billing_zip: billingDetails?.zip || null,
       billing_country: billingDetails?.country || null,
       subtotal: rawSubtotalUsd,
-      discount: bundleDiscountUsd + couponDiscountUsd,
+      discount: couponDiscountUsd,
       total_amount: expectedTotalUsd,
       currency: 'USD',
       coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,

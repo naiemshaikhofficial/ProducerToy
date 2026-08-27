@@ -77,11 +77,6 @@ export async function POST(request: Request) {
       return sum
     }, 0)
 
-    // Server-side bundle discount calculation
-    const bundleDiscountPercent = dbProducts.length >= 3 ? 10 : 0
-    const bundleDiscountInr = Math.round((rawSubtotalInr * bundleDiscountPercent) / 100)
-    const subtotalAfterBundle = rawSubtotalInr - bundleDiscountInr
-
     // Server-side coupon verification
     let verifiedCouponDiscountPercent = 0
     if (couponCode) {
@@ -98,8 +93,8 @@ export async function POST(request: Request) {
       }
     }
 
-    const couponDiscountInr = Math.round((subtotalAfterBundle * verifiedCouponDiscountPercent) / 100)
-    const expectedTotalInr = Math.max(0, subtotalAfterBundle - couponDiscountInr)
+    const couponDiscountInr = Math.round((rawSubtotalInr * verifiedCouponDiscountPercent) / 100)
+    const expectedTotalInr = Math.max(0, rawSubtotalInr - couponDiscountInr)
 
     // 3. SECURITY DEFENSE: Anti-Free-Order Spoofing
     if (isFree) {
@@ -267,7 +262,7 @@ export async function POST(request: Request) {
       billing_zip: billingDetails?.zip || null,
       billing_country: billingDetails?.country || null,
       subtotal: rawSubtotalInr,
-      discount: bundleDiscountInr + couponDiscountInr,
+      discount: couponDiscountInr,
       total_amount: expectedTotalInr,
       currency: 'INR',
       coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
