@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+      },
+    ];
+  },
   async headers() {
     const securityHeaders = [
       { key: 'X-Frame-Options', value: 'DENY' },

@@ -90,7 +90,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </Link>
 
           <Link 
-            href="/store" 
+            href="/" 
             prefetch={true}
             className="text-white font-black text-[16px] tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
           >
