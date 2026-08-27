@@ -17,7 +17,8 @@ import {
   Key,
   Bookmark,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  ShoppingCart
 } from 'lucide-react'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { useCurrency } from '@/context/CurrencyContext'
@@ -171,6 +172,22 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               >
                 <Key className="w-5 h-5 text-zinc-400" />
                 <span>Redeem Code</span>
+              </Link>
+
+              <Link
+                href="/cart"
+                prefetch={true}
+                onClick={onClose}
+                className="flex items-center justify-between text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
+              >
+                <div className="flex items-center gap-3.5">
+                  <ShoppingCart className="w-5 h-5 text-zinc-400" />
+                  <span>Cart</span>
+                </div>
+                {/* Cart Badge */}
+                <span className="bg-[#FA742B] text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                  Cart
+                </span>
               </Link>
 
               <Link

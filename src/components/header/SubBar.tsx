@@ -285,21 +285,20 @@ export const SubBar: React.FC<SubBarProps> = ({
             Gifts
           </Link>
 
-          {onOpenCart && (
-            <button
-              type="button"
-              onClick={onOpenCart}
-              className="flex items-center gap-2 text-zinc-400 hover:text-white font-normal transition-colors cursor-pointer py-1.5 px-2 rounded-lg group"
-            >
-              <ShoppingCart className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
-              <span>Cart</span>
-              {itemCount > 0 && (
-                <span className="bg-white text-black text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </button>
-          )}
+          <Link
+            href="/cart"
+            prefetch={true}
+            className={`flex items-center gap-2 font-normal transition-colors py-1.5 px-2 rounded-lg group ${
+              pathname === '/cart' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+            }`}
+          >
+            <span>Cart</span>
+            {itemCount > 0 && (
+              <span className="bg-[#FA742B] text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                {itemCount}
+              </span>
+            )}
+          </Link>
         </div>
 
       </div>
