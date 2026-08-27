@@ -47,7 +47,6 @@ export async function getWishlistAction(userId?: string): Promise<{ success: boo
           id,
           name,
           slug,
-          brand,
           product_type,
           price_inr,
           price_usd,
@@ -74,11 +73,14 @@ export async function getWishlistAction(userId?: string): Promise<{ success: boo
       .map((row: any) => {
         const p = row.products
         if (!p) return null
+        const brandName = Array.isArray(p.brands)
+          ? p.brands[0]?.name
+          : p.brands?.name || p.brand || 'Producer Toy'
         return {
           id: p.id,
           name: p.name,
           slug: p.slug,
-          brand: p.brands?.name || p.brand || 'Producer Toy',
+          brand: brandName,
           product_type: p.product_type,
           price_inr: Number(p.price_inr) || 0,
           price_usd: Number(p.price_usd) || 0,

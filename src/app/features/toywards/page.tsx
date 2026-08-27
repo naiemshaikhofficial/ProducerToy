@@ -78,19 +78,19 @@ export default function ToywardsFeaturePage() {
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 space-y-16 sm:space-y-24">
         
         {/* ========================================================================= */}
-        {/* HERO SECTION: 1:1 Epic Games Store Style Banner                          */}
+        {/* HERO SECTION: Producer Toy Style Banner with Signature Orange Accent       */}
         {/* ========================================================================= */}
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#0c142b] via-[#091024] to-[#050814] border border-[#1c2a4f] shadow-2xl p-6 sm:p-10 lg:p-14">
+        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#1a1008] via-[#120b05] to-[#0a0704] border border-[#3d200f] shadow-2xl p-6 sm:p-10 lg:p-14">
           
-          {/* Subtle Ambient Glow */}
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Subtle Warm Ambient Glow */}
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FA742B]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
             
             {/* Left Column: 3D Illustration */}
             <div className="lg:col-span-6 flex justify-center items-center">
-              <div className="relative w-full max-w-[480px] aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl border border-white/5 group">
+              <div className="relative w-full max-w-[480px] aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10 group">
                 <Image
                   src="/images/toywards/hero.jpg"
                   alt="Earn from 5% to 20% with Toywards"
@@ -98,26 +98,26 @@ export default function ToywardsFeaturePage() {
                   priority
                   className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c142b]/60 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#120b05]/80 via-transparent to-transparent pointer-events-none" />
               </div>
             </div>
 
             {/* Right Column: Hero Pitch & CTA */}
             <div className="lg:col-span-6 flex flex-col items-start space-y-5 sm:space-y-6 text-left">
               
-              <div className="inline-flex items-center gap-2 bg-[#26150b] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-[#2a160b] border border-[#542813] px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm">
                 <ToywardsIcon size={16} />
                 <span className="text-zinc-200">Rewards <span className="text-[#FA742B]">Program</span></span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
-                Earn from 5% to 20% with Toywards
+                Earn from <span className="text-[#FA742B]">5% to 20%</span> with Toywards
               </h1>
 
               <Link
                 href="/store"
                 prefetch={true}
-                className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-md uppercase tracking-wider transition-all duration-150 shadow-lg active:scale-95 inline-flex items-center gap-2"
+                className="bg-[#FA742B] hover:bg-[#ff8542] text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-md uppercase tracking-wider transition-all duration-150 shadow-lg shadow-[#FA742B]/20 active:scale-95 inline-flex items-center gap-2"
               >
                 <span>Shop Now</span>
                 <ArrowRight size={16} />
@@ -150,7 +150,7 @@ export default function ToywardsFeaturePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             
             {/* CARD 1: SHOP */}
-            <div className="bg-[#181818] hover:bg-[#1f1f1f] border border-[#282828] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center transition-all duration-200 group shadow-lg">
+            <div className="bg-[#181818] hover:bg-[#1f1f1f] border border-[#282828] hover:border-[#FA742B]/30 rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center transition-all duration-200 group shadow-lg">
               <div className="relative w-36 h-36 sm:w-40 sm:h-40 mb-6 rounded-2xl overflow-hidden">
                 <Image
                   src="/images/toywards/shop.jpg"
@@ -159,7 +159,7 @@ export default function ToywardsFeaturePage() {
                   className="object-contain group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight group-hover:text-[#FA742B] transition-colors">
                 Shop
               </h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
@@ -168,7 +168,7 @@ export default function ToywardsFeaturePage() {
             </div>
 
             {/* CARD 2: EARN */}
-            <div className="bg-[#181818] hover:bg-[#1f1f1f] border border-[#282828] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center transition-all duration-200 group shadow-lg">
+            <div className="bg-[#181818] hover:bg-[#1f1f1f] border border-[#282828] hover:border-[#FA742B]/30 rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center transition-all duration-200 group shadow-lg">
               <div className="relative w-36 h-36 sm:w-40 sm:h-40 mb-6 rounded-2xl overflow-hidden">
                 <Image
                   src="/images/toywards/earn.jpg"
@@ -177,7 +177,7 @@ export default function ToywardsFeaturePage() {
                   className="object-contain group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight group-hover:text-[#FA742B] transition-colors">
                 Earn
               </h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
@@ -186,7 +186,7 @@ export default function ToywardsFeaturePage() {
             </div>
 
             {/* CARD 3: REDEEM */}
-            <div className="bg-[#181818] hover:bg-[#1f1f1f] border border-[#282828] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center transition-all duration-200 group shadow-lg">
+            <div className="bg-[#181818] hover:bg-[#1f1f1f] border border-[#282828] hover:border-[#FA742B]/30 rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center transition-all duration-200 group shadow-lg">
               <div className="relative w-36 h-36 sm:w-40 sm:h-40 mb-6 rounded-2xl overflow-hidden">
                 <Image
                   src="/images/toywards/redeem.jpg"
@@ -195,7 +195,7 @@ export default function ToywardsFeaturePage() {
                   className="object-contain group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight group-hover:text-[#FA742B] transition-colors">
                 Redeem
               </h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">

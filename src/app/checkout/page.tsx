@@ -197,7 +197,7 @@ export default function CheckoutPage() {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('id, name, slug, price_usd, price_inr, cover_image, product_type, brand')
+          .select('id, name, slug, price_usd, price_inr, cover_image, product_type, brands(name)')
           .eq('is_active', true)
           .limit(6)
 
@@ -205,6 +205,15 @@ export default function CheckoutPage() {
           const filtered = data
             .filter((p: any) => !items.some((item) => item.id === p.id))
             .slice(0, 3)
+            .map((p: any) => {
+              const brandName = Array.isArray(p.brands)
+                ? p.brands[0]?.name
+                : p.brands?.name || p.brand || 'Producer Toy'
+              return {
+                ...p,
+                brand: brandName,
+              }
+            })
           setUpsellProducts(filtered)
         }
       } catch (err) {
