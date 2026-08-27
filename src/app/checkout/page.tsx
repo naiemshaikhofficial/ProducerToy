@@ -10,7 +10,11 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { validateCouponAction } from '@/actions/couponActions'
-import { processCheckoutOrderAction } from '@/actions/checkoutActions'
+import {
+  processCheckoutOrderAction,
+  createRazorpayOrderAction,
+  verifyRazorpayPaymentAction,
+} from '@/actions/checkoutActions'
 import { saveBillingAddressAction } from '@/actions/accountActions'
 import {
   BillingDetails,
@@ -475,37 +479,36 @@ export default function CheckoutPage() {
     }
 
     try {
-      const res = await fetch('/api/razorpay/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items.map((i) => ({
-            id: i.id,
-            name: i.name,
-            slug: i.slug,
-            price_usd: i.price_usd,
-            price_inr: i.price_inr,
-            product_type: i.product_type,
-          })),
-          couponCode: coupon,
+      const orderRes = await createRazorpayOrderAction(
+        items.map((i) => ({
+          id: i.id,
+          name: i.name,
+          slug: i.slug,
+          price_usd: i.price_usd,
+          price_inr: i.price_inr,
+          product_type: i.product_type,
+        })),
+        coupon,
+        {
           applyRewards: useRewards,
           rewardAmountUsed: rewardAmountUsedUsd,
-        }),
-      })
+        }
+      )
 
-      const order = await res.json()
-      if (order.error) throw new Error(order.error)
+      if (!orderRes.success || !orderRes.orderId) {
+        throw new Error(orderRes.error || 'Failed to initialize Razorpay payment order')
+      }
 
-      const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      const keyId = orderRes.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
       if (!keyId) throw new Error('Razorpay Key ID is missing')
 
       const options = {
         key: keyId,
-        amount: order.amount,
-        currency: order.currency || 'INR',
+        amount: orderRes.amount,
+        currency: orderRes.currency || 'INR',
         name: 'ProducerToy',
         description: `Order for ${items.length} ${items.length === 1 ? 'item' : 'items'}`,
-        order_id: order.id,
+        order_id: orderRes.orderId,
         image: '/favicon.ico',
         prefill: {
           name: billingDetails.fullName,
@@ -518,33 +521,30 @@ export default function CheckoutPage() {
         handler: async function (response: any) {
           setPaymentStatus('processing')
           try {
-            const verifyRes = await fetch('/api/razorpay/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                ...response,
-                items: items.map((i) => ({
-                  id: i.id,
-                  name: i.name,
-                  slug: i.slug,
-                  price_usd: i.price_usd,
-                  price_inr: i.price_inr,
-                  product_type: i.product_type,
-                })),
-                userId: user.id,
-                billingDetails: billingDetails,
-                couponCode: coupon,
-                applyRewards: useRewards,
-                rewardAmountUsed: rewardAmountUsedUsd,
-              }),
+            const verifyRes = await verifyRazorpayPaymentAction({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              items: items.map((i) => ({
+                id: i.id,
+                name: i.name,
+                slug: i.slug,
+                price_usd: i.price_usd,
+                price_inr: i.price_inr,
+                product_type: i.product_type,
+              })),
+              userId: user.id,
+              billingDetails: billingDetails,
+              couponCode: coupon,
+              applyRewards: useRewards,
+              rewardAmountUsed: rewardAmountUsedUsd,
             })
 
-            const verifyData = await verifyRes.json()
-            if (verifyData.success) {
+            if (verifyRes.success) {
               clearCart()
               setPaymentStatus('success')
             } else {
-              setErrorMsg(verifyData.error || 'Payment verification failed.')
+              setErrorMsg(verifyRes.error || 'Payment verification failed.')
               setPaymentStatus('idle')
             }
           } catch (err: any) {
@@ -667,6 +667,5 @@ export default function CheckoutPage() {
       />
     </div>
   )
-    </div>
-  )
 }
+

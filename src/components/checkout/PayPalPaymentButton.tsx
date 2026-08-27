@@ -2,6 +2,10 @@
 
 import React, { useState } from 'react'
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
+import {
+  createPayPalOrderAction,
+  capturePayPalOrderAction,
+} from '@/actions/checkoutActions'
 
 interface PayPalPaymentButtonProps {
   finalTotalUsd: number
@@ -53,20 +57,26 @@ export function PayPalPaymentButton({
             createOrder={async () => {
               onProcessing()
               try {
-                const res = await fetch('/api/paypal/create-order', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    items: items.map((i) => ({ id: i.id })),
-                    couponCode: couponCode,
+                const res = await createPayPalOrderAction(
+                  items.map((i) => ({
+                    id: i.id,
+                    name: i.name,
+                    slug: i.slug,
+                    price_usd: i.price_usd,
+                    price_inr: i.price_inr,
+                    product_type: i.product_type,
+                  })),
+                  couponCode,
+                  {
                     applyRewards: Boolean(applyRewards),
                     rewardAmountUsed: Number(rewardAmountUsed || 0),
-                  }),
-                })
+                  }
+                )
 
-                const data = await res.json()
-                if (data.error) throw new Error(data.error)
-                return data.id
+                if (!res.success || !res.orderId) {
+                  throw new Error(res.error || 'Failed to create PayPal order')
+                }
+                return res.orderId
               } catch (err: any) {
                 onError(err.message || 'Failed to create PayPal order')
                 throw err
@@ -75,25 +85,27 @@ export function PayPalPaymentButton({
             onApprove={async (data) => {
               onProcessing()
               try {
-                const captureRes = await fetch('/api/paypal/capture-order', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    orderId: data.orderID,
-                    items: items.map((i) => ({ id: i.id })),
-                    userId: userId,
-                    billingDetails: billingDetails,
-                    couponCode: couponCode,
-                    applyRewards: Boolean(applyRewards),
-                    rewardAmountUsed: Number(rewardAmountUsed || 0),
-                  }),
+                const captureRes = await capturePayPalOrderAction({
+                  orderId: data.orderID,
+                  items: items.map((i) => ({
+                    id: i.id,
+                    name: i.name,
+                    slug: i.slug,
+                    price_usd: i.price_usd,
+                    price_inr: i.price_inr,
+                    product_type: i.product_type,
+                  })),
+                  userId: userId,
+                  billingDetails: billingDetails,
+                  couponCode: couponCode,
+                  applyRewards: Boolean(applyRewards),
+                  rewardAmountUsed: Number(rewardAmountUsed || 0),
                 })
 
-                const captureData = await captureRes.json()
-                if (captureData.success) {
-                  onSuccess(captureData.orderNumber || data.orderID)
+                if (captureRes.success) {
+                  onSuccess(captureRes.orderNumber || data.orderID)
                 } else {
-                  onError(captureData.error || 'Payment capture failed')
+                  onError(captureRes.error || 'Payment capture failed')
                 }
               } catch (err: any) {
                 onError(err.message || 'PayPal capture error')

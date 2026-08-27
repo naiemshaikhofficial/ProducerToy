@@ -8,7 +8,11 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { validateCouponAction } from '@/actions/couponActions'
-import { processCheckoutOrderAction } from '@/actions/checkoutActions'
+import {
+  processCheckoutOrderAction,
+  createRazorpayOrderAction,
+  verifyRazorpayPaymentAction,
+} from '@/actions/checkoutActions'
 import { saveBillingAddressAction } from '@/actions/accountActions'
 import { COUNTRIES } from './countries'
 import { BillingDetails, PaymentStatus } from './types'
@@ -43,6 +47,10 @@ export function GlobalCheckoutModal() {
 
   // Newsletter preference
   const [newsletterOptIn, setNewsletterOptIn] = useState(true)
+
+  // Toywards Loyalty Rewards state
+  const [availableRewards, setAvailableRewards] = useState(0)
+  const [useRewards, setUseRewards] = useState(false)
 
   // Billing form state
   const [billingDetails, setBillingDetails] = useState<BillingDetails>({
@@ -107,6 +115,9 @@ export function GlobalCheckoutModal() {
             loadedCountry = profile.country || ''
             if (profile.newsletter !== undefined && profile.newsletter !== null) {
               setNewsletterOptIn(Boolean(profile.newsletter))
+            }
+            if (profile.reward_balance !== undefined && profile.reward_balance !== null) {
+              setAvailableRewards(Number(profile.reward_balance || 0))
             }
           }
         } catch {}
@@ -186,7 +197,20 @@ export function GlobalCheckoutModal() {
   const currentSubtotal = currency === 'INR' ? rawSubtotalInr : rawSubtotalUsd
 
   const discountAmount = discountPercent > 0 ? (currentSubtotal * discountPercent) / 100 : 0
-  const finalTotal = Math.max(0, currentSubtotal - discountAmount)
+  const amountAfterCoupon = Math.max(0, currentSubtotal - discountAmount)
+  const liveExchange = exchangeRate || 95.0
+  const availableRewardsInCurrentCurrency = isIndia
+    ? Math.round(availableRewards * liveExchange)
+    : availableRewards
+
+  const rewardDiscountAmount = useRewards
+    ? Math.min(amountAfterCoupon, availableRewardsInCurrentCurrency)
+    : 0
+
+  const finalTotal = Math.max(0, amountAfterCoupon - rewardDiscountAmount)
+  const rewardAmountUsedUsd = isIndia
+    ? Math.round((rewardDiscountAmount / liveExchange) * 100) / 100
+    : rewardDiscountAmount
 
   const handleBillingChange = (field: keyof BillingDetails, value: string) => {
     setBillingDetails((prev) => {
@@ -259,6 +283,8 @@ export function GlobalCheckoutModal() {
         {
           couponCode: coupon,
           currency: currency,
+          applyRewards: useRewards,
+          rewardAmountUsed: rewardAmountUsedUsd,
         }
       )
       if (res.success) {
@@ -296,29 +322,33 @@ export function GlobalCheckoutModal() {
         })
       }
 
-      const orderInitRes = await fetch('/api/razorpay/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: finalTotal,
-          currency: currency === 'INR' ? 'INR' : 'USD',
-          items,
-          billingDetails,
-        }),
-      })
+      const orderRes = await createRazorpayOrderAction(
+        items.map((i) => ({
+          id: i.id,
+          name: i.name,
+          slug: i.slug,
+          price_usd: i.price_usd,
+          price_inr: i.price_inr,
+          product_type: i.product_type,
+        })),
+        coupon,
+        {
+          applyRewards: useRewards,
+          rewardAmountUsed: rewardAmountUsedUsd,
+        }
+      )
 
-      const orderData = await orderInitRes.json()
-      if (!orderData.orderId) {
-        throw new Error(orderData.error || 'Failed to initialize payment gateway')
+      if (!orderRes.success || !orderRes.orderId) {
+        throw new Error(orderRes.error || 'Failed to initialize payment gateway')
       }
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || orderData.keyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
+        key: orderRes.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderRes.amount,
+        currency: orderRes.currency || 'INR',
         name: 'ProducerToy',
         description: `Purchase of ${items.length} sound & plugin items`,
-        order_id: orderData.orderId,
+        order_id: orderRes.orderId,
         prefill: {
           name: billingDetails.fullName,
           email: billingDetails.email,
@@ -328,28 +358,30 @@ export function GlobalCheckoutModal() {
         handler: async (response: any) => {
           setPaymentStatus('processing')
           try {
-            const verifyRes = await fetch('/api/razorpay/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                items,
-                userId: user?.id,
-                billingDetails,
-                couponCode: coupon,
-                newsletterOptIn,
-                currency,
-                totalAmount: finalTotal,
-              }),
+            const verifyRes = await verifyRazorpayPaymentAction({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              items: items.map((i) => ({
+                id: i.id,
+                name: i.name,
+                slug: i.slug,
+                price_usd: i.price_usd,
+                price_inr: i.price_inr,
+                product_type: i.product_type,
+              })),
+              userId: user?.id,
+              billingDetails,
+              couponCode: coupon,
+              applyRewards: useRewards,
+              rewardAmountUsed: rewardAmountUsedUsd,
             })
-            const verifyData = await verifyRes.json()
-            if (verifyData.success) {
+
+            if (verifyRes.success) {
               clearCart()
               setPaymentStatus('success')
             } else {
-              setErrorMsg(verifyData.error || 'Payment verification failed')
+              setErrorMsg(verifyRes.error || 'Payment verification failed')
               setPaymentStatus('idle')
             }
           } catch (verErr: any) {
@@ -452,6 +484,10 @@ export function GlobalCheckoutModal() {
             couponLoading={couponLoading}
             couponError={couponError}
             couponSuccessMsg={couponSuccessMsg}
+            availableRewards={availableRewards}
+            useRewards={useRewards}
+            onToggleRewards={setUseRewards}
+            rewardDiscountAmount={rewardDiscountAmount}
             onRazorpayCheckout={handleRazorpayCheckout}
             onFreeCheckout={handleFreeCheckout}
             onPayPalSuccess={handlePayPalSuccess}
