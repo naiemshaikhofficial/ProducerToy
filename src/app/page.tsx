@@ -9,6 +9,7 @@ import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
 import { FreeProducerToys } from '@/components/FreeProducerToys'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { EpicNewReleases } from '@/components/EpicNewReleases'
+import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
 export const revalidate = 86400 // 24-hour Edge Cache (instant on-demand revalidation via /api/revalidate & Server Actions)
@@ -100,6 +101,11 @@ export default async function HomePage() {
         {/* 4th Section: 1:1 Epic Games New Releases (Sorted by created_at) */}
         <div className="px-4 sm:px-0">
           <EpicNewReleases products={products} />
+        </div>
+
+        {/* 5th Section: 1:1 Epic Games Tri-Column Lists (Top Sellers, Coming Soon, Top Deals) */}
+        <div className="px-4 sm:px-0">
+          <EpicStorefrontLists products={products} />
         </div>
 
       </div>
