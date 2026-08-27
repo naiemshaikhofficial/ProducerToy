@@ -35,13 +35,10 @@ export default function EpicAccountClient() {
     'currency',
     'rewards',
     'redeem',
-    'parental',
-    'programs',
-    'publisher',
   ]
 
   const tabQuery = searchParams.get('tab') as AccountTab
-  const initialTab: AccountTab = (tabQuery && validTabs.includes(tabQuery)) ? tabQuery : 'settings'
+  const initialTab: AccountTab = (tabQuery && validTabs.includes(tabQuery)) ? tabQuery : 'rewards'
 
   const [activeTab, setActiveTabState] = useState<AccountTab>(initialTab)
   const [user, setUser] = useState<any>(null)
@@ -50,7 +47,7 @@ export default function EpicAccountClient() {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  // Keep activeTab in sync if URL query changes (e.g. browser back/forward or navigation from navbar)
+  // Keep activeTab in sync if URL query changes
   useEffect(() => {
     if (tabQuery && validTabs.includes(tabQuery) && tabQuery !== activeTab) {
       setActiveTabState(tabQuery)
@@ -149,9 +146,7 @@ export default function EpicAccountClient() {
   return (
     <div className="min-h-screen bg-[#121212] text-white">
       
-      {/* ========================================================================= */}
-      {/* 1. MOBILE EDGE-TO-EDGE ACCOUNT SELECTOR BAR (< lg) (Exact Match)          */}
-      {/* ========================================================================= */}
+      {/* 1. Mobile Edge Selector Bar */}
       <MobileAccountBar
         activeTab={activeTab}
         onSelectTab={(tab) => setActiveTab(tab)}
@@ -160,9 +155,7 @@ export default function EpicAccountClient() {
       <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
-          {/* ========================================================================= */}
-          {/* 2. DESKTOP PERMANENT LEFT SIDEBAR (>= lg)                                  */}
-          {/* ========================================================================= */}
+          {/* 2. Desktop Permanent Left Sidebar (Exact Screenshot Match) */}
           <div className="hidden lg:block lg:col-span-4 xl:col-span-3">
             <AccountSidebar
               activeTab={activeTab}
@@ -170,15 +163,12 @@ export default function EpicAccountClient() {
             />
           </div>
 
-          {/* ========================================================================= */}
-          {/* 3. MAIN VIEW CONTENT AREA                                                 */}
-          {/* ========================================================================= */}
+          {/* 3. Main View Content Area */}
           <div className="lg:col-span-8 xl:col-span-9 max-w-3xl">
             
             {/* TAB: SETTINGS */}
             {activeTab === 'settings' && (
               <div className="space-y-12">
-                {/* Header Title (Exact Screenshot Match) */}
                 <div>
                   <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight font-sans">
                     Settings
@@ -195,7 +185,6 @@ export default function EpicAccountClient() {
                   </div>
                 )}
 
-                {/* Sub-component: Account Information (ID, Display Name, Locked Email) */}
                 <AccountInfoSection
                   accountId={accountId}
                   displayName={displayName}
@@ -203,21 +192,18 @@ export default function EpicAccountClient() {
                   onSaveDisplayName={handleSaveDisplayName}
                 />
 
-                {/* Sub-component: Personal Details (First Name, Last Name, Address, Country) */}
                 <PersonalDetailsSection
                   user={user}
                   profile={profile}
                   onSaveSuccess={handleSaveSuccess}
                 />
 
-                {/* Sub-component: Company Details (Company Name, VAT, Address) */}
                 <CompanyDetailsSection
                   user={user}
                   profile={profile}
                   onSaveSuccess={handleSaveSuccess}
                 />
 
-                {/* Sub-component: Data & Privacy (Download Data, Delete Account) */}
                 <DataPrivacySection />
               </div>
             )}
@@ -259,6 +245,58 @@ export default function EpicAccountClient() {
               <RewardsAndWalletTab type="currency" profile={profile} />
             )}
 
+            {/* TAB: PAYMENT SETTINGS */}
+            {activeTab === 'payment' && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-3xl font-black text-white tracking-tight">
+                    Payment settings
+                  </h1>
+                  <p className="text-sm text-zinc-400 mt-1">
+                    Manage your saved payment methods and billing addresses.
+                  </p>
+                </div>
+
+                <div className="bg-[#181818] border border-[#242424] p-8 rounded-2xl text-center space-y-3">
+                  <p className="text-sm text-zinc-300">
+                    No saved payment cards or methods found on this account.
+                  </p>
+                  <Link
+                    href="/store"
+                    className="inline-block bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
+                  >
+                    Explore Store Catalog
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: SUBSCRIPTIONS */}
+            {activeTab === 'subscriptions' && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-3xl font-black text-white tracking-tight">
+                    Subscriptions
+                  </h1>
+                  <p className="text-sm text-zinc-400 mt-1">
+                    Manage active sound suite and plugin access plans.
+                  </p>
+                </div>
+
+                <div className="bg-[#181818] border border-[#242424] p-8 rounded-2xl text-center space-y-3">
+                  <p className="text-sm text-zinc-300">
+                    You do not have any active subscriptions.
+                  </p>
+                  <Link
+                    href="/store"
+                    className="inline-block bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
+                  >
+                    Explore Store Catalog
+                  </Link>
+                </div>
+              </div>
+            )}
+
             {/* TAB: LEGAL HISTORY & AGREEMENTS */}
             {activeTab === 'legal' && (
               <div className="space-y-6">
@@ -278,7 +316,7 @@ export default function EpicAccountClient() {
                         Producer Toy End User License Agreement (EULA)
                       </span>
                       <p className="text-xs text-zinc-400">
-                        Accepted on account creation • Governs software, digital sounds, commercial music rights, and Toywards rewards.
+                        Accepted on account creation • Governs software, digital sounds, commercial music rights, and rewards.
                       </p>
                     </div>
                     <Link
@@ -334,36 +372,6 @@ export default function EpicAccountClient() {
                       </Link>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB: PLACEHOLDER FOR REMAINING TABS */}
-            {(activeTab === 'payment' ||
-              activeTab === 'subscriptions' ||
-              activeTab === 'parental' ||
-              activeTab === 'programs' ||
-              activeTab === 'publisher') && (
-              <div className="space-y-6">
-                <div>
-                  <h1 className="text-3xl font-black text-white tracking-tight capitalize">
-                    {activeTab.replace('_', ' ')}
-                  </h1>
-                  <p className="text-sm text-zinc-400 mt-1">
-                    Manage your {activeTab.replace('_', ' ')} on ProducerToy.
-                  </p>
-                </div>
-
-                <div className="bg-[#181818] border border-[#242424] p-8 rounded-2xl text-center space-y-3">
-                  <p className="text-sm text-zinc-300">
-                    No active {activeTab.replace('_', ' ')} found for this account.
-                  </p>
-                  <Link
-                    href="/store"
-                    className="inline-block bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
-                  >
-                    Explore Store Catalog
-                  </Link>
                 </div>
               </div>
             )}
