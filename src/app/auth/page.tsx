@@ -545,8 +545,8 @@ function AuthForm() {
 
                 {/* Email Form */}
                 <form onSubmit={handleEmailContinue} className="space-y-4">
-                  <div>
-                    <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <div className="space-y-1">
+                    <label className="block text-[12px] font-semibold text-zinc-300">
                       Email Address
                     </label>
                     <input
@@ -555,7 +555,7 @@ function AuthForm() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="name@example.com"
-                      className="w-full bg-[#202020] text-white text-xs px-4 py-3.5 rounded-xl border border-[#2e2e2e] focus:outline-none focus:border-zinc-400 transition-colors placeholder:text-zinc-500"
+                      className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
                     />
                   </div>
 
@@ -608,8 +608,8 @@ function AuthForm() {
             {step === 'details' && (
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 {mode === 'signup' && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <div className="space-y-1">
+                    <label className="block text-[12px] font-semibold text-zinc-300">
                       Display Name
                     </label>
                     <input
@@ -618,14 +618,14 @@ function AuthForm() {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder="BeatProducer99"
-                      className="w-full bg-[#202020] text-white text-xs px-4 py-3 rounded-xl border border-[#2e2e2e] focus:outline-none focus:border-zinc-400 transition-colors placeholder:text-zinc-500"
+                      className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
                     />
                   </div>
                 )}
 
                 {/* Password Input */}
-                <div>
-                  <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">
+                <div className="space-y-1">
+                  <label className="block text-[12px] font-semibold text-zinc-300">
                     Password
                   </label>
                   <div className="relative">
@@ -635,7 +635,7 @@ function AuthForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full bg-[#202020] text-white text-xs pl-4 pr-10 py-3 rounded-xl border border-[#2e2e2e] focus:outline-none focus:border-zinc-400 transition-colors placeholder:text-zinc-500"
+                      className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
                     />
                     <button
                       type="button"
@@ -679,8 +679,8 @@ function AuthForm() {
 
                 {/* Confirm Password (Sign Up Mode) */}
                 {mode === 'signup' && (
-                  <div>
-                    <label className="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">
+                  <div className="space-y-1">
+                    <label className="block text-[12px] font-semibold text-zinc-300">
                       Confirm Password
                     </label>
                     <div className="relative">
@@ -690,7 +690,7 @@ function AuthForm() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full bg-[#202020] text-white text-xs pl-4 pr-10 py-3 rounded-xl border border-[#2e2e2e] focus:outline-none focus:border-zinc-400 transition-colors placeholder:text-zinc-500"
+                        className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
                       />
                       <button
                         type="button"

@@ -51,8 +51,8 @@ export const RedeemCodeTab: React.FC = () => {
         onSubmit={handleRedeem}
         className="bg-[#181818] border border-[#242424] p-6 rounded-2xl space-y-4 max-w-md"
       >
-        <div>
-          <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+        <div className="space-y-1">
+          <label className="text-[12px] font-semibold text-zinc-300 block">
             Code or Serial Key
           </label>
           <input
@@ -60,7 +60,7 @@ export const RedeemCodeTab: React.FC = () => {
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             placeholder="PROMO20 / XXXX-XXXX-XXXX"
-            className="w-full bg-[#202020] border border-[#333333] focus:border-zinc-400 text-white font-mono text-sm rounded-xl px-4 py-3 focus:outline-none uppercase tracking-widest"
+            className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white font-mono text-[13px] rounded-md px-3.5 outline-none transition-colors uppercase tracking-widest shadow-sm"
           />
         </div>
 

@@ -86,8 +86,8 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
 
       {/* First Name & Last Name */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+        <div className="space-y-1">
+          <label className="text-[12px] font-semibold text-zinc-300 block">
             First Name *
           </label>
           <input
@@ -95,12 +95,12 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             placeholder="First Name"
-            className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+            className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
           />
         </div>
 
-        <div>
-          <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+        <div className="space-y-1">
+          <label className="text-[12px] font-semibold text-zinc-300 block">
             Last Name *
           </label>
           <input
@@ -108,7 +108,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             placeholder="Last Name"
-            className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+            className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
           />
         </div>
       </div>
@@ -119,8 +119,8 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
           Address
         </h3>
 
-        <div>
-          <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+        <div className="space-y-1">
+          <label className="text-[12px] font-semibold text-zinc-300 block">
             Address Line 1 *
           </label>
           <input
@@ -128,12 +128,12 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
             value={addressLine1}
             onChange={(e) => setAddressLine1(e.target.value)}
             placeholder="Street Address or P.O. Box"
-            className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+            className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
           />
         </div>
 
-        <div>
-          <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+        <div className="space-y-1">
+          <label className="text-[12px] font-semibold text-zinc-300 block">
             Address Line 2
           </label>
           <input
@@ -141,13 +141,13 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
             value={addressLine2}
             onChange={(e) => setAddressLine2(e.target.value)}
             placeholder="Apartment, suite, unit, building, floor, etc."
-            className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+            className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-zinc-300 block">
               City *
             </label>
             <input
@@ -155,12 +155,12 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="City"
-              className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+              className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-zinc-300 block">
               Region
             </label>
             <input
@@ -168,12 +168,12 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               placeholder="State / Province"
-              className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+              className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-zinc-300 block">
               Postal Code *
             </label>
             <input
@@ -181,7 +181,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
               value={postalCode}
               onChange={(e) => setPostalCode(e.target.value)}
               placeholder="PIN / Postal Code"
-              className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none transition-colors"
+              className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md px-3.5 outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
             />
           </div>
         </div>

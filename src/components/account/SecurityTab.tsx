@@ -66,39 +66,39 @@ export const SecurityTab: React.FC = () => {
         <h2 className="text-xl font-bold text-white">Change password</h2>
 
         <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
-          <div>
-            <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-zinc-300 block">
               Current password *
             </label>
             <input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full bg-[#202020] border border-[#333333] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none"
+              className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors shadow-sm"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-zinc-300 block">
               New password *
             </label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-[#202020] border border-[#333333] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none"
+              className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors shadow-sm"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-zinc-400 block mb-1.5">
+          <div className="space-y-1">
+            <label className="text-[12px] font-semibold text-zinc-300 block">
               Confirm new password *
             </label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-[#202020] border border-[#333333] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none"
+              className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors shadow-sm"
             />
           </div>
 

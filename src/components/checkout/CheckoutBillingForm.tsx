@@ -55,23 +55,26 @@ export function CheckoutBillingForm({
           )}
         </div>
 
-        {/* Delivery Email */}
+        {/* Delivery Email (Locked & Non-editable) */}
         <div className="space-y-1">
-          <label className="text-[12px] font-semibold text-zinc-300">
-            Delivery Email
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-[12px] font-semibold text-zinc-300">
+              Delivery Email
+            </label>
+            <span className="text-[10px] text-zinc-500 flex items-center gap-1 font-medium select-none">
+              <Lock size={10} /> Locked
+            </span>
+          </div>
           <input
             type="email"
             placeholder="producer@studio.com"
             value={billingDetails.email}
-            onChange={(e) => onBillingChange('email', e.target.value)}
-            className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.email ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
-            }`}
+            readOnly
+            disabled
+            tabIndex={-1}
+            className="w-full h-10 bg-[#141414] border border-[#242424] text-zinc-400 text-[13px] px-3.5 rounded-md outline-none cursor-not-allowed select-none shadow-sm"
+            title="Delivery email is linked to your account and cannot be modified."
           />
-          {formErrors.email && (
-            <p className="text-[10px] text-red-400 font-medium">{formErrors.email}</p>
-          )}
         </div>
 
         {/* Phone Number with Epic Games Dark Dropdown */}
