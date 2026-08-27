@@ -77,52 +77,52 @@ export default function ToywardsFeaturePage() {
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 space-y-16 sm:space-y-24">
         
         {/* ========================================================================= */}
-        {/* HERO SECTION: 1:1 Epic Games Store Layout with Orange Poster Theme        */}
+        {/* HERO SECTION: 1:1 Exact Epic Games Store Full Banner with Orange Theme    */}
         {/* ========================================================================= */}
-        <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#1c1109] via-[#120b06] to-[#0a0603] border border-[#3d200f] shadow-2xl p-6 sm:p-10 lg:p-14">
+        <section className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-[#141414] shadow-2xl min-h-[440px] sm:min-h-[480px] lg:h-[500px] flex items-center">
           
-          {/* Subtle Warm Ambient Glow */}
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#FA742B]/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Background Poster Image (Full cover, cropped top/bottom, graphic on left) */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none">
+            <Image
+              src="/images/toywards/hero_full.png"
+              alt="Earn from 5% to 20% with Toywards"
+              fill
+              priority
+              className="object-cover object-left lg:object-center"
+            />
+            {/* Subtle mobile overlay to ensure readability on small screens */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent lg:hidden" />
+          </div>
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+          {/* Grid Layout: Left side transparent (shows graphic), Right side has CTA */}
+          <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-12 items-center px-6 sm:px-10 lg:px-16 py-10 sm:py-12">
             
-            {/* Left Column: 3D Illustration (Static - No hover effects) */}
-            <div className="lg:col-span-6 flex justify-center items-center">
-              <div className="relative w-full max-w-[480px] aspect-[16/10] sm:aspect-[16/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <Image
-                  src="/images/toywards/hero.jpg"
-                  alt="Earn from 5% to 20% with Toywards"
-                  fill
-                  priority
-                  className="object-cover"
-                />
-              </div>
-            </div>
+            {/* Left 6-7 cols: Space for the 3D Piggy/Cart/Hat graphic from the poster */}
+            <div className="hidden lg:block lg:col-span-6 xl:col-span-7 h-full" />
 
-            {/* Right Column: Title -> SHOP NOW Button -> Text -> Terms Link (Exact Screenshot 1 Match) */}
-            <div className="lg:col-span-6 flex flex-col items-start space-y-6 text-left">
+            {/* Right 5-6 cols: 1:1 Epic Games CTA (Title -> SHOP NOW -> Description -> Terms) */}
+            <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start space-y-5 sm:space-y-6 text-left mt-auto lg:mt-0">
               
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-[1.15]">
+              <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-white leading-[1.12] drop-shadow-md">
                 Earn from 5% to 20% with Toywards
               </h1>
 
               <Link
                 href="/store"
                 prefetch={true}
-                className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-md uppercase tracking-wider transition-colors shadow-lg active:scale-95 inline-flex items-center justify-center"
+                className="bg-white hover:bg-zinc-100 text-black font-black text-xs sm:text-sm px-8 sm:px-9 py-3.5 rounded-md uppercase tracking-wider transition-all active:scale-95 shadow-xl inline-flex items-center justify-center"
               >
                 Shop Now
               </Link>
 
-              <p className="text-sm sm:text-base text-zinc-300 font-normal leading-relaxed max-w-lg">
+              <p className="text-sm sm:text-base text-white/95 font-medium leading-relaxed max-w-md drop-shadow-sm">
                 Whenever you buy something on the Producer Toy Store, earn from 5% to 20% back with Toywards.
               </p>
 
               <Link
-                href="/terms"
+                href="/eula"
                 prefetch={true}
-                className="text-xs text-zinc-400 hover:text-white underline transition-colors"
+                className="text-xs text-white/80 hover:text-white underline transition-colors drop-shadow-xs"
               >
                 Terms and Conditions Apply
               </Link>
@@ -143,9 +143,9 @@ export default function ToywardsFeaturePage() {
             
             {/* CARD 1: SHOP */}
             <div className="bg-[#181818] border border-[#262626] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center shadow-lg">
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 mb-6 rounded-2xl overflow-hidden flex items-center justify-center">
+              <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
-                  src="/images/toywards/shop.jpg"
+                  src="/images/toywards/shop.png"
                   alt="Shop sound kits and plugins"
                   fill
                   className="object-contain"
@@ -155,15 +155,15 @@ export default function ToywardsFeaturePage() {
                 Shop
               </h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
-                Buy games, add-ons, plugins, and sound kits across PC, Mac, and the web.
+                Buy plugins, sound kits, sample packs, presets, and DAW templates across PC, Mac, and the web.
               </p>
             </div>
 
             {/* CARD 2: EARN */}
             <div className="bg-[#181818] border border-[#262626] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center shadow-lg">
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 mb-6 rounded-2xl overflow-hidden flex items-center justify-center">
+              <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
-                  src="/images/toywards/earn.jpg"
+                  src="/images/toywards/earn.png"
                   alt="Earn from 5% to 20% back"
                   fill
                   className="object-contain"
@@ -179,9 +179,9 @@ export default function ToywardsFeaturePage() {
 
             {/* CARD 3: REDEEM */}
             <div className="bg-[#181818] border border-[#262626] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center shadow-lg">
-              <div className="relative w-36 h-36 sm:w-44 sm:h-44 mb-6 rounded-2xl overflow-hidden flex items-center justify-center">
+              <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
-                  src="/images/toywards/redeem.jpg"
+                  src="/images/toywards/redeem.png"
                   alt="Redeem Toywards at checkout"
                   fill
                   className="object-contain"

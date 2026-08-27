@@ -219,10 +219,88 @@ export default function EpicAccountClient() {
               <RewardsAndWalletTab type="currency" profile={profile} />
             )}
 
+            {/* TAB: LEGAL HISTORY & AGREEMENTS */}
+            {activeTab === 'legal' && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-3xl font-black text-white tracking-tight">
+                    Legal History & Agreements
+                  </h1>
+                  <p className="text-sm text-zinc-400 mt-1">
+                    Review official End User License Agreements, commercial sound licenses, and store policies accepted on your account.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#FA742B]/30 transition-colors">
+                    <div className="space-y-1">
+                      <span className="text-sm font-bold text-white block">
+                        Producer Toy End User License Agreement (EULA)
+                      </span>
+                      <p className="text-xs text-zinc-400">
+                        Accepted on account creation • Governs software, digital sounds, commercial music rights, and Toywards rewards.
+                      </p>
+                    </div>
+                    <Link
+                      href="/eula"
+                      target="_blank"
+                      className="bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex-shrink-0 ml-4"
+                    >
+                      View EULA
+                    </Link>
+                  </div>
+
+                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#FA742B]/30 transition-colors">
+                    <div className="space-y-1">
+                      <span className="text-sm font-bold text-white block">
+                        100% Royalty-Free Commercial Audio Licensing
+                      </span>
+                      <p className="text-xs text-zinc-400">
+                        Details your global rights to monetize songs on Spotify, Apple Music, YouTube, and commercial film sync.
+                      </p>
+                    </div>
+                    <Link
+                      href="/licensing"
+                      target="_blank"
+                      className="bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex-shrink-0 ml-4"
+                    >
+                      View Terms
+                    </Link>
+                  </div>
+
+                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#FA742B]/30 transition-colors">
+                    <div className="space-y-1">
+                      <span className="text-sm font-bold text-white block">
+                        Terms of Service & Purchase Policy
+                      </span>
+                      <p className="text-xs text-zinc-400">
+                        Store operating terms, order processing, digital goods delivery, and GST taxation policies.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-4">
+                      <Link
+                        href="/terms"
+                        target="_blank"
+                        className="bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors"
+                      >
+                        Terms
+                      </Link>
+                      <Link
+                        href="/privacy"
+                        target="_blank"
+                        className="bg-[#242424] hover:bg-[#303030] text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors"
+                      >
+                        Privacy
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* TAB: PLACEHOLDER FOR REMAINING TABS */}
             {(activeTab === 'payment' ||
               activeTab === 'subscriptions' ||
-              activeTab === 'legal' ||
               activeTab === 'parental' ||
               activeTab === 'programs' ||
               activeTab === 'publisher') && (
