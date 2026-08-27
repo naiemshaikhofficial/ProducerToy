@@ -4,6 +4,19 @@ import { useEffect } from 'react'
 
 export function ContentProtection() {
   useEffect(() => {
+    // Completely bypass all protections in local development / localhost
+    if (
+      process.env.NODE_ENV === 'development' ||
+      typeof window !== 'undefined' && (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.startsWith('192.168.') ||
+        window.location.hostname.endsWith('.local')
+      )
+    ) {
+      return
+    }
+
     // Disable right-click context menu in production
     const handleContextMenu = (e: MouseEvent) => {
       const target = e.target as HTMLElement
@@ -25,7 +38,7 @@ export function ContentProtection() {
       }
     }
 
-    // Disable dangerous keyboard shortcuts (F12, View Source, Inspect Element, Save Page)
+    // Disable dangerous keyboard shortcuts in production (F12, View Source, Inspect Element, Save Page)
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
         e.key === 'F12' ||
@@ -37,7 +50,7 @@ export function ContentProtection() {
       }
     }
 
-    // Prevent drag & drop ripping of media files
+    // Prevent drag & drop ripping of media files in production
     const handleDragStart = (e: DragEvent) => {
       const target = e.target as HTMLElement
       if (!target) return

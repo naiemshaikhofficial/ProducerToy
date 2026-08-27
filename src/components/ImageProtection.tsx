@@ -4,6 +4,19 @@ import { useEffect } from 'react'
 
 export function ImageProtection() {
   useEffect(() => {
+    // Completely bypass image protection on localhost and local development
+    if (
+      process.env.NODE_ENV === 'development' ||
+      typeof window !== 'undefined' && (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname.startsWith('192.168.') ||
+        window.location.hostname.endsWith('.local')
+      )
+    ) {
+      return
+    }
+
     const handleDragStart = (e: DragEvent) => {
       const target = e.target as HTMLElement
       if (!target) return
