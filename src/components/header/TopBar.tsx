@@ -152,10 +152,15 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/store"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                      className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
-                      <ToywardsIcon size={16} />
-                      <span>Toywards</span>
+                      <div className="flex items-center gap-3">
+                        <ToywardsIcon size={16} />
+                        <span>Toywards</span>
+                      </div>
+                      <span className="text-[10px] font-bold bg-[#122820] text-[#1cd18c] border border-[#1d4638] px-1.5 py-0.5 rounded-full">
+                        5% Back
+                      </span>
                     </Link>
 
                     <Link

@@ -21,6 +21,7 @@ import {
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
 import { useAudio } from '@/context/AudioContext'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 88 88" fill="currentColor">
@@ -361,7 +362,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           </div>
 
           {/* Price Header */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className="flex items-center gap-3">
               {product.price_usd === 0 ? (
                 <span className="text-2xl sm:text-3xl font-extrabold text-[#00ff88]">FREE</span>
@@ -371,6 +372,16 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 </span>
               )}
             </div>
+
+            {/* Toywards 5% Rewards Pill */}
+            {product.price_usd > 0 && (
+              <div className="inline-flex items-center gap-2 bg-[#122820] border border-[#1d4638] text-[#1cd18c] px-3 py-1 rounded-full text-xs font-semibold select-none shadow-xs">
+                <ToywardsIcon size={14} />
+                <span>
+                  Get {formatPrice(undefined, Number((product.price_usd * 0.05).toFixed(2)))} in Toywards (5% Back)
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Epic Action Buttons (Buy Now + Cart Icon + Wishlist) */}

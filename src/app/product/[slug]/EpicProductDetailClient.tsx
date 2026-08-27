@@ -22,6 +22,7 @@ import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useAudio } from '@/context/AudioContext'
 import { useAuth } from '@/context/AuthContext'
+import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { ProductSpecsOverview, ProductSidebarBadge } from '@/components/ProductTypeSpecs'
 
 function WindowsIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -473,7 +474,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             </span>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className="flex items-center gap-3 flex-wrap">
               {Number(product.price_usd) === 0 ? (
                 <span className="text-2xl sm:text-3xl font-extrabold text-white">FREE</span>
@@ -495,6 +496,19 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 </>
               )}
             </div>
+
+            {/* Toywards 5% Rewards Pill */}
+            {Number(product.price_usd) > 0 && (
+              <div className="inline-flex items-center gap-2 bg-[#122820] border border-[#1d4638] text-[#1cd18c] px-3 py-1 rounded-full text-xs font-semibold select-none shadow-xs">
+                <ToywardsIcon size={14} />
+                <span>
+                  Get {formatPrice(
+                    product.price_inr ? Math.round(Number(product.price_inr) * 0.05) : undefined,
+                    Number((Number(product.price_usd) * 0.05).toFixed(2))
+                  )} in Toywards (5% Back)
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2.5">
@@ -630,6 +644,16 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 </span>
               </div>
             </div>
+
+            {Number(product.price_usd) > 0 && (
+              <div className="flex items-center justify-between pb-1">
+                <span className="text-zinc-400">Toywards</span>
+                <span className="font-semibold text-[#1cd18c] flex items-center gap-1.5">
+                  <ToywardsIcon size={14} />
+                  <span>Earn 5% Back</span>
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">License Type</span>

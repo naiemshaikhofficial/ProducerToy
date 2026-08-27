@@ -219,10 +219,10 @@ export function EpicCheckoutLayout({
             </div>
           </div>
 
-          {/* Toywards Light Orange Badge (Exact Match) */}
+          {/* Toywards Rewards Pill Badge (Exact 1:1 Epic Games Match) */}
           {!isFree && (
-            <div className="inline-flex items-center gap-2 bg-[#FA742B]/10 border border-[#FA742B]/30 text-[#FA742B] px-3.5 py-2.5 rounded-xl text-[12px] font-semibold select-none w-full shadow-sm">
-              <ToywardsIcon size={16} />
+            <div className="inline-flex items-center gap-2 bg-[#122820] border border-[#1d4638] text-[#1cd18c] px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold select-none w-fit shadow-xs">
+              <ToywardsIcon size={15} />
               <span>Get {currencySymbol}{rewardsAmount} in Toywards.</span>
             </div>
           )}

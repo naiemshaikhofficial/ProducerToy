@@ -114,10 +114,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 href="/store"
                 prefetch={true}
                 onClick={onClose}
-                className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
+                className="flex items-center justify-between text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
               >
-                <ToywardsIcon size={18} />
-                <span>Toywards</span>
+                <div className="flex items-center gap-3.5">
+                  <ToywardsIcon size={18} />
+                  <span>Toywards</span>
+                </div>
+                <span className="text-[10px] font-bold bg-[#122820] text-[#1cd18c] border border-[#1d4638] px-2 py-0.5 rounded-full">
+                  5% Back
+                </span>
               </Link>
 
               <Link
