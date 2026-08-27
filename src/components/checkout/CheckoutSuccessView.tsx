@@ -2,15 +2,41 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { CheckCircle2, ArrowRight } from 'lucide-react'
+import { CheckCircle2, ArrowRight, X } from 'lucide-react'
 
 interface CheckoutSuccessViewProps {
   email?: string
+  onClose?: () => void
 }
 
-export function CheckoutSuccessView({ email }: CheckoutSuccessViewProps) {
+export function CheckoutSuccessView({ email, onClose }: CheckoutSuccessViewProps) {
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 py-16 text-center space-y-6 max-w-lg mx-auto">
+    <div className="relative w-full min-h-[70vh] sm:min-h-[80vh] flex flex-col items-center justify-center px-4 py-12 sm:py-16 text-center space-y-6 max-w-lg mx-auto select-none">
+      {/* Top-Right Fixed Cut Icon ✕ (Exact Match) */}
+      <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20">
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+            title="Close"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        ) : (
+          <Link
+            href="/store"
+            prefetch={true}
+            className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+            title="Close and return to store"
+            aria-label="Close and return to store"
+          >
+            <X className="w-5 h-5" />
+          </Link>
+        )}
+      </div>
+
       <div className="w-14 h-14 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-white">
         <CheckCircle2 size={28} />
       </div>
@@ -40,6 +66,7 @@ export function CheckoutSuccessView({ email }: CheckoutSuccessViewProps) {
         <Link
           href="/library"
           prefetch={true}
+          onClick={onClose}
           className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-bold text-xs rounded-lg uppercase tracking-wider inline-flex items-center justify-center gap-2 transition-colors"
         >
           <span>Open Library Vault</span>
@@ -48,6 +75,7 @@ export function CheckoutSuccessView({ email }: CheckoutSuccessViewProps) {
         <Link
           href="/store"
           prefetch={true}
+          onClick={onClose}
           className="w-full h-11 bg-[#181818] hover:bg-[#202020] text-zinc-300 hover:text-white font-medium text-xs rounded-lg border border-[#282828] uppercase tracking-wider inline-flex items-center justify-center transition-colors"
         >
           Continue Shopping

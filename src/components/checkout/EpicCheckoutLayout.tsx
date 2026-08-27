@@ -117,6 +117,31 @@ export function EpicCheckoutLayout({
   return (
     <div className="w-full max-w-[1080px] lg:max-w-[1120px] h-screen max-h-screen bg-[#141414] border-x border-[#242424] rounded-none shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col md:flex-row overflow-hidden relative select-none font-sans">
       
+      {/* Top-Right Fixed/Sticky Cut Icon ✕ (Exact 1:1 Epic Games Match) */}
+      <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-50">
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+            title="Close checkout"
+            aria-label="Close checkout"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        ) : (
+          <Link
+            href="/store"
+            prefetch={true}
+            className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+            title="Close and return to store"
+            aria-label="Close and return to store"
+          >
+            <X className="w-5 h-5" />
+          </Link>
+        )}
+      </div>
+
       {/* ========================================================================= */}
       {/* LEFT COLUMN: ORDER SUMMARY (Pure Matte Blackish-Gray #1a1a1a)             */}
       {/* ========================================================================= */}
@@ -211,34 +236,12 @@ export function EpicCheckoutLayout({
       <div className="flex-1 bg-[#141414] p-8 lg:p-10 flex flex-col justify-between overflow-y-auto space-y-6">
         
         <div className="space-y-6">
-          {/* Top User Avatar & Close ✕ Button (Exact Match) */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 text-[13px] font-semibold text-zinc-300">
-              <div className="w-6 h-6 rounded-full bg-[#242424] border border-[#333333] text-white flex items-center justify-center text-[11px] font-bold">
-                {initialLetter}
-              </div>
-              <span className="truncate max-w-[220px]">{displayName}</span>
+          {/* Top User Avatar & Name (Exact 1:1 Epic Games Match) */}
+          <div className="flex items-center gap-2.5 text-[13px] font-normal text-zinc-300 pr-8">
+            <div className="w-6 h-6 rounded-full bg-[#242424] border border-[#333333] text-white flex items-center justify-center text-[11px] font-bold">
+              {initialLetter}
             </div>
-
-            {onClose ? (
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-zinc-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
-                title="Close checkout"
-              >
-                <X size={19} />
-              </button>
-            ) : (
-              <Link
-                href="/store"
-                prefetch={true}
-                className="text-zinc-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
-                title="Close and return to store"
-              >
-                <X size={19} />
-              </Link>
-            )}
+            <span className="truncate max-w-[220px]">{displayName}</span>
           </div>
 
           {/* Section Title */}

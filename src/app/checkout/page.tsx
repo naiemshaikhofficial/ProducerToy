@@ -565,7 +565,16 @@ export default function CheckoutPage() {
 
   // Success Confirmation Screen
   if (paymentStatus === 'success') {
-    return <CheckoutSuccessView email={billingDetails.email || user?.email} />
+    return (
+      <div className="fixed inset-0 z-50 bg-[#0e0e0e] text-white overflow-y-auto py-6 sm:py-10 px-4 sm:px-6 select-none flex flex-col items-center justify-center">
+        <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl">
+          <CheckoutSuccessView
+            email={billingDetails.email || user?.email}
+            onClose={() => router.push('/store')}
+          />
+        </div>
+      </div>
+    )
   }
 
   // Empty Cart Screen

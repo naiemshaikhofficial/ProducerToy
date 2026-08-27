@@ -400,8 +400,8 @@ export function GlobalCheckoutModal() {
         )}
 
         {paymentStatus === 'success' ? (
-          <div className="w-full bg-[#141414] border border-[#242424] rounded-xl p-8 shadow-2xl">
-            <CheckoutSuccessView email={billingDetails.email || user?.email} />
+          <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl">
+            <CheckoutSuccessView email={billingDetails.email || user?.email} onClose={closeCheckout} />
           </div>
         ) : (
           <EpicCheckoutLayout
