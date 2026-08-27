@@ -61,7 +61,10 @@ export async function generateMetadata({
     }
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://producertoy.com'
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
+      : 'https://producertoy.com'
   const brandName = product.brands?.name || product.brand || 'Producer Toy'
   const isFree = product.price_usd === 0
   const productType = product.product_type || 'VST Plugin'

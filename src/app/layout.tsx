@@ -14,7 +14,11 @@ import { ContentProtection } from '@/components/ContentProtection'
 import { StoreOrganizationJsonLd, WebSiteJsonLd } from '@/components/JsonLd'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://producertoy.com'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : 'https://producertoy.com'
+  ),
   title: {
     default: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
     template: '%s | Producer Toy Store',

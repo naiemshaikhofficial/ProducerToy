@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/store?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
     { url: `${baseUrl}/categories`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
     { url: `${baseUrl}/manufacturers`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
-    
+
     // Main High-Traffic Categories
     { url: `${baseUrl}/categories/plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/categories/sounds`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/categories/templates`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/categories/effects`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/categories/instruments`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    
+
     // Special SEO Landing Filters
     { url: `${baseUrl}/categories/plugins?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.88 },
     { url: `${baseUrl}/categories/sounds?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.88 },
@@ -109,7 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Combine all routes cleanly without duplicates
   const allEntries = [...staticRoutes, ...productEntries, ...categoryEntries, ...brandEntries]
   const uniqueUrlsMap = new Map<string, MetadataRoute.Sitemap[number]>()
-  
+
   allEntries.forEach((entry) => {
     if (!uniqueUrlsMap.has(entry.url)) {
       uniqueUrlsMap.set(entry.url, entry)

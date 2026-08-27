@@ -107,7 +107,10 @@ export function generatePageMetadata({
   keywords?: string[]
   path?: string
 }): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://producertoy.com'
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
+      : 'https://producertoy.com'
   const siteTitle = 'Producer Toy Store'
   const fullTitle = title.includes('Producer Toy') ? title : `${title} | ${siteTitle}`
 
