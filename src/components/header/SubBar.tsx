@@ -85,7 +85,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
-      <div className="flex md:hidden w-full px-4 sm:px-6 h-[48px] items-center justify-between relative">
+      <div className="flex md:hidden w-full px-4 sm:px-6 h-[54px] items-center justify-between relative">
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
@@ -97,29 +97,29 @@ export const SubBar: React.FC<SubBarProps> = ({
             className="w-full flex items-center gap-2 animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-5 h-5 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 ref={mobileInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store"
-                className="w-full bg-[#202020] text-white text-xs pl-10 pr-8 h-[38px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400"
+                className="w-full bg-[#202020] text-white text-sm pl-11 pr-8 h-[42px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400 font-sans"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => onSearchChange('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(false)}
-              className="text-xs text-zinc-400 hover:text-white px-2 py-1"
+              className="text-sm font-semibold text-zinc-300 hover:text-white px-2 py-1"
             >
               Cancel
             </button>
@@ -127,25 +127,25 @@ export const SubBar: React.FC<SubBarProps> = ({
         ) : (
           /* Normal Mobile SubBar: Search Icon (Left) + Discover ▾ (Center) */
           <>
-            {/* Search Icon Trigger */}
+            {/* Search Icon Trigger (Bigger size matching Epic Games) */}
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(true)}
-              className="p-1.5 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center justify-center"
+              className="p-1.5 text-zinc-200 hover:text-white transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
               aria-label="Open search"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-[21px] h-[21px] stroke-[2.2]" />
             </button>
 
-            {/* Discover ▾ Selector Dropdown (Exact True Screen Center) */}
+            {/* Discover ▾ Selector Dropdown (Exact True Screen Center & Bigger Font) */}
             <div ref={discoverMenuRef} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-30">
               <button
                 type="button"
                 onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1 text-[15px] font-semibold text-white hover:text-zinc-200 transition-colors py-1 px-2 cursor-pointer select-none"
+                className="flex items-center gap-1.5 text-[17px] font-extrabold text-white hover:text-zinc-200 transition-colors py-1.5 px-2 cursor-pointer select-none tracking-tight"
               >
                 <span>{currentSectionLabel}</span>
-                <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-zinc-300 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
               </button>
 
               {/* Exact Epic Games Store Mobile Dropdown Menu (Centered in the middle) */}
@@ -156,7 +156,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                     onClick={() => setIsDiscoverMenuOpen(false)}
                   />
 
-                  <div className="fixed left-1/2 -translate-x-1/2 top-[104px] w-[90vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020]">
+                  <div className="fixed left-1/2 -translate-x-1/2 top-[110px] w-[92vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020] rounded-b-2xl">
                     <div className="flex flex-col">
                       {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                         const isSelected = item.label === currentSectionLabel
@@ -167,9 +167,9 @@ export const SubBar: React.FC<SubBarProps> = ({
                               href={item.href}
                               prefetch={true}
                               onClick={() => setIsDiscoverMenuOpen(false)}
-                              className={`block py-4 text-[18px] sm:text-[19px] tracking-wide transition-colors ${
+                              className={`block py-4 text-[19px] sm:text-[20px] tracking-wide transition-colors ${
                                 isSelected
-                                  ? 'text-white font-bold'
+                                  ? 'text-white font-black'
                                   : 'text-zinc-400 font-normal hover:text-white'
                               }`}
                             >
@@ -185,35 +185,35 @@ export const SubBar: React.FC<SubBarProps> = ({
               )}
             </div>
 
-            {/* Right Icons: Wishlist, Gifts, Cart (Exact Screenshot Match) */}
-            <div className="flex items-center gap-4 text-zinc-300">
+            {/* Right Icons: Wishlist, Gifts, Cart (Exact Screenshot Match: Bigger & Spacious) */}
+            <div className="flex items-center gap-5 sm:gap-6 text-zinc-200">
               <Link
                 href="/wishlist"
                 prefetch={true}
-                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                className="p-1 text-zinc-200 hover:text-white transition-colors active:scale-95"
                 title="Wishlist"
               >
-                <Bookmark className="w-4 h-4" />
+                <Bookmark className="w-[21px] h-[21px] stroke-[2]" />
               </Link>
 
               <Link
                 href="/store?on_sale=true"
                 prefetch={true}
-                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                className="p-1 text-zinc-200 hover:text-white transition-colors active:scale-95"
                 title="Gifts"
               >
-                <Gift className="w-4 h-4" />
+                <Gift className="w-[21px] h-[21px] stroke-[2]" />
               </Link>
 
               <Link
                 href="/cart"
                 prefetch={true}
-                className="relative p-1 text-zinc-300 hover:text-white transition-colors flex items-center"
+                className="relative p-1 text-zinc-200 hover:text-white transition-colors active:scale-95 flex items-center"
                 title="Cart"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-[21px] h-[21px] stroke-[2]" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-[#FA742B] text-white text-[9.5px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  <span className="absolute -top-1 -right-2 bg-[#FA742B] text-white text-[10px] font-black min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-md leading-none">
                     {itemCount}
                   </span>
                 )}

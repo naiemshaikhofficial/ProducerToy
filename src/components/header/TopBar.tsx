@@ -86,14 +86,14 @@ export const TopBar: React.FC<TopBarProps> = ({
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
         <div className="flex items-center gap-5 sm:gap-8 lg:gap-10">
           <Link href="/" prefetch={true} className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
-            <LogoIcon size={34} />
-            <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+            <LogoIcon size={38} />
+            <ChevronDown className="w-4 h-4 text-zinc-400" />
           </Link>
 
           <Link 
             href="/" 
             prefetch={true}
-            className="text-white font-black text-[19px] sm:text-[22px] lg:text-[23px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-colors leading-none"
+            className="text-white font-black text-[20px] sm:text-[22px] lg:text-[23px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-colors leading-none"
           >
             STORE
           </Link>
@@ -336,11 +336,11 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
 
         {/* Mobile Right Controls: Library Button + Menu Hamburger */}
-        <div className="flex md:hidden items-center gap-3">
+        <div className="flex md:hidden items-center gap-3.5">
           <Link
             href="/library"
             prefetch={true}
-            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[11px] px-3.5 py-1.5 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
+            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-[12px] px-4 py-1.5 rounded-[6px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
           >
             Library
           </Link>
@@ -350,7 +350,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? <X className="w-7 h-7 stroke-[2.2]" /> : <Menu className="w-7 h-7 stroke-[2.2]" />}
           </button>
         </div>
 
