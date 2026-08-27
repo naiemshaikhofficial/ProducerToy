@@ -102,7 +102,7 @@ export const Header: React.FC = () => {
     if (searchQuery.trim()) {
       router.push(`/store?q=${encodeURIComponent(searchQuery.trim())}`)
     } else {
-      router.push('/store')
+      router.push('/')
     }
     setIsProductsMegaOpen(false)
     setIsMobileMenuOpen(false)
@@ -116,7 +116,7 @@ export const Header: React.FC = () => {
   const isShopPage =
     pathname === '/' ||
     pathname === '/store' ||
-    pathname?.startsWith('/store/') ||
+    pathname?.startsWith('/') ||
     pathname?.startsWith('/manufacturers') ||
     pathname?.startsWith('/categories') ||
     pathname?.startsWith('/product/') ||
@@ -127,13 +127,12 @@ export const Header: React.FC = () => {
     <>
       {/* Tier 1 Top Header Bar (Fixed when mobile menu is open, sticky/relative otherwise) */}
       <div
-        className={`${
-          isMobileMenuOpen
-            ? 'fixed top-0 left-0 right-0 z-[60]'
-            : isShopPage
+        className={`${isMobileMenuOpen
+          ? 'fixed top-0 left-0 right-0 z-[60]'
+          : isShopPage
             ? 'relative z-[60]'
             : 'sticky top-0 z-[60]'
-        } w-full bg-[#121212] select-none border-none`}
+          } w-full bg-[#121212] select-none border-none`}
       >
         <TopBar
           currency={currency}
