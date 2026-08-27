@@ -21,7 +21,7 @@ const FAQ_ITEMS = [
   {
     question: 'How do I earn Toywards?',
     answer:
-      'When you make a purchase on exclusive Producer Toy originals and featured sound collections, you can earn up to 20% back in Toywards. For all other store catalog purchases, you will automatically get 5% back. The exact amount of Toywards you earn is displayed right in your checkout order summary and on every product page before you buy.',
+      'When you make a purchase on exclusive Producer Toy originals and featured sound collections, you can earn up to 20% back in Toywards. The exact amount of Toywards you earn is displayed right in your checkout order summary and on every product page before you buy.',
   },
   {
     question: 'When do I receive my Toywards after purchase?',
@@ -66,9 +66,9 @@ const FAQ_ITEMS = [
 ]
 
 export const metadata: Metadata = generatePageMetadata({
-  title: 'Toywards Loyalty Program — Earn 5% to 20% Back on Every Purchase',
+  title: 'Toywards Loyalty Program — Earn up to 20% Back on Every Purchase',
   description:
-    'Join the Producer Toy Toywards loyalty program. Earn 5% to 20% cashback in Toywards on audio plugins, sample packs, presets, and DAW templates. Redeemable 1:1 at checkout.',
+    'Join the Producer Toy Toywards loyalty program. Earn up to 20% cashback in Toywards on audio plugins, sample packs, presets, and DAW templates. Redeemable 1:1 at checkout.',
   path: '/features/toywards',
   keywords: [
     'Toywards loyalty program',
@@ -93,7 +93,7 @@ export default function ToywardsFeaturePage() {
           <div className="absolute inset-0 w-full h-full pointer-events-none">
             <Image
               src="/images/toywards/hero_full.png"
-              alt="Earn from 5% to 20% with Toywards"
+              alt="Earn up to 20% with Toywards"
               fill
               priority
               className="object-cover object-left lg:object-center"
@@ -106,7 +106,7 @@ export default function ToywardsFeaturePage() {
 
             <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start space-y-5 sm:space-y-6 text-left mt-auto lg:mt-0">
               <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-white leading-[1.12] drop-shadow-md">
-                Earn from 5% to 20% with Toywards
+                Earn up to 20% with Toywards
               </h1>
 
               <Link
@@ -118,7 +118,7 @@ export default function ToywardsFeaturePage() {
               </Link>
 
               <p className="text-sm sm:text-base text-white/95 font-medium leading-relaxed max-w-md drop-shadow-sm">
-                Whenever you buy something on the Producer Toy Store, earn from 5% to 20% back with Toywards.
+                Whenever you buy something on the Producer Toy Store, earn up to 20% back with Toywards.
               </p>
 
               <Link
@@ -154,14 +154,14 @@ export default function ToywardsFeaturePage() {
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
                   src="/images/toywards/earn.png"
-                  alt="Earn from 5% to 20% back"
+                  alt="Earn up to 20% back"
                   fill
                   className="object-contain"
                 />
               </div>
               <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Earn</h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
-                Earn from 5% to 20% back with Toywards when you make purchases using Producer Toy’s payment system.
+                Earn up to 20% back with Toywards when you make purchases using Producer Toy’s payment system.
               </p>
             </div>
 

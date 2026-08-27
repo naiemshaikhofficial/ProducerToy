@@ -369,7 +369,7 @@ export default function WishlistPage() {
                         {!isFree && (
                           <div className="flex items-center gap-1.5 text-[11.5px] text-zinc-400 mt-3 font-medium">
                             <ToywardsIcon size={14} />
-                            <span>Earn 5% back in Toywards</span>
+                            <span>Earn Toywards on this purchase</span>
                           </div>
                         )}
                       </div>

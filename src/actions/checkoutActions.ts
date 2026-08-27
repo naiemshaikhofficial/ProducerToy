@@ -788,7 +788,7 @@ export async function verifyRazorpayPaymentAction(params: {
                 type: 'earned',
                 amount: actualCredited,
                 currency: 'USD',
-                description: `Earned 5% Toywards on Order #${orderNumber}`,
+                description: `Earned Toywards on Order #${orderNumber}`,
                 status: 'active',
                 expires_at: expiresDate.toISOString(),
               })
@@ -1079,7 +1079,7 @@ export async function capturePayPalOrderAction(params: {
                 type: 'earned',
                 amount: actualCredited,
                 currency: 'USD',
-                description: `Earned 5% Toywards on Order #${orderNumber}`,
+                description: `Earned Toywards on Order #${orderNumber}`,
                 status: 'active',
                 expires_at: expiresDate.toISOString(),
               })

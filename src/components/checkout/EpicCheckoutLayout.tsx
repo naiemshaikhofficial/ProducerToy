@@ -331,7 +331,7 @@ export function EpicCheckoutLayout({
                 ) : (
                   <div className="space-y-1">
                     <p className="text-zinc-300">
-                      Earn 5% (up to 20%) cashback with Toywards on this purchase. Credited to your account upon payment.
+                      Earn up to 20% cashback with Toywards on this purchase. Credited to your account upon payment.
                     </p>
                     <Link
                       href="/features/toywards"

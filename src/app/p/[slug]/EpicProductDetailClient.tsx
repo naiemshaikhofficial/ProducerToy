@@ -374,7 +374,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               )}
             </div>
 
-            {/* Toywards 5% Rewards Pill (Dual-Tone Orange & White) */}
+            {/* Toywards Rewards Pill (Dual-Tone Orange & White) */}
             {product.price_usd > 0 && (
               <Link
                 href="/features/toywards"
@@ -384,20 +384,20 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               >
                 <ToywardsIcon size={14} />
                 <span className="text-zinc-300">
-                  Get <strong className="text-white font-bold">{formatPrice(undefined, Number((product.price_usd * 0.05).toFixed(2)))}</strong> in <span className="text-[#FA742B] font-bold">Toywards (5% Back)</span>
+                  Earn <span className="text-[#FA742B] font-bold">Toywards Rewards</span> on this purchase
                 </span>
               </Link>
             )}
           </div>
 
-          {/* Epic Action Buttons (Buy Now + Cart Icon + Wishlist) */}
+          {/* Action Buttons (Buy Now + Cart Icon + Wishlist) */}
           <div className="space-y-2.5">
             {product.external_url ? (
               <a
                 href={product.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#0078f2] hover:bg-[#0060c2] text-white py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-950/20 cursor-pointer"
+                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || `GET ON ${developerName.toUpperCase()}`}</span>
@@ -410,7 +410,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                   className={`flex-1 py-3.5 px-6 text-sm font-bold uppercase tracking-wide rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
                     added
                       ? 'bg-zinc-800 text-zinc-400 cursor-default'
-                      : 'bg-[#0078f2] hover:bg-[#0060c2] text-white shadow-blue-950/30'
+                      : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20'
                   }`}
                 >
                   {added ? (

@@ -234,7 +234,7 @@ export default function EulaPage() {
             <div className="space-y-3 text-zinc-400">
               <h3 className="text-base font-bold text-zinc-200">11.1 Program Description & Earning</h3>
               <p>
-                All registered Producer Toy account holders are automatically enrolled in the <Link href="/features/toywards" className="text-[#FA742B] underline font-semibold">Toywards Loyalty Program</Link>. You earn from 5% to 20% back in Toywards on eligible store purchases. Toywards are credited to your active Rewards Balance to spend on future plugins and sound kits at checkout.
+                All registered Producer Toy account holders are automatically enrolled in the <Link href="/features/toywards" className="text-[#FA742B] underline font-semibold">Toywards Loyalty Program</Link>. You earn up to 20% back in Toywards on eligible store purchases. Toywards are credited to your active Rewards Balance to spend on future plugins and sound kits at checkout.
               </p>
               
               <h3 className="text-base font-bold text-zinc-200 pt-2">11.2 Redemption, Cap & Expiration</h3>
