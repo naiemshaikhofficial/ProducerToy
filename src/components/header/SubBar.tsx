@@ -197,9 +197,11 @@ export const SubBar: React.FC<SubBarProps> = ({
               </Link>
 
               <Link
-                href="/store?on_sale=true"
+                href="/gifts"
                 prefetch={true}
-                className="p-1 text-zinc-200 hover:text-white transition-colors active:scale-95"
+                className={`p-1 transition-colors active:scale-95 ${
+                  pathname === '/gifts' ? 'text-white' : 'text-zinc-200 hover:text-white'
+                }`}
                 title="Gifts"
               >
                 <Gift className="w-[21px] h-[21px] stroke-[2]" />
@@ -310,9 +312,11 @@ export const SubBar: React.FC<SubBarProps> = ({
           </Link>
 
           <Link
-            href="/store?on_sale=true"
+            href="/gifts"
             prefetch={true}
-            className="text-zinc-400 hover:text-white font-normal transition-colors"
+            className={`transition-colors font-normal ${
+              pathname === '/gifts' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+            }`}
           >
             Gifts
           </Link>
