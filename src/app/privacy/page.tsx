@@ -1,12 +1,21 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy | Producer Toy Store',
-  description: 'Privacy Policy, Anti-Spam Policy, Cookie Policy, and DPDP Act 2023 / GDPR compliance for Producer Toy.',
-}
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Privacy Policy — Producer Toy',
+  description:
+    'Producer Toy Privacy Policy, Data Protection, Cookie Policy, and DPDP Act / GDPR compliance standards for secure music producer shopping.',
+  path: '/privacy',
+  keywords: [
+    'Producer Toy privacy',
+    'Data protection policy',
+    'GDPR compliance',
+    'Producer Toy security',
+  ],
+})
 
 export default function PrivacyPolicyPage() {
   return (

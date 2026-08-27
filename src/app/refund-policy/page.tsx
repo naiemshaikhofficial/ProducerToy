@@ -1,12 +1,20 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Refund Policy | Producer Toy Store',
-  description: 'Strict No Refund & Final Sale Policy for digital VST plugins, sample packs, presets, and DAW templates on Producer Toy.',
-}
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Refund Policy & Digital Order Terms — Producer Toy',
+  description:
+    'Clear Refund Policy, Digital License Activation Terms, and Final Sale policies for VST plugins, sample packs, presets, and sound kits on Producer Toy Store.',
+  path: '/refund-policy',
+  keywords: [
+    'Producer Toy refund policy',
+    'Digital software refund terms',
+    'Sound kit return policy',
+  ],
+})
 
 export default function RefundPolicyPage() {
   return (

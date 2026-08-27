@@ -6,6 +6,8 @@ import { Metadata } from 'next'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 import { LocalDataCache } from '@/components/LocalDataCache'
 import { matchesSearchQuery } from '@/lib/search'
+import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
+import { CollectionPageJsonLd } from '@/components/JsonLd'
 
 export const revalidate = 1800 // Cache category pages with ISR for 30 minutes (0ms instant page loads)
 
@@ -130,11 +132,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const rawSlug = slug?.[0] || 'all'
   const cleanSlug = parseCategorySlug(rawSlug)
   const title = formatTitle(cleanSlug)
+  const description = CATEGORY_META_MAP[cleanSlug]?.description || `Browse and download top-rated ${title} on Producer Toy Store with 100% royalty-free license.`
   
-  return {
-    title: `${title} | Producer Toy Store`,
-    description: CATEGORY_META_MAP[cleanSlug]?.description || `Browse top rated ${title} on Producer Toy.`,
-  }
+  return generatePageMetadata({
+    title: `${title} — Music Production Plugins & Sounds`,
+    description,
+    path: `/categories/${rawSlug}`,
+    keywords: generateSmartKeywords(title, cleanSlug),
+  })
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
@@ -492,6 +497,18 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             ))}
           </div>
         )}
+
+        <CollectionPageJsonLd
+          title={`${categoryTitle} — Producer Toy`}
+          description={CATEGORY_META_MAP[cleanCategorySlug]?.description || `Browse top rated ${categoryTitle} on Producer Toy.`}
+          url={`https://producertoy.com/categories/${rawCategorySlug || 'all'}`}
+          items={products.map((p) => ({
+            name: p.name,
+            url: `https://producertoy.com/product/${p.slug}`,
+            price: p.price_usd,
+            image: p.cover_image,
+          }))}
+        />
 
         <LocalDataCache data={{ products, categories: categoriesOptions, brands: brandsOptions }} />
       </div>

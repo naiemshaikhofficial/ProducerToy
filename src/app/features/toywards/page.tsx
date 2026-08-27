@@ -1,87 +1,95 @@
-'use client'
-
-import React, { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Plus, Minus, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
+import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
+import { FAQPageJsonLd } from '@/components/JsonLd'
+import { ToywardsFaqAccordion } from './ToywardsFaqAccordion'
 
 const FAQ_ITEMS = [
   {
     question: 'What is the Toywards Program?',
     answer:
-      'Toywards is a loyalty rewards program where you earn rewards on any Producer Toy Store purchase—including sample packs, sound kits, synth presets, DAW templates, and audio plugins. You can spend your accumulated Toywards at checkout for direct discounts on your next orders.'
+      'Toywards is a loyalty rewards program where you earn rewards on any Producer Toy Store purchase—including sample packs, sound kits, synth presets, DAW templates, and audio plugins. You can spend your accumulated Toywards at checkout for direct discounts on your next orders.',
   },
   {
     question: 'How do I join the Toywards program?',
     answer:
-      'All Producer Toy account holders are automatically enrolled in the Toywards program as soon as they create an account and accept our End User License Agreement and Terms of Service. There are no extra sign-up fees or subscriptions required.'
+      'All Producer Toy account holders are automatically enrolled in the Toywards program as soon as they create an account and accept our End User License Agreement and Terms of Service. There are no extra sign-up fees or subscriptions required.',
   },
   {
     question: 'How do I earn Toywards?',
     answer:
-      'When you make a purchase on exclusive Producer Toy originals and featured sound collections, you can earn up to 20% back in Toywards. For all other store catalog purchases, you will automatically get 5% back. The exact amount of Toywards you earn is displayed right in your checkout order summary and on every product page before you buy.'
+      'When you make a purchase on exclusive Producer Toy originals and featured sound collections, you can earn up to 20% back in Toywards. For all other store catalog purchases, you will automatically get 5% back. The exact amount of Toywards you earn is displayed right in your checkout order summary and on every product page before you buy.',
   },
   {
     question: 'When do I receive my Toywards after purchase?',
     answer:
-      'Toywards are granted depending on the type of content purchased:\n• For instant digital downloads and non-refundable sound kits, your rewards are granted instantly to your Rewards Balance.\n• For other purchases, rewards are deposited in full alignment with our standard purchase policy.'
+      'Toywards are granted depending on the type of content purchased:\n• For instant digital downloads and non-refundable sound kits, your rewards are granted instantly to your Rewards Balance.\n• For other purchases, rewards are deposited in full alignment with our standard purchase policy.',
   },
   {
     question: 'Where can I check my Toywards balance?',
     answer:
-      'You can check your current Toywards balance anytime in your Account Settings under the Rewards & Wallet tab. There, you will find additional information including your active balance, pending rewards, and full redemption history.'
+      'You can check your current Toywards balance anytime in your Account Settings under the Rewards & Wallet tab. There, you will find additional information including your active balance, pending rewards, and full redemption history.',
   },
   {
     question: 'How do I redeem Toywards at checkout?',
     answer:
-      'You can easily apply your available Toywards directly during the checkout flow on desktop, tablet, and mobile. The selected reward amount is deducted directly from your order total before payment.'
+      'You can easily apply your available Toywards directly during the checkout flow on desktop, tablet, and mobile. The selected reward amount is deducted directly from your order total before payment.',
   },
   {
     question: 'Do Toywards expire?',
     answer:
-      'Yes, Toywards expire 25 months from the date on which they were granted to your Rewards Balance, giving you more than 2 full years to spend them on new sounds and plugins.'
+      'Yes, Toywards expire 25 months from the date on which they were granted to your Rewards Balance, giving you more than 2 full years to spend them on new sounds and plugins.',
   },
   {
     question: 'Is there a maximum cap on Toywards balance?',
     answer:
-      'Yes. Your Toywards balance is capped at USD $500 (or equivalent in your local currency, such as INR). If a purchase would push you over the limit, you will receive the portion of the rewards that keeps you within the cap.'
+      'Yes. Your Toywards balance is capped at USD $500 (or equivalent in your local currency, such as INR). If a purchase would push you over the limit, you will receive the portion of the rewards that keeps you within the cap.',
   },
   {
     question: 'Can Toywards be combined with sales and coupons?',
     answer:
-      'Yes! Toywards can be combined together with ongoing store sale discounts, bundle promotions, and creator coupon codes for maximum savings.'
+      'Yes! Toywards can be combined together with ongoing store sale discounts, bundle promotions, and creator coupon codes for maximum savings.',
   },
   {
     question: 'What happens to Toywards if I request a refund?',
     answer:
-      'If your purchase is eligible for a refund under our Refund Policy, any Toywards earned from that purchase will be deducted from your balance. If you used Toywards to pay for a refunded purchase, those Toywards will be returned to your Rewards Balance.'
+      'If your purchase is eligible for a refund under our Refund Policy, any Toywards earned from that purchase will be deducted from your balance. If you used Toywards to pay for a refunded purchase, those Toywards will be returned to your Rewards Balance.',
   },
   {
     question: 'Can Toywards be transferred between accounts or cashed out?',
     answer:
-      'No. Transferring Toywards between different accounts is not permitted. Toywards have no cash value outside of Producer Toy Store and cannot be traded, transferred, or exchanged for physical currency.'
-  }
+      'No. Transferring Toywards between different accounts is not permitted. Toywards have no cash value outside of Producer Toy Store and cannot be traded, transferred, or exchanged for physical currency.',
+  },
 ]
 
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Toywards Loyalty Program — Earn 5% to 20% Back on Every Purchase',
+  description:
+    'Join the Producer Toy Toywards loyalty program. Earn 5% to 20% cashback in Toywards on audio plugins, sample packs, presets, and DAW templates. Redeemable 1:1 at checkout.',
+  path: '/features/toywards',
+  keywords: [
+    'Toywards loyalty program',
+    'Producer Toy rewards',
+    'VST plugin cashback',
+    'Sample pack rewards',
+    'Music producer rewards program',
+    'Audio plugin discount program',
+  ],
+})
+
 export default function ToywardsFeaturePage() {
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
-
-  const toggleFaq = (index: number) => {
-    setOpenFaqIndex(openFaqIndex === index ? null : index)
-  }
-
   return (
     <main className="min-h-screen bg-[#121212] text-white select-none pb-24 font-sans">
+      <FAQPageJsonLd faqs={FAQ_ITEMS} />
       
       {/* Container wrapper */}
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 space-y-16 sm:space-y-24">
         
-        {/* ========================================================================= */}
-        {/* HERO SECTION: 1:1 Exact Epic Games Store Full Banner with Orange Theme    */}
-        {/* ========================================================================= */}
+        {/* HERO SECTION */}
         <section className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-[#141414] shadow-2xl min-h-[440px] sm:min-h-[480px] lg:h-[500px] flex items-center">
-          
-          {/* Background Poster Image (Full cover, cropped top/bottom, graphic on left) */}
           <div className="absolute inset-0 w-full h-full pointer-events-none">
             <Image
               src="/images/toywards/hero_full.png"
@@ -90,19 +98,13 @@ export default function ToywardsFeaturePage() {
               priority
               className="object-cover object-left lg:object-center"
             />
-            {/* Subtle mobile overlay to ensure readability on small screens */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent lg:hidden" />
           </div>
 
-          {/* Grid Layout: Left side transparent (shows graphic), Right side has CTA */}
           <div className="relative z-10 w-full h-full grid grid-cols-1 lg:grid-cols-12 items-center px-6 sm:px-10 lg:px-16 py-10 sm:py-12">
-            
-            {/* Left 6-7 cols: Space for the 3D Piggy/Cart/Hat graphic from the poster */}
             <div className="hidden lg:block lg:col-span-6 xl:col-span-7 h-full" />
 
-            {/* Right 5-6 cols: 1:1 Epic Games CTA (Title -> SHOP NOW -> Description -> Terms) */}
             <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-start space-y-5 sm:space-y-6 text-left mt-auto lg:mt-0">
-              
               <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-white leading-[1.12] drop-shadow-md">
                 Earn from 5% to 20% with Toywards
               </h1>
@@ -126,22 +128,13 @@ export default function ToywardsFeaturePage() {
               >
                 Terms and Conditions Apply
               </Link>
-
             </div>
-
           </div>
-
         </section>
 
-
-        {/* ========================================================================= */}
-        {/* 3 STEPS CARDS: Shop, Earn, Redeem (Exact Screenshot 2 Match - Static)      */}
-        {/* ========================================================================= */}
+        {/* 3 STEPS CARDS */}
         <section className="space-y-8">
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            
-            {/* CARD 1: SHOP */}
             <div className="bg-[#181818] border border-[#262626] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center shadow-lg">
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
@@ -151,15 +144,12 @@ export default function ToywardsFeaturePage() {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
-                Shop
-              </h3>
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Shop</h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                 Buy plugins, sound kits, sample packs, presets, and DAW templates across PC, Mac, and the web.
               </p>
             </div>
 
-            {/* CARD 2: EARN */}
             <div className="bg-[#181818] border border-[#262626] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center shadow-lg">
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
@@ -169,15 +159,12 @@ export default function ToywardsFeaturePage() {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
-                Earn
-              </h3>
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Earn</h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                 Earn from 5% to 20% back with Toywards when you make purchases using Producer Toy’s payment system.
               </p>
             </div>
 
-            {/* CARD 3: REDEEM */}
             <div className="bg-[#181818] border border-[#262626] rounded-2xl p-8 sm:p-10 flex flex-col items-center text-center shadow-lg">
               <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-6 flex items-center justify-center">
                 <Image
@@ -187,58 +174,22 @@ export default function ToywardsFeaturePage() {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
-                Redeem
-              </h3>
+              <h3 className="text-2xl font-black text-white mb-3 tracking-tight">Redeem</h3>
               <p className="text-zinc-400 text-sm leading-relaxed font-normal">
                 Spend rewards on your next sounds, plugins, and expansions on the Producer Toy Store when you checkout.
               </p>
             </div>
-
           </div>
-
         </section>
 
-
-        {/* ========================================================================= */}
-        {/* FREQUENTLY ASKED QUESTIONS: Accordion (Exact Epic Games Match)             */}
-        {/* ========================================================================= */}
+        {/* FREQUENTLY ASKED QUESTIONS */}
         <section className="max-w-3xl mx-auto space-y-10 pt-4">
-          
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white text-center tracking-tight">
             Frequently Asked Questions
           </h2>
 
-          <div className="divide-y divide-[#262626] border-t border-b border-[#262626]">
-            {FAQ_ITEMS.map((item, idx) => {
-              const isOpen = openFaqIndex === idx
-              return (
-                <div key={idx} className="py-5 sm:py-6">
-                  <button
-                    type="button"
-                    onClick={() => toggleFaq(idx)}
-                    className="w-full flex items-center justify-between text-left gap-4 group cursor-pointer focus:outline-none"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="text-base sm:text-lg font-bold text-white group-hover:text-zinc-200 transition-colors">
-                      {item.question}
-                    </span>
-                    <span className="text-zinc-400 group-hover:text-white transition-colors flex-shrink-0">
-                      {isOpen ? <Minus size={20} /> : <Plus size={20} />}
-                    </span>
-                  </button>
+          <ToywardsFaqAccordion items={FAQ_ITEMS} />
 
-                  {isOpen && (
-                    <div className="mt-4 text-sm sm:text-[15px] text-zinc-400 leading-relaxed font-normal whitespace-pre-line animate-in fade-in duration-150 pr-4">
-                      {item.answer}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Contact Support Prompt */}
           <div className="text-center pt-6 space-y-3">
             <p className="text-xs text-zinc-400">
               Have more questions about your Toywards rewards or balance?
@@ -252,11 +203,9 @@ export default function ToywardsFeaturePage() {
               <ChevronRight size={14} />
             </Link>
           </div>
-
         </section>
 
       </div>
-
     </main>
   )
 }

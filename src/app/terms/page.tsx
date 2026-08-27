@@ -1,12 +1,21 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Terms and Conditions | Producer Toy Store',
-  description: 'Complete Terms and Conditions, Rent to Own, Disposable Email Ban, Brand Disclaimer, and Acceptable Use Policy for Producer Toy.',
-}
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Terms and Conditions — Producer Toy',
+  description:
+    'Complete Terms and Conditions, Account Rules, Rent to Own, Brand Disclaimers, and Acceptable Use Policy for Producer Toy Store.',
+  path: '/terms',
+  keywords: [
+    'Producer Toy terms',
+    'Terms and conditions',
+    'Music store policy',
+    'Producer Toy legal',
+  ],
+})
 
 export default function TermsAndConditionsPage() {
   return (

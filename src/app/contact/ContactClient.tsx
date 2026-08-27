@@ -1,0 +1,167 @@
+'use client'
+
+import React, { useState } from 'react'
+import Link from 'next/link'
+import { Send, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { submitContactFormAction } from '@/actions/contactActions'
+
+export function ContactClient() {
+  const [submitted, setSubmitted] = useState(false)
+  const [serverMsg, setServerMsg] = useState('')
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    orderId: '',
+    subject: 'Order & Download Support',
+    message: '',
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const payload = new FormData()
+    payload.append('name', formData.name)
+    payload.append('email', formData.email)
+    payload.append('subject', formData.subject)
+    payload.append('message', formData.message)
+
+    const res = await submitContactFormAction(payload)
+    if (res.success) {
+      setServerMsg(res.message)
+      setSubmitted(true)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[#121212] text-white py-14 px-6 sm:px-10 lg:px-16 font-sans">
+      <div className="max-w-4xl mx-auto space-y-10">
+        {/* Back Link & Minimal Header */}
+        <div className="space-y-4 pb-6 border-b border-zinc-800/60">
+          <Link
+            href="/"
+            prefetch={true}
+            className="inline-flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Store</span>
+          </Link>
+          <div className="space-y-1">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Customer Care & Technical Support
+            </h1>
+            <p className="text-xs sm:text-sm text-zinc-400">
+              Need assistance with license keys, Toywards balance, downloads, or billing? We are here to help.
+            </p>
+          </div>
+        </div>
+
+        {submitted ? (
+          <div className="bg-[#181818] border border-zinc-800 rounded-2xl p-8 sm:p-12 text-center space-y-4 shadow-2xl">
+            <div className="w-16 h-16 bg-[#251b14] border border-[#fa742b]/30 rounded-full flex items-center justify-center mx-auto text-[#fa742b]">
+              <CheckCircle2 size={32} />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-white">Message Received</h2>
+            <p className="text-sm text-zinc-300 max-w-md mx-auto leading-relaxed">
+              {serverMsg || 'Thank you for reaching out! Our support team typically responds within 2–6 hours.'}
+            </p>
+            <div className="pt-4">
+              <Link
+                href="/store"
+                prefetch={true}
+                className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-full uppercase transition-all shadow-lg inline-block"
+              >
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-[#181818] border border-zinc-800 rounded-2xl p-6 sm:p-10 space-y-6 shadow-2xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  Full Name <span className="text-[#fa742b]">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g. John Doe"
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#fa742b] transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  Email Address <span className="text-[#fa742b]">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="e.g. producer@gmail.com"
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#fa742b] transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  Order / Invoice Number (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.orderId}
+                  onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
+                  placeholder="e.g. PT-M82..."
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#fa742b] transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  Subject Category <span className="text-[#fa742b]">*</span>
+                </label>
+                <select
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#fa742b] transition-colors cursor-pointer"
+                >
+                  <option value="Order & Download Support">Order & Download Support</option>
+                  <option value="Toywards Loyalty Points">Toywards Loyalty Points Inquiry</option>
+                  <option value="Serial Key Issue">Serial / License Key Issue</option>
+                  <option value="Creator & Partnership">Creator & Sound Designer Partnership</option>
+                  <option value="Billing & Refund">Billing or Refund Request</option>
+                  <option value="Other">Other Inquiry</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                Message & Details <span className="text-[#fa742b]">*</span>
+              </label>
+              <textarea
+                required
+                rows={5}
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                placeholder="Please describe your query or issue in detail..."
+                className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#fa742b] transition-colors resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full sm:w-auto bg-[#fa742b] hover:bg-[#e05800] text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2"
+            >
+              <Send size={16} />
+              <span>Send Message</span>
+            </button>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}

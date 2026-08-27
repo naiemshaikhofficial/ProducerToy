@@ -1,8 +1,10 @@
 import React from 'react'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Product } from '@/components/ProductCard'
 import { getHomepageProducts } from '@/lib/data/products'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 
 import { EpicHeroCarousel } from '@/components/EpicHeroCarousel'
 import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
@@ -15,6 +17,24 @@ import { EpicTrending } from '@/components/EpicTrending'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
 export const revalidate = 86400 // 24-hour Edge Cache (instant on-demand revalidation via /api/revalidate & Server Actions)
+
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
+  description:
+    'Download world-class VST plugins, royalty-free sample packs, Serum synth presets, and DAW templates. The premier minimalist marketplace for modern music creators.',
+  path: '/',
+  keywords: [
+    'VST Plugins',
+    'Free VST Plugins',
+    'Sample Packs',
+    'Free Sample Packs',
+    'Serum Presets',
+    'Vital Presets',
+    'FL Studio Templates',
+    'Ableton Live Plugins',
+    'Toywards Rewards',
+  ],
+})
 
 export default async function HomePage() {
   let products: Product[] = await getHomepageProducts()

@@ -1,12 +1,21 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ArrowLeft, ShieldCheck, FileText, Scale, ExternalLink } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'End User License Agreement (EULA) | Producer Toy Store',
-  description: 'Official End User License Agreement (EULA), 100% Royalty-Free Commercial Usage, Toywards Terms, and Software Licensing for Producer Toy Store.',
-}
+export const metadata: Metadata = generatePageMetadata({
+  title: 'End User License Agreement (EULA) — Producer Toy',
+  description:
+    'Official End User License Agreement (EULA), 100% Royalty-Free Commercial Clearance, Toywards Section 11 Loyalty Terms, and Software Licensing for Producer Toy Store.',
+  path: '/eula',
+  keywords: [
+    'Producer Toy EULA',
+    'Music software license',
+    'Toywards terms',
+    'Commercial clearance audio license',
+  ],
+})
 
 export default function EulaPage() {
   return (

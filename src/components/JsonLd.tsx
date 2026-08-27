@@ -154,3 +154,116 @@ export function StoreOrganizationJsonLd() {
     />
   )
 }
+
+export function WebSiteJsonLd() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Producer Toy',
+    alternateName: ['ProducerToy', 'Producer Toy Store'],
+    url: 'https://producertoy.com',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://producertoy.com/store?q={search_term_string}',
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+export function CollectionPageJsonLd({
+  title,
+  description,
+  url,
+  items = [],
+}: {
+  title: string
+  description: string
+  url: string
+  items?: Array<{ name: string; url: string; price?: number; image?: string }>
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: title,
+    description: description,
+    url: url,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: items.slice(0, 20).map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        url: item.url,
+        ...(item.image ? { image: item.image } : {}),
+      })),
+    },
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+export function FAQPageJsonLd({
+  faqs,
+}: {
+  faqs: Array<{ question: string; answer: string }>
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+export function BreadcrumbJsonLd({
+  breadcrumbs,
+}: {
+  breadcrumbs: Array<{ name: string; url: string }>
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbs.map((bc, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: bc.name,
+      item: bc.url,
+    })),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+

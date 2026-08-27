@@ -1,12 +1,21 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Royalty-Free Licensing Agreement | Producer Toy',
-  description: '100% Royalty-Free Commercial License terms for sample packs, 808s, synth presets, and DAW templates purchased on Producer Toy.',
-}
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Royalty-Free Commercial Audio License & EULA — Producer Toy',
+  description:
+    '100% Royalty-Free Commercial License terms for sample packs, 808s, synth presets, sound kits, and DAW templates purchased on Producer Toy.',
+  path: '/licensing',
+  keywords: [
+    'Royalty-free sample license',
+    'Commercial clearance sound kit',
+    'Music production licensing terms',
+    'Producer Toy licensing',
+  ],
+})
 
 export default function LicensingAgreementPage() {
   return (

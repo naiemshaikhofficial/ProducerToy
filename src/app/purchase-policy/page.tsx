@@ -1,12 +1,21 @@
 import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
+import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ArrowLeft } from 'lucide-react'
 
-export const metadata: Metadata = {
-  title: 'Purchase Policy | Producer Toy Store',
-  description: 'Complete Purchase Policy, Accepted Payment Methods, Instant Digital Delivery, and Taxation Terms for Producer Toy.',
-}
+export const metadata: Metadata = generatePageMetadata({
+  title: 'Purchase Policy & Digital Fulfillment — Producer Toy',
+  description:
+    'Complete Purchase Policy, Accepted Payment Methods, Instant Digital Delivery, Toywards Redemption, and Taxation Terms for Producer Toy Store.',
+  path: '/purchase-policy',
+  keywords: [
+    'Producer Toy purchase policy',
+    'Payment methods',
+    'Instant digital delivery terms',
+    'Music producer store policy',
+  ],
+})
 
 export default function PurchasePolicyPage() {
   return (

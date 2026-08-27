@@ -1,4 +1,5 @@
 import React from 'react'
+import { Metadata } from 'next'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { ProductCard, Product } from '@/components/ProductCard'
 import Link from 'next/link'
@@ -7,6 +8,8 @@ import { Handshake } from 'lucide-react'
 import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 import { LocalDataCache } from '@/components/LocalDataCache'
 import { matchesSearchQuery } from '@/lib/search'
+import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
+import { CollectionPageJsonLd } from '@/components/JsonLd'
 
 export const revalidate = 1800 // Cache static page for 30 minutes (instant 0ms loading, revalidated via /api/revalidate)
 
@@ -77,6 +80,53 @@ export async function generateStaticParams() {
     { slug: ['instruments'] },
     { slug: ['bundles'] },
   ]
+}
+
+export async function generateMetadata({ params, searchParams }: StorePageProps): Promise<Metadata> {
+  const { slug } = await params
+  const { free, deals, brand, q, cat } = await searchParams
+
+  const rawSlug = slug?.[0] || ''
+  const isFree = rawSlug === 'free' || free === 'true'
+  const isDeals = deals === 'true'
+
+  let title = 'Music Production Store — VST Plugins, Sample Packs & Presets'
+  let description = 'Browse the Producer Toy marketplace for premier VST plugins, royalty-free sample packs, synth presets, and DAW templates with instant digital download.'
+  let path = '/store'
+
+  if (rawSlug) {
+    const formattedCategory = rawSlug.charAt(0).toUpperCase() + rawSlug.slice(1).replace(/-/g, ' ')
+    title = `${formattedCategory} Store — Music Production Tools`
+    description = `Download top-rated ${formattedCategory} for FL Studio, Ableton Live, Logic Pro, and more on Producer Toy.`
+    path = `/store/${rawSlug}`
+  }
+
+  if (brand) {
+    const brandName = brand.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    title = `${brandName} Audio Plugins & Software Tools`
+    description = `Discover ${brandName} VST plugins, sound banks, and music software on Producer Toy Store.`
+  }
+
+  if (isFree) {
+    title = 'Free VST Plugins, Sample Packs & Sound Kits'
+    description = 'Download 100% free VST audio plugins, royalty-free sample packs, and synth presets on Producer Toy Store.'
+    path = '/store?free=true'
+  } else if (isDeals) {
+    title = 'Hot Deals & Special Sales on Audio Plugins & Sounds'
+    description = 'Save up to 80% off on top VST plugins, sample packs, and music production suites.'
+  }
+
+  if (q) {
+    title = `Search Results for "${q}" — Producer Toy`
+    description = `Find the best VST plugins, sample packs, and presets matching "${q}".`
+  }
+
+  return generatePageMetadata({
+    title,
+    description,
+    path,
+    keywords: generateSmartKeywords(title, rawSlug || 'store'),
+  })
 }
 
 export default async function StorePage({ params, searchParams }: StorePageProps) {
@@ -515,6 +565,18 @@ export default async function StorePage({ params, searchParams }: StorePageProps
           ))}
         </div>
       )}
+
+      <CollectionPageJsonLd
+        title={selectedBrand ? `${selectedBrand.name} Plugins & Sounds` : categorySlug ? `${categorySlug} Store` : 'Producer Toy Store'}
+        description={`Explore premier ${categorySlug || 'music production'} products on Producer Toy.`}
+        url={`https://producertoy.com/store${categorySlug ? `/${categorySlug}` : ''}`}
+        items={products.map((p) => ({
+          name: p.name,
+          url: `https://producertoy.com/product/${p.slug}`,
+          price: p.price_usd,
+          image: p.cover_image,
+        }))}
+      />
 
       <LocalDataCache data={{ products, categories: categoriesOptions, brands: brandsOptions }} />
     </div>
