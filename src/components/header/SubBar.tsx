@@ -18,17 +18,20 @@ interface SubBarProps {
 }
 
 const NAV_LINKS = [
-  { label: 'Discover', href: '/store' },
-  { label: 'Browse', href: '/store' },
-  { label: 'News', href: '/store' },
+  { label: 'Deals', href: '/store?on_sale=true' },
+  { label: 'Brands', href: '/manufacturers' },
+  { label: 'Rent to Own', href: '/store' },
+  { label: 'Blog', href: '/store' },
+  { label: 'Free', href: '/store?free=true' },
 ]
 
 const MOBILE_DISCOVER_OPTIONS = [
-  { label: 'Discover', href: '/store' },
-  { label: 'Browse', href: '/store' },
-  { label: 'News', href: '/store' },
+  { label: 'Products', href: '/store' },
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
+  { label: 'Rent to Own', href: '/store' },
+  { label: 'Blog', href: '/store' },
+  { label: 'Free', href: '/store?free=true' },
 ]
 
 export const SubBar: React.FC<SubBarProps> = ({
@@ -222,16 +225,34 @@ export const SubBar: React.FC<SubBarProps> = ({
             </form>
           </div>
 
-          {/* Desktop Sub Navigation Links (Discover, Browse, News) */}
-          <nav className="flex items-center gap-7 lg:gap-8 ml-8 text-[14px]">
-            {NAV_LINKS.map((link, idx) => {
-              const isActive = idx === 0 && pathname === '/store' || (idx > 0 && pathname === link.href)
+          {/* Desktop Sub Navigation Links (Products ˅, Deals, Brands, Rent to Own, Blog, Free) */}
+          <nav className="flex items-center gap-6 lg:gap-8 ml-6 lg:ml-8 text-[14px]">
+            {/* Products Mega Dropdown Trigger */}
+            <div 
+              className="relative flex items-center cursor-pointer py-2"
+              onMouseEnter={onMouseEnterProducts}
+              onMouseLeave={onMouseLeaveProducts}
+            >
+              <button 
+                type="button"
+                className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${
+                  isProductsMegaOpen ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span>Products</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isProductsMegaOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
+              </button>
+            </div>
+
+            {/* Mapped Sub Links */}
+            {NAV_LINKS.map((link) => {
+              const isActive = pathname === link.href
               return (
                 <Link 
                   key={link.label} 
                   href={link.href} 
                   prefetch={true}
-                  className={`transition-colors py-2 ${
+                  className={`transition-colors py-2 font-medium ${
                     isActive 
                       ? 'text-white font-bold' 
                       : 'text-zinc-400 font-normal hover:text-white'
