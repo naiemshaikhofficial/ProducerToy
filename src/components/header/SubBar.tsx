@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Search, ChevronDown, X, ShoppingCart } from 'lucide-react'
+import { Search, ChevronDown, X, ShoppingCart, Bookmark, Gift } from 'lucide-react'
 
 interface SubBarProps {
   searchQuery: string
@@ -185,8 +185,40 @@ export const SubBar: React.FC<SubBarProps> = ({
               )}
             </div>
 
-            {/* Empty Spacer to balance the search icon */}
-            <div className="w-9" />
+            {/* Right Icons: Wishlist, Gifts, Cart (Exact Screenshot Match) */}
+            <div className="flex items-center gap-4 text-zinc-300">
+              <Link
+                href="/wishlist"
+                prefetch={true}
+                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                title="Wishlist"
+              >
+                <Bookmark className="w-4 h-4" />
+              </Link>
+
+              <Link
+                href="/store?on_sale=true"
+                prefetch={true}
+                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                title="Gifts"
+              >
+                <Gift className="w-4 h-4" />
+              </Link>
+
+              <Link
+                href="/cart"
+                prefetch={true}
+                className="relative p-1 text-zinc-300 hover:text-white transition-colors flex items-center"
+                title="Cart"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-[#FA742B] text-white text-[9.5px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+            </div>
           </>
         )}
 
