@@ -81,18 +81,19 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <div className="w-full bg-[#121212] border-none">
-      <div className="w-full px-4 sm:px-7 lg:px-8 h-[52px] sm:h-[58px] flex items-center justify-between">
+      <div className="w-full px-5 sm:px-8 lg:px-10 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
-        <div className="flex items-center gap-3 sm:gap-6">
-          <Link href="/" prefetch={true} className="flex items-center hover:opacity-90 transition-opacity">
-            <LogoIcon size={28} />
+        <div className="flex items-center gap-5 sm:gap-8 lg:gap-10">
+          <Link href="/" prefetch={true} className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+            <LogoIcon size={34} />
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
           </Link>
 
           <Link 
             href="/" 
             prefetch={true}
-            className="text-white font-black text-[14px] sm:text-[16px] tracking-wider uppercase font-sans hover:text-zinc-200 transition-colors"
+            className="text-white font-black text-[19px] sm:text-[22px] lg:text-[23px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-colors leading-none"
           >
             STORE
           </Link>
@@ -100,19 +101,19 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link 
             href="/store" 
             prefetch={true}
-            className="hidden md:block text-zinc-300 hover:text-white text-[14px] font-medium transition-colors"
+            className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors"
           >
             Support
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1 text-zinc-300 hover:text-white text-[14px] font-medium cursor-pointer transition-colors">
+          <div className="hidden lg:flex items-center gap-1.5 text-zinc-300 hover:text-white text-[15px] font-medium cursor-pointer transition-colors">
             <span>Distribute</span>
             <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
           </div>
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}
-        <div className="hidden md:flex items-center gap-5">
+        <div className="hidden md:flex items-center gap-6">
 
           {/* Globe Language / Region Selector Trigger (Exact 1:1 Epic Games Match) */}
           <div className="relative" ref={globeMenuRef}>
@@ -125,7 +126,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               title={`Select Region & Currency (Current: ${region?.name || 'India'} - ${currency})`}
               aria-label="Select Region and Currency"
             >
-              <Globe className="w-[19px] h-[19px]" />
+              <Globe className="w-[21px] h-[21px]" />
             </button>
 
             {/* Epic Games Region / Currency Dropdown Menu */}
@@ -183,12 +184,12 @@ export const TopBar: React.FC<TopBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                className="flex items-center gap-2.5 py-1 px-1.5 hover:bg-[#1c1c1c] rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 py-1 px-2 hover:bg-[#1c1c1c] rounded-lg transition-colors cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-full bg-[#2a2a2a] text-white text-[11.5px] font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#2a2a2a] text-white text-[12.5px] font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm flex-shrink-0">
                   {initialLetter}
                 </div>
-                <span className="text-[13px] font-normal text-zinc-300 hover:text-white truncate max-w-[140px]">
+                <span className="text-[14.5px] font-medium text-zinc-300 hover:text-white truncate max-w-[160px]">
                   {displayName}
                 </span>
               </button>
@@ -332,7 +333,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link
             href="/library"
             prefetch={true}
-            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[12px] px-4 py-2 rounded-[4px] active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-normal"
+            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-[13px] px-5 py-2.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center cursor-pointer uppercase tracking-wider"
           >
             Library
           </Link>
