@@ -65,6 +65,28 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Auto close mobile drawer & mega menu on route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+    setIsProductsMegaOpen(false)
+  }, [pathname])
+
+  // Freeze background scrolling completely when mobile menu drawer is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      const originalBodyOverflow = document.body.style.overflow
+      const originalHtmlOverflow = document.documentElement.style.overflow
+
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow
+        document.documentElement.style.overflow = originalHtmlOverflow
+      }
+    }
+  }, [isMobileMenuOpen])
+
   // Hide Header completely on Auth and Checkout pages (exact Epic Games screen lock)
   if (
     pathname === '/auth' ||
@@ -103,8 +125,16 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      {/* Tier 1 Top Header Bar (Sticky on non-shop pages like /account, /library, /checkout, etc.) */}
-      <div className={`${isShopPage ? 'relative' : 'sticky top-0'} z-[60] w-full bg-[#121212] select-none border-none`}>
+      {/* Tier 1 Top Header Bar (Fixed when mobile menu is open, sticky/relative otherwise) */}
+      <div
+        className={`${
+          isMobileMenuOpen
+            ? 'fixed top-0 left-0 right-0 z-[60]'
+            : isShopPage
+            ? 'relative z-[60]'
+            : 'sticky top-0 z-[60]'
+        } w-full bg-[#121212] select-none border-none`}
+      >
         <TopBar
           currency={currency}
           onToggleCurrency={toggleCurrency}

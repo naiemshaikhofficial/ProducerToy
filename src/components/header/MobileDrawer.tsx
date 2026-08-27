@@ -58,8 +58,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
-    <div className="fixed inset-0 top-[52px] z-50 bg-[#121212] flex flex-col md:hidden animate-in slide-in-from-right duration-200 overflow-y-auto">
-      <div className="p-6 flex flex-col gap-6 flex-1">
+    <div className="fixed inset-x-0 bottom-0 top-[58px] z-[55] bg-[#121212] flex flex-col md:hidden animate-in slide-in-from-right duration-200 overflow-y-auto overscroll-contain">
+      <div className="p-6 pb-12 flex flex-col gap-6 flex-1">
         
         {/* ========================================================================= */}
         {/* VIEW 1: ACCOUNT SUB-VIEW (When Profile Initial Icon is tapped)             */}
