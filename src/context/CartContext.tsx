@@ -12,11 +12,15 @@ export interface CartItem {
   cover_image: string
   product_type: string
   brand: string
+  is_gift?: boolean
+  gift_recipient_email?: string
+  gift_message?: string
+  gift_send_date?: string
 }
 
 interface CartContextType {
   items: CartItem[]
-  addItem: (item: CartItem, openDrawer?: boolean) => void
+  addItem: (item: any, openDrawer?: boolean) => void
   removeItem: (id: string) => void
   clearCart: () => void
   isCartOpen: boolean
@@ -53,6 +57,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       cover_image: item.cover_image || '',
       product_type: item.product_type || 'plugin',
       brand: item.brand || item.brands?.name || 'Producer Toy',
+      is_gift: Boolean(item.is_gift),
+      gift_recipient_email: item.gift_recipient_email || '',
+      gift_message: item.gift_message || '',
+      gift_send_date: item.gift_send_date || '',
     }
   }
 

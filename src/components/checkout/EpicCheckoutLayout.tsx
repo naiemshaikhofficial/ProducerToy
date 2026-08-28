@@ -97,6 +97,8 @@ export function EpicCheckoutLayout({
   const [isBillingOpen, setIsBillingOpen] = useState(true)
   const [isCreatorCodeOpen, setIsCreatorCodeOpen] = useState(false)
   const [isRewardsExpanded, setIsRewardsExpanded] = useState(false)
+  const [giftRefundAgreed, setGiftRefundAgreed] = useState(true)
+  const hasGiftItems = items.some((i) => i.is_gift || i.gift_recipient_email)
 
   // Sync selected payment method with region / currency
   useEffect(() => {
@@ -191,6 +193,17 @@ export function EpicCheckoutLayout({
                   <h3 className="font-semibold text-[14.5px] text-white line-clamp-2 leading-snug">
                     {item.name}
                   </h3>
+
+                  {/* Gift Tag Badge (Screenshot 3 Match) */}
+                  {item.is_gift && (
+                    <div className="mt-1">
+                      <span className="inline-flex items-center gap-1 bg-[#282828] border border-[#383838] text-zinc-200 text-[10.5px] font-bold px-2 py-0.5 rounded-full">
+                        <Gift size={11} className="text-[#FA742B]" />
+                        <span>Gift</span>
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2 mt-1.5 text-[12px] text-zinc-400">
                     <span className="truncate">{item.brand || 'Producer Toy'}</span>
                     {items.length > 1 && (
