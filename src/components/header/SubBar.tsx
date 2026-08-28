@@ -200,19 +200,19 @@ export const SubBar: React.FC<SubBarProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* Exact Epic Games Store Mobile Dropdown Menu (Fixed Below Header)           */}
+      {/* Exact Epic Games Store Mobile Dropdown Menu (Seamless Extension)           */}
       {/* ========================================================================= */}
       {isDiscoverMenuOpen && (
         <div ref={discoverMenuRef} className="md:hidden">
           {/* Dark Dimmed Backdrop */}
           <div 
-            className="fixed inset-0 top-[110px] bg-black/65 z-40"
+            className="fixed inset-0 bg-black/70 z-40"
             onClick={() => setIsDiscoverMenuOpen(false)}
           />
 
-          {/* Centered Dropdown Panel with equal Left & Right blank space and Rounded Bottom Corners */}
-          <div className="absolute top-full left-3.5 right-3.5 max-w-[380px] mx-auto bg-[#121212] border border-t-0 border-[#242424] rounded-b-2xl shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
-            <div className="px-7 flex flex-col">
+          {/* Seamless Subheader Dropdown: Full Width Edge-to-Edge, Identical #121212 Color, No Bottom Border */}
+          <div className="absolute top-full left-0 right-0 w-full bg-[#121212] border-none shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-1">
+            <div className="w-full px-5 sm:px-6 flex flex-col">
               {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                 const isSelected = item.label === currentSectionLabel
                 const isLast = idx === MOBILE_DISCOVER_OPTIONS.length - 1
@@ -222,7 +222,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                       href={item.href}
                       prefetch={true}
                       onClick={() => setIsDiscoverMenuOpen(false)}
-                      className={`block py-4 text-[15.5px] tracking-normal transition-colors ${
+                      className={`block py-3.5 text-[15px] tracking-normal transition-colors ${
                         isSelected
                           ? 'text-white font-medium'
                           : 'text-zinc-400 font-normal hover:text-white'
