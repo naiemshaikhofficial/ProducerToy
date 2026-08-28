@@ -89,12 +89,12 @@ export const SubBar: React.FC<SubBarProps> = ({
   })()
 
   return (
-    <div className="w-full bg-[#121212] relative z-30">
+    <div className="w-full bg-[#121212] relative z-50">
       
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
-      <div className="flex md:hidden w-full px-3.5 sm:px-6 h-[50px] items-center justify-between relative">
+      <div className="flex md:hidden w-full px-3.5 sm:px-6 h-[50px] items-center justify-between relative z-50 bg-[#121212]">
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
@@ -200,18 +200,18 @@ export const SubBar: React.FC<SubBarProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* Exact Epic Games Store Mobile Dropdown Menu                                */}
+      {/* Exact Epic Games Store Mobile Dropdown Menu (Unified Seamless Surface)     */}
       {/* ========================================================================= */}
       {isDiscoverMenuOpen && (
         <div ref={discoverMenuRef} className="md:hidden">
-          {/* Dark Dimmed Backdrop */}
+          {/* Dark Dimmed Backdrop (Behind Subbar and Dropdown) */}
           <div 
             className="fixed inset-0 bg-black/75 z-40"
             onClick={() => setIsDiscoverMenuOpen(false)}
           />
 
-          {/* Epic Centered Card attached to Subbar with Rounded Bottom Corners & Inner Padding */}
-          <div className="absolute top-full left-2 right-2 max-w-[340px] mx-auto bg-[#181818] rounded-b-2xl shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
+          {/* Epic Centered Card with Prominent Left & Right Cut Margins */}
+          <div className="absolute top-full left-5 right-5 max-w-[285px] mx-auto bg-[#181818] rounded-none border-none shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
             <div className="px-6 flex flex-col">
               {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                 const isSelected = item.label === currentSectionLabel
