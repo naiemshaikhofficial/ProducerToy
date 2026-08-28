@@ -200,7 +200,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* Exact Epic Games Store Mobile Dropdown Menu (Fixed Full-Width Below Header) */}
+      {/* Exact Epic Games Store Mobile Dropdown Menu (Fixed Below Header)           */}
       {/* ========================================================================= */}
       {isDiscoverMenuOpen && (
         <div ref={discoverMenuRef} className="md:hidden">
@@ -210,25 +210,28 @@ export const SubBar: React.FC<SubBarProps> = ({
             onClick={() => setIsDiscoverMenuOpen(false)}
           />
 
-          {/* Full Width Dropdown Panel directly below SubBar matching Screenshot 1 */}
-          <div className="absolute top-full left-0 right-0 w-full bg-[#121212] border-b border-[#222222] shadow-2xl z-50 animate-in fade-in duration-150">
-            <div className="px-6 py-2 divide-y divide-[#202020]">
-              {MOBILE_DISCOVER_OPTIONS.map((item) => {
+          {/* Centered Dropdown Panel with equal Left & Right blank space and Rounded Bottom Corners */}
+          <div className="absolute top-full left-3.5 right-3.5 max-w-[380px] mx-auto bg-[#121212] border border-t-0 border-[#242424] rounded-b-2xl shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
+            <div className="px-7 flex flex-col">
+              {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                 const isSelected = item.label === currentSectionLabel
+                const isLast = idx === MOBILE_DISCOVER_OPTIONS.length - 1
                 return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    prefetch={true}
-                    onClick={() => setIsDiscoverMenuOpen(false)}
-                    className={`block py-4 text-[15px] tracking-normal transition-colors ${
-                      isSelected
-                        ? 'text-white font-medium'
-                        : 'text-zinc-400 font-normal hover:text-white'
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
+                  <div key={item.label}>
+                    <Link
+                      href={item.href}
+                      prefetch={true}
+                      onClick={() => setIsDiscoverMenuOpen(false)}
+                      className={`block py-4 text-[15.5px] tracking-normal transition-colors ${
+                        isSelected
+                          ? 'text-white font-medium'
+                          : 'text-zinc-400 font-normal hover:text-white'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                    {!isLast && <div className="w-full h-[1px] bg-[#222222]" />}
+                  </div>
                 )
               })}
             </div>
