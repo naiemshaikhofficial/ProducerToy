@@ -210,8 +210,8 @@ export const SubBar: React.FC<SubBarProps> = ({
             onClick={() => setIsDiscoverMenuOpen(false)}
           />
 
-          {/* Epic Centered Card with Prominent Left & Right Cut Margins */}
-          <div className="absolute top-full left-5 right-5 max-w-[285px] mx-auto bg-[#181818] rounded-none border-none shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
+          {/* Epic Centered Card with Prominent Left & Right Cut Margins & Exact #121212 Color */}
+          <div className="absolute top-full left-5 right-5 max-w-[285px] mx-auto bg-[#121212] rounded-none border-none shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
             <div className="px-6 flex flex-col">
               {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                 const isSelected = item.label === currentSectionLabel
@@ -230,7 +230,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                     >
                       {item.label}
                     </Link>
-                    {!isLast && <div className="w-full h-[1px] bg-[#282828]" />}
+                    {!isLast && <div className="w-full h-[1px] bg-[#222222]" />}
                   </div>
                 )
               })}
