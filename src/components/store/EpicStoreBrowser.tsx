@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import {
   Search,
   ChevronDown,
@@ -11,7 +11,6 @@ import {
   Check,
   X,
   SlidersHorizontal,
-  RotateCcw,
 } from 'lucide-react'
 import { Product, ProductCard } from '@/components/ProductCard'
 
@@ -111,11 +110,8 @@ export function EpicStoreBrowser({
   isBundlesActive = false,
   isRentActive = false,
   activePriceTier = '',
-  headerTitle,
-  headerDescription,
 }: EpicStoreBrowserProps) {
   const router = useRouter()
-  const pathname = usePathname()
 
   // State
   const [searchKeyword, setSearchKeyword] = useState(activeQuery)
@@ -157,22 +153,17 @@ export function EpicStoreBrowser({
     activeBrandSlug ? [activeBrandSlug] : []
   )
 
-  // Accordion Expand State
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    events: true,
-    price: true,
-    types: true,
-    genres: false,
-    platforms: false,
-    features: false,
-    brands: false,
-  })
+  // Explicit user toggles for accordion sections
+  const [customSectionToggles, setCustomSectionToggles] = useState<Record<string, boolean>>({})
 
-  const toggleSection = (section: string) => {
-    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }))
+  const toggleSection = (sectionId: string, defaultOpen: boolean) => {
+    setCustomSectionToggles((prev) => ({
+      ...prev,
+      [sectionId]: prev[sectionId] !== undefined ? !prev[sectionId] : !defaultOpen,
+    }))
   }
 
-  // Count active filters in each section for Epic badge count
+  // Active filter counts per section
   const eventsCount = (selectedEvents.discounted ? 1 : 0) + (selectedEvents.free ? 1 : 0) + (selectedEvents.rentToOwn ? 1 : 0)
   const priceCount = selectedPriceTiers.length
   const typesCount = selectedProductTypes.length
@@ -198,13 +189,13 @@ export function EpicStoreBrowser({
     setSelectedBrands([])
     setSearchKeyword('')
     setSelectedSort('newest')
+    setCustomSectionToggles({})
     router.push('/store', { scroll: false })
   }
 
-  // Filter products in-memory for instant 0ms response
+  // Filter products in-memory
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      // 1. Keyword search
       if (searchKeyword.trim()) {
         const kw = searchKeyword.toLowerCase().trim()
         const match =
@@ -216,25 +207,21 @@ export function EpicStoreBrowser({
         if (!match) return false
       }
 
-      // 2. Events: Discounted
       if (selectedEvents.discounted) {
         const hasDiscount =
           p.original_price_usd && Number(p.original_price_usd) > Number(p.price_usd)
         if (!hasDiscount) return false
       }
 
-      // 3. Events: Free
       if (selectedEvents.free) {
         if (Number(p.price_usd) !== 0) return false
       }
 
-      // 4. Events: Rent to Own
       if (selectedEvents.rentToOwn) {
         const isRto = (p as any).is_rent_to_own || p.product_type === 'rent_to_own'
         if (!isRto) return false
       }
 
-      // 5. Price Tiers
       if (selectedPriceTiers.length > 0) {
         const price = Number(p.price_usd) || 0
         const isDisc = p.original_price_usd && Number(p.original_price_usd) > price
@@ -250,7 +237,6 @@ export function EpicStoreBrowser({
         if (!matchesAnyTier) return false
       }
 
-      // 6. Product Types
       if (selectedProductTypes.length > 0) {
         const typeMap: Record<string, string> = {
           plugins: 'plugin',
@@ -266,7 +252,6 @@ export function EpicStoreBrowser({
         if (!matchesType) return false
       }
 
-      // 7. Genres & Effects
       if (selectedGenres.length > 0) {
         const pCats = (p.category_slugs || []).map((c) => c.toLowerCase().replace(/[-_]/g, ' '))
         const pSub = (p.subcategories?.name || p.subcategory || '').toString().toLowerCase()
@@ -277,7 +262,6 @@ export function EpicStoreBrowser({
         if (!matchesGenre) return false
       }
 
-      // 8. Platforms / Formats
       if (selectedPlatforms.length > 0) {
         const formatStr = (p.vst_format || '').toLowerCase()
         const matchesPlatform = selectedPlatforms.some((plat) => {
@@ -290,7 +274,6 @@ export function EpicStoreBrowser({
         if (!matchesPlatform) return false
       }
 
-      // 9. Brands
       if (selectedBrands.length > 0) {
         const brandSlug =
           p.brands?.slug?.toLowerCase() ||
@@ -334,7 +317,7 @@ export function EpicStoreBrowser({
     return list
   }, [filteredProducts, selectedSort])
 
-  // Click outside for sort dropdown
+  // Sort dropdown ref
   const sortRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -346,16 +329,382 @@ export function EpicStoreBrowser({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isSortOpen])
 
-  // Get active sort label
   const currentSortLabel =
     SORT_OPTIONS.find((s) => s.id === selectedSort)?.label || 'New Release'
+
+  // Dynamic Sidebar Section Definitions
+  const filterSections = useMemo(() => {
+    return [
+      {
+        id: 'events',
+        title: 'Events',
+        count: eventsCount,
+        defaultOpen: eventsCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+            <label className="flex items-center gap-3 cursor-pointer select-none group">
+              <div
+                className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                  selectedEvents.discounted
+                    ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                    : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                }`}
+              >
+                {selectedEvents.discounted && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+              <input
+                type="checkbox"
+                checked={selectedEvents.discounted}
+                onChange={(e) =>
+                  setSelectedEvents((prev) => ({ ...prev, discounted: e.target.checked }))
+                }
+                className="hidden"
+              />
+              <span className={selectedEvents.discounted ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                Discounted
+              </span>
+            </label>
+
+            <label className="flex items-center gap-3 cursor-pointer select-none group">
+              <div
+                className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                  selectedEvents.free
+                    ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                    : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                }`}
+              >
+                {selectedEvents.free && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+              <input
+                type="checkbox"
+                checked={selectedEvents.free}
+                onChange={(e) =>
+                  setSelectedEvents((prev) => ({ ...prev, free: e.target.checked }))
+                }
+                className="hidden"
+              />
+              <span className={selectedEvents.free ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                Free Producer Toys
+              </span>
+            </label>
+
+            <label className="flex items-center gap-3 cursor-pointer select-none group">
+              <div
+                className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                  selectedEvents.rentToOwn
+                    ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                    : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                }`}
+              >
+                {selectedEvents.rentToOwn && <Check className="w-3 h-3 stroke-[3]" />}
+              </div>
+              <input
+                type="checkbox"
+                checked={selectedEvents.rentToOwn}
+                onChange={(e) =>
+                  setSelectedEvents((prev) => ({ ...prev, rentToOwn: e.target.checked }))
+                }
+                className="hidden"
+              />
+              <span className={selectedEvents.rentToOwn ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                Rent to Own
+              </span>
+            </label>
+          </div>
+        ),
+      },
+      {
+        id: 'price',
+        title: 'Price',
+        count: priceCount,
+        defaultOpen: priceCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+            {PRICE_TIERS.map((tier) => {
+              const isChecked = selectedPriceTiers.includes(tier.id)
+              return (
+                <label key={tier.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div
+                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                      isChecked
+                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    }`}
+                  >
+                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setSelectedPriceTiers((prev) =>
+                        prev.includes(tier.id)
+                          ? prev.filter((id) => id !== tier.id)
+                          : [...prev, tier.id]
+                      )
+                    }}
+                    className="hidden"
+                  />
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                    {tier.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
+        id: 'types',
+        title: 'Types',
+        count: typesCount,
+        defaultOpen: typesCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+            {PRODUCT_TYPES.map((type) => {
+              const isChecked = selectedProductTypes.includes(type.slug)
+              return (
+                <label key={type.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div
+                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                      isChecked
+                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    }`}
+                  >
+                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setSelectedProductTypes((prev) =>
+                        prev.includes(type.slug)
+                          ? prev.filter((s) => s !== type.slug)
+                          : [...prev, type.slug]
+                      )
+                    }}
+                    className="hidden"
+                  />
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                    {type.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
+        id: 'genres',
+        title: 'Genre & Effects',
+        count: genresCount,
+        defaultOpen: genresCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+            {[...GENRES_EFFECTS]
+              .sort((a, b) => {
+                const aChecked = selectedGenres.includes(a.id) ? 1 : 0
+                const bChecked = selectedGenres.includes(b.id) ? 1 : 0
+                return bChecked - aChecked
+              })
+              .map((genre) => {
+                const isChecked = selectedGenres.includes(genre.id)
+                return (
+                  <label key={genre.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                    <div
+                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                        isChecked
+                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                      }`}
+                    >
+                      {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => {
+                        setSelectedGenres((prev) =>
+                          prev.includes(genre.id)
+                            ? prev.filter((id) => id !== genre.id)
+                            : [...prev, genre.id]
+                        )
+                      }}
+                      className="hidden"
+                    />
+                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                      {genre.label}
+                    </span>
+                  </label>
+                )
+              })}
+          </div>
+        ),
+      },
+      {
+        id: 'platforms',
+        title: 'Platform',
+        count: platformsCount,
+        defaultOpen: platformsCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+            {PLATFORMS.map((plat) => {
+              const isChecked = selectedPlatforms.includes(plat.id)
+              return (
+                <label key={plat.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div
+                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                      isChecked
+                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    }`}
+                  >
+                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setSelectedPlatforms((prev) =>
+                        prev.includes(plat.id)
+                          ? prev.filter((id) => id !== plat.id)
+                          : [...prev, plat.id]
+                      )
+                    }}
+                    className="hidden"
+                  />
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                    {plat.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
+        id: 'features',
+        title: 'Features',
+        count: featuresCount,
+        defaultOpen: featuresCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+            {FEATURES_LIST.map((feat) => {
+              const isChecked = selectedFeatures.includes(feat.id)
+              return (
+                <label key={feat.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div
+                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                      isChecked
+                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    }`}
+                  >
+                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setSelectedFeatures((prev) =>
+                        prev.includes(feat.id)
+                          ? prev.filter((id) => id !== feat.id)
+                          : [...prev, feat.id]
+                      )
+                    }}
+                    className="hidden"
+                  />
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                    {feat.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
+        id: 'brands',
+        title: 'Brands',
+        count: brandsCount,
+        defaultOpen: brandsCount > 0,
+        render: () => (
+          <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+            {[...brands]
+              .sort((a, b) => {
+                const aChecked = selectedBrands.includes(a.slug) ? 1 : 0
+                const bChecked = selectedBrands.includes(b.slug) ? 1 : 0
+                return bChecked - aChecked
+              })
+              .map((brand) => {
+                const isChecked = selectedBrands.includes(brand.slug)
+                return (
+                  <label key={brand.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                    <div
+                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                        isChecked
+                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
+                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                      }`}
+                    >
+                      {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => {
+                        setSelectedBrands((prev) =>
+                          prev.includes(brand.slug)
+                            ? prev.filter((s) => s !== brand.slug)
+                            : [...prev, brand.slug]
+                        )
+                      }}
+                      className="hidden"
+                    />
+                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                      {brand.name}
+                    </span>
+                  </label>
+                )
+              })}
+          </div>
+        ),
+      },
+    ]
+  }, [
+    eventsCount,
+    priceCount,
+    typesCount,
+    genresCount,
+    platformsCount,
+    featuresCount,
+    brandsCount,
+    selectedEvents,
+    selectedPriceTiers,
+    selectedProductTypes,
+    selectedGenres,
+    selectedPlatforms,
+    selectedFeatures,
+    selectedBrands,
+    brands,
+  ])
+
+  // Sort sections: Active filter sections (count > 0) move to the TOP automatically!
+  const sortedSections = useMemo(() => {
+    return [...filterSections].sort((a, b) => {
+      const aActive = a.count > 0 ? 1 : 0
+      const bActive = b.count > 0 ? 1 : 0
+      return bActive - aActive
+    })
+  }, [filterSections])
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-24">
       <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         
         {/* ========================================================================= */}
-        {/* 1. TOP BAR: SHOW DROPDOWN + ACTIVE FILTER TAGS (1:1 Epic Games Match)       */}
+        {/* 1. TOP BAR: SHOW DROPDOWN + ACTIVE FILTER TAGS                             */}
         {/* ========================================================================= */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-[#202020]">
           
@@ -547,7 +896,7 @@ export function EpicStoreBrowser({
 
 
         {/* ========================================================================= */}
-        {/* 2. TWO-COLUMN MAIN STORE LAYOUT (Exact 1:1 Epic Games Store Grid & Sidebar)*/}
+        {/* 2. TWO-COLUMN MAIN STORE LAYOUT (Active Filters Auto-Top & Open)          */}
         {/* ========================================================================= */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6 items-start">
           
@@ -582,7 +931,7 @@ export function EpicStoreBrowser({
 
 
           {/* ================= RIGHT COLUMN: STICKY FILTERS SIDEBAR (3 Cols) ====== */}
-          <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-4 bg-[#121212] select-none">
+          <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-3 bg-[#121212] select-none">
             
             {/* Sidebar Top: Filters (Count) + Reset */}
             <div className="flex items-center justify-between pb-2 border-b border-[#202020]">
@@ -601,7 +950,7 @@ export function EpicStoreBrowser({
             </div>
 
             {/* Keyword Search Input (Exact Epic Search Box) */}
-            <div className="relative">
+            <div className="relative pb-1">
               <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
@@ -621,446 +970,39 @@ export function EpicStoreBrowser({
               )}
             </div>
 
-            {/* Accordion Group 1: Events */}
-            <div className="border-t border-[#202020] pt-3.5">
-              <button
-                type="button"
-                onClick={() => toggleSection('events')}
-                className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-              >
-                <span className="flex items-center gap-2">
-                  <span>Events</span>
-                  {eventsCount > 0 && (
-                    <span className="text-[11px] font-bold text-zinc-400">{eventsCount}</span>
-                  )}
-                </span>
-                {openSections.events ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400" />
-                )}
-              </button>
+            {/* Dynamic Sorted Accordion Sections (Active sections automatically at TOP and OPEN) */}
+            {sortedSections.map((sec) => {
+              const isOpen =
+                customSectionToggles[sec.id] !== undefined
+                  ? customSectionToggles[sec.id]
+                  : sec.defaultOpen
 
-              {openSections.events && (
-                <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-                  {/* Discounted Checkbox */}
-                  <label className="flex items-center gap-3 cursor-pointer select-none group">
-                    <div
-                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                        selectedEvents.discounted
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                      }`}
-                    >
-                      {selectedEvents.discounted && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={selectedEvents.discounted}
-                      onChange={(e) =>
-                        setSelectedEvents((prev) => ({ ...prev, discounted: e.target.checked }))
-                      }
-                      className="hidden"
-                    />
-                    <span className={selectedEvents.discounted ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                      Discounted
+              return (
+                <div key={sec.id} className="border-t border-[#202020] pt-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(sec.id, sec.defaultOpen)}
+                    className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>{sec.title}</span>
+                      {sec.count > 0 && (
+                        <span className="text-[11px] font-bold text-[#FA742B] bg-[#FA742B]/10 px-1.5 py-0.2 rounded">
+                          {sec.count}
+                        </span>
+                      )}
                     </span>
-                  </label>
-
-                  {/* Free Checkbox */}
-                  <label className="flex items-center gap-3 cursor-pointer select-none group">
-                    <div
-                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                        selectedEvents.free
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                      }`}
-                    >
-                      {selectedEvents.free && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={selectedEvents.free}
-                      onChange={(e) =>
-                        setSelectedEvents((prev) => ({ ...prev, free: e.target.checked }))
-                      }
-                      className="hidden"
-                    />
-                    <span className={selectedEvents.free ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                      Free Producer Toys
-                    </span>
-                  </label>
-
-                  {/* Rent to Own Checkbox */}
-                  <label className="flex items-center gap-3 cursor-pointer select-none group">
-                    <div
-                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                        selectedEvents.rentToOwn
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                      }`}
-                    >
-                      {selectedEvents.rentToOwn && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={selectedEvents.rentToOwn}
-                      onChange={(e) =>
-                        setSelectedEvents((prev) => ({ ...prev, rentToOwn: e.target.checked }))
-                      }
-                      className="hidden"
-                    />
-                    <span className={selectedEvents.rentToOwn ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                      Rent to Own
-                    </span>
-                  </label>
-                </div>
-              )}
-            </div>
-
-            {/* Accordion Group 2: Price Tiers */}
-            <div className="border-t border-[#202020] pt-3.5">
-              <button
-                type="button"
-                onClick={() => toggleSection('price')}
-                className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-              >
-                <span className="flex items-center gap-2">
-                  <span>Price</span>
-                  {priceCount > 0 && (
-                    <span className="text-[11px] font-bold text-zinc-400">{priceCount}</span>
-                  )}
-                </span>
-                {openSections.price ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400" />
-                )}
-              </button>
-
-              {openSections.price && (
-                <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-                  {PRICE_TIERS.map((tier) => {
-                    const isChecked = selectedPriceTiers.includes(tier.id)
-                    return (
-                      <label key={tier.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                        <div
-                          className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                              : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedPriceTiers((prev) =>
-                              prev.includes(tier.id)
-                                ? prev.filter((id) => id !== tier.id)
-                                : [...prev, tier.id]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                          {tier.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Accordion Group 3: Types */}
-            <div className="border-t border-[#202020] pt-3.5">
-              <button
-                type="button"
-                onClick={() => toggleSection('types')}
-                className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-              >
-                <span className="flex items-center gap-2">
-                  <span>Types</span>
-                  {typesCount > 0 && (
-                    <span className="text-[11px] font-bold text-zinc-400">{typesCount}</span>
-                  )}
-                </span>
-                {openSections.types ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400" />
-                )}
-              </button>
-
-              {openSections.types && (
-                <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-                  {PRODUCT_TYPES.map((type) => {
-                    const isChecked = selectedProductTypes.includes(type.slug)
-                    return (
-                      <label key={type.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                        <div
-                          className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                              : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedProductTypes((prev) =>
-                              prev.includes(type.slug)
-                                ? prev.filter((s) => s !== type.slug)
-                                : [...prev, type.slug]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                          {type.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Accordion Group 4: Genre / Sound Categories */}
-            <div className="border-t border-[#202020] pt-3.5">
-              <button
-                type="button"
-                onClick={() => toggleSection('genres')}
-                className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-              >
-                <span className="flex items-center gap-2">
-                  <span>Genre & Effects</span>
-                  {genresCount > 0 && (
-                    <span className="text-[11px] font-bold text-zinc-400">{genresCount}</span>
-                  )}
-                </span>
-                {openSections.genres ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400" />
-                )}
-              </button>
-
-              {openSections.genres && (
-                <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-                  {GENRES_EFFECTS.map((genre) => {
-                    const isChecked = selectedGenres.includes(genre.id)
-                    return (
-                      <label key={genre.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                        <div
-                          className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                              : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedGenres((prev) =>
-                              prev.includes(genre.id)
-                                ? prev.filter((id) => id !== genre.id)
-                                : [...prev, genre.id]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                          {genre.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Accordion Group 5: Platform */}
-            <div className="border-t border-[#202020] pt-3.5">
-              <button
-                type="button"
-                onClick={() => toggleSection('platforms')}
-                className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-              >
-                <span className="flex items-center gap-2">
-                  <span>Platform</span>
-                  {platformsCount > 0 && (
-                    <span className="text-[11px] font-bold text-zinc-400">{platformsCount}</span>
-                  )}
-                </span>
-                {openSections.platforms ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400" />
-                )}
-              </button>
-
-              {openSections.platforms && (
-                <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-                  {PLATFORMS.map((plat) => {
-                    const isChecked = selectedPlatforms.includes(plat.id)
-                    return (
-                      <label key={plat.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                        <div
-                          className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                              : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedPlatforms((prev) =>
-                              prev.includes(plat.id)
-                                ? prev.filter((id) => id !== plat.id)
-                                : [...prev, plat.id]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                          {plat.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Accordion Group 6: Features */}
-            <div className="border-t border-[#202020] pt-3.5">
-              <button
-                type="button"
-                onClick={() => toggleSection('features')}
-                className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-              >
-                <span className="flex items-center gap-2">
-                  <span>Features</span>
-                  {featuresCount > 0 && (
-                    <span className="text-[11px] font-bold text-zinc-400">{featuresCount}</span>
-                  )}
-                </span>
-                {openSections.features ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400" />
-                )}
-              </button>
-
-              {openSections.features && (
-                <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-                  {FEATURES_LIST.map((feat) => {
-                    const isChecked = selectedFeatures.includes(feat.id)
-                    return (
-                      <label key={feat.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                        <div
-                          className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                              : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedFeatures((prev) =>
-                              prev.includes(feat.id)
-                                ? prev.filter((id) => id !== feat.id)
-                                : [...prev, feat.id]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                          {feat.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Accordion Group 7: Brands */}
-            {brands.length > 0 && (
-              <div className="border-t border-[#202020] pt-3.5">
-                <button
-                  type="button"
-                  onClick={() => toggleSection('brands')}
-                  className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-                >
-                  <span className="flex items-center gap-2">
-                    <span>Brands</span>
-                    {brandsCount > 0 && (
-                      <span className="text-[11px] font-bold text-zinc-400">{brandsCount}</span>
+                    {isOpen ? (
+                      <ChevronUp className="w-4 h-4 text-zinc-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-zinc-400" />
                     )}
-                  </span>
-                  {openSections.brands ? (
-                    <ChevronUp className="w-4 h-4 text-zinc-400" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-zinc-400" />
-                  )}
-                </button>
+                  </button>
 
-                {openSections.brands && (
-                  <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-                    {brands.map((brand) => {
-                      const isChecked = selectedBrands.includes(brand.slug)
-                      return (
-                        <label key={brand.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                          <div
-                            className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                              isChecked
-                                ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                                : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                            }`}
-                          >
-                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                          </div>
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={() => {
-                              setSelectedBrands((prev) =>
-                                prev.includes(brand.slug)
-                                  ? prev.filter((s) => s !== brand.slug)
-                                  : [...prev, brand.slug]
-                              )
-                            }}
-                            className="hidden"
-                          />
-                          <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                            {brand.name}
-                          </span>
-                        </label>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+                  {isOpen && sec.render()}
+                </div>
+              )
+            })}
 
           </div>
 
@@ -1081,10 +1023,10 @@ export function EpicStoreBrowser({
 
           {/* Drawer Panel */}
           <div className="fixed inset-y-0 right-0 w-[88vw] max-w-[340px] bg-[#141414] border-l border-[#242424] shadow-2xl p-6 overflow-y-auto flex flex-col justify-between animate-in slide-in-from-right duration-200">
-            <div className="space-y-6">
+            <div className="space-y-5">
               
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#242424]">
+              <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
                 <div className="flex items-center gap-2">
                   <SlidersHorizontal className="w-4 h-4 text-[#FA742B]" />
                   <span className="text-base font-bold text-white">
@@ -1112,139 +1054,39 @@ export function EpicStoreBrowser({
                 />
               </div>
 
-              {/* Mobile Events Section */}
-              <div className="space-y-3">
-                <span className="text-xs font-bold text-white uppercase tracking-wider block">
-                  Events
-                </span>
-                <div className="space-y-2.5 text-sm">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <div
-                      className={`w-4 h-4 rounded-[4px] border flex items-center justify-center ${
-                        selectedEvents.discounted
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white'
-                          : 'border-zinc-700 bg-[#202020]'
-                      }`}
+              {/* Dynamic Sorted Accordion Sections in Mobile */}
+              {sortedSections.map((sec) => {
+                const isOpen =
+                  customSectionToggles[sec.id] !== undefined
+                    ? customSectionToggles[sec.id]
+                    : sec.defaultOpen
+
+                return (
+                  <div key={sec.id} className="border-t border-[#242424] pt-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(sec.id, sec.defaultOpen)}
+                      className="flex items-center justify-between w-full text-xs font-bold text-white py-1 cursor-pointer tracking-wider"
                     >
-                      {selectedEvents.discounted && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={selectedEvents.discounted}
-                      onChange={(e) =>
-                        setSelectedEvents((prev) => ({ ...prev, discounted: e.target.checked }))
-                      }
-                      className="hidden"
-                    />
-                    <span className={selectedEvents.discounted ? 'text-white font-semibold' : 'text-zinc-300'}>
-                      Discounted
-                    </span>
-                  </label>
+                      <span className="flex items-center gap-2">
+                        <span>{sec.title}</span>
+                        {sec.count > 0 && (
+                          <span className="text-[11px] font-bold text-[#FA742B] bg-[#FA742B]/10 px-1.5 py-0.2 rounded">
+                            {sec.count}
+                          </span>
+                        )}
+                      </span>
+                      {isOpen ? (
+                        <ChevronUp className="w-4 h-4 text-zinc-400" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-zinc-400" />
+                      )}
+                    </button>
 
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <div
-                      className={`w-4 h-4 rounded-[4px] border flex items-center justify-center ${
-                        selectedEvents.free
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white'
-                          : 'border-zinc-700 bg-[#202020]'
-                      }`}
-                    >
-                      {selectedEvents.free && <Check className="w-3 h-3 stroke-[3]" />}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={selectedEvents.free}
-                      onChange={(e) =>
-                        setSelectedEvents((prev) => ({ ...prev, free: e.target.checked }))
-                      }
-                      className="hidden"
-                    />
-                    <span className={selectedEvents.free ? 'text-white font-semibold' : 'text-zinc-300'}>
-                      Free Producer Toys
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Mobile Price Section */}
-              <div className="space-y-3 pt-3 border-t border-[#242424]">
-                <span className="text-xs font-bold text-white uppercase tracking-wider block">
-                  Price
-                </span>
-                <div className="space-y-2.5 text-sm">
-                  {PRICE_TIERS.map((tier) => {
-                    const isChecked = selectedPriceTiers.includes(tier.id)
-                    return (
-                      <label key={tier.id} className="flex items-center gap-3 cursor-pointer">
-                        <div
-                          className={`w-4 h-4 rounded-[4px] border flex items-center justify-center ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white'
-                              : 'border-zinc-700 bg-[#202020]'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedPriceTiers((prev) =>
-                              prev.includes(tier.id)
-                                ? prev.filter((id) => id !== tier.id)
-                                : [...prev, tier.id]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300'}>
-                          {tier.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Mobile Types Section */}
-              <div className="space-y-3 pt-3 border-t border-[#242424]">
-                <span className="text-xs font-bold text-white uppercase tracking-wider block">
-                  Types
-                </span>
-                <div className="space-y-2.5 text-sm">
-                  {PRODUCT_TYPES.map((type) => {
-                    const isChecked = selectedProductTypes.includes(type.slug)
-                    return (
-                      <label key={type.id} className="flex items-center gap-3 cursor-pointer">
-                        <div
-                          className={`w-4 h-4 rounded-[4px] border flex items-center justify-center ${
-                            isChecked
-                              ? 'bg-[#FA742B] border-[#FA742B] text-white'
-                              : 'border-zinc-700 bg-[#202020]'
-                          }`}
-                        >
-                          {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            setSelectedProductTypes((prev) =>
-                              prev.includes(type.slug)
-                                ? prev.filter((s) => s !== type.slug)
-                                : [...prev, type.slug]
-                            )
-                          }}
-                          className="hidden"
-                        />
-                        <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300'}>
-                          {type.label}
-                        </span>
-                      </label>
-                    )
-                  })}
-                </div>
-              </div>
+                    {isOpen && sec.render()}
+                  </div>
+                )
+              })}
 
             </div>
 
