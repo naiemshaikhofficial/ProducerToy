@@ -260,6 +260,42 @@ export function GlobalCheckoutModal() {
     }
   }
 
+  const recordCompletedGifts = (orderItems: any[]) => {
+    try {
+      const giftItems = orderItems.filter((i) => i.is_gift || i.gift_recipient_email)
+      if (giftItems.length > 0) {
+        const existingGifts = JSON.parse(localStorage.getItem('pt_user_gifts') || '[]')
+        giftItems.forEach((item) => {
+          const giftId = `gift-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`
+          const claimCode = `PT-GIFT-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+          existingGifts.unshift({
+            id: giftId,
+            productId: item.id,
+            productName: item.name,
+            productSlug: item.slug,
+            coverImage: item.cover_image,
+            senderEmail: user?.email || billingDetails.email || 'Producer',
+            recipientEmail: item.gift_recipient_email || 'recipient@example.com',
+            message: item.gift_message || 'Enjoy the gift!',
+            sendDate: item.gift_send_date || new Date().toISOString().split('T')[0],
+            priceUsd: item.price_usd,
+            priceInr: item.price_inr,
+            createdAt: new Date().toISOString(),
+            status: 'sent',
+            claimCode: claimCode,
+          })
+        })
+        localStorage.setItem('pt_user_gifts', JSON.stringify(existingGifts))
+        localStorage.removeItem('pt_pending_gifts')
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('storage'))
+        }
+      }
+    } catch (e) {
+      console.error('Error recording gift order:', e)
+    }
+  }
+
   const handleFreeCheckout = async () => {
     if (!validateForm()) return
     setLoading(true)
@@ -288,6 +324,7 @@ export function GlobalCheckoutModal() {
         }
       )
       if (res.success) {
+        recordCompletedGifts(items)
         clearCart()
         setPaymentStatus('success')
       } else {
@@ -378,6 +415,7 @@ export function GlobalCheckoutModal() {
             })
 
             if (verifyRes.success) {
+              recordCompletedGifts(items)
               clearCart()
               setPaymentStatus('success')
             } else {
@@ -401,6 +439,7 @@ export function GlobalCheckoutModal() {
   }
 
   const handlePayPalSuccess = () => {
+    recordCompletedGifts(items)
     clearCart()
     setPaymentStatus('success')
   }

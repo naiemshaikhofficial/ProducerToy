@@ -369,7 +369,10 @@ export function SendGiftModal({
                   {product.name}
                 </h3>
                 <div className="text-lg font-black text-white">
-                  {formatPrice(product.price_inr, product.price_usd)}
+                  {formatPrice(
+                    product.price_inr ? Number(product.price_inr) : undefined,
+                    Number(product.price_usd) || 0
+                  )}
                 </div>
               </div>
 

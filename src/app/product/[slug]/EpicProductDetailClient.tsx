@@ -27,6 +27,7 @@ import { useAudio } from '@/context/AudioContext'
 import { useAuth } from '@/context/AuthContext'
 import { ToywardsSparkleIcon } from '@/components/account/RewardsAndWalletTab'
 import { ProductSpecsOverview } from '@/components/ProductTypeSpecs'
+import { SendGiftModal } from '@/components/gifts/SendGiftModal'
 
 function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -984,68 +985,13 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       </div>
 
       {/* ========================================================================= */}
-      {/* GIFT MODAL POPUP                                                          */}
+      {/* 1:1 SEND GIFT MODAL POPUP (Exact Screenshots 1 & 2 Match)                 */}
       {/* ========================================================================= */}
-      {giftModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-xs animate-in fade-in"
-            onClick={() => setGiftModalOpen(false)}
-          />
-          <div className="relative z-10 w-full max-w-md bg-[#181818] border border-[#2c2c2c] rounded-2xl p-6 space-y-4 shadow-2xl animate-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Gift className="w-5 h-5 text-[#FA742B]" />
-                <span>Gift this Product</span>
-              </h3>
-              <button
-                onClick={() => setGiftModalOpen(false)}
-                className="text-zinc-400 hover:text-white cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-xs text-zinc-300">
-              Send <strong className="text-white">{product.name}</strong> as a digital gift license directly to a fellow producer or friend's email.
-            </p>
-
-            <input
-              type="email"
-              placeholder="recipient@example.com"
-              value={giftRecipient}
-              onChange={(e) => setGiftRecipient(e.target.value)}
-              className="w-full bg-[#141414] border border-[#2c2c2c] text-white text-xs px-3.5 py-3 rounded-xl outline-none focus:border-[#FA742B]"
-            />
-
-            {giftSaved && (
-              <p className="text-xs font-bold text-green-400">
-                Gift details saved! Complete checkout to send the gift key.
-              </p>
-            )}
-
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#242424]">
-              <button
-                type="button"
-                onClick={() => setGiftModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-[#242424] text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setGiftSaved(true)
-                  setTimeout(() => setGiftModalOpen(false), 1200)
-                }}
-                className="px-5 py-2 rounded-xl bg-[#FA742B] hover:bg-[#E05A18] text-white text-xs font-extrabold uppercase cursor-pointer"
-              >
-                Save Gift Info
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SendGiftModal
+        isOpen={giftModalOpen}
+        onClose={() => setGiftModalOpen(false)}
+        product={product}
+      />
 
     </div>
   )
