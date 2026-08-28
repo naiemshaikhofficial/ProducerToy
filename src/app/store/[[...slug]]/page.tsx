@@ -2,14 +2,11 @@ import React from 'react'
 import { Metadata } from 'next'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { ProductCard, Product } from '@/components/ProductCard'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Handshake } from 'lucide-react'
-import { CategoryFilterBar } from '@/components/CategoryFilterBar'
 import { LocalDataCache } from '@/components/LocalDataCache'
 import { matchesSearchQuery } from '@/lib/search'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 import { CollectionPageJsonLd } from '@/components/JsonLd'
+import { EpicStoreBrowser } from '@/components/store/EpicStoreBrowser'
 
 export const revalidate = 1800 // Cache static page for 30 minutes (instant 0ms loading, revalidated via /api/revalidate)
 
@@ -133,7 +130,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   const { slug } = await params
   const {
     q: queryText = '',
-    sort: sortOption = 'popularity',
+    sort: sortOption = 'newest',
     free: freeParam,
     deals: dealsParam,
     bundles: bundlesParam,
@@ -153,7 +150,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
   let products: Product[] = []
   let categoriesOptions: Array<{ id: string; name: string; slug: string }> = []
-  let brandsOptions: Array<{ id: string; name: string; slug: string }> = []
+  let brandsOptions: Array<{ id: string; name: string; slug: string; logo_url?: string | null }> = []
   let selectedBrand: { id: string; name: string; slug: string; logo_url: string | null; description?: string | null } | null = null
   let isFromDatabase = false
 
@@ -351,9 +348,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   const getHeaderMeta = () => {
     if (selectedBrand) {
       return {
-        subLabel: null,
         title: selectedBrand.name,
-        logo: selectedBrand.logo_url,
         description: selectedBrand.description || `Explore premier VST plugins, sample packs, and sound design tools created by ${selectedBrand.name}.`
       }
     }
@@ -361,9 +356,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     if (subTypeSlug) {
       const formattedSub = subTypeSlug.replace(/-/g, ' ')
       return {
-        subLabel: null,
         title: formattedSub.toUpperCase(),
-        logo: null,
         description: `Explore top-rated ${formattedSub} plugins and presets curated for mixing, mastering, and modern sound design.`
       }
     }
@@ -372,199 +365,65 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       switch (categorySlug.toLowerCase()) {
         case 'plugins':
           return {
-            subLabel: null,
             title: 'VST Plugins',
-            logo: null,
             description: 'Browse premier VST audio plugins, analog saturators, synths, and mixing processors crafted for professional music producers.'
           }
         case 'sample-packs':
         case 'sounds':
         case 'samples':
           return {
-            subLabel: null,
             title: 'Sample Packs & Drum Kits',
-            logo: null,
             description: 'Explore high-quality royalty-free 808 sub basses, drum kits, vocal chops, and melody loops ready for your DAW.'
           }
         case 'presets':
           return {
-            subLabel: null,
             title: 'Synth & Mixing Presets',
-            logo: null,
             description: 'Instantly upgrade your sound with synth presets for Serum, Vital, and DAW vocal chain mixing templates.'
           }
         case 'templates':
           return {
-            subLabel: null,
             title: 'DAW Templates & Stems',
-            logo: null,
             description: 'Full DAW project templates designed to jumpstart your track creation and learn pro arrangement techniques.'
           }
         default:
           const formattedCat = categorySlug.replace(/-/g, ' ')
           return {
-            subLabel: null,
             title: formattedCat.charAt(0).toUpperCase() + formattedCat.slice(1),
-            logo: null,
             description: `Discover top tools and resources under ${formattedCat}.`
           }
       }
     }
 
     return {
-      subLabel: null,
       title: 'Store Catalog',
-      logo: null,
       description: 'Discover the premier marketplace for VST plugins, royalty-free sample packs, synth presets, and DAW templates.'
     }
   }
 
-  const { subLabel, title, logo, description } = getHeaderMeta()
-  const baseUrl = categorySlug ? `/store/${categorySlug}` : '/store'
-  const activeFilter = isFree ? 'free' : isDeals ? 'deals' : isBundles ? 'bundles' : isRentToOwn ? 'rent' : 'all'
+  const { title, description } = getHeaderMeta()
 
   return (
-    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 bg-[#121212] min-h-screen text-white select-none">
+    <div className="w-full bg-[#121212] min-h-screen text-white select-none">
       <LocalDataCache data={{ categories: categoriesOptions, brands: brandsOptions }} />
       
-      {/* Header (Title, Description) */}
-      <div className="space-y-2 pt-2">
-        {subLabel && (
-          <span className="text-xs font-black uppercase tracking-wider text-zinc-400 block">
-            {subLabel}
-          </span>
-        )}
-        <div className="flex items-center gap-4">
-          {logo && (
-            <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-black/40 border border-zinc-800 flex-shrink-0">
-              <Image src={logo} alt={title} fill className="object-contain p-1" />
-            </div>
-          )}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white uppercase flex items-center gap-3">
-            {title}
-          </h1>
-        </div>
-        <p className="text-xs sm:text-sm text-zinc-400 max-w-3xl leading-relaxed pt-1">
-          {description}
-        </p>
-      </div>
-
-      {/* Quick Filter Pills (All, Deals, Free, Bundles, Rent to Own) */}
-      <div className="flex flex-wrap items-center gap-3 pt-2">
-        <Link
-          href={baseUrl}
-          prefetch={true}
-          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
-            activeFilter === 'all'
-              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
-              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
-          }`}
-        >
-          All
-        </Link>
-
-        <Link
-          href={`${baseUrl}?deals=true`}
-          prefetch={true}
-          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
-            activeFilter === 'deals'
-              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
-              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
-          }`}
-        >
-          Deals
-        </Link>
-
-        <Link
-          href={`${baseUrl}?free=true`}
-          prefetch={true}
-          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
-            activeFilter === 'free'
-              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
-              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
-          }`}
-        >
-          Free
-        </Link>
-
-        <Link
-          href={`${baseUrl}?bundles=true`}
-          prefetch={true}
-          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
-            activeFilter === 'bundles'
-              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
-              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
-          }`}
-        >
-          Bundles
-        </Link>
-
-        <Link
-          href={`${baseUrl}?rent_to_own=true`}
-          prefetch={true}
-          className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
-            activeFilter === 'rent'
-              ? 'bg-[#2b2b2b] text-white border border-zinc-600 shadow-md'
-              : 'bg-[#1a1a1a] text-zinc-400 hover:text-white hover:bg-[#242424] border border-zinc-800'
-          }`}
-        >
-          Rent to Own
-        </Link>
-      </div>
-
-      {/* Interactive Dropdown Filter Bar (Category, Brand, Price, Popularity Sort) */}
-      <CategoryFilterBar
+      {/* 1:1 Epic Games Store Browser with Two-Column Filter System & Orange Theme */}
+      <EpicStoreBrowser
+        products={products}
         categories={categoriesOptions}
         brands={brandsOptions}
-        activeCategory={catParam || subTypeSlug}
-        activeBrand={brandParam}
-        activePrice={priceParam}
+        activeCategorySlug={categorySlug}
+        activeSubTypeSlug={subTypeSlug}
+        activeBrandSlug={brandParam}
+        activeQuery={queryText}
         activeSort={sortOption}
+        isDealsActive={isDeals}
+        isFreeActive={isFree}
+        isBundlesActive={isBundles}
+        isRentActive={isRentToOwn}
+        activePriceTier={priceParam}
+        headerTitle={title}
+        headerDescription={description}
       />
-
-      {/* Product Grid or Brand Tying-Up Banner */}
-      {products.length === 0 ? (
-        selectedBrand ? (
-          <div className="text-center py-16 px-6 rounded-3xl bg-[#161616] border border-[#262626] max-w-3xl mx-auto shadow-2xl space-y-4 my-8">
-            <div className="w-16 h-16 rounded-2xl bg-[#202020] border border-[#2a2a2a] text-white flex items-center justify-center mx-auto shadow-inner">
-              <Handshake className="w-8 h-8" />
-            </div>
-            <p className="text-xs font-extrabold uppercase tracking-widest text-zinc-400">
-              Partnering in Progress
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              We are tying up with {selectedBrand.name}!
-            </h2>
-            <p className="text-sm text-zinc-300 max-w-xl mx-auto leading-relaxed">
-              {selectedBrand.description || `We are currently tying up with ${selectedBrand.name} to bring their complete catalog of VST plugins, sample tools, and presets to ProducerToy. Stay tuned!`}
-            </p>
-            <div className="pt-4 flex items-center justify-center gap-4 flex-wrap">
-              <Link href="/manufacturers" prefetch={true} className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-xl uppercase transition-all shadow-lg">
-                Browse All Manufacturers
-              </Link>
-              <Link href="/store" prefetch={true} className="bg-[#202020] hover:bg-[#282828] text-white font-extrabold text-xs py-3 px-6 rounded-xl border border-[#303030] uppercase transition-all">
-                Explore Available Products
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center py-20 px-6 rounded-2xl bg-[#161616] border border-[#262626] max-w-xl mx-auto my-8 space-y-3">
-            <p className="text-lg font-bold text-white tracking-tight">No products found matching your filter</p>
-            <p className="text-xs text-zinc-400">Try searching for another keyword or clearing category filters.</p>
-            <div className="pt-2">
-              <Link href="/store" prefetch={true} className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs py-3 px-6 rounded-full inline-block uppercase transition-all shadow-lg">
-                Reset Store Catalog
-              </Link>
-            </div>
-          </div>
-        )
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-8 sm:gap-x-6 sm:gap-y-10">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
 
       <CollectionPageJsonLd
         title={selectedBrand ? `${selectedBrand.name} Plugins & Sounds` : categorySlug ? `${categorySlug} Store` : 'Producer Toy Store'}
@@ -577,8 +436,6 @@ export default async function StorePage({ params, searchParams }: StorePageProps
           image: p.cover_image,
         }))}
       />
-
-      <LocalDataCache data={{ products, categories: categoriesOptions, brands: brandsOptions }} />
     </div>
   )
 }
