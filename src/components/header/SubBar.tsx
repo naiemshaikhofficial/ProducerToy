@@ -200,19 +200,19 @@ export const SubBar: React.FC<SubBarProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* Exact Epic Games Store Mobile Dropdown Menu (Seamless Extension)           */}
+      {/* Exact Epic Games Store Mobile Dropdown Menu                                */}
       {/* ========================================================================= */}
       {isDiscoverMenuOpen && (
         <div ref={discoverMenuRef} className="md:hidden">
           {/* Dark Dimmed Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/70 z-40"
+            className="fixed inset-0 bg-black/75 z-40"
             onClick={() => setIsDiscoverMenuOpen(false)}
           />
 
-          {/* Seamless Subheader Dropdown: Full Width Edge-to-Edge, Identical #121212 Color, No Bottom Border */}
-          <div className="absolute top-full left-0 right-0 w-full bg-[#121212] border-none shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-1">
-            <div className="w-full px-5 sm:px-6 flex flex-col">
+          {/* Epic Centered Card attached to Subbar with Rounded Bottom Corners & Inner Padding */}
+          <div className="absolute top-full left-2 right-2 max-w-[340px] mx-auto bg-[#181818] rounded-b-2xl shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
+            <div className="px-6 flex flex-col">
               {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
                 const isSelected = item.label === currentSectionLabel
                 const isLast = idx === MOBILE_DISCOVER_OPTIONS.length - 1
@@ -224,13 +224,13 @@ export const SubBar: React.FC<SubBarProps> = ({
                       onClick={() => setIsDiscoverMenuOpen(false)}
                       className={`block py-3.5 text-[15px] tracking-normal transition-colors ${
                         isSelected
-                          ? 'text-white font-medium'
+                          ? 'text-white font-semibold'
                           : 'text-zinc-400 font-normal hover:text-white'
                       }`}
                     >
                       {item.label}
                     </Link>
-                    {!isLast && <div className="w-full h-[1px] bg-[#222222]" />}
+                    {!isLast && <div className="w-full h-[1px] bg-[#282828]" />}
                   </div>
                 )
               })}
