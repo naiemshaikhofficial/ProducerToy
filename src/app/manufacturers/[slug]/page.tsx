@@ -45,16 +45,16 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
   const cleanSlug = decodeURIComponent(slug).trim().toLowerCase()
   const supabase = getAdminClient()
 
-  const { data: brand } = await supabase
+  const { data: dbBrand } = await supabase
     .from('brands')
     .select('id, name, slug, description, logo_url')
     .eq('slug', cleanSlug)
     .maybeSingle()
 
-  if (!brand) {
-    return {
-      title: 'Brand Not Found | Producer Toy Store',
-    }
+  const brand = dbBrand || {
+    name: cleanSlug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+    description: `Browse audio plugins and music tools by ${cleanSlug}.`,
+    slug: cleanSlug,
   }
 
   const title = `${brand.name} VST Plugins, Samples & Audio Software — Producer Toy`
@@ -95,13 +95,43 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
       .limit(8),
   ])
 
-  const brand = brandRes.data
+  const allProducts = (productsRes.data || []) as Product[]
+  const allBrands = (otherBrandsRes.data || [])
+
+  // Resolve brand from DB or construct gracefully from slug
+  let brand = brandRes.data
   if (!brand) {
-    notFound()
+    // Try to find in allProducts or otherBrands
+    const matchedBrand = allBrands.find(
+      (b) => b.slug.toLowerCase() === cleanSlug || b.name.toLowerCase().includes(cleanSlug)
+    )
+    if (matchedBrand) {
+      brand = {
+        id: matchedBrand.id,
+        name: matchedBrand.name,
+        slug: matchedBrand.slug,
+        logo_url: matchedBrand.logo_url,
+        description: `Explore top-rated audio plugins and sound libraries created by ${matchedBrand.name}.`,
+        website_url: null,
+      }
+    } else {
+      // Graceful fallback brand object so no 404 is ever thrown
+      const formattedBrandName = cleanSlug
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ')
+
+      brand = {
+        id: cleanSlug,
+        name: formattedBrandName,
+        slug: cleanSlug,
+        logo_url: null,
+        description: `Discover premier VST plugins, preset banks, and sound packs by ${formattedBrandName}.`,
+        website_url: null,
+      }
+    }
   }
 
-  const allProducts = (productsRes.data || []) as Product[]
-  
   // Filter products by this brand (either by brand_id or brand name / slug)
   let brandProducts = allProducts.filter((p) => {
     const pBrandSlug = p.brands?.slug?.toLowerCase() || p.brand?.toLowerCase()

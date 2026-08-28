@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import {
   Search,
   ChevronDown,
@@ -63,7 +63,7 @@ const PRODUCT_TYPES = [
   { id: 'bundle', label: 'Bundles & Suites', slug: 'bundles' },
 ]
 
-const GENRES_EFFECTS = [
+const BASE_GENRES = [
   { id: 'reverb', label: 'Reverb' },
   { id: 'delay', label: 'Delay & Echo' },
   { id: 'compressor', label: 'Compressor' },
@@ -98,8 +98,8 @@ const FEATURES_LIST = [
 
 export function EpicStoreBrowser({
   products,
-  categories,
-  brands,
+  categories = [],
+  brands = [],
   activeCategorySlug = '',
   activeSubTypeSlug = '',
   activeBrandSlug = '',
@@ -110,6 +110,8 @@ export function EpicStoreBrowser({
   isBundlesActive = false,
   isRentActive = false,
   activePriceTier = '',
+  headerTitle,
+  headerDescription,
 }: EpicStoreBrowserProps) {
   const router = useRouter()
 
@@ -163,6 +165,18 @@ export function EpicStoreBrowser({
     }))
   }
 
+  // Dynamically merge Supabase categories with base genres for full database fidelity
+  const dynamicGenres = useMemo(() => {
+    const list = [...BASE_GENRES]
+    categories.forEach((c) => {
+      const slugKey = c.slug || c.id
+      if (!list.some((e) => e.id === slugKey)) {
+        list.push({ id: slugKey, label: c.name })
+      }
+    })
+    return list
+  }, [categories])
+
   // Active filter counts per section
   const eventsCount = (selectedEvents.discounted ? 1 : 0) + (selectedEvents.free ? 1 : 0) + (selectedEvents.rentToOwn ? 1 : 0)
   const priceCount = selectedPriceTiers.length
@@ -193,7 +207,7 @@ export function EpicStoreBrowser({
     router.push('/store', { scroll: false })
   }
 
-  // Filter products in-memory
+  // Filter products in-memory for instant 0ms response without recurring DB calls
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       if (searchKeyword.trim()) {
@@ -502,7 +516,7 @@ export function EpicStoreBrowser({
         defaultOpen: genresCount > 0,
         render: () => (
           <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-            {[...GENRES_EFFECTS]
+            {[...dynamicGenres]
               .sort((a, b) => {
                 const aChecked = selectedGenres.includes(a.id) ? 1 : 0
                 const bChecked = selectedGenres.includes(b.id) ? 1 : 0
@@ -568,7 +582,7 @@ export function EpicStoreBrowser({
                     onChange={() => {
                       setSelectedPlatforms((prev) =>
                         prev.includes(plat.id)
-                          ? prev.filter((id) => id !== plat.id)
+                          ? prev.filter((p) => p !== plat.id)
                           : [...prev, plat.id]
                       )
                     }}
@@ -687,6 +701,7 @@ export function EpicStoreBrowser({
     selectedPlatforms,
     selectedFeatures,
     selectedBrands,
+    dynamicGenres,
     brands,
   ])
 
@@ -703,6 +718,22 @@ export function EpicStoreBrowser({
     <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-24">
       <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         
+        {/* ========================================================================= */}
+        {/* PAGE HEADER: TITLE & DESCRIPTION (Restored as requested)                 */}
+        {/* ========================================================================= */}
+        {headerTitle && (
+          <div className="space-y-1.5 pb-6 pt-1">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white uppercase">
+              {headerTitle}
+            </h1>
+            {headerDescription && (
+              <p className="text-xs sm:text-sm text-zinc-400 max-w-3xl leading-relaxed">
+                {headerDescription}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* ========================================================================= */}
         {/* 1. TOP BAR: SHOW DROPDOWN + ACTIVE FILTER TAGS                             */}
         {/* ========================================================================= */}
