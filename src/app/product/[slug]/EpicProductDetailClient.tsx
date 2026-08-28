@@ -236,7 +236,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       {/* 1. TOP TITLE HEADER (Exact 1:1 Match)                                     */}
       {/* ========================================================================= */}
       <div>
-        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
           {product.name}
         </h1>
       </div>
@@ -245,7 +245,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       {/* 2. SUB-NAVIGATION BAR (Exact 1:1 Match)                                   */}
       {/* ========================================================================= */}
       <div className="border-b border-[#202020]">
-        <div className="flex items-center gap-8 text-sm font-semibold overflow-x-auto custom-scrollbar">
+        <div className="flex items-center gap-8 text-sm font-medium overflow-x-auto custom-scrollbar">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'addons', label: 'Presets & Sounds' },
@@ -256,7 +256,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`py-3 relative transition-colors cursor-pointer whitespace-nowrap text-[14px] ${
-                activeTab === tab.id ? 'text-white font-bold' : 'text-zinc-400 hover:text-white font-normal'
+                activeTab === tab.id ? 'text-white font-semibold' : 'text-zinc-400 hover:text-white font-normal'
               }`}
             >
               <span>{tab.label}</span>
@@ -289,10 +289,10 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         <div className="bg-[#181818] border border-[#262626] rounded-xl p-4 flex items-center gap-3.5 shadow-sm">
           <div className="w-12 h-12 rounded-lg bg-[#222222] border border-[#333333] flex flex-col items-center justify-center text-center flex-shrink-0">
             <span className="text-[10px] font-bold text-[#FA742B] uppercase leading-none">AUDIO</span>
-            <span className="text-sm font-black text-white leading-tight">100%</span>
+            <span className="text-sm font-bold text-white leading-tight">100%</span>
           </div>
           <div>
-            <div className="text-sm font-bold text-white leading-tight">
+            <div className="text-sm font-semibold text-white leading-tight">
               100% Royalty-Free
             </div>
             <div className="text-xs text-zinc-400 mt-0.5">
@@ -303,7 +303,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
 
         {/* C. Category Tag Pill (Centered) */}
         <div className="flex justify-center">
-          <span className="bg-[#242424] text-zinc-300 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-lg border border-[#303030]">
+          <span className="bg-[#242424] text-zinc-300 text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-lg border border-[#303030]">
             {formattedType(product.product_type)}
           </span>
         </div>
@@ -312,12 +312,12 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         <div className="space-y-1 text-left">
           <div className="flex items-center gap-3 flex-wrap">
             {Number(product.price_usd) === 0 ? (
-              <span className="text-3xl font-black text-white">FREE</span>
+              <span className="text-3xl font-bold text-white">FREE</span>
             ) : (
               <>
                 {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
                   <>
-                    <span className="text-xs bg-[#FA742B] text-white font-extrabold px-2 py-0.5 rounded">
+                    <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-0.5 rounded">
                       -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
                     </span>
                     <span className="text-base text-zinc-500 line-through">
@@ -325,7 +325,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                     </span>
                   </>
                 )}
-                <span className="text-3xl font-black text-white">
+                <span className="text-3xl font-bold text-white">
                   {formatPrice(product.price_inr, product.price_usd)}
                 </span>
               </>
@@ -341,7 +341,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               href={product.external_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-4 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+              className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
             >
               <ExternalLink className="w-4 h-4" />
               <span>{product.button_text || 'Get Now'}</span>
@@ -351,7 +351,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               <button
                 type="button"
                 onClick={handleGetNow}
-                className="flex-1 py-4 px-6 text-sm font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.98] shadow-lg shadow-[#FA742B]/20"
+                className="flex-1 py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.98] shadow-lg shadow-[#FA742B]/20"
               >
                 <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
               </button>
@@ -705,7 +705,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             {/* Detailed Description & Read More (Screenshot 4 Match) */}
             {activeTab === 'overview' && product.full_description && (
               <div className="space-y-3 pt-2">
-                <h3 className="text-xl font-black text-white tracking-tight">About {product.name}</h3>
+                <h3 className="text-xl font-bold text-white tracking-tight">About {product.name}</h3>
                 <div
                   className={`text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal transition-all ${
                     !isDescExpanded ? 'max-h-48 overflow-hidden relative' : ''
@@ -720,7 +720,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 <button
                   type="button"
                   onClick={() => setIsDescExpanded(!isDescExpanded)}
-                  className="text-xs font-bold text-zinc-300 hover:text-white flex items-center gap-1.5 pt-1 cursor-pointer transition-colors"
+                  className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 pt-1 cursor-pointer transition-colors"
                 >
                   <span>{isDescExpanded ? 'Show less' : 'Show more'}</span>
                   {isDescExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -770,7 +770,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           </div>
 
           <div>
-            <span className="bg-[#242424] text-zinc-200 text-xs font-bold px-3 py-1 rounded-md inline-block uppercase tracking-wider border border-[#303030]">
+            <span className="bg-[#242424] text-zinc-200 text-xs font-semibold px-3 py-1 rounded-md inline-block uppercase tracking-wider border border-[#303030]">
               {formattedType(product.product_type)}
             </span>
           </div>
@@ -778,12 +778,12 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           <div className="space-y-2">
             <div className="flex items-center gap-3 flex-wrap">
               {Number(product.price_usd) === 0 ? (
-                <span className="text-3xl font-black text-white">FREE</span>
+                <span className="text-3xl font-bold text-white">FREE</span>
               ) : (
                 <>
                   {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
                     <>
-                      <span className="text-xs bg-[#FA742B] text-white font-extrabold px-2 py-1 rounded">
+                      <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-1 rounded">
                         -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
                       </span>
                       <span className="text-base text-zinc-500 line-through">
@@ -791,7 +791,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                       </span>
                     </>
                   )}
-                  <span className="text-3xl font-black text-white">
+                  <span className="text-3xl font-bold text-white">
                     {formatPrice(product.price_inr, product.price_usd)}
                   </span>
                 </>
@@ -808,7 +808,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               >
                 <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
                 <span className="text-zinc-300">
-                  Earn <span className="text-[#FA742B] font-bold">Toywards Rewards</span> on this purchase
+                  Earn <span className="text-[#FA742B] font-semibold">Toywards Rewards</span> on this purchase
                 </span>
               </Link>
             )}
@@ -821,7 +821,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 href={product.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
@@ -831,7 +831,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 <button
                   type="button"
                   onClick={handleGetNow}
-                  className="flex-1 py-3.5 px-6 text-sm font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
+                  className="flex-1 py-3.5 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
                 >
                   <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
                 </button>

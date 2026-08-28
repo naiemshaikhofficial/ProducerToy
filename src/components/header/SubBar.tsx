@@ -85,7 +85,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
-      <div className="flex md:hidden w-full px-4 sm:px-6 h-[54px] items-center justify-between relative">
+      <div className="flex md:hidden w-full px-4 sm:px-6 h-[50px] sm:h-[54px] items-center justify-between relative">
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
@@ -97,14 +97,14 @@ export const SubBar: React.FC<SubBarProps> = ({
             className="w-full flex items-center gap-2 animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="relative flex-1">
-              <Search className="w-5 h-5 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 ref={mobileInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store"
-                className="w-full bg-[#202020] text-white text-sm pl-11 pr-8 h-[42px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400 font-sans"
+                className="w-full bg-[#202020] text-white text-sm pl-10 pr-8 h-[38px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400 font-sans"
               />
               {searchQuery && (
                 <button
@@ -119,103 +119,106 @@ export const SubBar: React.FC<SubBarProps> = ({
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(false)}
-              className="text-sm font-semibold text-zinc-300 hover:text-white px-2 py-1"
+              className="text-sm font-medium text-zinc-300 hover:text-white px-2 py-1"
             >
               Cancel
             </button>
           </form>
         ) : (
-          /* Normal Mobile SubBar: Search Icon (Left) + Discover ▾ (Center) */
+          /* Normal Mobile SubBar: Left Group (Search + Discover ▾) & Right Group (Wishlist, Gifts, Cart) */
           <>
-            {/* Search Icon Trigger (Bigger size matching Epic Games) */}
-            <button
-              type="button"
-              onClick={() => setIsMobileSearchOpen(true)}
-              className="p-1.5 text-zinc-200 hover:text-white transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
-              aria-label="Open search"
-            >
-              <Search className="w-[21px] h-[21px] stroke-[2.2]" />
-            </button>
-
-            {/* Discover ▾ Selector Dropdown (Exact True Screen Center & Bigger Font) */}
-            <div ref={discoverMenuRef} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-30">
+            {/* Left Group: Search Icon + Discover Selector (No collision with right icons) */}
+            <div className="flex items-center gap-3.5 sm:gap-5">
+              {/* Search Icon Trigger */}
               <button
                 type="button"
-                onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1.5 text-[17px] font-extrabold text-white hover:text-zinc-200 transition-colors py-1.5 px-2 cursor-pointer select-none tracking-tight"
+                onClick={() => setIsMobileSearchOpen(true)}
+                className="p-1 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
+                aria-label="Open search"
               >
-                <span>{currentSectionLabel}</span>
-                <ChevronDown className={`w-4 h-4 text-zinc-300 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
+                <Search className="w-[19px] h-[19px] stroke-[1.8]" />
               </button>
 
-              {/* Exact Epic Games Store Mobile Dropdown Menu (Centered in the middle) */}
-              {isDiscoverMenuOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 top-0 bg-black/75 z-40"
-                    onClick={() => setIsDiscoverMenuOpen(false)}
-                  />
+              {/* Discover ▾ Selector Dropdown (Clean Epic Games style: regular/medium weight, elegant spacing) */}
+              <div ref={discoverMenuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
+                  className="flex items-center gap-1.5 text-[14px] sm:text-[15px] font-normal text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer select-none tracking-normal"
+                >
+                  <span>{currentSectionLabel}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-zinc-300 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
+                </button>
 
-                  <div className="fixed left-1/2 -translate-x-1/2 top-[110px] w-[92vw] max-w-[400px] bg-[#121212] shadow-2xl px-7 pt-6 pb-8 z-50 animate-in fade-in duration-150 border-b border-[#202020] rounded-b-2xl">
-                    <div className="flex flex-col">
-                      {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
-                        const isSelected = item.label === currentSectionLabel
-                        const isLast = idx === MOBILE_DISCOVER_OPTIONS.length - 1
-                        return (
-                          <div key={item.label}>
-                            <Link
-                              href={item.href}
-                              prefetch={true}
-                              onClick={() => setIsDiscoverMenuOpen(false)}
-                              className={`block py-4 text-[19px] sm:text-[20px] tracking-wide transition-colors ${
-                                isSelected
-                                  ? 'text-white font-black'
-                                  : 'text-zinc-400 font-normal hover:text-white'
-                              }`}
-                            >
-                              {item.label}
-                            </Link>
-                            {!isLast && <div className="w-full h-[1px] bg-[#222222]" />}
-                          </div>
-                        )
-                      })}
+                {/* Epic Games Store Mobile Dropdown Menu */}
+                {isDiscoverMenuOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 top-0 bg-black/70 z-40"
+                      onClick={() => setIsDiscoverMenuOpen(false)}
+                    />
+
+                    <div className="fixed left-4 right-4 top-[108px] max-w-[360px] mx-auto bg-[#181818] shadow-2xl px-6 py-4 z-50 animate-in fade-in duration-150 border border-[#282828] rounded-xl">
+                      <div className="flex flex-col">
+                        {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
+                          const isSelected = item.label === currentSectionLabel
+                          const isLast = idx === MOBILE_DISCOVER_OPTIONS.length - 1
+                          return (
+                            <div key={item.label}>
+                              <Link
+                                href={item.href}
+                                prefetch={true}
+                                onClick={() => setIsDiscoverMenuOpen(false)}
+                                className={`block py-3 text-[15px] sm:text-[16px] tracking-normal transition-colors ${
+                                  isSelected
+                                    ? 'text-white font-semibold'
+                                    : 'text-zinc-400 font-normal hover:text-white'
+                                }`}
+                              >
+                                {item.label}
+                              </Link>
+                              {!isLast && <div className="w-full h-[1px] bg-[#242424]" />}
+                            </div>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
 
-            {/* Right Icons: Wishlist, Gifts, Cart (Exact Screenshot Match: Bigger & Spacious) */}
-            <div className="flex items-center gap-5 sm:gap-6 text-zinc-200">
+            {/* Right Group: Wishlist, Gifts, Cart (Clean spacing, responsive) */}
+            <div className="flex items-center gap-3.5 sm:gap-5 text-zinc-300">
               <Link
                 href="/wishlist"
                 prefetch={true}
-                className="p-1 text-zinc-200 hover:text-white transition-colors active:scale-95"
+                className="p-1 text-zinc-300 hover:text-white transition-colors active:scale-95"
                 title="Wishlist"
               >
-                <Bookmark className="w-[21px] h-[21px] stroke-[2]" />
+                <Bookmark className="w-[19px] h-[19px] stroke-[1.8]" />
               </Link>
 
               <Link
                 href="/gifts"
                 prefetch={true}
                 className={`p-1 transition-colors active:scale-95 ${
-                  pathname === '/gifts' ? 'text-white' : 'text-zinc-200 hover:text-white'
+                  pathname === '/gifts' ? 'text-white' : 'text-zinc-300 hover:text-white'
                 }`}
                 title="Gifts"
               >
-                <Gift className="w-[21px] h-[21px] stroke-[2]" />
+                <Gift className="w-[19px] h-[19px] stroke-[1.8]" />
               </Link>
 
               <Link
                 href="/cart"
                 prefetch={true}
-                className="relative p-1 text-zinc-200 hover:text-white transition-colors active:scale-95 flex items-center"
+                className="relative p-1 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center"
                 title="Cart"
               >
-                <ShoppingCart className="w-[21px] h-[21px] stroke-[2]" />
+                <ShoppingCart className="w-[19px] h-[19px] stroke-[1.8]" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-[#FA742B] text-white text-[10px] font-black min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-md leading-none">
+                  <span className="absolute -top-1 -right-2 bg-[#FA742B] text-white text-[10px] font-bold min-w-[17px] h-[17px] px-1 rounded-full flex items-center justify-center shadow-md leading-none">
                     {itemCount}
                   </span>
                 )}
