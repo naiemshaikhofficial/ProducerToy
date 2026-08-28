@@ -617,6 +617,22 @@ export function EpicCheckoutLayout({
         {/* Bottom Action Area (Pay Now Button + Compliance Text) */}
         <div className="pt-4 space-y-3">
           
+          {/* Gift Refund Policy Agreement Checkbox (Exact Screenshot 3 Match) */}
+          {hasGiftItems && (
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#181818] border border-[#262626]">
+              <input
+                type="checkbox"
+                id="gift-refund-agree"
+                checked={giftRefundAgreed}
+                onChange={(e) => setGiftRefundAgreed(e.target.checked)}
+                className="mt-0.5 w-4 h-4 rounded bg-[#202020] border-[#383838] text-[#FA742B] focus:ring-0 accent-[#FA742B] cursor-pointer shrink-0"
+              />
+              <label htmlFor="gift-refund-agree" className="text-[11.5px] text-zinc-300 leading-snug cursor-pointer select-none">
+                If my gift is rejected by the recipient, I understand that ProducerToy will refund my purchase. If the refund to my original payment method cannot be completed, I authorize ProducerToy to issue the refund to my account balance instead, and I agree to the <Link href="/purchase-policy" target="_blank" className="text-[#FA742B] hover:underline">Purchase Terms</Link>.
+              </label>
+            </div>
+          )}
+
           {/* If International PayPal is explicitly selected */}
           {selectedMethod === 'paypal' && !isFree ? (
             user?.id ? (
@@ -643,7 +659,7 @@ export function EpicCheckoutLayout({
             <button
               type="button"
               onClick={handlePayClick}
-              disabled={loading || paymentStatus === 'processing'}
+              disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed)}
               className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-[6px] transition-all shadow-md flex items-center justify-center cursor-pointer disabled:opacity-60 active:scale-[0.99]"
             >
               {loading || paymentStatus === 'processing' ? (
