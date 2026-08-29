@@ -52,6 +52,8 @@ export interface Product {
   external_url?: string
   button_text?: string
   is_featured?: boolean
+  is_coming_soon?: boolean
+  release_date?: string | null
   created_at?: string | null
 }
 
@@ -249,7 +251,11 @@ export function ProductCard({ product }: { product: Product }) {
 
         {/* Price Row */}
         <div className="flex items-center gap-2 mt-1">
-          {isFree ? (
+          {product.is_coming_soon ? (
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
+              {product.release_date ? `Available ${product.release_date}` : 'Coming Soon'}
+            </span>
+          ) : isFree ? (
             <span className="text-sm font-bold text-white">Free</span>
           ) : (
             <>

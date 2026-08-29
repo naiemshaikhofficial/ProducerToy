@@ -22,6 +22,8 @@ export const CATALOG_PRODUCT_SELECT = `
   short_description,
   category_slugs,
   is_featured,
+  is_coming_soon,
+  release_date,
   is_active,
   created_at,
   brands ( id, name, slug, logo_url ),

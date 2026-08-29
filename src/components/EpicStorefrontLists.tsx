@@ -38,35 +38,38 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
   const [mobileActiveIndex, setMobileActiveIndex] = useState(0)
   const mobileScrollRef = useRef<HTMLDivElement>(null)
 
-  // 1. Column 1: Top Sellers / New Releases (5 products)
+  // 1. Column 1: Top Sellers / New Releases (Excluding Coming Soon)
   const topSellersList = useMemo<ListItemProduct[]>(() => {
-    return products.slice(0, 5).map((p, idx) => {
-      const priceUsd = Number(p.price_usd) || 0
-      const isFree = priceUsd === 0
-      return {
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        brand: p.brands?.name || p.brand || 'Producer Toy',
-        product_type: p.product_type,
-        price_usd: priceUsd,
-        price_inr: p.price_inr ? Number(p.price_inr) : convertUsdToInr(priceUsd),
-        original_price_usd: p.original_price_usd ? Number(p.original_price_usd) : undefined,
-        original_price_inr: p.original_price_inr ? Number(p.original_price_inr) : undefined,
-        cover_image: p.cover_image,
-        demo_audio_url: p.demo_audio_url,
-        vst_format: p.vst_format,
-        short_description: p.short_description,
-        statusBadge: isFree ? 'Free' : 'Now On Producer Toy',
-        statusType: isFree ? 'free' : 'new',
-        releaseDate: `Available 08/${24 + idx}/26`,
-      }
-    })
+    return products
+      .filter((p) => !p.is_coming_soon)
+      .slice(0, 5)
+      .map((p, idx) => {
+        const priceUsd = Number(p.price_usd) || 0
+        const isFree = priceUsd === 0
+        return {
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          brand: p.brands?.name || p.brand || 'Producer Toy',
+          product_type: p.product_type,
+          price_usd: priceUsd,
+          price_inr: p.price_inr ? Number(p.price_inr) : convertUsdToInr(priceUsd),
+          original_price_usd: p.original_price_usd ? Number(p.original_price_usd) : undefined,
+          original_price_inr: p.original_price_inr ? Number(p.original_price_inr) : undefined,
+          cover_image: p.cover_image,
+          demo_audio_url: p.demo_audio_url,
+          vst_format: p.vst_format,
+          short_description: p.short_description,
+          statusBadge: isFree ? 'Free' : 'Now On Producer Toy',
+          statusType: isFree ? 'free' : 'new',
+          releaseDate: `Available 08/${24 + idx}/26`,
+        }
+      })
   }, [products, convertUsdToInr])
 
-  // 2. Column 2: Coming Soon (Dynamically pulled from Database + curated upcoming flagship products)
+  // 2. Column 2: Coming Soon (Dynamically pulled strictly from Database is_coming_soon)
   const comingSoonList = useMemo<ListItemProduct[]>(() => {
-    const dbComingSoon: ListItemProduct[] = products
+    return products
       .filter((p) => Boolean(p.is_coming_soon))
       .map((p) => {
         const priceUsd = Number(p.price_usd) || 0
@@ -86,81 +89,18 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
           statusType: 'coming_soon',
         }
       })
-
-    const upcomingPresets: ListItemProduct[] = [
-      {
-        id: 'cs-1',
-        name: 'Oblivion 808 Distortion VST',
-        slug: 'oblivion-808-distortion-vst',
-        brand: 'Producer Toy',
-        product_type: 'plugin',
-        price_usd: 29.99,
-        cover_image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop',
-        short_description: 'Aggressive multi-band 808 saturation, sub-harmonics exciter and soft clipper.',
-        statusBadge: 'Coming Soon',
-        statusType: 'coming_soon',
-      },
-      {
-        id: 'cs-2',
-        name: 'Vocal Sauce Elite Processor',
-        slug: 'vocal-sauce-elite-processor',
-        brand: 'Producer Toy',
-        product_type: 'plugin',
-        price_usd: 39.99,
-        cover_image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop',
-        short_description: 'All-in-one vocal chain with pitch correction, air EQ, and lush studio reverb.',
-        statusBadge: 'Coming Soon',
-        statusType: 'coming_soon',
-      },
-      {
-        id: 'cs-3',
-        name: 'Cyberpunk Serum Presets Vol. 2',
-        slug: 'cyberpunk-serum-presets-vol-2',
-        brand: 'Producer Toy',
-        product_type: 'preset',
-        price_usd: 14.99,
-        cover_image: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=600&auto=format&fit=crop',
-        short_description: '80 Dystopian synthwave leads, gritty Reese basses, and holographic pads.',
-        statusBadge: 'Available 10/15/26',
-        statusType: 'coming_soon',
-      },
-      {
-        id: 'cs-4',
-        name: 'Vintage Tape Machine VST3',
-        slug: 'vintage-tape-machine-vst3',
-        brand: 'Producer Toy',
-        product_type: 'plugin',
-        price_usd: 24.99,
-        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
-        short_description: 'Warm reel-to-reel magnetic tape emulation with flutter, wow, and harmonic drive.',
-        statusBadge: 'Coming Soon',
-        statusType: 'coming_soon',
-      },
-      {
-        id: 'cs-5',
-        name: 'Dark Brooklyn Drill Drum Loops',
-        slug: 'dark-brooklyn-drill-drum-loops',
-        brand: 'Producer Toy',
-        product_type: 'sample_pack',
-        price_usd: 19.99,
-        cover_image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=600&auto=format&fit=crop',
-        short_description: 'Hard-hitting sliding 808s, punchy snare patterns, and dark piano melodies.',
-        statusBadge: 'Coming Soon',
-        statusType: 'coming_soon',
-      },
-    ]
-
-    const combined = [...dbComingSoon, ...upcomingPresets.filter((p) => !dbComingSoon.some((d) => d.slug === p.slug))]
-    return combined.slice(0, 5)
   }, [products, convertUsdToInr])
 
-  // 3. Column 3: Top Deals & Free (5 products with discounts or free)
+  // 3. Column 3: Top Deals & Free (Excluding Coming Soon)
   const topDealsList = useMemo<ListItemProduct[]>(() => {
-    return products.slice(0, 5).map((p) => {
-      const priceUsd = Number(p.price_usd) || 0
-      const isFree = priceUsd === 0
-      const originalPriceUsd = p.original_price_usd ? Number(p.original_price_usd) : (priceUsd > 0 ? priceUsd * 1.35 : 0)
-      const hasDiscount = originalPriceUsd > priceUsd && !isFree
+    return products
+      .filter((p) => !p.is_coming_soon)
+      .slice(0, 5)
+      .map((p) => {
+        const priceUsd = Number(p.price_usd) || 0
+        const isFree = priceUsd === 0
+        const originalPriceUsd = p.original_price_usd ? Number(p.original_price_usd) : (priceUsd > 0 ? priceUsd * 1.35 : 0)
+        const hasDiscount = originalPriceUsd > priceUsd && !isFree
       const discountPercent = hasDiscount
         ? Math.round(((originalPriceUsd - priceUsd) / originalPriceUsd) * 100)
         : 0

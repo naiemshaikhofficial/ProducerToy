@@ -448,28 +448,10 @@ export function EpicProductDetailClient({
           ) : product.is_coming_soon ? (
             <button
               type="button"
-              onClick={() =>
-                toggleWishlist({
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  brand: product.brands?.name || product.brand || 'Producer Toy',
-                  product_type: product.product_type || 'plugin',
-                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
-                  price_usd: Number(product.price_usd) || 0,
-                  cover_image: product.cover_image,
-                  vst_format: product.vst_format,
-                  short_description: product.short_description,
-                })
-              }
-              className={`w-full py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
-                isSaved
-                  ? 'bg-rose-950/50 border border-rose-600 text-rose-300'
-                  : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20 active:scale-95'
-              }`}
+              disabled
+              className="w-full py-4 px-6 rounded-xl text-sm font-black uppercase tracking-wider bg-[#222222] border border-[#333333] text-zinc-400 cursor-not-allowed flex items-center justify-center gap-2 select-none shadow-sm"
             >
-              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-300' : ''}`} />
-              <span>{isSaved ? 'In Wishlist (Get Notified)' : 'Add to Wishlist (Get Notified)'}</span>
+              <span>COMING SOON</span>
             </button>
           ) : (
             <div className="flex items-center gap-3">
@@ -497,18 +479,20 @@ export function EpicProductDetailClient({
             </div>
           )}
 
-          {/* Gift Button */}
-          <button
-            type="button"
-            onClick={() => setGiftModalOpen(true)}
-            className="w-full py-3.5 px-5 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
-          >
-            <Gift className="w-4 h-4 text-zinc-300" />
-            <span>Gift</span>
-            <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
-              New!
-            </span>
-          </button>
+          {/* Gift Button (Only if not coming soon) */}
+          {!product.is_coming_soon && (
+            <button
+              type="button"
+              onClick={() => setGiftModalOpen(true)}
+              className="w-full py-3.5 px-5 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
+            >
+              <Gift className="w-4 h-4 text-zinc-300" />
+              <span>Gift</span>
+              <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
+                New!
+              </span>
+            </button>
+          )}
 
           {/* Wishlist Button */}
           <button
@@ -954,28 +938,10 @@ export function EpicProductDetailClient({
             ) : product.is_coming_soon ? (
               <button
                 type="button"
-                onClick={() =>
-                  toggleWishlist({
-                    id: product.id,
-                    name: product.name,
-                    slug: product.slug,
-                    brand: product.brands?.name || product.brand || 'Producer Toy',
-                    product_type: product.product_type || 'plugin',
-                    price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
-                    price_usd: Number(product.price_usd) || 0,
-                    cover_image: product.cover_image,
-                    vst_format: product.vst_format,
-                    short_description: product.short_description,
-                  })
-                }
-                className={`w-full py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
-                  isSaved
-                    ? 'bg-rose-950/50 border border-rose-600 text-rose-300'
-                    : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20 active:scale-95'
-                }`}
+                disabled
+                className="w-full py-3.5 px-6 rounded-xl text-sm font-black uppercase tracking-wider bg-[#222222] border border-[#333333] text-zinc-400 cursor-not-allowed flex items-center justify-center select-none shadow-sm"
               >
-                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-300' : ''}`} />
-                <span>{isSaved ? 'In Wishlist (Get Notified)' : 'Add to Wishlist (Get Notified)'}</span>
+                <span>COMING SOON</span>
               </button>
             ) : (
               <div className="flex items-center gap-2">
@@ -1006,18 +972,20 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Gift Button */}
-            <button
-              type="button"
-              onClick={() => setGiftModalOpen(true)}
-              className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
-            >
-              <Gift className="w-4 h-4 text-zinc-300" />
-              <span>Gift</span>
-              <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
-                New!
-              </span>
-            </button>
+            {/* Gift Button (Only if not coming soon) */}
+            {!product.is_coming_soon && (
+              <button
+                type="button"
+                onClick={() => setGiftModalOpen(true)}
+                className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
+              >
+                <Gift className="w-4 h-4 text-zinc-300" />
+                <span>Gift</span>
+                <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
+                  New!
+                </span>
+              </button>
+            )}
 
             {/* Wishlist Button */}
             <button
