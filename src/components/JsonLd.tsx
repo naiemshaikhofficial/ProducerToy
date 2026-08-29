@@ -300,3 +300,42 @@ export function BreadcrumbJsonLd({
   )
 }
 
+export function ItemListJsonLd({
+  name,
+  description,
+  itemListElement,
+}: {
+  name: string
+  description: string
+  itemListElement: Array<{
+    position: number
+    name: string
+    url: string
+    image?: string
+    description?: string
+  }>
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    description,
+    numberOfItems: itemListElement.length,
+    itemListElement: itemListElement.map((item) => ({
+      '@type': 'ListItem',
+      position: item.position,
+      name: item.name,
+      url: item.url,
+      image: item.image,
+      description: item.description,
+    })),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+

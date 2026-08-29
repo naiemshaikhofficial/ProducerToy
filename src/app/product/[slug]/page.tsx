@@ -83,12 +83,12 @@ export async function generateMetadata({
     product.product_type || 'VST Plugin',
     isFree
   )
-  const coverImage = product.cover_image || `${siteUrl}/Icon.png`
+  const dynamicOgImage = `${siteUrl}/api/og?title=${encodeURIComponent(product.name)}&brand=${encodeURIComponent(brandName)}&type=${encodeURIComponent(productType)}&rating=4.8&price=${encodeURIComponent(isFree ? 'FREE' : `$${Number(product.price_usd).toFixed(2)}`)}&image=${encodeURIComponent(product.cover_image || '')}`
 
   return generatePageMetadata({
     title: pageTitle,
     description: pageDescription,
-    image: coverImage,
+    image: dynamicOgImage,
     keywords: smartKeywords,
     path: `/product/${product.slug}`,
   })

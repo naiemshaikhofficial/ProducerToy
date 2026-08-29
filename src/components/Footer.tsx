@@ -35,25 +35,25 @@ export function Footer() {
             <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-xs text-zinc-400">
               {/* Left Sub-column */}
               <div className="space-y-2.5">
-                <div><Link href="/categories/1-Instruments" prefetch={true} className="hover:text-white transition-colors">Instruments</Link></div>
-                <div><Link href="/categories/3-Studio-Tools" prefetch={true} className="hover:text-white transition-colors">Studio Tools</Link></div>
-                <div><Link href="/categories/2-Effects" prefetch={true} className="hover:text-white transition-colors">Effects</Link></div>
-                <div><Link href="/categories/4-Sounds" prefetch={true} className="hover:text-white transition-colors">Sounds</Link></div>
-                <div><Link href="/categories/bundles" prefetch={true} className="hover:text-white transition-colors">Bundles</Link></div>
-                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Blog</Link></div>
-                <div><Link href="/categories/1-Instruments?free=true" prefetch={true} className="hover:text-white transition-colors">Free Instruments</Link></div>
-                <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands</Link></div>
+                <div><Link href="/free-vst-plugins" prefetch={true} className="text-[#FA742B] font-semibold hover:underline">Free VST Plugins</Link></div>
+                <div><Link href="/best/free-autotune-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Free Auto-Tune</Link></div>
+                <div><Link href="/best/free-saturation-plugins" prefetch={true} className="hover:text-white transition-colors">Best Saturation VSTs</Link></div>
+                <div><Link href="/best/free-compressor-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Compressors</Link></div>
+                <div><Link href="/best/free-reverb-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Reverb Plugins</Link></div>
+                <div><Link href="/categories/instruments" prefetch={true} className="hover:text-white transition-colors">Virtual Instruments</Link></div>
+                <div><Link href="/categories/sounds" prefetch={true} className="hover:text-white transition-colors">Sample Packs</Link></div>
+                <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands & Developers</Link></div>
               </div>
 
               {/* Right Sub-column */}
               <div className="space-y-2.5">
-                <div><Link href="/categories/2-Effects?free=true" prefetch={true} className="hover:text-white transition-colors">Free Effects</Link></div>
-                <div><Link href="/categories/3-Studio-Tools?free=true" prefetch={true} className="hover:text-white transition-colors">Free Studio Tools</Link></div>
-                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Courses</Link></div>
-                <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Black Friday</Link></div>
-                <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Affiliate Program</Link></div>
-                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Plugin+</Link></div>
-                <div><Link href="/store" prefetch={true} className="hover:text-white transition-colors">Rent to Own</Link></div>
+                <div><Link href="/daw/fl-studio" prefetch={true} className="hover:text-white transition-colors">FL Studio Plugins</Link></div>
+                <div><Link href="/daw/ableton-live" prefetch={true} className="hover:text-white transition-colors">Ableton Live Plugins</Link></div>
+                <div><Link href="/daw/logic-pro" prefetch={true} className="hover:text-white transition-colors">Logic Pro AU Plugins</Link></div>
+                <div><Link href="/best/free-trap-drum-kits-808" prefetch={true} className="hover:text-white transition-colors">Free Trap 808 Kits</Link></div>
+                <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Deals & Discounts</Link></div>
+                <div><Link href="/features/toywards" prefetch={true} className="hover:text-white transition-colors">Toywards Rewards</Link></div>
+                <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Developer Portal</Link></div>
               </div>
             </div>
           </div>

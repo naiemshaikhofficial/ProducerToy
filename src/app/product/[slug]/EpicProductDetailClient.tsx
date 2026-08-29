@@ -31,6 +31,7 @@ import { SendGiftModal } from '@/components/gifts/SendGiftModal'
 import { EpicRatingModal } from '@/components/product/EpicRatingModal'
 import { ProductFaqSection } from '@/components/product/ProductFaqSection'
 import { RelatedProductsSection } from '@/components/product/RelatedProductsSection'
+import { AutoLinkText } from '@/components/seo/AutoLinkText'
 import { ProductRatingStats } from '@/actions/ratingActions'
 
 function WindowsIcon({ className = 'w-4 h-4' }: { className?: string }) {
@@ -717,11 +718,11 @@ export function EpicProductDetailClient({
               <div className="space-y-3 pt-2">
                 <h3 className="text-xl font-bold text-white tracking-tight">About {product.name}</h3>
                 <div
-                  className={`text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal transition-all ${
+                  className={`text-sm text-zinc-300 leading-relaxed space-y-4 font-normal transition-all ${
                     !isDescExpanded ? 'max-h-48 overflow-hidden relative' : ''
                   }`}
                 >
-                  {product.full_description}
+                  <AutoLinkText text={product.full_description} />
                   {!isDescExpanded && (
                     <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#121212] to-transparent pointer-events-none" />
                   )}

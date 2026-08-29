@@ -29,6 +29,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/categories/sounds?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/categories/presets?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
 
+    // Programmatic "Best Of" Roundups (Google Position 0 Target)
+    { url: `${baseUrl}/best/free-autotune-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-saturation-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-compressor-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-reverb-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-delay-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-eq-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-trap-drum-kits-808`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+
+    // Dedicated DAW Landing Hubs
+    { url: `${baseUrl}/daw/fl-studio`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+    { url: `${baseUrl}/daw/ableton-live`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+    { url: `${baseUrl}/daw/logic-pro`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+    { url: `${baseUrl}/daw/cubase`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+    { url: `${baseUrl}/daw/studio-one`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+    { url: `${baseUrl}/daw/reaper`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+
     // Features & Programs
     { url: `${baseUrl}/features/toywards`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/brands`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },

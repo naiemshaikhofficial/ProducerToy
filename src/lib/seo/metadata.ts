@@ -276,7 +276,9 @@ export function generatePageMetadata({
   const cleanTitle = title.trim()
   const fullTitle = cleanTitle.includes('Producer Toy') ? cleanTitle : `${cleanTitle} | ${siteTitle}`
 
-  const ogImageUrl = image || `${baseUrl}/Icon.png`
+  const ogImageUrl =
+    image ||
+    `${baseUrl}/api/og?title=${encodeURIComponent(cleanTitle)}&brand=Producer+Toy`
   const canonicalUrl = path ? `${baseUrl}${path.startsWith('/') ? path : `/${path}`}` : baseUrl
 
   return {
@@ -298,6 +300,8 @@ export function generatePageMetadata({
       images: [
         {
           url: ogImageUrl,
+          width: 1200,
+          height: 630,
           alt: cleanTitle,
         },
       ],
