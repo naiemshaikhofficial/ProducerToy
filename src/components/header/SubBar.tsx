@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Search, ChevronDown, X, ShoppingCart, Bookmark, Gift } from 'lucide-react'
+import { useGifts } from '@/context/GiftContext'
 
 interface SubBarProps {
   searchQuery: string
@@ -46,6 +47,7 @@ export const SubBar: React.FC<SubBarProps> = ({
   onOpenCart,
 }) => {
   const pathname = usePathname()
+  const { unopenedCount } = useGifts()
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [isDiscoverMenuOpen, setIsDiscoverMenuOpen] = useState(false)
   const mobileInputRef = useRef<HTMLInputElement>(null)
@@ -172,12 +174,17 @@ export const SubBar: React.FC<SubBarProps> = ({
               <Link
                 href="/gifts"
                 prefetch={true}
-                className={`p-1 transition-colors active:scale-95 ${
+                className={`relative p-1 transition-colors active:scale-95 flex items-center ${
                   pathname === '/gifts' ? 'text-white' : 'text-zinc-300 hover:text-white'
                 }`}
                 title="Gifts"
               >
                 <Gift className="w-[19px] h-[19px] stroke-[1.8]" />
+                {unopenedCount > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-white text-black text-[10px] font-extrabold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-md leading-none animate-in zoom-in-75">
+                    {unopenedCount}
+                  </span>
+                )}
               </Link>
 
               <Link
@@ -327,11 +334,16 @@ export const SubBar: React.FC<SubBarProps> = ({
           <Link
             href="/gifts"
             prefetch={true}
-            className={`transition-colors font-normal ${
+            className={`flex items-center gap-1.5 transition-colors font-normal ${
               pathname === '/gifts' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
             }`}
           >
-            Gifts
+            <span>Gifts</span>
+            {unopenedCount > 0 && (
+              <span className="bg-white text-black text-[11px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none shadow-sm animate-in zoom-in-75">
+                {unopenedCount}
+              </span>
+            )}
           </Link>
 
           <Link

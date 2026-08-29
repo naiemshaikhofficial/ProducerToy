@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCurrency } from '@/context/CurrencyContext'
+import { useGifts } from '@/context/GiftContext'
 import {
   getUserGiftsAction,
   claimUserGiftAction,
@@ -34,6 +35,7 @@ const TABS: { id: GiftTab; label: string }[] = [
 export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftRecord[] }) {
   const { user } = useAuth()
   const { formatPrice } = useCurrency()
+  const { refreshGifts: refreshGlobalGifts } = useGifts()
   const [activeTab, setActiveTab] = useState<GiftTab>('all')
   const [gifts, setGifts] = useState<GiftRecord[]>(initialGifts)
   const [claimedSuccessId, setClaimedSuccessId] = useState<string | null>(null)
@@ -97,6 +99,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
           prev.map((g) => (g.id === gift.id ? { ...g, status: 'claimed' } : g))
         )
         setClaimedSuccessId(gift.id)
+        refreshGlobalGifts()
         setTimeout(() => setClaimedSuccessId(null), 3500)
       } else {
         alert(res.error || 'Failed to claim gift.')
@@ -121,6 +124,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
         setGifts((prev) =>
           prev.map((g) => (g.id === gift.id ? { ...g, status: 'rejected' } : g))
         )
+        refreshGlobalGifts()
       } else {
         alert(res.error || 'Failed to decline gift.')
       }

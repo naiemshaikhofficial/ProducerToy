@@ -3,6 +3,7 @@ import './globals.css'
 import { CurrencyProvider } from '@/context/CurrencyContext'
 import { CartProvider } from '@/context/CartContext'
 import { WishlistProvider } from '@/context/WishlistContext'
+import { GiftProvider } from '@/context/GiftContext'
 import { AudioProvider } from '@/context/AudioContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { Header } from '@/components/Header'
@@ -135,22 +136,24 @@ export default function RootLayout({
           <CurrencyProvider>
             <CartProvider>
               <WishlistProvider>
-                <AudioProvider>
-                  <ImageProtection />
-                  <ContentProtection />
-                  
-                  <Header />
-                  
-                  <main className="flex-1 pb-24">
-                    {children}
-                  </main>
-                  
-                  <Footer />
-                  
-                  <AudioPlayer />
-                  <CartDrawer />
+                <GiftProvider>
+                  <AudioProvider>
+                    <ImageProtection />
+                    <ContentProtection />
+                    
+                    <Header />
+                    
+                    <main className="flex-1 pb-24">
+                      {children}
+                    </main>
+                    
+                    <Footer />
+                    
+                    <AudioPlayer />
+                    <CartDrawer />
 
-                </AudioProvider>
+                  </AudioProvider>
+                </GiftProvider>
               </WishlistProvider>
             </CartProvider>
           </CurrencyProvider>

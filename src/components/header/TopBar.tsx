@@ -25,6 +25,7 @@ import { LogoIcon } from '@/components/Logo'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { useAuth } from '@/context/AuthContext'
 import { useCurrency } from '@/context/CurrencyContext'
+import { useGifts } from '@/context/GiftContext'
 
 interface TopBarProps {
   currency: string
@@ -48,6 +49,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onToggleMobileMenu,
 }) => {
   const { region, setRegion, regions } = useCurrency()
+  const { unopenedCount } = useGifts()
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
   const [isGlobeMenuOpen, setIsGlobeMenuOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
@@ -236,10 +238,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/gifts"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
+                      className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
-                      <Gift className="w-4 h-4 text-zinc-400" />
-                      <span>Gifts</span>
+                      <div className="flex items-center gap-3">
+                        <Gift className="w-4 h-4 text-zinc-400" />
+                        <span>Gifts</span>
+                      </div>
+                      {unopenedCount > 0 && (
+                        <span className="bg-white text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded-full leading-none shadow-sm">
+                          {unopenedCount} new
+                        </span>
+                      )}
                     </Link>
 
                     <Link
