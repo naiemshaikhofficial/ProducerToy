@@ -79,7 +79,7 @@ export function EpicProductDetailClient({
   const [giftModalOpen, setGiftModalOpen] = useState(false)
   const [ratingModalOpen, setRatingModalOpen] = useState(false)
   const [ratingStats, setRatingStats] = useState<ProductRatingStats>(
-    initialRatingStats || { averageRating: 4.8, totalReviews: 124, userCanRate: true }
+    initialRatingStats || { averageRating: 0, totalReviews: 0, userCanRate: true }
   )
 
   const isSaved = checkWishlisted(product.id)
@@ -267,14 +267,26 @@ export function EpicProductDetailClient({
           {product.name}
         </h1>
 
-        {/* Epic Games Store Static Minimalist Star Rating: ★★★★★ 4.7 */}
+        {/* Epic Games Store Static Minimalist Star Rating */}
         <div className="flex items-center gap-2 pt-0.5 text-sm">
-          <div className="flex items-center text-white text-base tracking-[-2px] select-none">
-            {'★'.repeat(Math.round(ratingStats.averageRating))}
-            <span className="text-zinc-700">{'★'.repeat(5 - Math.round(ratingStats.averageRating))}</span>
-          </div>
-          <span className="text-white font-bold text-sm ml-0.5">{ratingStats.averageRating.toFixed(1)}</span>
-          <span className="text-zinc-500 text-xs font-normal">({ratingStats.totalReviews})</span>
+          {ratingStats.totalReviews > 0 ? (
+            <>
+              <div className="flex items-center text-white text-base tracking-[-2px] select-none">
+                {'★'.repeat(Math.round(ratingStats.averageRating))}
+                <span className="text-zinc-700">{'★'.repeat(5 - Math.round(ratingStats.averageRating))}</span>
+              </div>
+              <span className="text-white font-bold text-sm ml-0.5">{ratingStats.averageRating.toFixed(1)}</span>
+              <span className="text-zinc-500 text-xs font-normal">({ratingStats.totalReviews})</span>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center text-zinc-600 text-base tracking-[-2px] select-none">
+                ★★★★★
+              </div>
+              <span className="text-zinc-400 text-xs font-normal">No ratings yet</span>
+            </>
+          )}
+
           <button
             type="button"
             onClick={() => setRatingModalOpen(true)}

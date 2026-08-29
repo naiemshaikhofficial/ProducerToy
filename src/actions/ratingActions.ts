@@ -22,7 +22,7 @@ export async function getProductRatingStatsAction(productId: string): Promise<Pr
       data: { user },
     } = await supabase.auth.getUser()
 
-    // 2. Fetch all reviews for this product using authenticated/anon client
+    // 2. Fetch all real reviews for this product
     const { data: reviews, error } = await supabase
       .from('product_reviews')
       .select('rating, user_id')
@@ -44,27 +44,24 @@ export async function getProductRatingStatsAction(productId: string): Promise<Pr
       }
     }
 
-    // If real reviews exist in database, calculate exact average from them
-    let averageRating = 4.8
-    let displayReviewsCount = 124
-
+    // Exact real average calculation from database
+    let averageRating = 0
     if (totalReviews > 0) {
       const sum = reviewList.reduce((acc, r) => acc + Number(r.rating || 5), 0)
       averageRating = Math.round((sum / totalReviews) * 10) / 10
-      displayReviewsCount = totalReviews
     }
 
     return {
       averageRating,
-      totalReviews: displayReviewsCount,
+      totalReviews,
       userRating,
-      userCanRate: Boolean(user), // Any signed in user can rate
+      userCanRate: Boolean(user),
     }
   } catch (err) {
     console.error('Error in getProductRatingStatsAction:', err)
     return {
-      averageRating: 4.8,
-      totalReviews: 124,
+      averageRating: 0,
+      totalReviews: 0,
       userCanRate: false,
     }
   }

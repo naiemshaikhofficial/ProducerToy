@@ -90,13 +90,16 @@ export function ProductJsonLd({
         logo: 'https://producertoy.com/Icon.png',
       },
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: ratingValue.toString(),
-      reviewCount: reviewCount.toString(),
-      bestRating: '5',
-      worstRating: '1',
-    },
+    aggregateRating:
+      reviewCount && reviewCount > 0
+        ? {
+            '@type': 'AggregateRating',
+            ratingValue: ratingValue.toString(),
+            reviewCount: reviewCount.toString(),
+            bestRating: '5',
+            worstRating: '1',
+          }
+        : undefined,
     category: categoryName,
   }
 
