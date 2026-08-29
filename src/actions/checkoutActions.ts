@@ -24,6 +24,8 @@ export interface CheckoutItemInput {
   price_inr?: number
   price_usd?: number
   product_type?: string
+  delivery_method?: string
+  license_type?: string
   is_gift?: boolean
   gift_recipient_email?: string
   gift_message?: string
