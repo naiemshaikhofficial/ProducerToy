@@ -64,6 +64,11 @@ export function GlobalCheckoutModal() {
     country: '',
   })
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  const [lastGiftInfo, setLastGiftInfo] = useState<{
+    hasGifts: boolean
+    giftRecipientEmail: string
+    hasSelfItems: boolean
+  } | null>(null)
 
   // Auto-load profile & billing data on mount or open
   useEffect(() => {
@@ -259,12 +264,6 @@ export function GlobalCheckoutModal() {
       setCouponLoading(false)
     }
   }
-
-  const [lastGiftInfo, setLastGiftInfo] = useState<{
-    hasGifts: boolean
-    giftRecipientEmail: string
-    hasSelfItems: boolean
-  } | null>(null)
 
   const recordCompletedGifts = (orderItems: any[]) => {
     try {

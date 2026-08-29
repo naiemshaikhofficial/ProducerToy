@@ -27,6 +27,16 @@ export const metadata: Metadata = {
     'The premier minimalist marketplace for music producers. Download premium and free VST plugins, sample packs, synth presets, and DAW templates.',
   keywords: [
     'Producer Toy',
+    'producertoy',
+    'producertoy.com',
+    'producer toys',
+    'producers toy',
+    'producers toys',
+    'producer toy store',
+    'producer toy marketplace',
+    'producer toy official',
+    'producer toy plugins',
+    'producer toy sounds',
     'VST Plugins',
     'Free VST Plugins',
     'Sample Packs',
@@ -64,12 +74,21 @@ export const metadata: Metadata = {
       'The premier minimalist marketplace for music producers. Download premium and free VST plugins, sample packs, synth presets, and DAW templates.',
     images: [
       {
+        url: 'https://producertoy.com/Icon.png',
+        width: 512,
+        height: 512,
+        alt: 'Producer Toy Logo',
+      },
+      {
         url: 'https://producertoy.com/pt-banner.png',
         width: 1200,
         height: 630,
         alt: 'Producer Toy Store',
       },
     ],
+  },
+  other: {
+    'og:logo': 'https://producertoy.com/Icon.png',
   },
   twitter: {
     card: 'summary_large_image',

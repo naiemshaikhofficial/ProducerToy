@@ -122,7 +122,7 @@ export async function generateMetadata({ params, searchParams }: StorePageProps)
     title,
     description,
     path,
-    keywords: generateSmartKeywords(title, rawSlug || 'store'),
+    keywords: generateSmartKeywords(title, rawSlug || 'store', brand || '', rawSlug || '', isFree),
   })
 }
 

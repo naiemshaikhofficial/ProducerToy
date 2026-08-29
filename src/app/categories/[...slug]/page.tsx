@@ -138,7 +138,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     title: `${title} — Music Production Plugins & Sounds`,
     description,
     path: `/categories/${rawSlug}`,
-    keywords: generateSmartKeywords(title, cleanSlug),
+    keywords: generateSmartKeywords(title, cleanSlug, '', CATEGORY_META_MAP[cleanSlug]?.productType || 'plugin'),
   })
 }
 

@@ -45,13 +45,26 @@ export function ProductJsonLd({
     ...keywords,
   ]
 
+  const productImage = image || 'https://producertoy.com/Icon.png'
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': ['Product', 'SoftwareApplication'],
-    name: `${name} by ${brandName}`,
-    alternateName: [name, `${brandName} ${name}`, `Free ${name}`],
+    name: name,
+    headline: `${name} by ${brandName}`,
+    alternateName: [`${name} by ${brandName}`, `${brandName} ${name}`, `Free ${name}`],
     description: description || `Download ${name} by ${brandName} on Producer Toy Store. Fast direct download for ${vstFormat}.`,
-    image: image ? [image] : ['https://producertoy.com/pt-banner.png'],
+    image: [productImage],
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      contentUrl: productImage,
+      url: productImage,
+      caption: `${name} by ${brandName}`,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
     sku: sku || name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
     keywords: autoKeywords.join(', '),
     brand: {
@@ -74,6 +87,7 @@ export function ProductJsonLd({
         '@type': 'Organization',
         name: 'Producer Toy',
         url: 'https://producertoy.com',
+        logo: 'https://producertoy.com/Icon.png',
       },
     },
     aggregateRating: {
@@ -134,10 +148,20 @@ export function ProductJsonLd({
 export function StoreOrganizationJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': ['Organization', 'OnlineStore'],
+    '@id': 'https://producertoy.com/#organization',
     name: 'Producer Toy',
+    alternateName: ['ProducerToy', 'Producer Toy Store'],
     url: 'https://producertoy.com',
-    logo: 'https://producertoy.com/Icon.png',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://producertoy.com/Icon.png',
+      contentUrl: 'https://producertoy.com/Icon.png',
+      width: '512',
+      height: '512',
+      caption: 'Producer Toy Logo',
+    },
+    image: 'https://producertoy.com/Icon.png',
     description: 'The premier minimalist marketplace for music producers. Download VST plugins, sample packs, synth presets, and DAW templates.',
     sameAs: [
       'https://twitter.com/producertoy',
@@ -197,12 +221,23 @@ export function CollectionPageJsonLd({
     url: url,
     mainEntity: {
       '@type': 'ItemList',
-      itemListElement: items.slice(0, 20).map((item, index) => ({
+      itemListElement: items.slice(0, 30).map((item, index) => ({
         '@type': 'ListItem',
         position: index + 1,
         name: item.name,
         url: item.url,
-        ...(item.image ? { image: item.image } : {}),
+        item: {
+          '@type': 'Product',
+          name: item.name,
+          url: item.url,
+          image: item.image,
+          offers: item.price !== undefined ? {
+            '@type': 'Offer',
+            price: item.price.toFixed(2),
+            priceCurrency: 'USD',
+            url: item.url,
+          } : undefined,
+        },
       })),
     },
   }

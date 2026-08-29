@@ -21,9 +21,16 @@ export const revalidate = 86400 // 24-hour Edge Cache (instant on-demand revalid
 export const metadata: Metadata = generatePageMetadata({
   title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
   description:
-    'Download world-class VST plugins, royalty-free sample packs, Serum synth presets, and DAW templates. The premier minimalist marketplace for modern music creators.',
+    'Download world-class VST plugins, royalty-free sample packs, Serum synth presets, and DAW templates on Producer Toy. The premier marketplace for modern music creators.',
   path: '/',
   keywords: [
+    'Producer Toy',
+    'producertoy',
+    'producertoy.com',
+    'producer toys',
+    'producers toy',
+    'producers toys',
+    'producer toy store',
     'VST Plugins',
     'Free VST Plugins',
     'Sample Packs',
@@ -32,6 +39,10 @@ export const metadata: Metadata = generatePageMetadata({
     'Vital Presets',
     'FL Studio Templates',
     'Ableton Live Plugins',
+    'Saturation Plugins',
+    'Free Saturator VST',
+    'Dynamic EQ VST',
+    'Space Reverb VST',
     'Toywards Rewards',
   ],
 })

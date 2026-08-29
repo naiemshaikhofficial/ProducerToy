@@ -75,13 +75,19 @@ export async function generateMetadata({
     ? `${product.name} by ${brandName}. ${product.short_description || product.description}. Instant direct download for FL Studio, Ableton Live, Logic Pro, Cubase & Pro Tools.`
     : `Download ${product.name} by ${brandName} on Producer Toy Store. High-quality ${productType} for music producers.`
 
-  const smartKeywords = generateSmartKeywords(product.name, `${productType} ${brandName}`)
-  const ogImageUrl = `${siteUrl}/api/og?title=${encodeURIComponent(product.name)}&brand=${encodeURIComponent(brandName)}&price=${isFree ? 'FREE' : product.price_usd}&type=${encodeURIComponent(productType)}`
+  const smartKeywords = generateSmartKeywords(
+    product.name,
+    product.product_type || 'VST Plugin',
+    brandName,
+    product.product_type || 'VST Plugin',
+    isFree
+  )
+  const coverImage = product.cover_image || `${siteUrl}/Icon.png`
 
   return generatePageMetadata({
     title: pageTitle,
     description: pageDescription,
-    image: ogImageUrl,
+    image: coverImage,
     keywords: smartKeywords,
     path: `/product/${product.slug}`,
   })

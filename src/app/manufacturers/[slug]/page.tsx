@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
     title,
     description,
     path: `/manufacturers/${brand.slug}`,
-    keywords: generateSmartKeywords(brand.name, 'audio plugin developer brand manufacturer'),
+    keywords: generateSmartKeywords(brand.name, 'audio plugin developer brand manufacturer', brand.name, 'plugin'),
   })
 }
 

@@ -123,12 +123,14 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
               href={`/product/${item.slug}`}
               prefetch={true}
               className="group flex flex-col select-none cursor-pointer"
+              title={`${item.name} by ${item.brand || 'Producer Toy'}`}
             >
               {/* 3:4 Poster Image Container (Static + Brightness on Hover) */}
               <div className="relative w-full aspect-[3/4] rounded-t-lg sm:rounded-t-xl overflow-hidden bg-[#202020] border-t border-x border-[#282828]">
                 <Image
                   src={getCdnImageUrl(item.cover_image, { width: 600 })}
-                  alt={item.name}
+                  alt={`${item.name} by ${item.brand || 'Producer Toy'} - Free VST Plugin`}
+                  title={`${item.name} - ${item.brand || 'Producer Toy'}`}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
