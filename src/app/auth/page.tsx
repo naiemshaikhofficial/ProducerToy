@@ -427,8 +427,8 @@ function AuthForm() {
               </h1>
 
               {nextUrl.includes('checkout') && (
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#26150b] border border-[#4a2412] text-[#FA742B] text-[11.5px] font-bold tracking-wide animate-in fade-in">
-                  <span>🔒 Sign in to complete your checkout & instant download</span>
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#202020] border border-[#303030] text-zinc-300 text-[11.5px] font-semibold tracking-wide animate-in fade-in">
+                  <span>🔒 Sign in to complete your checkout &amp; instant download</span>
                 </div>
               )}
 

@@ -17,7 +17,9 @@ import {
   Gift,
   Info,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCurrency } from '@/context/CurrencyContext'
@@ -65,6 +67,8 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [copied, setCopied] = useState(false)
   const [isDescExpanded, setIsDescExpanded] = useState(false)
+  const [isVideoMuted, setIsVideoMuted] = useState<boolean>(false)
+  const videoIframeRef = React.useRef<HTMLIFrameElement | null>(null)
   const [giftModalOpen, setGiftModalOpen] = useState(false)
   const [giftRecipient, setGiftRecipient] = useState('')
   const [giftSaved, setGiftSaved] = useState(false)
@@ -537,13 +541,42 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           <div className="space-y-3 w-full">
             <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
               {activeMedia.type === 'video' && activeMedia.videoId ? (
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${activeMedia.videoId}?autoplay=1&mute=0&rel=0&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1&showinfo=0&autohide=1&fs=0&playsinline=1&loop=1&playlist=${activeMedia.videoId}`}
-                  title={`${product.name} Video Demo`}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <div className="relative w-full h-full">
+                  <iframe
+                    ref={videoIframeRef}
+                    id={`youtube-trailer-${activeMedia.videoId}`}
+                    src={`https://www.youtube-nocookie.com/embed/${activeMedia.videoId}?autoplay=1&mute=${isVideoMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&playsinline=1&loop=1&playlist=${activeMedia.videoId}`}
+                    title={`${product.name} Video Demo`}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+
+                  {/* Minimalist Floating Instant Mute / Unmute Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextState = !isVideoMuted
+                      setIsVideoMuted(nextState)
+                      if (videoIframeRef.current && videoIframeRef.current.contentWindow) {
+                        videoIframeRef.current.contentWindow.postMessage(
+                          JSON.stringify({
+                            event: 'command',
+                            func: nextState ? 'mute' : 'unMute',
+                            args: '',
+                          }),
+                          '*'
+                        )
+                      }
+                    }}
+                    className="absolute top-3 right-3 z-30 bg-black/80 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-full backdrop-blur-md transition-all border border-white/15 shadow-xl cursor-pointer flex items-center gap-1.5 text-xs font-semibold active:scale-95"
+                    title={isVideoMuted ? 'Unmute Video' : 'Mute Video'}
+                    aria-label={isVideoMuted ? 'Unmute Video' : 'Mute Video'}
+                  >
+                    {isVideoMuted ? <VolumeX className="w-3.5 h-3.5 text-zinc-400" /> : <Volume2 className="w-3.5 h-3.5 text-white" />}
+                    <span className="text-[11px] font-medium tracking-wide text-zinc-200">{isVideoMuted ? 'Unmute' : 'Mute'}</span>
+                  </button>
+                </div>
               ) : (
                 <Image
                   src={activeMedia.url}
@@ -560,7 +593,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 <button
                   type="button"
                   onClick={handleAudition}
-                  className="absolute bottom-4 right-4 bg-black/80 hover:bg-[#FA742B] text-white px-4 py-2.5 rounded-full backdrop-blur-md transition-all z-20 flex items-center gap-2 text-xs font-bold shadow-2xl border border-white/10 cursor-pointer"
+                  className="absolute bottom-4 right-4 bg-black/80 hover:bg-zinc-800 text-white px-4 py-2.5 rounded-full backdrop-blur-md transition-all z-20 flex items-center gap-2 text-xs font-bold shadow-2xl border border-white/10 cursor-pointer"
                 >
                   {isCurrentPlaying ? (
                     <>

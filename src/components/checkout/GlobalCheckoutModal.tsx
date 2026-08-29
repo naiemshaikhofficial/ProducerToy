@@ -533,8 +533,8 @@ export function GlobalCheckoutModal() {
               <div className="relative w-14 h-14 sm:w-16 sm:h-16">
                 {/* Background Dark Track */}
                 <div className="w-full h-full rounded-full border-4 border-[#222222]" />
-                {/* Producer Toy Brand Orange Spinner Arc */}
-                <div className="absolute inset-0 w-full h-full rounded-full border-4 border-transparent border-t-[#FA742B] animate-spin duration-700 ease-linear" />
+                {/* Minimalist Crisp White Spinner Arc */}
+                <div className="absolute inset-0 w-full h-full rounded-full border-4 border-transparent border-t-white animate-spin duration-700 ease-linear" />
               </div>
             </div>
           </div>

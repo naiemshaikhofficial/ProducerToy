@@ -49,7 +49,7 @@ export function CheckoutSuccessView({
       </div>
 
       <div className="w-14 h-14 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-white">
-        {hasGifts ? <Gift size={28} className="text-[#FA742B]" /> : <CheckCircle2 size={28} />}
+        {hasGifts ? <Gift size={28} className="text-white" /> : <CheckCircle2 size={28} />}
       </div>
 
       <div className="space-y-1.5">

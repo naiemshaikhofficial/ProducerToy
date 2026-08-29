@@ -173,7 +173,7 @@ export function EpicCheckoutLayout({
           ) : (
             <Link
               href="/auth?next=/checkout"
-              className="text-[11px] font-bold text-[#FA742B] hover:underline"
+              className="text-[11px] font-bold text-zinc-300 hover:text-white hover:underline"
               title="Sign in for faster checkout"
             >
               Sign In
@@ -236,7 +236,7 @@ export function EpicCheckoutLayout({
                   <button
                     type="button"
                     onClick={() => setIsMultiItemsExpanded(!isMultiItemsExpanded)}
-                    className="text-[10px] font-bold bg-[#2e190e] text-[#FA742B] border border-[#4a2412] px-1.5 py-0.5 rounded shrink-0 cursor-pointer"
+                    className="text-[10px] font-bold bg-[#282828] text-zinc-300 border border-[#383838] px-1.5 py-0.5 rounded shrink-0 cursor-pointer"
                   >
                     +{items.length - 1} more
                   </button>
@@ -251,45 +251,42 @@ export function EpicCheckoutLayout({
           </div>
         </div>
 
-        {/* Multi-Item Dropdown Accordion (if multiple items in cart) */}
+        {/* Expandable Multi-items Accordion Tray */}
         {isMultiItemsExpanded && items.length > 1 && (
-          <div className="bg-[#181818] border-b border-[#282828] p-3 space-y-2 animate-in slide-in-from-top-2 duration-150">
-            <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">
+          <div className="bg-[#181818] border-b border-[#2c2c2c] px-4 py-3 space-y-2.5 animate-in slide-in-from-top-2 duration-150 flex-shrink-0">
+            <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">
               Cart Items ({items.length})
             </div>
             {items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between gap-3 p-2 rounded-lg bg-[#202020] border border-[#2a2a2a]">
-                <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div className="relative w-6 h-8 rounded bg-[#141414] overflow-hidden flex-shrink-0">
+              <div key={item.id} className="flex items-center justify-between py-1 border-b border-[#222222] last:border-0">
+                <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-3">
+                  <div className="relative w-6 h-7 bg-[#141414] border border-[#2a2a2a] rounded-[2px] overflow-hidden flex-shrink-0">
                     <Image src={item.cover_image || '/placeholder.jpg'} alt={item.name} fill sizes="24px" className="object-cover" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-white truncate">{item.name}</p>
-                    <p className="text-[11px] text-zinc-400">{formatPrice(item.price_inr, item.price_usd)}</p>
+                    <span className="text-xs text-zinc-200 font-semibold truncate block">{item.name}</span>
+                    <span className="text-[10px] text-zinc-400 truncate block">{item.brand || 'Producer Toy'}</span>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeItem(item.id)}
-                  className="p-1 text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
-                  title="Remove item"
-                >
-                  <Trash2 size={13} />
-                </button>
+                <div className="text-xs font-bold text-white whitespace-nowrap">
+                  {currencySymbol}{(isIndia ? item.price_inr : item.price_usd).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Main Scrollable Content */}
-        <div className="p-4 space-y-4 flex-1">
+        {/* Scrollable Checkout Content Area */}
+        <div className="flex-1 px-4 py-5 space-y-4">
           
-          {/* Heading: Payment Details */}
-          <h2 className="text-[22px] font-black text-white tracking-tight pt-1">
-            Payment Details
-          </h2>
+          {/* Section Heading: Payment Details */}
+          <div>
+            <h2 className="text-[19px] font-black text-white tracking-tight">
+              Payment Details
+            </h2>
+          </div>
 
-          {/* Toywards / Epic Rewards Card */}
+          {/* Toywards Rewards Balance Box */}
           <div className="bg-[#202020] border border-[#2c2c2c] rounded-xl p-3.5 transition-all">
             <button
               type="button"
@@ -297,12 +294,12 @@ export function EpicCheckoutLayout({
               className="w-full flex items-center justify-between text-left cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-full bg-[#26150b] border border-[#4a2412] flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded-full bg-[#282828] border border-[#383838] flex items-center justify-center flex-shrink-0">
                   <ToywardsIcon size={14} />
                 </div>
                 <span className="text-[14px] font-bold text-white">Toywards</span>
                 {availableRewards > 0 && (
-                  <span className="text-[10.5px] font-bold bg-[#26150b] text-[#FA742B] border border-[#4a2412] px-2 py-0.5 rounded-full">
+                  <span className="text-[10.5px] font-bold bg-[#282828] text-zinc-300 border border-[#383838] px-2 py-0.5 rounded-full">
                     {currencySymbol}{isIndia ? Math.round(availableRewards * 95) : availableRewards.toFixed(2)} Available
                   </span>
                 )}
@@ -322,7 +319,7 @@ export function EpicCheckoutLayout({
                         type="checkbox"
                         checked={Boolean(useRewards)}
                         onChange={(e) => onToggleRewards && onToggleRewards(e.target.checked)}
-                        className="mt-0.5 accent-[#FA742B] w-4 h-4 rounded cursor-pointer"
+                        className="mt-0.5 accent-white w-4 h-4 rounded cursor-pointer"
                       />
                       <div className="space-y-0.5">
                         <span className="text-xs font-bold text-white block">
@@ -342,7 +339,7 @@ export function EpicCheckoutLayout({
                     <Link
                       href="/features/toywards"
                       target="_blank"
-                      className="inline-block text-[11.5px] text-[#FA742B] hover:underline font-bold"
+                      className="inline-block text-[11.5px] text-zinc-300 hover:text-white hover:underline font-bold"
                     >
                       Learn more
                     </Link>
@@ -374,7 +371,7 @@ export function EpicCheckoutLayout({
 
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                   selectedMethod === 'card'
-                    ? 'border-[#FA742B] bg-[#FA742B]'
+                    ? 'border-white bg-white'
                     : 'border-[#555555] bg-transparent'
                 }`}>
                   {selectedMethod === 'card' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -403,7 +400,7 @@ export function EpicCheckoutLayout({
 
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                   selectedMethod === 'paypal'
-                    ? 'border-[#FA742B] bg-[#FA742B]'
+                    ? 'border-white bg-white'
                     : 'border-[#555555] bg-transparent'
                 }`}>
                   {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -432,7 +429,7 @@ export function EpicCheckoutLayout({
 
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                   selectedMethod === 'gpay'
-                    ? 'border-[#FA742B] bg-[#FA742B]'
+                    ? 'border-white bg-white'
                     : 'border-[#555555] bg-transparent'
                 }`}>
                   {selectedMethod === 'gpay' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -462,7 +459,7 @@ export function EpicCheckoutLayout({
 
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                     selectedMethod === 'upi'
-                      ? 'border-[#FA742B] bg-[#FA742B]'
+                      ? 'border-white bg-white'
                       : 'border-[#555555] bg-transparent'
                   }`}>
                     {selectedMethod === 'upi' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -517,7 +514,7 @@ export function EpicCheckoutLayout({
                     placeholder="ENTER CREATOR CODE"
                     value={coupon}
                     onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-                    className="flex-1 h-9 bg-[#141414] border border-[#333333] text-white text-xs px-3 rounded-lg outline-none uppercase font-bold placeholder:text-zinc-500 focus:border-[#FA742B]"
+                    className="flex-1 h-9 bg-[#141414] border border-[#333333] text-white text-xs px-3 rounded-lg outline-none uppercase font-bold placeholder:text-zinc-500 focus:border-zinc-400"
                   />
                   <button
                     type="button"
@@ -592,7 +589,7 @@ export function EpicCheckoutLayout({
 
             {/* Regular / Coupon Discount */}
             {discountAmount > 0.01 && (
-              <div className="flex justify-between items-center text-[#FA742B] font-medium text-xs">
+              <div className="flex justify-between items-center text-emerald-400 font-medium text-xs">
                 <span>{coupon ? `Coupon Discount (${coupon})` : 'Sale Discount'}</span>
                 <span className="font-semibold">
                   -{currencySymbol}{discountAmount.toFixed(2)}
@@ -602,7 +599,7 @@ export function EpicCheckoutLayout({
 
             {/* Toywards Applied Discount */}
             {rewardDiscountAmount > 0 && (
-              <div className="flex justify-between items-center text-[#FA742B] font-medium text-xs animate-in fade-in">
+              <div className="flex justify-between items-center text-emerald-400 font-medium text-xs animate-in fade-in">
                 <span className="flex items-center gap-1.5">
                   <ToywardsIcon size={13} />
                   <span>Toywards Applied</span>
@@ -622,13 +619,13 @@ export function EpicCheckoutLayout({
             </div>
           </div>
 
-          {/* Toywards Rewards Pill Badge (Brand Orange Theme) */}
+          {/* Toywards Rewards Pill Badge (Minimalist Neutral Theme) */}
           {!isFree && (
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#26150b] border border-[#4a2412] px-3.5 py-2 rounded-lg text-[12.5px] select-none w-fit shadow-xs">
+              <div className="inline-flex items-center gap-2 bg-[#1c1c1c] border border-[#2a2a2a] px-3.5 py-2 rounded-lg text-[12.5px] select-none w-fit shadow-xs">
                 <ToywardsIcon size={15} />
-                <span className="text-zinc-200 font-medium">
-                  Get <strong className="text-white font-bold">{currencySymbol}{rewardsAmount}</strong> in <span className="text-[#FA742B] font-bold">Toywards</span>.
+                <span className="text-zinc-300 font-medium">
+                  Get <strong className="text-white font-bold">{currencySymbol}{rewardsAmount}</strong> in <span className="text-white font-bold">Toywards</span>.
                 </span>
               </div>
             </div>
@@ -642,10 +639,10 @@ export function EpicCheckoutLayout({
                 id="mobile-gift-refund-agree"
                 checked={giftRefundAgreed}
                 onChange={(e) => setGiftRefundAgreed(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded bg-[#242424] border-[#383838] text-[#FA742B] focus:ring-0 accent-[#FA742B] cursor-pointer shrink-0"
+                className="mt-0.5 w-4 h-4 rounded bg-[#242424] border-[#383838] text-white focus:ring-0 accent-white cursor-pointer shrink-0"
               />
               <label htmlFor="mobile-gift-refund-agree" className="text-[11.5px] text-zinc-300 leading-snug cursor-pointer select-none">
-                If my gift is rejected by the recipient, I understand that ProducerToy will refund my purchase. If the refund to my original payment method cannot be completed, I authorize ProducerToy to issue the refund to my account balance instead, and I agree to the <Link href="/purchase-policy" target="_blank" className="text-[#FA742B] hover:underline font-bold">Purchase Terms</Link>.
+                If my gift is rejected by the recipient, I understand that ProducerToy will refund my purchase. If the refund to my original payment method cannot be completed, I authorize ProducerToy to issue the refund to my account balance instead, and I agree to the <Link href="/purchase-policy" target="_blank" className="text-zinc-300 hover:text-white underline font-bold">Purchase Terms</Link>.
               </label>
             </div>
           )}
@@ -682,7 +679,7 @@ export function EpicCheckoutLayout({
                 {loading || paymentStatus === 'processing' ? (
                   <div className="relative w-5 h-5 flex items-center justify-center">
                     <div className="w-full h-full rounded-full border-2 border-black/20" />
-                    <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-[#FA742B] animate-spin duration-700 ease-linear" />
+                    <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-black animate-spin duration-700 ease-linear" />
                   </div>
                 ) : (
                   <span>
@@ -703,13 +700,13 @@ export function EpicCheckoutLayout({
           <div className="pt-1 space-y-2 text-[11px] text-zinc-400 leading-relaxed select-none pb-6">
             <p>
               By selecting &lsquo;{hasGiftItems ? (isFree ? 'Send Gift' : 'Pay and Send Gift') : (isFree ? 'Claim Free Download' : 'Pay Now')}&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
-              <Link href="/eula" target="_blank" className="text-[#FA742B] hover:underline font-medium">
+              <Link href="/eula" target="_blank" className="text-zinc-400 hover:text-white underline font-medium">
                 End User License Agreement
               </Link>.
             </p>
             <p>
               You are paying for a digital license for this product; for terms, see{' '}
-              <Link href="/purchase-policy" target="_blank" className="text-[#FA742B] hover:underline font-medium">
+              <Link href="/purchase-policy" target="_blank" className="text-zinc-400 hover:text-white underline font-medium">
                 purchase policy
               </Link>.
             </p>
@@ -784,11 +781,11 @@ export function EpicCheckoutLayout({
                     {item.is_gift && (
                       <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                         <span className="inline-flex items-center gap-1 bg-[#282828] border border-[#383838] text-zinc-200 text-[10.5px] font-bold px-2 py-0.5 rounded-full">
-                          <Gift size={11} className="text-[#FA742B]" />
+                          <Gift size={11} className="text-zinc-400" />
                           <span>Gift</span>
                         </span>
                         {item.gift_recipient_email && (
-                          <span className="text-[11px] text-[#FA742B] font-medium truncate max-w-[200px]">
+                          <span className="text-[11px] text-zinc-300 font-medium truncate max-w-[200px]">
                             to: {item.gift_recipient_email}
                           </span>
                         )}
@@ -832,7 +829,7 @@ export function EpicCheckoutLayout({
 
               {/* Regular / Coupon Discount */}
               {discountAmount > 0.01 && (
-                <div className="flex justify-between items-center text-[#FA742B] font-medium">
+                <div className="flex justify-between items-center text-emerald-400 font-medium">
                   <span>{coupon ? `Coupon Discount (${coupon})` : 'Sale Discount'}</span>
                   <span className="font-semibold">
                     -{currencySymbol}{discountAmount.toFixed(2)}
@@ -842,7 +839,7 @@ export function EpicCheckoutLayout({
 
               {/* Toywards Applied Discount */}
               {rewardDiscountAmount > 0 && (
-                <div className="flex justify-between items-center text-[#FA742B] font-medium animate-in fade-in">
+                <div className="flex justify-between items-center text-emerald-400 font-medium animate-in fade-in">
                   <span className="flex items-center gap-1.5">
                     <ToywardsIcon size={13} />
                     <span>Toywards Applied</span>
@@ -864,10 +861,10 @@ export function EpicCheckoutLayout({
 
             {/* Toywards Rewards Pill Badge */}
             {!isFree && (
-              <div className="inline-flex items-center gap-2 bg-[#26150b] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-[12.5px] select-none w-fit shadow-xs">
+              <div className="inline-flex items-center gap-2 bg-[#1c1c1c] border border-[#2a2a2a] px-3.5 py-1.5 rounded-full text-[12.5px] select-none w-fit shadow-xs">
                 <ToywardsIcon size={15} />
-                <span className="text-zinc-200 font-medium">
-                  Get <strong className="text-white font-bold">{currencySymbol}{rewardsAmount}</strong> in <span className="text-[#FA742B] font-bold">Toywards</span>.
+                <span className="text-zinc-300 font-medium">
+                  Get <strong className="text-white font-bold">{currencySymbol}{rewardsAmount}</strong> in <span className="text-white font-bold">Toywards</span>.
                 </span>
               </div>
             )}
@@ -895,7 +892,7 @@ export function EpicCheckoutLayout({
                 </div>
                 <Link
                   href="/auth?next=/checkout"
-                  className="text-[#FA742B] hover:underline text-xs font-bold transition-colors"
+                  className="text-zinc-300 hover:text-white text-xs font-bold underline transition-colors"
                 >
                   Sign In
                 </Link>
@@ -920,7 +917,7 @@ export function EpicCheckoutLayout({
                   <ToywardsIcon size={18} />
                   <span className="text-[13.5px] font-bold text-white">Toywards</span>
                   {availableRewards > 0 && (
-                    <span className="text-[10.5px] font-bold bg-[#26150b] text-[#FA742B] border border-[#4a2412] px-2 py-0.5 rounded-full">
+                    <span className="text-[10.5px] font-bold bg-[#282828] text-zinc-300 border border-[#383838] px-2 py-0.5 rounded-full">
                       {currencySymbol}{isIndia ? Math.round(availableRewards * 95) : availableRewards.toFixed(2)} Available
                     </span>
                   )}
@@ -940,7 +937,7 @@ export function EpicCheckoutLayout({
                           type="checkbox"
                           checked={Boolean(useRewards)}
                           onChange={(e) => onToggleRewards && onToggleRewards(e.target.checked)}
-                          className="mt-0.5 accent-[#FA742B] w-4 h-4 rounded cursor-pointer"
+                          className="mt-0.5 accent-white w-4 h-4 rounded cursor-pointer"
                         />
                         <div className="space-y-0.5">
                           <span className="text-xs font-bold text-white block">
@@ -960,7 +957,7 @@ export function EpicCheckoutLayout({
                       <Link
                         href="/features/toywards"
                         target="_blank"
-                        className="inline-block text-[11.5px] text-[#FA742B] hover:underline font-bold"
+                        className="inline-block text-[11.5px] text-zinc-300 hover:text-white hover:underline font-bold"
                       >
                         Learn more
                       </Link>
@@ -998,7 +995,7 @@ export function EpicCheckoutLayout({
 
                       <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                         selectedMethod === 'upi'
-                          ? 'border-[#FA742B] bg-[#FA742B]'
+                          ? 'border-white bg-white'
                           : 'border-[#404040] bg-transparent'
                       }`}>
                         {selectedMethod === 'upi' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -1029,7 +1026,7 @@ export function EpicCheckoutLayout({
 
                       <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                         selectedMethod === 'paypal'
-                          ? 'border-[#FA742B] bg-[#FA742B]'
+                          ? 'border-white bg-white'
                           : 'border-[#404040] bg-transparent'
                       }`}>
                         {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -1055,7 +1052,7 @@ export function EpicCheckoutLayout({
 
                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                       selectedMethod === 'card'
-                        ? 'border-[#FA742B] bg-[#FA742B]'
+                        ? 'border-white bg-white'
                         : 'border-[#404040] bg-transparent'
                     }`}>
                       {selectedMethod === 'card' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -1084,7 +1081,7 @@ export function EpicCheckoutLayout({
 
                     <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                       selectedMethod === 'gpay'
-                        ? 'border-[#FA742B] bg-[#FA742B]'
+                        ? 'border-white bg-white'
                         : 'border-[#404040] bg-transparent'
                     }`}>
                       {selectedMethod === 'gpay' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -1114,7 +1111,7 @@ export function EpicCheckoutLayout({
 
                       <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
                         selectedMethod === 'paypal'
-                          ? 'border-[#FA742B] bg-[#FA742B]'
+                          ? 'border-white bg-white'
                           : 'border-[#404040] bg-transparent'
                       }`}>
                         {selectedMethod === 'paypal' && <div className="w-1.5 h-1.5 rounded-full bg-black" />}
@@ -1167,7 +1164,7 @@ export function EpicCheckoutLayout({
                       placeholder="ENTER CREATOR CODE"
                       value={coupon}
                       onChange={(e) => setCoupon(e.target.value.toUpperCase())}
-                      className="flex-1 h-8 bg-[#121212] border border-[#282828] text-white text-xs px-3 rounded-md outline-none uppercase font-semibold placeholder:text-zinc-500 focus:border-[#FA742B]"
+                      className="flex-1 h-8 bg-[#121212] border border-[#282828] text-white text-xs px-3 rounded-md outline-none uppercase font-semibold placeholder:text-zinc-500 focus:border-zinc-400"
                     />
                     <button
                       type="button"
@@ -1234,10 +1231,10 @@ export function EpicCheckoutLayout({
                   id="gift-refund-agree"
                   checked={giftRefundAgreed}
                   onChange={(e) => setGiftRefundAgreed(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded bg-[#202020] border-[#383838] text-[#FA742B] focus:ring-0 accent-[#FA742B] cursor-pointer shrink-0"
+                  className="mt-0.5 w-4 h-4 rounded bg-[#202020] border-[#383838] text-white focus:ring-0 accent-white cursor-pointer shrink-0"
                 />
                 <label htmlFor="gift-refund-agree" className="text-[11.5px] text-zinc-300 leading-snug cursor-pointer select-none">
-                  If my gift is rejected by the recipient, I understand that ProducerToy will refund my purchase. If the refund to my original payment method cannot be completed, I authorize ProducerToy to issue the refund to my account balance instead, and I agree to the <Link href="/purchase-policy" target="_blank" className="text-[#FA742B] hover:underline font-bold">Purchase Terms</Link>.
+                  If my gift is rejected by the recipient, I understand that ProducerToy will refund my purchase. If the refund to my original payment method cannot be completed, I authorize ProducerToy to issue the refund to my account balance instead, and I agree to the <Link href="/purchase-policy" target="_blank" className="text-zinc-300 hover:text-white underline font-bold">Purchase Terms</Link>.
                 </label>
               </div>
             )}
@@ -1273,7 +1270,7 @@ export function EpicCheckoutLayout({
                 {loading || paymentStatus === 'processing' ? (
                   <div className="relative w-5 h-5 flex items-center justify-center">
                     <div className="w-full h-full rounded-full border-2 border-black/20" />
-                    <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-[#FA742B] animate-spin duration-700 ease-linear" />
+                    <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-black animate-spin duration-700 ease-linear" />
                   </div>
                 ) : (
                   <span>
@@ -1292,10 +1289,10 @@ export function EpicCheckoutLayout({
             {/* Legal & Compliance Disclaimer */}
             <p className="text-[10px] text-zinc-400 leading-relaxed select-none">
               By selecting &lsquo;{hasGiftItems ? (isFree ? 'Send Gift' : 'Pay and Send Gift') : (isFree ? 'Claim Free Download' : 'Pay Now')}&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
-              <Link href="/eula" target="_blank" className="text-[#FA742B] hover:underline font-medium">
+              <Link href="/eula" target="_blank" className="text-zinc-400 hover:text-white underline font-medium">
                 End User License Agreement
               </Link>. You are paying for a digital license for this product; for terms, see{' '}
-              <Link href="/purchase-policy" target="_blank" className="text-[#FA742B] hover:underline font-medium">
+              <Link href="/purchase-policy" target="_blank" className="text-zinc-400 hover:text-white underline font-medium">
                 purchase policy
               </Link>.
             </p>
