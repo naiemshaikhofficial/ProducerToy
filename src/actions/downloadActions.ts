@@ -34,29 +34,48 @@ export async function getSecureDownloadUrlAction(
 
     const adminSupabase = getAdminClient()
 
-    // 1. Verify Product exists in catalog
-    const { data: product, error: productError } = await adminSupabase
+    // 1. Verify Product exists in catalog (support both UUID id and slug)
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId)
+    
+    let productQuery = adminSupabase
       .from('products')
-      .select('id, name, product_type, price_usd, price_inr, is_free')
-      .eq('id', productId)
-      .maybeSingle()
+      .select('id, name, slug, product_type, price_usd, price_inr, is_free')
 
-    if (productError || !product) {
-      return { success: false, error: 'Product not found' }
+    if (isUuid) {
+      productQuery = productQuery.eq('id', productId)
+    } else {
+      productQuery = productQuery.eq('slug', productId)
+    }
+
+    const { data: product, error: productError } = await productQuery.maybeSingle()
+    let activeProduct = product
+
+    if (productError || !activeProduct) {
+      // Fallback try opposite field or direct lookup
+      const { data: fallbackProduct } = await adminSupabase
+        .from('products')
+        .select('id, name, slug, product_type, price_usd, price_inr, is_free')
+        .or(`id.eq.${productId},slug.eq.${productId}`)
+        .maybeSingle()
+
+      if (!fallbackProduct) {
+        return { success: false, error: 'Product not found in store catalog' }
+      }
+      activeProduct = fallbackProduct
     }
 
     const isFree =
-      Boolean(product.is_free) ||
-      (Number(product.price_usd || 0) <= 0 && Number(product.price_inr || 0) <= 0)
+      Boolean(activeProduct.is_free) ||
+      (Number(activeProduct.price_usd || 0) <= 0 && Number(activeProduct.price_inr || 0) <= 0)
 
     // 2. If not free, verify ownership in purchases OR claimed gifts
     if (!isFree) {
-      // Check purchases table
+      // Check purchases table (matching both id and slug)
       const { data: purchaseRecord } = await adminSupabase
         .from('purchases')
         .select('id')
         .eq('user_id', user.id)
-        .eq('product_id', productId)
+        .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
         .maybeSingle()
 
       let isOwner = Boolean(purchaseRecord)
@@ -66,7 +85,7 @@ export async function getSecureDownloadUrlAction(
         const { data: giftRecord } = await adminSupabase
           .from('gifts')
           .select('id')
-          .eq('product_id', productId)
+          .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
           .eq('status', 'claimed')
           .or(`recipient_user_id.eq.${user.id},recipient_email.ilike.${user.email.toLowerCase()}`)
           .maybeSingle()
@@ -88,8 +107,8 @@ export async function getSecureDownloadUrlAction(
     const token = signDownloadToken(
       {
         uid: user.id,
-        pid: product.id,
-        type: product.product_type,
+        pid: activeProduct.id,
+        type: activeProduct.product_type,
         platform: platform || 'windows',
         ip: rawIp,
       },

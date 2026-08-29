@@ -1061,7 +1061,12 @@ export function EpicLibraryClient({
                   <button
                     type="button"
                     disabled={isDownloading}
-                    onClick={() => handleStartDownload(product.id, selectedPlatform)}
+                    onClick={() =>
+                      handleStartDownload(
+                        product.id || installProduct.product_id || installProduct.id,
+                        selectedPlatform
+                      )
+                    }
                     className="bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-6 rounded-lg uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isDownloading ? (
