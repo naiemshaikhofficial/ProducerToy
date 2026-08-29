@@ -1,39 +1,26 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  ArrowRight,
   Gift,
-  CheckCircle2,
   Clock,
-  Mail,
-  ExternalLink,
-  Sparkles,
   Download,
-  Key
+  Sparkles,
+  XCircle,
+  CheckCircle2,
+  RefreshCw,
+  Ban
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCurrency } from '@/context/CurrencyContext'
-import { claimGiftAction } from '@/actions/checkoutActions'
-
-export interface UserGift {
-  id: string
-  productId: string
-  productName: string
-  productSlug: string
-  coverImage: string
-  senderEmail: string
-  recipientEmail: string
-  message: string
-  sendDate: string
-  priceUsd: number | string
-  priceInr?: number | string
-  createdAt: string
-  status: 'unopened' | 'received' | 'sent'
-  claimCode: string
-}
+import {
+  getUserGiftsAction,
+  claimUserGiftAction,
+  rejectUserGiftAction,
+  GiftRecord,
+} from '@/actions/giftActions'
 
 type GiftTab = 'all' | 'unopened' | 'received' | 'sent'
 
@@ -44,46 +31,48 @@ const TABS: { id: GiftTab; label: string }[] = [
   { id: 'sent', label: 'Sent' },
 ]
 
-export function GiftsPageClient() {
+export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftRecord[] }) {
   const { user } = useAuth()
   const { formatPrice } = useCurrency()
   const [activeTab, setActiveTab] = useState<GiftTab>('all')
-  const [gifts, setGifts] = useState<UserGift[]>([])
+  const [gifts, setGifts] = useState<GiftRecord[]>(initialGifts)
   const [claimedSuccessId, setClaimedSuccessId] = useState<string | null>(null)
   const [claimLoadingId, setClaimLoadingId] = useState<string | null>(null)
+  const [rejectLoadingId, setRejectLoadingId] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
-  // Load user gifts from localStorage on mount
-  useEffect(() => {
+  const fetchGifts = useCallback(async () => {
     try {
-      const storedGifts: UserGift[] = JSON.parse(localStorage.getItem('pt_user_gifts') || '[]')
-      setGifts(storedGifts)
-    } catch {
-      setGifts([])
+      const res = await getUserGiftsAction()
+      if (res.success && res.gifts) {
+        setGifts(res.gifts)
+      }
+    } catch (e) {
+      console.error('Error fetching gifts:', e)
     }
   }, [])
 
-  // Listen for storage events (e.g. after checkout completion in another tab/modal)
+  // Fetch gifts on auth change or mount
   useEffect(() => {
-    const handleStorageChange = () => {
-      try {
-        const storedGifts: UserGift[] = JSON.parse(localStorage.getItem('pt_user_gifts') || '[]')
-        setGifts(storedGifts)
-      } catch {}
-    }
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [])
+    fetchGifts()
+  }, [user?.id, fetchGifts])
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    await fetchGifts()
+    setIsRefreshing(false)
+  }
 
   // Filter gifts based on active tab & current user
-  const currentUserEmail = user?.email?.toLowerCase() || ''
-  
+  const currentUserEmail = (user?.email || '').toLowerCase()
+
   const filteredGifts = gifts.filter((gift) => {
     const isSentByMe = currentUserEmail
-      ? gift.senderEmail?.toLowerCase() === currentUserEmail
-      : true
+      ? gift.sender_email?.toLowerCase() === currentUserEmail || gift.sender_id === user?.id
+      : false
 
     const isReceivedByMe = currentUserEmail
-      ? gift.recipientEmail?.toLowerCase() === currentUserEmail
+      ? gift.recipient_email?.toLowerCase() === currentUserEmail || gift.recipient_id === user?.id
       : true
 
     if (activeTab === 'sent') {
@@ -93,51 +82,53 @@ export function GiftsPageClient() {
       return isReceivedByMe && gift.status === 'unopened'
     }
     if (activeTab === 'received') {
-      return isReceivedByMe && gift.status === 'received'
+      return isReceivedByMe && gift.status === 'claimed'
     }
     return isSentByMe || isReceivedByMe
   })
 
   // Claim/Open Gift Action
-  const handleClaimGift = async (gift: UserGift) => {
+  const handleClaimGift = async (gift: GiftRecord) => {
     setClaimLoadingId(gift.id)
     try {
-      // 1. Update gift status to received locally
-      const updatedGifts = gifts.map((g) =>
-        g.id === gift.id ? { ...g, status: 'received' as const } : g
-      )
-      setGifts(updatedGifts)
-      localStorage.setItem('pt_user_gifts', JSON.stringify(updatedGifts))
-
-      // 2. Call server action to attach purchase to library in database
-      await claimGiftAction({
-        giftId: gift.id,
-        claimCode: gift.claimCode,
-        productId: gift.productId,
-        recipientEmail: user?.email || gift.recipientEmail,
-      })
-
-      // 3. Add product to library in localStorage fallback
-      const library = JSON.parse(localStorage.getItem('pt_purchased_products') || '[]')
-      if (!library.some((item: any) => item.id === gift.productId)) {
-        library.push({
-          id: gift.productId,
-          name: gift.productName,
-          slug: gift.productSlug,
-          cover_image: gift.coverImage,
-          claimed_at: new Date().toISOString(),
-          is_gift: true,
-          gift_sender: gift.senderEmail,
-        })
-        localStorage.setItem('pt_purchased_products', JSON.stringify(library))
+      const res = await claimUserGiftAction(gift.id)
+      if (res.success) {
+        setGifts((prev) =>
+          prev.map((g) => (g.id === gift.id ? { ...g, status: 'claimed' } : g))
+        )
+        setClaimedSuccessId(gift.id)
+        setTimeout(() => setClaimedSuccessId(null), 3500)
+      } else {
+        alert(res.error || 'Failed to claim gift.')
       }
-
-      setClaimedSuccessId(gift.id)
-      setTimeout(() => setClaimedSuccessId(null), 3000)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to claim gift:', err)
+      alert(err.message || 'Failed to claim gift.')
     } finally {
       setClaimLoadingId(null)
+    }
+  }
+
+  // Decline/Reject Gift Action
+  const handleRejectGift = async (gift: GiftRecord) => {
+    if (!confirm(`Are you sure you want to decline this gift of "${gift.product_name}"?`)) {
+      return
+    }
+    setRejectLoadingId(gift.id)
+    try {
+      const res = await rejectUserGiftAction(gift.id)
+      if (res.success) {
+        setGifts((prev) =>
+          prev.map((g) => (g.id === gift.id ? { ...g, status: 'rejected' } : g))
+        )
+      } else {
+        alert(res.error || 'Failed to decline gift.')
+      }
+    } catch (err: any) {
+      console.error('Failed to decline gift:', err)
+      alert(err.message || 'Failed to decline gift.')
+    } finally {
+      setRejectLoadingId(null)
     }
   }
 
@@ -172,13 +163,25 @@ export function GiftsPageClient() {
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
         
         {/* ========================================================================= */}
-        {/* 1. TOP TITLE HEADER & TABS (Exact 1:1 Match)                              */}
+        {/* 1. TOP TITLE HEADER & TABS                                                */}
         {/* ========================================================================= */}
         <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-none">
-              Gifts
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-none">
+                Gifts
+              </h1>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                title="Refresh Gifts"
+                className={`p-2 rounded-xl bg-[#1c1c1c] hover:bg-[#252525] border border-[#2c2c2c] text-zinc-400 hover:text-white transition-all cursor-pointer ${
+                  isRefreshing ? 'animate-spin' : ''
+                }`}
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* Quick gift summary count pill if gifts exist */}
             {gifts.length > 0 && (
@@ -196,15 +199,15 @@ export function GiftsPageClient() {
                 const isActive = activeTab === tab.id
                 const tabCount = gifts.filter((g) => {
                   const isSentByMe = currentUserEmail
-                    ? g.senderEmail?.toLowerCase() === currentUserEmail
-                    : true
+                    ? g.sender_email?.toLowerCase() === currentUserEmail || g.sender_id === user?.id
+                    : false
                   const isReceivedByMe = currentUserEmail
-                    ? g.recipientEmail?.toLowerCase() === currentUserEmail
+                    ? g.recipient_email?.toLowerCase() === currentUserEmail || g.recipient_id === user?.id
                     : true
 
                   if (tab.id === 'sent') return isSentByMe
                   if (tab.id === 'unopened') return isReceivedByMe && g.status === 'unopened'
-                  if (tab.id === 'received') return isReceivedByMe && g.status === 'received'
+                  if (tab.id === 'received') return isReceivedByMe && g.status === 'claimed'
                   return isSentByMe || isReceivedByMe
                 }).length
 
@@ -242,10 +245,10 @@ export function GiftsPageClient() {
           <div className="mt-6 sm:mt-8 space-y-4">
             {filteredGifts.map((gift) => {
               const isSentByMe = currentUserEmail
-                ? gift.senderEmail?.toLowerCase() === currentUserEmail
+                ? gift.sender_email?.toLowerCase() === currentUserEmail || gift.sender_id === user?.id
                 : false
               const isReceivedByMe = currentUserEmail
-                ? gift.recipientEmail?.toLowerCase() === currentUserEmail
+                ? gift.recipient_email?.toLowerCase() === currentUserEmail || gift.recipient_id === user?.id
                 : true
 
               return (
@@ -256,10 +259,10 @@ export function GiftsPageClient() {
                   {/* Left: Artwork + Details */}
                   <div className="flex items-start gap-4">
                     {/* Cover */}
-                    <div className="relative w-16 h-22 sm:w-20 sm:h-26 rounded-xl overflow-hidden bg-[#121212] border border-[#282828] shrink-0 shadow-md">
+                    <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden bg-[#121212] border border-[#282828] shrink-0 shadow-md">
                       <Image
-                        src={gift.coverImage || '/placeholder.jpg'}
-                        alt={gift.productName}
+                        src={gift.cover_image || '/placeholder.jpg'}
+                        alt={gift.product_name || 'Gift'}
                         fill
                         unoptimized
                         className="object-cover"
@@ -275,34 +278,40 @@ export function GiftsPageClient() {
                               ? isSentByMe && !isReceivedByMe
                                 ? 'bg-amber-950/40 border-amber-600/40 text-amber-400'
                                 : 'bg-[#FA742B]/15 border-[#FA742B]/40 text-[#FA742B]'
-                              : 'bg-emerald-950/40 border-emerald-600/40 text-emerald-400'
+                              : gift.status === 'claimed'
+                              ? 'bg-emerald-950/40 border-emerald-600/40 text-emerald-400'
+                              : 'bg-rose-950/40 border-rose-600/40 text-rose-400'
                           }`}
                         >
                           {gift.status === 'unopened'
                             ? isSentByMe && !isReceivedByMe
                               ? 'Sent to Friend (Unclaimed)'
                               : 'Unopened Gift'
-                            : 'Claimed & In Library'}
+                            : gift.status === 'claimed'
+                            ? isSentByMe && !isReceivedByMe
+                              ? 'Claimed by Friend'
+                              : 'Claimed & In Library'
+                            : 'Declined'}
                         </span>
 
                         <span className="text-xs text-zinc-500 font-mono">
-                          {gift.claimCode}
+                          {gift.claim_code}
                         </span>
                       </div>
 
                       <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
-                        {gift.productName}
+                        {gift.product_name}
                       </h3>
 
                       {/* Sender / Recipient Info */}
                       <div className="flex items-center gap-2 text-xs text-zinc-400 flex-wrap">
                         {isSentByMe ? (
-                          <span>To: <strong className="text-zinc-200">{gift.recipientEmail}</strong></span>
+                          <span>To: <strong className="text-zinc-200">{gift.recipient_email}</strong></span>
                         ) : (
-                          <span>From: <strong className="text-zinc-200">{gift.senderEmail}</strong></span>
+                          <span>From: <strong className="text-zinc-200">{gift.sender_email}</strong></span>
                         )}
                         <span>•</span>
-                        <span>{new Date(gift.sendDate || gift.createdAt).toLocaleDateString()}</span>
+                        <span>{new Date(gift.created_at).toLocaleDateString()}</span>
                       </div>
 
                       {/* Message Note */}
@@ -317,30 +326,47 @@ export function GiftsPageClient() {
                   {/* Right: Actions */}
                   <div className="w-full sm:w-auto flex items-center justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#222222]">
                     {isReceivedByMe && gift.status === 'unopened' ? (
-                      <button
-                        type="button"
-                        onClick={() => handleClaimGift(gift)}
-                        disabled={claimLoadingId === gift.id}
-                        className="w-full sm:w-auto bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        <span>
-                          {claimedSuccessId === gift.id
-                            ? 'Claimed!'
-                            : claimLoadingId === gift.id
-                            ? 'Claiming...'
-                            : 'Claim to Library'}
-                        </span>
-                      </button>
-                    ) : gift.status === 'received' ? (
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          onClick={() => handleClaimGift(gift)}
+                          disabled={claimLoadingId === gift.id || rejectLoadingId === gift.id}
+                          className="flex-1 sm:flex-none bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span>
+                            {claimedSuccessId === gift.id
+                              ? 'Claimed!'
+                              : claimLoadingId === gift.id
+                              ? 'Claiming...'
+                              : 'Claim to Library'}
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRejectGift(gift)}
+                          disabled={claimLoadingId === gift.id || rejectLoadingId === gift.id}
+                          className="bg-[#202020] hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-700/50 text-zinc-400 border border-[#2c2c2c] font-bold text-xs px-3.5 py-3 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+                          title="Decline Gift"
+                        >
+                          <Ban className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : gift.status === 'claimed' ? (
                       <Link
                         href="/library"
                         prefetch={true}
-                        className="w-full sm:w-auto bg-[#202020] hover:bg-[#282828] text-zinc-200 hover:text-white border border-[#2c2c2c] font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+                        className="w-full sm:w-auto bg-[#202020] hover:bg-[#282828] text-zinc-200 hover:text-white border border-[#2c2c2c] font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        <Download className="w-4 h-4 text-zinc-400" />
+                        <Download className="w-4 h-4 text-emerald-400" />
                         <span>View in Library</span>
                       </Link>
+                    ) : gift.status === 'rejected' ? (
+                      <div className="flex items-center gap-1.5 text-xs text-rose-400 font-bold bg-rose-950/30 border border-rose-800/30 px-3.5 py-2 rounded-xl">
+                        <XCircle className="w-4 h-4" />
+                        <span>Declined</span>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold bg-amber-950/30 border border-amber-800/30 px-3.5 py-2 rounded-xl">
                         <Clock className="w-4 h-4" />
@@ -354,7 +380,7 @@ export function GiftsPageClient() {
           </div>
         ) : (
           /* ========================================================================= */
-          /* VIEW B: EMPTY STATE CONTAINER (Exact Screenshot 1 & 2 1:1 Match)          */
+          /* VIEW B: EMPTY STATE CONTAINER                                             */
           /* ========================================================================= */
           <div className="mt-6 sm:mt-8 bg-[#181818] border border-[#242424] rounded-2xl sm:rounded-3xl min-h-[380px] sm:min-h-[480px] p-8 sm:p-14 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-2xl">
             
@@ -403,67 +429,35 @@ export function GiftsPageClient() {
                     strokeLinejoin="round"
                   />
                   {/* Center Vertical Ribbon */}
-                  <line
-                    x1="32"
-                    y1="19"
-                    x2="32"
-                    y2="52"
+                  <path
+                    d="M32 19V52"
                     stroke="#FA742B"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                   />
-                  {/* Accent Ribbon Stripe */}
-                  <line
-                    x1="26"
-                    y1="27"
-                    x2="26"
-                    y2="52"
-                    stroke="#FA742B"
-                    strokeWidth="1.5"
-                    strokeDasharray="2 3"
-                    strokeOpacity="0.4"
-                  />
-                  <line
-                    x1="38"
-                    y1="27"
-                    x2="38"
-                    y2="52"
-                    stroke="#FA742B"
-                    strokeWidth="1.5"
-                    strokeDasharray="2 3"
-                    strokeOpacity="0.4"
-                  />
                 </svg>
-
-                {/* Surrounding Accent Dots / Sparkles */}
-                <div className="absolute -top-2 -left-3 w-1.5 h-1.5 rounded-full bg-[#FA742B]/70" />
-                <div className="absolute top-2 -right-4 w-2 h-2 rounded-full bg-[#FA742B]/80" />
-                <div className="absolute -bottom-2 -right-2 w-1.5 h-1.5 rounded-full bg-[#FA742B]/60" />
-                <div className="absolute bottom-1 -left-4 w-2 h-2 rounded-full bg-[#FA742B]/70" />
               </div>
 
-              {/* Empty Heading */}
-              <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight leading-snug">
+              {/* Headings */}
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                 {getEmptyHeading()}
               </h2>
-
-              {/* Subtitle */}
-              <p className="text-xs sm:text-sm text-zinc-400 mt-1.5 max-w-sm">
+              <p className="text-xs sm:text-sm text-zinc-400 mt-2 max-w-md mx-auto leading-relaxed">
                 {getEmptySubtitle()}
               </p>
 
-              {/* Orange CTA Button (Exact Screenshot Match: Browse Sounds / Browse Tools) */}
-              <Link
-                href="/store"
-                prefetch={true}
-                className="mt-6 sm:mt-7 bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer inline-flex items-center justify-center gap-2"
-              >
-                <span>Browse Sound Kits & Plugins</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+              {/* Call-to-action button to explore and send gifts */}
+              <div className="mt-7">
+                <Link
+                  href="/"
+                  className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <Gift className="w-4 h-4" />
+                  <span>Browse Sound Kits &amp; Plugins</span>
+                </Link>
+              </div>
 
             </div>
-
           </div>
         )}
 

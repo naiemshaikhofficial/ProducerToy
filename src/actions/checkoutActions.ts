@@ -387,6 +387,45 @@ export async function processCheckoutAction(
       console.warn('Orders table record note:', orderErr)
     }
 
+    // Insert Gift records to public.gifts table in Supabase
+    const giftItems = items.filter((i) => i.is_gift || i.gift_recipient_email)
+    if (giftItems.length > 0) {
+      for (const giftItem of giftItems) {
+        const dbProduct = dbProducts.find((p) => p.id === giftItem.id || p.slug === giftItem.slug) || giftItem
+        const recipientEmail = (giftItem.gift_recipient_email || '').trim().toLowerCase()
+        if (recipientEmail && isUUID(dbProduct.id)) {
+          let recipientUserId: string | null = null
+          try {
+            const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+            const recipientUser = usersData?.users?.find(
+              (u: any) => u.email?.toLowerCase() === recipientEmail
+            )
+            if (recipientUser) {
+              recipientUserId = recipientUser.id
+            }
+          } catch {}
+
+          const claimCode = `PT-GIFT-${crypto.randomBytes(3).toString('hex').toUpperCase()}`
+          await adminSupabase.from('gifts').insert({
+            product_id: dbProduct.id,
+            sender_id: targetUserId || null,
+            sender_email: targetEmail,
+            sender_name: billingDetails?.fullName || 'Producer',
+            recipient_id: recipientUserId,
+            recipient_email: recipientEmail,
+            message: giftItem.gift_message || 'Enjoy the gift!',
+            claim_code: claimCode,
+            status: 'unopened',
+            price_usd: Number(dbProduct.price_usd || 0),
+            price_inr: Number(dbProduct.price_inr || 0),
+            created_at: new Date().toISOString(),
+          })
+        }
+      }
+    }
+
+    revalidatePath('/gifts')
+
     // 7. Update Toywards Balance & Log Transaction (if rewards used)
     if (verifiedRewardDiscountUsd > 0 && targetUserId) {
       try {
@@ -820,6 +859,45 @@ export async function verifyRazorpayPaymentAction(params: {
       created_at: new Date().toISOString(),
     })
 
+    // Insert Gift records to public.gifts table in Supabase
+    const giftItems = items.filter((i) => i.is_gift || i.gift_recipient_email)
+    if (giftItems.length > 0) {
+      for (const giftItem of giftItems) {
+        const dbProduct = dbProducts.find((p) => p.id === giftItem.id || p.slug === giftItem.slug) || giftItem
+        const recipientEmail = (giftItem.gift_recipient_email || '').trim().toLowerCase()
+        if (recipientEmail && isUUID(dbProduct.id)) {
+          let recipientUserId: string | null = null
+          try {
+            const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+            const recipientUser = usersData?.users?.find(
+              (u: any) => u.email?.toLowerCase() === recipientEmail
+            )
+            if (recipientUser) {
+              recipientUserId = recipientUser.id
+            }
+          } catch {}
+
+          const claimCode = `PT-GIFT-${crypto.randomBytes(3).toString('hex').toUpperCase()}`
+          await adminSupabase.from('gifts').insert({
+            product_id: dbProduct.id,
+            sender_id: targetUserId || null,
+            sender_email: targetEmail,
+            sender_name: billingDetails?.fullName || 'Producer',
+            recipient_id: recipientUserId,
+            recipient_email: recipientEmail,
+            message: giftItem.gift_message || 'Enjoy the gift!',
+            claim_code: claimCode,
+            status: 'unopened',
+            price_usd: Number(dbProduct.price_usd || 0),
+            price_inr: Number(dbProduct.price_inr || 0),
+            created_at: new Date().toISOString(),
+          })
+        }
+      }
+    }
+
+    revalidatePath('/gifts')
+
     // Toywards Loyalty Rewards (EULA Section 11)
     if (targetUserId) {
       try {
@@ -1161,6 +1239,45 @@ export async function capturePayPalOrderAction(params: {
       items: items,
       created_at: new Date().toISOString(),
     })
+
+    // Insert Gift records to public.gifts table in Supabase
+    const giftItems = items.filter((i) => i.is_gift || i.gift_recipient_email)
+    if (giftItems.length > 0) {
+      for (const giftItem of giftItems) {
+        const dbProduct = dbProducts.find((p) => p.id === giftItem.id || p.slug === giftItem.slug) || giftItem
+        const recipientEmail = (giftItem.gift_recipient_email || '').trim().toLowerCase()
+        if (recipientEmail && isUUID(dbProduct.id)) {
+          let recipientUserId: string | null = null
+          try {
+            const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+            const recipientUser = usersData?.users?.find(
+              (u: any) => u.email?.toLowerCase() === recipientEmail
+            )
+            if (recipientUser) {
+              recipientUserId = recipientUser.id
+            }
+          } catch {}
+
+          const claimCode = `PT-GIFT-${crypto.randomBytes(3).toString('hex').toUpperCase()}`
+          await adminSupabase.from('gifts').insert({
+            product_id: dbProduct.id,
+            sender_id: userId || null,
+            sender_email: targetEmail,
+            sender_name: billingDetails?.fullName || 'Producer',
+            recipient_id: recipientUserId,
+            recipient_email: recipientEmail,
+            message: giftItem.gift_message || 'Enjoy the gift!',
+            claim_code: claimCode,
+            status: 'unopened',
+            price_usd: Number(dbProduct.price_usd || 0),
+            price_inr: Number(dbProduct.price_inr || 0),
+            created_at: new Date().toISOString(),
+          })
+        }
+      }
+    }
+
+    revalidatePath('/gifts')
 
     // Toywards Loyalty Rewards (EULA Section 11)
     if (userId) {

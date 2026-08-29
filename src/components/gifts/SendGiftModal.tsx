@@ -15,6 +15,7 @@ import {
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
+import { validateGiftEligibilityAction } from '@/actions/giftActions'
 
 interface SendGiftModalProps {
   isOpen: boolean
@@ -66,6 +67,7 @@ export function SendGiftModal({
   })
   const [emailError, setEmailError] = useState('')
   const [isTooltipOpen, setIsTooltipOpen] = useState(false)
+  const [isCheckingEligibility, setIsCheckingEligibility] = useState(false)
 
   // Reset state when opened
   useEffect(() => {
@@ -73,6 +75,7 @@ export function SendGiftModal({
       setEmailError('')
       setSelectedMessage('Enjoy the gift!')
       setIsMessageDropdownOpen(false)
+      setIsCheckingEligibility(false)
     }
   }, [isOpen])
 
@@ -98,7 +101,7 @@ export function SendGiftModal({
     setIsMessageDropdownOpen(false)
   }
 
-  const handleGoToCheckout = () => {
+  const handleGoToCheckout = async () => {
     const trimmed = recipientEmail.trim()
     if (!trimmed) {
       setEmailError('Please enter a valid recipient email address.')
@@ -112,6 +115,27 @@ export function SendGiftModal({
       setEmailError('You cannot gift a product to your own account email.')
       return
     }
+
+    setIsCheckingEligibility(true)
+    setEmailError('')
+
+    try {
+      const check = await validateGiftEligibilityAction({
+        productId: product.id,
+        recipientEmail: trimmed,
+        senderEmail: user?.email,
+      })
+
+      if (!check.allowed) {
+        setEmailError(check.reason || 'Cannot send gift to this email.')
+        setIsCheckingEligibility(false)
+        return
+      }
+    } catch (err: any) {
+      console.warn('Eligibility check note:', err)
+    }
+
+    setIsCheckingEligibility(false)
 
     const finalMessage =
       selectedMessage === 'Custom message...'
@@ -408,14 +432,21 @@ export function SendGiftModal({
           <button
             type="button"
             onClick={handleGoToCheckout}
-            disabled={!isFormValid}
-            className={`px-7 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer shadow-md ${
-              isFormValid
+            disabled={!isFormValid || isCheckingEligibility}
+            className={`px-7 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 ${
+              isFormValid && !isCheckingEligibility
                 ? 'bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-95 shadow-[#FA742B]/25'
                 : 'bg-[#222222] text-zinc-500 cursor-not-allowed'
             }`}
           >
-            Go to checkout
+            {isCheckingEligibility ? (
+              <>
+                <div className="w-4 h-4 rounded-full border-2 border-zinc-400 border-t-white animate-spin" />
+                <span>Checking...</span>
+              </>
+            ) : (
+              <span>Go to checkout</span>
+            )}
           </button>
         </div>
 
