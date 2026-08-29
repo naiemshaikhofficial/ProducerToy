@@ -244,16 +244,18 @@ export function CartPageClient() {
                       {/* Actions Row: Gift Icon Button + Move to Wishlist (Screenshot 2 Match) */}
                       <div className="space-y-2.5 pt-1">
                         <div className="flex items-center gap-3">
-                          {/* Gift Button */}
-                          <button
-                            type="button"
-                            onClick={() => handleOpenGiftModal(item)}
-                            className="w-12 h-12 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-200 border border-[#2c2c2c] transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
-                            title="Gift this product"
-                            aria-label="Gift item"
-                          >
-                            <Gift className="w-5 h-5" />
-                          </button>
+                          {/* Gift Button (Only for paid items) */}
+                          {(Number(item.price_usd || 0) > 0 || Number(item.price_inr || 0) > 0) && (
+                            <button
+                              type="button"
+                              onClick={() => handleOpenGiftModal(item)}
+                              className="w-12 h-12 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-200 border border-[#2c2c2c] transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
+                              title="Gift this product"
+                              aria-label="Gift item"
+                            >
+                              <Gift className="w-5 h-5" />
+                            </button>
+                          )}
 
                           {/* Move to Wishlist Button */}
                           <button

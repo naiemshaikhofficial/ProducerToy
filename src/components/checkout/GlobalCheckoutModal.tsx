@@ -216,14 +216,15 @@ export function GlobalCheckoutModal() {
     ? Math.round(availableRewards * liveExchange)
     : availableRewards
 
-  const rewardDiscountAmount = useRewards
+  const hasGiftItems = items.some((i) => i.is_gift || i.gift_recipient_email)
+  const rewardDiscountAmount = (!hasGiftItems && useRewards)
     ? Math.min(amountAfterCoupon, availableRewardsInCurrentCurrency)
     : 0
 
   const finalTotal = Math.max(0, amountAfterCoupon - rewardDiscountAmount)
-  const rewardAmountUsedUsd = isIndia
+  const rewardAmountUsedUsd = (!hasGiftItems && isIndia)
     ? Math.round((rewardDiscountAmount / liveExchange) * 100) / 100
-    : rewardDiscountAmount
+    : (!hasGiftItems ? rewardDiscountAmount : 0)
 
   const handleBillingChange = (field: keyof BillingDetails, value: string) => {
     setBillingDetails((prev) => {
@@ -314,13 +315,19 @@ export function GlobalCheckoutModal() {
     setLoading(true)
     setErrorMsg('')
     try {
+      const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+      if (hasGifts) {
+        setErrorMsg('Gift orders require a paid purchase and cannot be bypassed or claimed for free.')
+        setLoading(false)
+        return
+      }
+
       if (user?.id) {
         await saveBillingAddressAction(user.id, billingDetails).catch(() => {})
       }
-      const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
       const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
       const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
-      setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+      setLastGiftInfo({ hasGifts: false, giftRecipientEmail: '', hasSelfItems })
 
       const res = await processCheckoutOrderAction(
         items.map((i) => ({

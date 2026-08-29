@@ -889,18 +889,20 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               </div>
             )}
 
-            {/* Gift Button */}
-            <button
-              type="button"
-              onClick={() => setGiftModalOpen(true)}
-              className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
-            >
-              <Gift className="w-4 h-4 text-zinc-300" />
-              <span>Gift</span>
-              <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
-                New!
-              </span>
-            </button>
+            {/* Gift Button (Only for paid items) */}
+            {!product.is_coming_soon && (Number(product.price_usd || 0) > 0 || Number(product.price_inr || 0) > 0) && (
+              <button
+                type="button"
+                onClick={() => setGiftModalOpen(true)}
+                className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
+              >
+                <Gift className="w-4 h-4 text-zinc-300" />
+                <span>Gift</span>
+                <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
+                  New!
+                </span>
+              </button>
+            )}
 
             {/* Wishlist Button */}
             <button

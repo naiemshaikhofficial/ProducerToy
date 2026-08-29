@@ -222,7 +222,8 @@ export async function processCheckoutAction(
     const amountAfterCouponUsd = Math.max(0, rawSubtotalUsd - couponDiscountUsd)
 
     let verifiedRewardDiscountUsd = 0
-    if (options?.applyRewards && options?.rewardAmountUsed && targetUserId) {
+    const hasGiftItems = items.some((i) => i.is_gift || i.gift_recipient_email)
+    if (!hasGiftItems && options?.applyRewards && options?.rewardAmountUsed && targetUserId) {
       const { data: userProfile } = await adminSupabase
         .from('profiles')
         .select('reward_balance')
@@ -234,6 +235,14 @@ export async function processCheckoutAction(
     }
 
     const expectedTotalUsd = Math.max(0, amountAfterCouponUsd - verifiedRewardDiscountUsd)
+
+    // Security Rule: Gift items can NEVER be bypassed or claimed via free checkout
+    if (hasGiftItems) {
+      return {
+        success: false,
+        error: 'Gift items require verified payment and cannot be claimed through free checkout.',
+      }
+    }
 
     if (expectedTotalUsd > 0.01) {
       return {
@@ -559,7 +568,8 @@ export async function createRazorpayOrderAction(
     const amountAfterCouponInr = Math.max(0, rawSubtotalInr - couponDiscountInr)
 
     let verifiedRewardDiscountInr = 0
-    if (options?.applyRewards && user?.id) {
+    const hasGiftItems = items.some((i) => i.is_gift || i.gift_recipient_email)
+    if (!hasGiftItems && options?.applyRewards && user?.id) {
       const { data: userProf } = await adminSupabase
         .from('profiles')
         .select('reward_balance')
@@ -1030,7 +1040,8 @@ export async function createPayPalOrderAction(
     const amountAfterCouponUsd = Math.max(0, rawSubtotalUsd - couponDiscountUsd)
 
     let verifiedRewardDiscountUsd = 0
-    if (options?.applyRewards && user?.id) {
+    const hasGiftItems = items.some((i) => i.is_gift || i.gift_recipient_email)
+    if (!hasGiftItems && options?.applyRewards && user?.id) {
       const { data: userProf } = await adminSupabase
         .from('profiles')
         .select('reward_balance')

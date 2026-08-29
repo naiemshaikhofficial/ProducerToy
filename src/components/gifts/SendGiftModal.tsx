@@ -8,14 +8,25 @@ import {
   Calendar,
   ChevronDown,
   HelpCircle,
-  CheckCircle2,
-  Gift,
   AlertCircle
 } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
 import { validateGiftEligibilityAction } from '@/actions/giftActions'
+
+// Windows & Apple SVG Icons
+const WindowsIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.802" />
+  </svg>
+)
+
+const AppleIcon = ({ className = 'w-4 h-4' }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.85-.9.04-2 .6-2.65 1.35-.58.66-.99 1.72-.88 2.76 1.01.08 2-.51 2.61-1.26z" />
+  </svg>
+)
 
 interface SendGiftModalProps {
   isOpen: boolean
@@ -69,11 +80,28 @@ export function SendGiftModal({
   const [isTooltipOpen, setIsTooltipOpen] = useState(false)
   const [isCheckingEligibility, setIsCheckingEligibility] = useState(false)
 
+  // Freeze background scrolling completely when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalBodyOverflow = document.body.style.overflow
+      const originalHtmlOverflow = document.documentElement.style.overflow
+
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
+
+      return () => {
+        document.body.style.overflow = originalBodyOverflow
+        document.documentElement.style.overflow = originalHtmlOverflow
+      }
+    }
+  }, [isOpen])
+
   // Reset state when opened
   useEffect(() => {
     if (isOpen) {
       setEmailError('')
       setSelectedMessage('Enjoy the gift!')
+      setCustomMessageText('')
       setIsMessageDropdownOpen(false)
       setIsCheckingEligibility(false)
     }
@@ -111,6 +139,12 @@ export function SendGiftModal({
       setEmailError('Please enter a valid email format (e.g. producer@example.com).')
       return
     }
+    const isFree = Number(product.price_usd || 0) <= 0 && Number(product.price_inr || 0) <= 0
+    if (isFree) {
+      setEmailError('Free items cannot be gifted. Anyone can claim and download this free product directly from the store.')
+      return
+    }
+
     if (user?.email && trimmed.toLowerCase() === user.email.toLowerCase()) {
       setEmailError('You cannot gift a product to your own account email.')
       return
@@ -191,192 +225,196 @@ export function SendGiftModal({
   const isFormValid = validateEmail(recipientEmail.trim())
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 select-none font-sans">
-      
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 font-sans touch-none">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
 
-      {/* Modal Card (Exact Screenshot 1 & 2 1:1 Layout) */}
-      <div className="relative z-10 w-full max-w-[820px] bg-[#141414] border border-[#242424] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col">
+      {/* Modal Card (1:1 Exact Match with PC & Mobile Screenshots) */}
+      <div className="relative z-10 w-full max-w-[480px] md:max-w-[760px] lg:max-w-[800px] bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl sm:rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[88dvh] sm:max-h-[92vh]">
         
-        {/* Top Header Row */}
-        <div className="px-6 py-5 border-b border-[#202020] flex items-center justify-between">
-          <h2 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
-            <span>Send gift</span>
-          </h2>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-zinc-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Modal Body: 2-Column Grid on Desktop, Stack on Mobile */}
-        <div className="grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-[#202020]">
+        {/* Scrollable Container (Grid on Desktop, Stack on Mobile) */}
+        <div className="overflow-y-auto overscroll-contain touch-pan-y p-5 sm:p-7 md:p-8 flex-1 min-h-0 [scrollbar-width:thin] [scrollbar-color:#383838_transparent] [-webkit-overflow-scrolling:touch]">
           
-          {/* ================= LEFT FORM COLUMN (7 cols) ================= */}
-          <div className="md:col-span-7 p-6 sm:p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
             
-            {/* Field 1: Who's it for? */}
-            <div className="space-y-2 relative">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-                <span>Who&apos;s it for?</span>
-                <span className="text-[#FA742B]">*</span>
-                
-                {/* Tooltip trigger */}
+            {/* ================= LEFT COLUMN: TITLE & FORM INPUTS ================= */}
+            <div className="space-y-5">
+              
+              {/* Header Title */}
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Send gift
+                </h2>
+                {/* Mobile close button */}
                 <button
                   type="button"
-                  onMouseEnter={() => setIsTooltipOpen(true)}
-                  onMouseLeave={() => setIsTooltipOpen(false)}
-                  onClick={() => setIsTooltipOpen(!isTooltipOpen)}
-                  className="text-zinc-400 hover:text-white cursor-pointer ml-1 relative"
-                  aria-label="Info"
+                  onClick={onClose}
+                  className="md:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                  aria-label="Close"
                 >
-                  <HelpCircle className="w-3.5 h-3.5" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Tooltip bubble (Screenshot 1 Match) */}
-              {isTooltipOpen && (
-                <div className="absolute left-0 -top-12 z-30 bg-[#242424] text-zinc-200 text-[11px] px-3.5 py-2 rounded-lg border border-[#383838] shadow-xl max-w-xs animate-in fade-in duration-150 leading-relaxed">
-                  Send digital gifts directly to any verified producer email address.
-                </div>
-              )}
-
-              {/* Recipient Email Input Box */}
-              <div className="relative">
-                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="email"
-                  value={recipientEmail}
-                  onChange={(e) => handleEmailChange(e.target.value)}
-                  placeholder="Enter recipient's registered email"
-                  className={`w-full bg-[#1c1c1c] text-white text-xs sm:text-sm pl-10 pr-9 h-[44px] rounded-xl border transition-colors outline-none placeholder:text-zinc-400 ${
-                    emailError
-                      ? 'border-red-500/80 focus:border-red-500'
-                      : 'border-[#2c2c2c] focus:border-[#FA742B]'
-                  }`}
-                />
-                {recipientEmail && (
+              {/* Field 1: Who's it for? */}
+              <div className="space-y-1.5 relative">
+                <div className="flex items-center justify-between text-xs sm:text-[13px] font-bold text-white">
+                  <div className="flex items-center gap-1">
+                    <span>Who&apos;s it for?</span>
+                    <span className="text-white">*</span>
+                  </div>
+                  
+                  {/* Tooltip trigger */}
                   <button
                     type="button"
-                    onClick={handleClearEmail}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
+                    onMouseEnter={() => setIsTooltipOpen(true)}
+                    onMouseLeave={() => setIsTooltipOpen(false)}
+                    onClick={() => setIsTooltipOpen(!isTooltipOpen)}
+                    className="text-zinc-400 hover:text-white cursor-pointer relative"
+                    aria-label="Help"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <HelpCircle className="w-3.5 h-3.5" />
                   </button>
-                )}
-              </div>
-
-              {emailError && (
-                <div className="text-[11px] text-red-400 flex items-center gap-1.5 pt-0.5">
-                  <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{emailError}</span>
                 </div>
-              )}
-            </div>
 
-            {/* Field 2: Add a message */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-1 text-xs font-bold text-white">
-                <span>Add a message</span>
-                <span className="text-[#FA742B]">*</span>
-              </div>
+                {/* Tooltip Popup */}
+                {isTooltipOpen && (
+                  <div className="absolute right-0 -top-12 z-30 bg-[#282828] text-zinc-200 text-[11px] px-3 py-2 rounded-lg border border-[#3e3e3e] shadow-xl max-w-xs animate-in fade-in duration-150 leading-relaxed">
+                    Send digital sound packs and plugins directly to any producer&apos;s email.
+                  </div>
+                )}
 
-              {/* Custom Message Dropdown Selector (Screenshot 2 Match) */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
-                  className="w-full bg-[#1c1c1c] border border-[#2c2c2c] hover:border-[#383838] text-white text-xs sm:text-sm px-4 h-[44px] rounded-xl flex items-center justify-between cursor-pointer transition-colors text-left"
-                >
-                  <span className="truncate">
-                    {selectedMessage || 'Select a message'}
-                  </span>
-                  <ChevronDown
-                    className={`w-4 h-4 text-zinc-400 transition-transform ${
-                      isMessageDropdownOpen ? 'rotate-180 text-white' : ''
+                {/* Search Input Box */}
+                <div className="relative">
+                  <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="email"
+                    value={recipientEmail}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    placeholder="Search for a display name"
+                    className={`w-full bg-[#141414] text-white text-xs sm:text-sm pl-10 pr-9 h-[44px] rounded-xl border transition-colors outline-none placeholder:text-zinc-500 ${
+                      emailError
+                        ? 'border-red-500/80 focus:border-red-500'
+                        : 'border-[#333333] focus:border-zinc-400'
                     }`}
                   />
-                </button>
+                  {recipientEmail ? (
+                    <button
+                      type="button"
+                      onClick={handleClearEmail}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  )}
+                </div>
 
-                {/* Dropdown Options List */}
-                {isMessageDropdownOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-20"
-                      onClick={() => setIsMessageDropdownOpen(false)}
-                    />
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-[#181818] border border-[#2c2c2c] rounded-xl shadow-2xl overflow-hidden z-30 animate-in fade-in duration-100 divide-y divide-[#222222]">
-                      {PRESET_MESSAGES.map((msg) => (
-                        <button
-                          key={msg}
-                          type="button"
-                          onClick={() => handleSelectMessage(msg)}
-                          className={`w-full text-left px-4 py-3 text-xs sm:text-sm transition-colors cursor-pointer ${
-                            selectedMessage === msg
-                              ? 'bg-[#252525] text-white font-bold'
-                              : 'text-zinc-300 hover:bg-[#202020] hover:text-white'
-                          }`}
-                        >
-                          {msg}
-                        </button>
-                      ))}
-                    </div>
-                  </>
+                {emailError && (
+                  <div className="text-[11px] text-red-400 flex items-center gap-1.5 pt-0.5">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{emailError}</span>
+                  </div>
                 )}
               </div>
 
-              {/* Custom Note input if 'Custom message...' selected */}
-              {selectedMessage === 'Custom message...' && (
-                <textarea
-                  rows={2}
-                  value={customMessageText}
-                  onChange={(e) => setCustomMessageText(e.target.value)}
-                  placeholder="Type your personal note to recipient..."
-                  className="w-full bg-[#1c1c1c] text-white text-xs p-3 rounded-xl border border-[#2c2c2c] focus:border-[#FA742B] outline-none mt-2"
-                />
-              )}
-            </div>
+              {/* Field 2: Add a message */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1 text-xs sm:text-[13px] font-bold text-white">
+                  <span>Add a message</span>
+                  <span className="text-white">*</span>
+                </div>
 
-            {/* Field 3: When shall we send the gift? */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-1 text-xs font-bold text-white">
-                <span>When shall we send the gift?</span>
-                <span className="text-[#FA742B]">*</span>
+                {/* Message Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
+                    className="w-full bg-[#141414] border border-[#333333] hover:border-[#444444] text-white text-xs sm:text-sm px-4 h-[44px] rounded-xl flex items-center justify-between cursor-pointer transition-colors text-left"
+                  >
+                    <span className={`truncate ${!selectedMessage ? 'text-zinc-500' : 'text-white'}`}>
+                      {selectedMessage || 'Select a message'}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-zinc-400 transition-transform ${
+                        isMessageDropdownOpen ? 'rotate-180 text-white' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {/* Dropdown Options */}
+                  {isMessageDropdownOpen && (
+                    <>
+                      <div
+                        className="fixed inset-0 z-20"
+                        onClick={() => setIsMessageDropdownOpen(false)}
+                      />
+                      <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#181818] border border-[#333333] rounded-xl shadow-2xl overflow-hidden z-30 animate-in fade-in duration-100 divide-y divide-[#282828]">
+                        {PRESET_MESSAGES.map((msg) => (
+                          <button
+                            key={msg}
+                            type="button"
+                            onClick={() => handleSelectMessage(msg)}
+                            className={`w-full text-left px-4 py-3 text-xs sm:text-sm transition-colors cursor-pointer ${
+                              selectedMessage === msg
+                                ? 'bg-[#2a2a2a] text-white font-bold'
+                                : 'text-zinc-300 hover:bg-[#222222] hover:text-white'
+                            }`}
+                          >
+                            {msg}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Custom Note input if 'Custom message...' selected */}
+                {selectedMessage === 'Custom message...' && (
+                  <textarea
+                    rows={2}
+                    value={customMessageText}
+                    onChange={(e) => setCustomMessageText(e.target.value)}
+                    placeholder="Type your personal note to recipient..."
+                    className="w-full bg-[#141414] text-white text-xs p-3 rounded-xl border border-[#333333] focus:border-zinc-400 outline-none mt-2"
+                  />
+                )}
               </div>
 
-              <div className="relative">
-                <input
-                  type="date"
-                  value={sendDate}
-                  onChange={(e) => setSendDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full bg-[#1c1c1c] border border-[#2c2c2c] focus:border-[#FA742B] text-white text-xs sm:text-sm px-4 h-[44px] rounded-xl outline-none"
-                />
-                <Calendar className="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              {/* Field 3: When shall we send the gift? */}
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-1 text-xs sm:text-[13px] font-bold text-white">
+                  <span>When shall we send the gift?</span>
+                  <span className="text-white">*</span>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={sendDate}
+                    onChange={(e) => setSendDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full bg-[#141414] border border-[#333333] focus:border-zinc-400 text-white text-xs sm:text-sm px-4 h-[44px] rounded-xl outline-none"
+                  />
+                  <Calendar className="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+
+                <p className="text-[12px] text-zinc-400 leading-tight pt-0.5">
+                  They&apos;ll receive the gift immediately
+                </p>
               </div>
 
-              <p className="text-[11px] text-zinc-400 leading-tight">
-                They&apos;ll receive the gift immediately
-              </p>
             </div>
 
-          </div>
-
-          {/* ================= RIGHT PREVIEW COLUMN (5 cols) ================= */}
-          <div className="md:col-span-5 p-6 sm:p-8 bg-[#161616] flex flex-col justify-between space-y-6">
-            
-            <div className="space-y-4">
-              {/* Product Artwork (16:9) */}
-              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-[#282828] bg-[#121212] shadow-inner">
+            {/* ================= RIGHT COLUMN: PRODUCT CARD ================= */}
+            <div className="bg-[#141414] border border-[#282828] rounded-2xl p-4 space-y-3.5 shadow-inner">
+              
+              {/* Artwork Banner (Landscape 16:9) */}
+              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-[#2a2a2a] bg-[#101010]">
                 <Image
                   src={product.cover_image || '/placeholder.jpg'}
                   alt={product.name}
@@ -386,45 +424,52 @@ export function SendGiftModal({
                 />
               </div>
 
-              {/* Product Title & Price */}
-              <div className="space-y-1">
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug">
+              {/* Product Title & Platform Icon */}
+              <div className="flex items-start justify-between gap-3 pt-0.5">
+                <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-snug">
                   {product.name}
                 </h3>
-                <div className="text-lg font-black text-white">
-                  {formatPrice(
-                    product.price_inr ? Number(product.price_inr) : undefined,
-                    Number(product.price_usd) || 0
-                  )}
+                <div className="flex items-center gap-1 text-zinc-400 shrink-0 pt-0.5">
+                  <WindowsIcon className="w-4 h-4" />
+                  <AppleIcon className="w-4 h-4" />
                 </div>
               </div>
 
-              {/* License Badge Box */}
-              <div className="bg-[#141414] border border-[#242424] rounded-xl p-3 flex items-center gap-2.5">
-                <span className="inline-flex items-center font-black bg-[#FA742B] text-black px-1.5 py-0.5 rounded text-[10px] uppercase">
+              {/* Price */}
+              <div className="text-base sm:text-lg font-bold text-white">
+                {formatPrice(
+                  product.price_inr ? Number(product.price_inr) : undefined,
+                  Number(product.price_usd) || 0
+                )}
+              </div>
+
+              {/* License / Format Badge */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded bg-[#222222] border border-[#333333] flex items-center justify-center text-[10px] font-black text-white shrink-0">
                   100%
-                </span>
-                <span className="text-xs font-bold text-zinc-200">
+                </div>
+                <span className="text-xs font-bold text-zinc-300">
                   Royalty-Free Commercial License
                 </span>
               </div>
-            </div>
 
-            {/* Disclaimer Text at Bottom (Exact Screenshot 1 & 2 Match) */}
-            <p className="text-[11px] text-zinc-500 leading-relaxed">
-              Gifted sound tools can&apos;t be refunded unless the recipient declines the gift.
-            </p>
+              {/* Refund Disclaimer */}
+              <p className="text-[11.5px] text-zinc-400 leading-relaxed pt-2 border-t border-[#222222]">
+                Gifted sound tools and plugins can&apos;t be refunded unless the recipient declines the gift.
+              </p>
+
+            </div>
 
           </div>
 
         </div>
 
-        {/* Modal Footer Controls (Cancel + Go to checkout) */}
-        <div className="px-6 py-4 bg-[#121212] border-t border-[#202020] flex items-center justify-between">
+        {/* Modal Bottom Fixed Actions (Exact Match with Screenshot) */}
+        <div className="px-5 sm:px-7 py-4 bg-[#181818] border-t border-[#2a2a2a] flex items-center gap-4 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-200 text-xs sm:text-sm font-bold transition-colors cursor-pointer"
+            className="px-7 py-3 rounded-xl bg-transparent hover:bg-zinc-800 border border-zinc-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer text-center"
           >
             Cancel
           </button>
@@ -433,15 +478,15 @@ export function SendGiftModal({
             type="button"
             onClick={handleGoToCheckout}
             disabled={!isFormValid || isCheckingEligibility}
-            className={`px-7 py-2.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 ${
+            className={`px-8 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 text-center ${
               isFormValid && !isCheckingEligibility
-                ? 'bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-95 shadow-[#FA742B]/25'
-                : 'bg-[#222222] text-zinc-500 cursor-not-allowed'
+                ? 'bg-white hover:bg-zinc-200 text-black cursor-pointer shadow-lg active:scale-95'
+                : 'bg-[#282828] text-zinc-600 cursor-not-allowed'
             }`}
           >
             {isCheckingEligibility ? (
               <>
-                <div className="w-4 h-4 rounded-full border-2 border-zinc-400 border-t-white animate-spin" />
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-zinc-400 border-t-white animate-spin" />
                 <span>Checking...</span>
               </>
             ) : (
@@ -451,7 +496,6 @@ export function SendGiftModal({
         </div>
 
       </div>
-
     </div>
   )
 }

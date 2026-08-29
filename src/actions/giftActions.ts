@@ -57,6 +57,26 @@ export async function validateGiftEligibilityAction({
       return { allowed: false, reason: 'You cannot gift a product to your own account.' }
     }
 
+    // 0. Strict check: Free / 0-value items cannot be gifted
+    const { data: prodData } = await adminSupabase
+      .from('products')
+      .select('id, name, price_usd, price_inr, is_free')
+      .eq('id', productId)
+      .maybeSingle()
+
+    if (prodData) {
+      const isFree = Boolean(
+        prodData.is_free ||
+        (Number(prodData.price_usd || 0) <= 0 && Number(prodData.price_inr || 0) <= 0)
+      )
+      if (isFree) {
+        return {
+          allowed: false,
+          reason: 'Free items cannot be gifted. Anyone can claim and download this free product directly from the store.',
+        }
+      }
+    }
+
     // 1. Check if recipient already owns the product in purchases
     const { data: existingPurchases } = await adminSupabase
       .from('purchases')

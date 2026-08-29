@@ -117,7 +117,8 @@ export function EpicCheckoutLayout({
     }
   }, [isIndia])
 
-  const isFree = finalTotal <= 0
+  const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+  const isFree = finalTotal <= 0 && !hasGifts
   const rewardsAmount = (finalTotal * 0.05).toFixed(2)
   const vatAmount = (finalTotal * 18) / 118
   const discountAmount = Math.max(0, currentSubtotal - finalTotal - rewardDiscountAmount)
@@ -312,7 +313,11 @@ export function EpicCheckoutLayout({
 
             {isRewardsExpanded && (
               <div className="mt-3 pt-3 border-t border-[#2a2a2a] text-[12.5px] text-zinc-400 space-y-2.5 animate-in fade-in duration-150">
-                {availableRewards > 0 ? (
+                {hasGifts ? (
+                  <div className="bg-[#181818] p-3 rounded-lg border border-[#303030] text-[12px] text-zinc-400 leading-relaxed">
+                    Toywards rewards balance cannot be redeemed for gift purchases. All gifts require verified direct payment.
+                  </div>
+                ) : availableRewards > 0 ? (
                   <div className="space-y-2">
                     <label className="flex items-start gap-2.5 cursor-pointer bg-[#181818] hover:bg-[#222222] p-2.5 rounded-lg border border-[#303030] transition-colors select-none">
                       <input

@@ -22,6 +22,7 @@ import {
   rejectUserGiftAction,
   GiftRecord,
 } from '@/actions/giftActions'
+import { GiftClaimSuccessModal } from '@/components/gifts/GiftClaimSuccessModal'
 
 type GiftTab = 'all' | 'unopened' | 'received' | 'sent'
 
@@ -39,6 +40,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
   const [activeTab, setActiveTab] = useState<GiftTab>('all')
   const [gifts, setGifts] = useState<GiftRecord[]>(initialGifts)
   const [claimedSuccessId, setClaimedSuccessId] = useState<string | null>(null)
+  const [claimedGiftModalData, setClaimedGiftModalData] = useState<GiftRecord | null>(null)
   const [claimLoadingId, setClaimLoadingId] = useState<string | null>(null)
   const [rejectLoadingId, setRejectLoadingId] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -95,12 +97,13 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
     try {
       const res = await claimUserGiftAction(gift.id)
       if (res.success) {
+        const updatedGift: GiftRecord = { ...gift, status: 'claimed' }
         setGifts((prev) =>
-          prev.map((g) => (g.id === gift.id ? { ...g, status: 'claimed' } : g))
+          prev.map((g) => (g.id === gift.id ? updatedGift : g))
         )
         setClaimedSuccessId(gift.id)
+        setClaimedGiftModalData(updatedGift)
         refreshGlobalGifts()
-        setTimeout(() => setClaimedSuccessId(null), 3500)
       } else {
         alert(res.error || 'Failed to claim gift.')
       }
@@ -453,8 +456,8 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
               {/* Call-to-action button to explore and send gifts */}
               <div className="mt-7">
                 <Link
-                  href="/"
-                  className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+                  href="/store"
+                  className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-7 py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-lg active:scale-95 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Gift className="w-4 h-4" />
                   <span>Browse Sound Kits &amp; Plugins</span>
@@ -466,6 +469,14 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
         )}
 
       </div>
+
+      {/* Checkout-Style Gift Claimed Success Confirmation Modal */}
+      <GiftClaimSuccessModal
+        isOpen={Boolean(claimedGiftModalData)}
+        onClose={() => setClaimedGiftModalData(null)}
+        gift={claimedGiftModalData}
+        userEmail={user?.email || undefined}
+      />
     </div>
   )
 }

@@ -1005,8 +1005,8 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Gift Button (Only if not coming soon) */}
-            {!product.is_coming_soon && (
+            {/* Gift Button (Only for paid items) */}
+            {!product.is_coming_soon && (Number(product.price_usd || 0) > 0 || Number(product.price_inr || 0) > 0) && (
               <button
                 type="button"
                 onClick={() => setGiftModalOpen(true)}
