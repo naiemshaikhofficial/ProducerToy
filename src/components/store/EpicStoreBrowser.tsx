@@ -355,16 +355,16 @@ export function EpicStoreBrowser({
         count: eventsCount,
         defaultOpen: eventsCount > 0,
         render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300">
             <label className="flex items-center gap-3 cursor-pointer select-none group">
               <div
-                className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                   selectedEvents.discounted
-                    ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                    : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                    : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
-                {selectedEvents.discounted && <Check className="w-3 h-3 stroke-[3]" />}
+                {selectedEvents.discounted && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
               </div>
               <input
                 type="checkbox"
@@ -374,20 +374,20 @@ export function EpicStoreBrowser({
                 }
                 className="hidden"
               />
-              <span className={selectedEvents.discounted ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+              <span className={selectedEvents.discounted ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                 Discounted
               </span>
             </label>
 
             <label className="flex items-center gap-3 cursor-pointer select-none group">
               <div
-                className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                   selectedEvents.free
-                    ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                    : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                    : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
-                {selectedEvents.free && <Check className="w-3 h-3 stroke-[3]" />}
+                {selectedEvents.free && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
               </div>
               <input
                 type="checkbox"
@@ -397,20 +397,20 @@ export function EpicStoreBrowser({
                 }
                 className="hidden"
               />
-              <span className={selectedEvents.free ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+              <span className={selectedEvents.free ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                 Free Producer Toys
               </span>
             </label>
 
             <label className="flex items-center gap-3 cursor-pointer select-none group">
               <div
-                className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                   selectedEvents.rentToOwn
-                    ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                    : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                    ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                    : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
-                {selectedEvents.rentToOwn && <Check className="w-3 h-3 stroke-[3]" />}
+                {selectedEvents.rentToOwn && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
               </div>
               <input
                 type="checkbox"
@@ -420,7 +420,7 @@ export function EpicStoreBrowser({
                 }
                 className="hidden"
               />
-              <span className={selectedEvents.rentToOwn ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+              <span className={selectedEvents.rentToOwn ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                 Rent to Own
               </span>
             </label>
@@ -433,19 +433,19 @@ export function EpicStoreBrowser({
         count: priceCount,
         defaultOpen: priceCount > 0,
         render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300">
             {PRICE_TIERS.map((tier) => {
               const isChecked = selectedPriceTiers.includes(tier.id)
               return (
                 <label key={tier.id} className="flex items-center gap-3 cursor-pointer select-none group">
                   <div
-                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                    className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                       isChecked
-                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                        ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                        : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
-                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
                   </div>
                   <input
                     type="checkbox"
@@ -459,7 +459,7 @@ export function EpicStoreBrowser({
                     }}
                     className="hidden"
                   />
-                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                     {tier.label}
                   </span>
                 </label>
@@ -469,53 +469,12 @@ export function EpicStoreBrowser({
         ),
       },
       {
-        id: 'types',
-        title: 'Types',
-        count: typesCount,
-        defaultOpen: typesCount > 0,
-        render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-            {PRODUCT_TYPES.map((type) => {
-              const isChecked = selectedProductTypes.includes(type.slug)
-              return (
-                <label key={type.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                  <div
-                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                      isChecked
-                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                    }`}
-                  >
-                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => {
-                      setSelectedProductTypes((prev) =>
-                        prev.includes(type.slug)
-                          ? prev.filter((s) => s !== type.slug)
-                          : [...prev, type.slug]
-                      )
-                    }}
-                    className="hidden"
-                  />
-                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                    {type.label}
-                  </span>
-                </label>
-              )
-            })}
-          </div>
-        ),
-      },
-      {
-        id: 'genres',
-        title: 'Genre & Effects',
+        id: 'genre',
+        title: 'Genre',
         count: genresCount,
         defaultOpen: genresCount > 0,
         render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
             {[...dynamicGenres]
               .sort((a, b) => {
                 const aChecked = selectedGenres.includes(a.id) ? 1 : 0
@@ -527,13 +486,13 @@ export function EpicStoreBrowser({
                 return (
                   <label key={genre.id} className="flex items-center gap-3 cursor-pointer select-none group">
                     <div
-                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                      className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                         isChecked
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                          ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                          : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                       }`}
                     >
-                      {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                      {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
                     </div>
                     <input
                       type="checkbox"
@@ -547,7 +506,7 @@ export function EpicStoreBrowser({
                       }}
                       className="hidden"
                     />
-                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                       {genre.label}
                     </span>
                   </label>
@@ -557,65 +516,24 @@ export function EpicStoreBrowser({
         ),
       },
       {
-        id: 'platforms',
-        title: 'Platform',
-        count: platformsCount,
-        defaultOpen: platformsCount > 0,
-        render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
-            {PLATFORMS.map((plat) => {
-              const isChecked = selectedPlatforms.includes(plat.id)
-              return (
-                <label key={plat.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                  <div
-                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
-                      isChecked
-                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
-                    }`}
-                  >
-                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => {
-                      setSelectedPlatforms((prev) =>
-                        prev.includes(plat.id)
-                          ? prev.filter((p) => p !== plat.id)
-                          : [...prev, plat.id]
-                      )
-                    }}
-                    className="hidden"
-                  />
-                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
-                    {plat.label}
-                  </span>
-                </label>
-              )
-            })}
-          </div>
-        ),
-      },
-      {
         id: 'features',
         title: 'Features',
         count: featuresCount,
         defaultOpen: featuresCount > 0,
         render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300">
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300">
             {FEATURES_LIST.map((feat) => {
               const isChecked = selectedFeatures.includes(feat.id)
               return (
                 <label key={feat.id} className="flex items-center gap-3 cursor-pointer select-none group">
                   <div
-                    className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                    className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                       isChecked
-                        ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                        : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                        ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                        : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
-                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
                   </div>
                   <input
                     type="checkbox"
@@ -629,7 +547,7 @@ export function EpicStoreBrowser({
                     }}
                     className="hidden"
                   />
-                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                     {feat.label}
                   </span>
                 </label>
@@ -639,12 +557,94 @@ export function EpicStoreBrowser({
         ),
       },
       {
+        id: 'types',
+        title: 'Types',
+        count: typesCount,
+        defaultOpen: typesCount > 0,
+        render: () => (
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300">
+            {PRODUCT_TYPES.map((type) => {
+              const isChecked = selectedProductTypes.includes(type.slug)
+              return (
+                <label key={type.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div
+                    className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
+                      isChecked
+                        ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                        : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
+                    }`}
+                  >
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setSelectedProductTypes((prev) =>
+                        prev.includes(type.slug)
+                          ? prev.filter((s) => s !== type.slug)
+                          : [...prev, type.slug]
+                      )
+                    }}
+                    className="hidden"
+                  />
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
+                    {type.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
+        id: 'platforms',
+        title: 'Platform',
+        count: platformsCount,
+        defaultOpen: platformsCount > 0,
+        render: () => (
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300">
+            {PLATFORMS.map((plat) => {
+              const isChecked = selectedPlatforms.includes(plat.id)
+              return (
+                <label key={plat.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                  <div
+                    className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
+                      isChecked
+                        ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                        : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
+                    }`}
+                  >
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setSelectedPlatforms((prev) =>
+                        prev.includes(plat.id)
+                          ? prev.filter((p) => p !== plat.id)
+                          : [...prev, plat.id]
+                      )
+                    }}
+                    className="hidden"
+                  />
+                  <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
+                    {plat.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
+        ),
+      },
+      {
         id: 'brands',
-        title: 'Brands',
+        title: 'Developers',
         count: brandsCount,
         defaultOpen: brandsCount > 0,
         render: () => (
-          <div className="pt-2.5 space-y-2 text-xs text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
             {[...brands]
               .sort((a, b) => {
                 const aChecked = selectedBrands.includes(a.slug) ? 1 : 0
@@ -656,13 +656,13 @@ export function EpicStoreBrowser({
                 return (
                   <label key={brand.id} className="flex items-center gap-3 cursor-pointer select-none group">
                     <div
-                      className={`w-[17px] h-[17px] rounded-[3px] border flex items-center justify-center transition-all ${
+                      className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                         isChecked
-                          ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-sm'
-                          : 'border-zinc-700 bg-transparent group-hover:border-zinc-500'
+                          ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                          : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                       }`}
                     >
-                      {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                      {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
                     </div>
                     <input
                       type="checkbox"
@@ -676,7 +676,7 @@ export function EpicStoreBrowser({
                       }}
                       className="hidden"
                     />
-                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white'}>
+                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
                       {brand.name}
                     </span>
                   </label>
@@ -962,78 +962,91 @@ export function EpicStoreBrowser({
 
 
           {/* ================= RIGHT COLUMN: STICKY FILTERS SIDEBAR (3 Cols) ====== */}
-          <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-3 bg-[#121212] select-none">
+          <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-1 bg-[#121212] select-none">
             
-            {/* Sidebar Top: Filters (Count) + Reset */}
-            <div className="flex items-center justify-between pb-2 border-b border-[#202020]">
-              <span className="text-sm font-bold text-white tracking-tight">
+            {/* Sidebar Top: Filters (Count) */}
+            <div className="flex items-center justify-between pb-3">
+              <h3 className="text-base font-black text-white tracking-tight">
                 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-              </span>
-              {activeFilterCount > 0 && (
-                <button
-                  type="button"
-                  onClick={handleResetAll}
-                  className="text-xs text-[#FA742B] hover:underline font-semibold cursor-pointer"
-                >
-                  Reset
-                </button>
-              )}
+              </h3>
             </div>
 
             {/* Keyword Search Input (Exact Epic Search Box) */}
-            <div className="relative pb-1">
-              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="relative pb-2">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="Keywords"
-                className="w-full bg-[#202020] text-white text-xs pl-9 pr-8 h-9 rounded-lg border border-transparent focus:outline-none focus:bg-[#282828] focus:border-[#383838] placeholder:text-zinc-500 font-sans transition-all"
+                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#282828] text-white text-sm pl-10 pr-9 h-11 rounded-lg border border-transparent focus:border-[#383838] placeholder:text-zinc-500 font-sans transition-all outline-none"
               />
               {searchKeyword && (
                 <button
                   type="button"
                   onClick={() => setSearchKeyword('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer"
                 >
-                  <X className="w-3 h-3" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
 
             {/* Dynamic Sorted Accordion Sections (Active sections automatically at TOP and OPEN) */}
-            {sortedSections.map((sec) => {
-              const isOpen =
-                customSectionToggles[sec.id] !== undefined
-                  ? customSectionToggles[sec.id]
-                  : sec.defaultOpen
+            <div className="divide-y divide-[#222222]">
+              {sortedSections.map((sec) => {
+                const isOpen =
+                  customSectionToggles[sec.id] !== undefined
+                    ? customSectionToggles[sec.id]
+                    : sec.defaultOpen
 
-              return (
-                <div key={sec.id} className="border-t border-[#202020] pt-3">
-                  <button
-                    type="button"
-                    onClick={() => toggleSection(sec.id, sec.defaultOpen)}
-                    className="flex items-center justify-between w-full text-xs font-bold text-white hover:text-zinc-200 transition-colors py-1 cursor-pointer tracking-wider"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span>{sec.title}</span>
-                      {sec.count > 0 && (
-                        <span className="text-[11px] font-bold text-[#FA742B] bg-[#FA742B]/10 px-1.5 py-0.2 rounded">
-                          {sec.count}
-                        </span>
-                      )}
-                    </span>
-                    {isOpen ? (
-                      <ChevronUp className="w-4 h-4 text-zinc-400" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-zinc-400" />
-                    )}
-                  </button>
+                return (
+                  <div key={sec.id} className="py-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(sec.id, sec.defaultOpen)}
+                      className="flex items-center justify-between w-full py-3.5 text-sm font-bold text-white hover:text-zinc-200 transition-colors cursor-pointer"
+                    >
+                      <span className="text-sm font-bold tracking-tight">{sec.title}</span>
+                      <div className="flex items-center gap-2.5">
+                        {sec.count > 0 && (
+                          <span className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
+                            {sec.count}
+                          </span>
+                        )}
+                        {isOpen ? (
+                          <ChevronUp className="w-4 h-4 text-zinc-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-zinc-400" />
+                        )}
+                      </div>
+                    </button>
 
-                  {isOpen && sec.render()}
-                </div>
-              )
-            })}
+                    {isOpen && sec.render()}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Sticky Action Bar (Clear + Orange Apply) */}
+            {(activeFilterCount > 0 || searchKeyword) && (
+              <div className="pt-4 flex items-center gap-3 sticky bottom-4 bg-[#121212]/95 backdrop-blur-sm z-20">
+                <button
+                  type="button"
+                  onClick={handleResetAll}
+                  className="flex-1 py-3 px-4 bg-transparent hover:bg-[#202020] text-white rounded-xl border border-[#333333] hover:border-[#555555] font-bold text-sm transition-all cursor-pointer text-center"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="flex-1 py-3 px-4 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl font-black text-sm shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center"
+                >
+                  Apply
+                </button>
+              </div>
+            )}
 
           </div>
 
@@ -1042,50 +1055,44 @@ export function EpicStoreBrowser({
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MOBILE FILTER SLIDE-OVER DRAWER (< lg)                                 */}
+      {/* 3. 1:1 EPIC GAMES STORE FULL-SCREEN MOBILE FILTER OVERLAY (< lg)          */}
       {/* ========================================================================= */}
       {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-[100] lg:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/80 animate-in fade-in duration-200"
-            onClick={() => setIsMobileFilterOpen(false)}
-          />
+        <div className="fixed inset-0 z-[100] lg:hidden bg-[#121212] flex flex-col w-full h-full overflow-hidden select-none animate-in fade-in duration-150">
+          
+          {/* Scrollable Filter Body */}
+          <div className="flex-1 overflow-y-auto px-5 pt-6 pb-28 custom-scrollbar space-y-4">
+            
+            {/* Header */}
+            <div className="pb-1">
+              <h2 className="text-base font-extrabold text-white tracking-tight">
+                Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+              </h2>
+            </div>
 
-          {/* Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 w-[88vw] max-w-[340px] bg-[#141414] border-l border-[#242424] shadow-2xl p-6 overflow-y-auto flex flex-col justify-between animate-in slide-in-from-right duration-200">
-            <div className="space-y-5">
-              
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-[#FA742B]" />
-                  <span className="text-base font-bold text-white">
-                    Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-                  </span>
-                </div>
+            {/* Keyword Search Input */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                placeholder="Keywords"
+                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#282828] text-white text-sm pl-10 pr-9 h-11 rounded-lg border border-transparent focus:outline-none focus:border-[#383838] placeholder:text-zinc-500 font-sans transition-all"
+              />
+              {searchKeyword && (
                 <button
                   type="button"
-                  onClick={() => setIsMobileFilterOpen(false)}
-                  className="p-1 text-zinc-400 hover:text-white cursor-pointer"
+                  onClick={() => setSearchKeyword('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
-              </div>
+              )}
+            </div>
 
-              {/* Keyword Search */}
-              <div className="relative">
-                <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  placeholder="Keywords"
-                  className="w-full bg-[#202020] text-white text-sm pl-9 pr-4 h-10 rounded-xl border border-transparent focus:outline-none focus:bg-[#282828]"
-                />
-              </div>
-
-              {/* Dynamic Sorted Accordion Sections in Mobile */}
+            {/* Dynamic Sorted Accordion Sections */}
+            <div className="divide-y divide-[#222222]">
               {sortedSections.map((sec) => {
                 const isOpen =
                   customSectionToggles[sec.id] !== undefined
@@ -1093,53 +1100,56 @@ export function EpicStoreBrowser({
                     : sec.defaultOpen
 
                 return (
-                  <div key={sec.id} className="border-t border-[#242424] pt-3">
+                  <div key={sec.id} className="py-1">
                     <button
                       type="button"
                       onClick={() => toggleSection(sec.id, sec.defaultOpen)}
-                      className="flex items-center justify-between w-full text-xs font-bold text-white py-1 cursor-pointer tracking-wider"
+                      className="flex items-center justify-between w-full py-4 text-sm font-bold text-white cursor-pointer"
                     >
-                      <span className="flex items-center gap-2">
-                        <span>{sec.title}</span>
+                      <span className="text-sm font-bold tracking-tight">{sec.title}</span>
+                      <div className="flex items-center gap-2.5">
                         {sec.count > 0 && (
-                          <span className="text-[11px] font-bold text-[#FA742B] bg-[#FA742B]/10 px-1.5 py-0.2 rounded">
+                          <span className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
                             {sec.count}
                           </span>
                         )}
-                      </span>
-                      {isOpen ? (
-                        <ChevronUp className="w-4 h-4 text-zinc-400" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 text-zinc-400" />
-                      )}
+                        {isOpen ? (
+                          <ChevronUp className="w-4 h-4 text-zinc-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-zinc-400" />
+                        )}
+                      </div>
                     </button>
 
                     {isOpen && sec.render()}
                   </div>
                 )
               })}
-
-            </div>
-
-            {/* Mobile Footer Buttons */}
-            <div className="pt-6 border-t border-[#242424] flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleResetAll}
-                className="flex-1 py-3 bg-[#202020] text-zinc-300 hover:text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-              >
-                Reset
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsMobileFilterOpen(false)}
-                className="flex-1 py-3 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl text-xs font-bold shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer"
-              >
-                Show Results
-              </button>
             </div>
 
           </div>
+
+          {/* Fixed Bottom Floating Action Bar (Exact 1:1 Epic Games: Clear & Orange Apply) */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-[#121212] border-t border-[#202020] flex items-center gap-3 z-30 shadow-2xl">
+            <button
+              type="button"
+              onClick={handleResetAll}
+              className="flex-1 py-3 px-4 bg-transparent hover:bg-[#202020] text-white rounded-xl border border-[#333333] hover:border-[#555555] font-bold text-sm transition-all cursor-pointer text-center"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsMobileFilterOpen(false)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              className="flex-1 py-3 px-4 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl font-black text-sm shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center"
+            >
+              Apply
+            </button>
+          </div>
+
         </div>
       )}
 
