@@ -107,7 +107,7 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
 
           {/* View More Bordered Action Button */}
           <Link
-            href="/store?free=true"
+            href="/free-vst-plugins"
             prefetch={true}
             className="px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white hover:text-white bg-transparent hover:bg-white/10 border border-white/20 hover:border-white rounded-lg transition-all cursor-pointer inline-flex items-center justify-center active:scale-95"
           >

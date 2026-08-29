@@ -23,10 +23,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/categories/effects`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/categories/instruments`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
 
-    // Special SEO Landing Filters
-    { url: `${baseUrl}/categories/plugins?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.88 },
-    { url: `${baseUrl}/categories/sounds?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.88 },
-    { url: `${baseUrl}/categories/presets?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.88 },
+    // High-Intent SEO Landing Hubs
+    { url: `${baseUrl}/free-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+    { url: `${baseUrl}/categories/plugins?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/categories/sounds?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/categories/presets?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
 
     // Features & Programs
     { url: `${baseUrl}/features/toywards`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },

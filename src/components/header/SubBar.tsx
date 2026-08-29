@@ -22,7 +22,7 @@ const NAV_LINKS = [
   { label: 'Brands', href: '/manufacturers' },
   { label: 'Rent to Own', href: '/store' },
   { label: 'Blog', href: '/store' },
-  { label: 'Free', href: '/store?free=true' },
+  { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 
 const MOBILE_DISCOVER_OPTIONS = [
@@ -31,7 +31,7 @@ const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Brands', href: '/manufacturers' },
   { label: 'Rent to Own', href: '/store' },
   { label: 'Blog', href: '/store' },
-  { label: 'Free', href: '/store?free=true' },
+  { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 
 export const SubBar: React.FC<SubBarProps> = ({

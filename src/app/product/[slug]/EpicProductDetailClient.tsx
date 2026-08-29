@@ -17,7 +17,7 @@ import {
   Gift,
   Info,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCurrency } from '@/context/CurrencyContext'
@@ -28,8 +28,12 @@ import { useAuth } from '@/context/AuthContext'
 import { ToywardsSparkleIcon } from '@/components/account/RewardsAndWalletTab'
 import { ProductSpecsOverview } from '@/components/ProductTypeSpecs'
 import { SendGiftModal } from '@/components/gifts/SendGiftModal'
+import { EpicRatingModal } from '@/components/product/EpicRatingModal'
+import { ProductFaqSection } from '@/components/product/ProductFaqSection'
+import { RelatedProductsSection } from '@/components/product/RelatedProductsSection'
+import { ProductRatingStats } from '@/actions/ratingActions'
 
-function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
+function WindowsIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <Image
       src="/icons8-windows-100.png"
@@ -41,7 +45,7 @@ function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
   )
 }
 
-function AppleIcon({ className = "w-4 h-4" }: { className?: string }) {
+function AppleIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <Image
       src="/icons8-apple-100.png"
@@ -53,7 +57,13 @@ function AppleIcon({ className = "w-4 h-4" }: { className?: string }) {
   )
 }
 
-export function EpicProductDetailClient({ product }: { product: any }) {
+export function EpicProductDetailClient({
+  product,
+  initialRatingStats,
+}: {
+  product: any
+  initialRatingStats?: ProductRatingStats
+}) {
   const router = useRouter()
   const { user } = useAuth()
   const { formatPrice, convertUsdToInr } = useCurrency()
@@ -66,8 +76,10 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const [copied, setCopied] = useState(false)
   const [isDescExpanded, setIsDescExpanded] = useState(false)
   const [giftModalOpen, setGiftModalOpen] = useState(false)
-  const [giftRecipient, setGiftRecipient] = useState('')
-  const [giftSaved, setGiftSaved] = useState(false)
+  const [ratingModalOpen, setRatingModalOpen] = useState(false)
+  const [ratingStats, setRatingStats] = useState<ProductRatingStats>(
+    initialRatingStats || { averageRating: 4.8, totalReviews: 124, userCanRate: true }
+  )
 
   const isSaved = checkWishlisted(product.id)
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
@@ -115,13 +127,13 @@ export function EpicProductDetailClient({ product }: { product: any }) {
     mediaItems.push({
       type: 'video',
       url: `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`,
-      videoId: ytVideoId
+      videoId: ytVideoId,
     })
   }
 
   const rawImages = [
     product.cover_image,
-    ...dbExtraImages.filter((url: string) => url && url !== product.cover_image)
+    ...dbExtraImages.filter((url: string) => url && url !== product.cover_image),
   ].filter(Boolean)
 
   if (rawImages.length === 0 && product.cover_image) {
@@ -132,7 +144,10 @@ export function EpicProductDetailClient({ product }: { product: any }) {
     mediaItems.push({ type: 'image', url: img })
   })
 
-  const activeMedia = mediaItems[selectedImageIndex] || mediaItems[0] || { type: 'image', url: product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop' }
+  const activeMedia = mediaItems[selectedImageIndex] || mediaItems[0] || {
+    type: 'image',
+    url: product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop',
+  }
 
   const handleAudition = () => {
     if (!product.demo_audio_url) return
@@ -168,18 +183,30 @@ export function EpicProductDetailClient({ product }: { product: any }) {
 
   const formattedType = (type: string) => {
     switch (type) {
-      case 'plugin': return 'Audio Plugin'
-      case 'sample_pack': return 'Sample Pack'
-      case 'preset': return 'Synth Preset'
-      case 'template': return 'DAW Project'
-      case 'sound_kit': return 'Sound Kit'
-      default: return 'Sound Tool'
+      case 'plugin':
+        return 'Audio Plugin'
+      case 'sample_pack':
+        return 'Sample Pack'
+      case 'preset':
+        return 'Synth Preset'
+      case 'template':
+        return 'DAW Project'
+      case 'sound_kit':
+        return 'Sound Kit'
+      default:
+        return 'Sound Tool'
     }
   }
 
-  const availableFormats = product.vst_format || product.format || (product.product_type === 'sample_pack' ? '24-Bit WAV / STEMS' : 'VST3, AU, AAX (64-Bit)')
+  const availableFormats =
+    product.vst_format ||
+    product.format ||
+    (product.product_type === 'sample_pack' ? '24-Bit WAV / STEMS' : 'VST3, AU, AAX (64-Bit)')
   const publisherName = product.publisher || 'Producer Toy'
-  const releaseYear = product.release_year || product.release_date || (product.created_at ? new Date(product.created_at).getFullYear().toString() : '2026')
+  const releaseYear =
+    product.release_year ||
+    product.release_date ||
+    (product.created_at ? new Date(product.created_at).getFullYear().toString() : '2026')
   const developerName = product.brands?.name || product.brand || 'Producer Toy'
 
   const licenseType = (() => {
@@ -224,21 +251,39 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const subCategoryList = product.subcategories?.name
     ? [product.subcategories.name]
     : Array.isArray(product.sub_category || product.subcategory || product.tags)
-      ? (product.sub_category || product.subcategory || product.tags)
-      : typeof (product.sub_category || product.subcategory || product.tags || product.categories?.name) === 'string'
-        ? (product.sub_category || product.subcategory || product.tags || product.categories?.name).split(',')
-        : ['Sound Kits']
+    ? product.sub_category || product.subcategory || product.tags
+    : typeof (product.sub_category || product.subcategory || product.tags || product.categories?.name) === 'string'
+    ? (product.sub_category || product.subcategory || product.tags || product.categories?.name).split(',')
+    : ['Sound Kits']
 
   return (
     <div className="space-y-6 text-white max-w-[1240px] mx-auto font-sans select-none pb-20">
-      
       {/* ========================================================================= */}
-      {/* 1. TOP TITLE HEADER (Exact 1:1 Match)                                     */}
+      {/* 1. TOP TITLE HEADER & EPIC RATING (Exact 1:1 Match)                       */}
       {/* ========================================================================= */}
-      <div>
+      <div className="space-y-2">
         <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
           {product.name}
         </h1>
+
+        {/* Epic Games Store Static Minimalist Star Rating: ★★★★★ 4.7 */}
+        <div className="flex items-center gap-2 pt-0.5 text-sm">
+          <div className="flex items-center text-white text-base tracking-[-2px] select-none">
+            {'★'.repeat(Math.round(ratingStats.averageRating))}
+            <span className="text-zinc-700">{'★'.repeat(5 - Math.round(ratingStats.averageRating))}</span>
+          </div>
+          <span className="text-white font-bold text-sm ml-0.5">{ratingStats.averageRating.toFixed(1)}</span>
+          <span className="text-zinc-500 text-xs font-normal">({ratingStats.totalReviews})</span>
+          {ratingStats.userCanRate && (
+            <button
+              type="button"
+              onClick={() => setRatingModalOpen(true)}
+              className="ml-2 text-xs text-zinc-400 hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+            >
+              {ratingStats.userRating ? `Your rating: ${ratingStats.userRating}★` : 'Rate Product'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ========================================================================= */}
@@ -272,7 +317,6 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       {/* 3. MOBILE HERO & CTA SECTION (< lg ONLY - EXACT SCREENSHOT 1 & 2 MATCH)   */}
       {/* ========================================================================= */}
       <div className="block lg:hidden space-y-5">
-        
         {/* A. Mobile Hero Poster (16:9 aspect) */}
         <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#141414] border border-[#262626]">
           <Image
@@ -292,12 +336,8 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             <span className="text-sm font-bold text-white leading-tight">100%</span>
           </div>
           <div>
-            <div className="text-sm font-semibold text-white leading-tight">
-              100% Royalty-Free
-            </div>
-            <div className="text-xs text-zinc-400 mt-0.5">
-              Commercial Sync & Master Clearance Included
-            </div>
+            <div className="text-sm font-semibold text-white leading-tight">100% Royalty-Free</div>
+            <div className="text-xs text-zinc-400 mt-0.5">Commercial Sync & Master Clearance Included</div>
           </div>
         </div>
 
@@ -333,9 +373,8 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           </div>
         </div>
 
-        {/* E. CTA Action Buttons (Exact Screenshot 1 Stack: Buy Now + Cart, Gift, Wishlist) */}
+        {/* E. CTA Action Buttons */}
         <div className="space-y-3 pt-1">
-          {/* Row 1: Buy Now (Orange) + Cart Button */}
           {product.external_url ? (
             <a
               href={product.external_url}
@@ -367,16 +406,12 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 aria-label="Add to cart"
                 title={added ? 'In Cart' : 'Add to Cart'}
               >
-                {added ? (
-                  <Check className="w-5 h-5 text-white" />
-                ) : (
-                  <ShoppingCart className="w-5 h-5" />
-                )}
+                {added ? <Check className="w-5 h-5 text-white" /> : <ShoppingCart className="w-5 h-5" />}
               </button>
             </div>
           )}
 
-          {/* Row 2: Gift Button (with 'New!' Badge on right) */}
+          {/* Gift Button */}
           <button
             type="button"
             onClick={() => setGiftModalOpen(true)}
@@ -389,23 +424,10 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             </span>
           </button>
 
-          {/* Row 3: Wishlist Button */}
+          {/* Wishlist Button */}
           <button
             type="button"
-            onClick={() =>
-              toggleWishlist({
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                brand: product.brands?.name || product.brand || 'Producer Toy',
-                product_type: product.product_type || 'plugin',
-                price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
-                price_usd: Number(product.price_usd) || 0,
-                cover_image: product.cover_image,
-                vst_format: product.vst_format,
-                short_description: product.short_description,
-              })
-            }
+            onClick={() => toggleWishlist(product.id)}
             className={`w-full py-3.5 px-5 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
               isSaved
                 ? 'bg-rose-950/40 border-rose-600 text-rose-400'
@@ -416,7 +438,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             <span>{isSaved ? 'In Wishlist' : 'Wishlist'}</span>
           </button>
 
-          {/* Audition Demo Button (if demo audio exists) */}
+          {/* Audition Demo Button */}
           {product.demo_audio_url && (
             <button
               type="button"
@@ -438,10 +460,8 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           )}
         </div>
 
-        {/* F. Metadata Specs List (Screenshot 2 Exact Match Table) */}
+        {/* F. Metadata Specs List */}
         <div className="border-t border-b border-[#222222] py-3 space-y-3 text-xs">
-          
-          {/* Toywards Row */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Toywards</span>
             <Link
@@ -454,7 +474,6 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             </Link>
           </div>
 
-          {/* Refund Type Row */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Refund Type</span>
             <div className="flex items-center gap-1 font-semibold text-zinc-200">
@@ -463,25 +482,21 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             </div>
           </div>
 
-          {/* Developer */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Developer</span>
             <span className="font-semibold text-white">{developerName}</span>
           </div>
 
-          {/* Publisher */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Publisher</span>
             <span className="font-semibold text-white">{publisherName}</span>
           </div>
 
-          {/* Release Date */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Release Date</span>
             <span className="font-semibold text-white">{releaseYear}</span>
           </div>
 
-          {/* Platform */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Platform</span>
             <div className="flex items-center gap-2">
@@ -494,15 +509,13 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             </div>
           </div>
 
-          {/* Format */}
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Format</span>
             <span className="font-semibold text-white">{availableFormats}</span>
           </div>
-
         </div>
 
-        {/* G. Social Actions: Share & Report (Side by Side) */}
+        {/* G. Social Actions */}
         <div className="flex items-center gap-3 pt-1">
           <button
             type="button"
@@ -522,18 +535,15 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             <span>Report</span>
           </Link>
         </div>
-
       </div>
 
       {/* ========================================================================= */}
       {/* 4. MAIN 2-COLUMN GRID (DESKTOP >= lg & SHARED BODY CONTENT)               */}
       {/* ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start pt-2">
-        
         {/* ================= LEFT COLUMN (MEDIA & DETAILS) ================= */}
         <div className="lg:col-span-8 space-y-8 w-full">
-          
-          {/* Media Showcase (Audio/Video Trailer + Thumbnails) */}
+          {/* Media Showcase */}
           <div className="space-y-3 w-full">
             <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
               {activeMedia.type === 'video' && activeMedia.videoId ? (
@@ -577,7 +587,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               )}
             </div>
 
-            {/* Thumbnail Carousel Strip (Supports Video Trailers + Images) */}
+            {/* Thumbnail Carousel Strip */}
             {mediaItems.length > 1 && (
               <div className="flex items-center gap-2 pt-1 w-full">
                 <button
@@ -625,7 +635,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             )}
           </div>
 
-          {/* Lead Hook Tagline / Description (Screenshot 3 Match) */}
+          {/* Lead Hook Tagline / Description */}
           <div className="space-y-6 w-full">
             {product.short_description && (
               <p className="text-base sm:text-lg text-zinc-200 leading-relaxed font-medium">
@@ -633,10 +643,10 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               </p>
             )}
 
-            {/* Genres & Features Badges (2-column layout with vertical divider - Screenshot 3 Match) */}
+            {/* Genres & Features Badges */}
             {activeTab === 'overview' && (
               <div className="grid grid-cols-2 gap-6 pt-5 pb-2 border-t border-[#202020]">
-                {/* Genres / Categories (Left Column) */}
+                {/* Genres / Categories */}
                 <div className="space-y-2.5 pr-4 border-r border-[#262626]">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                     Genres
@@ -656,7 +666,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                   </div>
                 </div>
 
-                {/* Features (Right Column) */}
+                {/* Features */}
                 <div className="space-y-2.5 pl-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                     Features
@@ -675,7 +685,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               </div>
             )}
 
-            {/* Highlight Promo Card: Producer Toy Club / Toywards (Screenshot 3 Match) */}
+            {/* Highlight Promo Card: Toywards */}
             <div className="p-6 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-4 shadow-xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center">
@@ -702,7 +712,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               </div>
             </div>
 
-            {/* Detailed Description & Read More (Screenshot 4 Match) */}
+            {/* Detailed Description & Read More */}
             {activeTab === 'overview' && product.full_description && (
               <div className="space-y-3 pt-2">
                 <h3 className="text-xl font-bold text-white tracking-tight">About {product.name}</h3>
@@ -733,30 +743,15 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               <ProductSpecsOverview product={product} />
             )}
 
-            {/* FAQ Tab */}
-            {activeTab === 'faq' && (
-              <div className="space-y-4 pt-4">
-                <h3 className="text-lg font-bold text-white">Frequently Asked Questions</h3>
-                <div className="space-y-3">
-                  <div className="bg-[#161616] border border-[#262626] p-4 rounded-xl space-y-1">
-                    <h4 className="font-semibold text-white text-sm">How do I download my purchase?</h4>
-                    <p className="text-xs text-zinc-400">Once purchased, your file is instantly available under &quot;My Purchases&quot; with direct high-speed download links.</p>
-                  </div>
-                  <div className="bg-[#161616] border border-[#262626] p-4 rounded-xl space-y-1">
-                    <h4 className="font-semibold text-white text-sm">Are these sounds royalty-free?</h4>
-                    <p className="text-xs text-zinc-400">Yes, 100% of products on Producer Toy Store are cleared for commercial use.</p>
-                  </div>
-                </div>
-              </div>
+            {/* FAQ Tab & Overview FAQ Section */}
+            {(activeTab === 'faq' || activeTab === 'overview') && (
+              <ProductFaqSection product={product} />
             )}
-
           </div>
-
         </div>
 
         {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
         <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-4 w-full">
-          
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image
@@ -835,7 +830,6 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 >
                   <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={() => addItem(product, true)}
@@ -872,97 +866,53 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             {/* Wishlist Button */}
             <button
               type="button"
-              onClick={() =>
-                toggleWishlist({
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  brand: product.brands?.name || product.brand || 'Producer Toy',
-                  product_type: product.product_type || 'plugin',
-                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
-                  price_usd: Number(product.price_usd) || 0,
-                  cover_image: product.cover_image,
-                  vst_format: product.vst_format,
-                  short_description: product.short_description,
-                })
-              }
+              onClick={() => toggleWishlist(product.id)}
               className={`w-full py-3 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                 isSaved
-                  ? 'bg-rose-950/40 border-rose-600 text-rose-400'
+                  ? 'bg-white text-black border-white'
                   : 'bg-[#222222] hover:bg-[#2a2a2a] border-[#333333] text-white'
               }`}
             >
-              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-400' : ''}`} />
+              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-black' : ''}`} />
               <span>{isSaved ? 'In Wishlist' : 'Add to Wishlist'}</span>
             </button>
-
-            {/* OS Compatibility Grid */}
-            <div className="grid grid-cols-2 gap-2.5 pt-1">
-              <div
-                title="Compatible with Windows"
-                className="bg-[#1c1c1c] border border-[#2e2e2e] text-white py-3 px-4 rounded-xl flex items-center justify-center shadow-sm select-none"
-              >
-                <WindowsIcon className="w-5 h-5 text-zinc-200" />
-              </div>
-
-              <div
-                title="Compatible with macOS"
-                className="bg-[#1c1c1c] border border-[#2e2e2e] text-white py-3 px-4 rounded-xl flex items-center justify-center shadow-sm select-none"
-              >
-                <AppleIcon className="w-5 h-5 text-zinc-200" />
-              </div>
-            </div>
           </div>
 
           {/* Desktop Metadata Specs Table */}
-          <div className="space-y-3 pt-3 text-xs border-t border-[#222222]">
+          <div className="space-y-3 pt-4 text-xs border-t border-[#202020]">
             <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">Developer</span>
-              {(product.brands?.slug || product.brand) ? (
-                <Link
-                  href={`/store/${product.brands?.slug || (product.brand ? product.brand.toLowerCase().replace(/\s+/g, '-') : '')}`}
-                  prefetch={true}
-                  className="font-semibold text-white hover:underline transition-colors"
-                >
-                  {developerName}
-                </Link>
-              ) : (
-                <span className="font-semibold text-white">{developerName}</span>
-              )}
+              <span className="font-semibold text-white">{developerName}</span>
             </div>
-
             <div className="flex items-center justify-between pb-1">
-              <span className="text-zinc-400">Release Date</span>
+              <span className="text-zinc-400">Publisher</span>
+              <span className="font-semibold text-white">{publisherName}</span>
+            </div>
+            <div className="flex items-center justify-between pb-1">
+              <span className="text-zinc-400">Release Year</span>
               <span className="font-semibold text-white">{releaseYear}</span>
             </div>
-
+            <div className="flex items-center justify-between pb-1">
+              <span className="text-zinc-400">Format</span>
+              <span className="font-semibold text-white">{availableFormats}</span>
+            </div>
             <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">Platform</span>
               <div className="flex items-center gap-2">
-                <span className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center" title="Windows">
+                <span
+                  className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center"
+                  title="Windows"
+                >
                   <WindowsIcon className="w-4 h-4" />
                 </span>
-                <span className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center" title="macOS">
+                <span
+                  className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center"
+                  title="macOS"
+                >
                   <AppleIcon className="w-4 h-4" />
                 </span>
               </div>
             </div>
-
-            {Number(product.price_usd) > 0 && (
-              <div className="flex items-center justify-between pb-1">
-                <span className="text-zinc-400">Toywards</span>
-                <Link
-                  href="/features/toywards"
-                  target="_blank"
-                  className="font-semibold text-zinc-200 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer"
-                  title="Learn more about Toywards"
-                >
-                  <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
-                  <span>Earn <span className="text-[#FA742B] font-bold">Toywards</span></span>
-                </Link>
-              </div>
-            )}
-
             <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">License Type</span>
               <span className="font-semibold text-white">{licenseType}</span>
@@ -979,20 +929,37 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               <span>{copied ? 'Copied!' : 'Share'}</span>
             </button>
           </div>
-
         </div>
-
       </div>
 
       {/* ========================================================================= */}
-      {/* 1:1 SEND GIFT MODAL POPUP (Exact Screenshots 1 & 2 Match)                 */}
+      {/* 4. RELATED PRODUCTS / ALTERNATIVE PLUGINS INTERNAL LINKING MESH            */}
       {/* ========================================================================= */}
-      <SendGiftModal
-        isOpen={giftModalOpen}
-        onClose={() => setGiftModalOpen(false)}
-        product={product}
+      <RelatedProductsSection
+        currentProductId={product.id}
+        currentProductSlug={product.slug}
+        currentProductType={product.product_type}
+        categorySlugs={product.category_slugs}
+        brandName={developerName}
       />
 
+      {/* ========================================================================= */}
+      {/* 5. EPIC 1:1 STAR RATING MODAL (Minimalist Dark UI)                         */}
+      {/* ========================================================================= */}
+      <EpicRatingModal
+        isOpen={ratingModalOpen}
+        onClose={() => setRatingModalOpen(false)}
+        productId={product.id}
+        productSlug={product.slug}
+        productName={product.name}
+        initialRating={ratingStats.userRating || 5}
+        onRatingSuccess={(updatedStats) => setRatingStats(updatedStats)}
+      />
+
+      {/* ========================================================================= */}
+      {/* 6. 1:1 SEND GIFT MODAL POPUP                                              */}
+      {/* ========================================================================= */}
+      <SendGiftModal isOpen={giftModalOpen} onClose={() => setGiftModalOpen(false)} product={product} />
     </div>
   )
 }

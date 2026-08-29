@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Metadata } from 'next'
 import { ProductJsonLd } from '@/components/JsonLd'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
+import { getProductRatingStatsAction } from '@/actions/ratingActions'
 
 export const revalidate = 3600 // Cache static page for 1 hour (revalidate via /api/revalidate)
 
@@ -105,6 +106,8 @@ export default async function EpicProductDetailPage({
     notFound()
   }
 
+  const ratingStats = await getProductRatingStatsAction(product.id)
+
   return (
     <div className="max-w-[1240px] mx-auto px-6 sm:px-8 lg:px-12 py-4 space-y-4 text-white min-h-screen">
       <ProductJsonLd
@@ -117,9 +120,11 @@ export default async function EpicProductDetailPage({
         url={`https://producertoy.com/product/${product.slug}`}
         categoryName={product.product_type || 'VST Plugin'}
         vstFormat={product.vst_format || 'VST3, AU, AAX'}
+        ratingValue={ratingStats.averageRating}
+        reviewCount={ratingStats.totalReviews}
       />
       {/* Main Epic Games Product Detail Client View */}
-      <EpicProductDetailClient product={product} />
+      <EpicProductDetailClient product={product} initialRatingStats={ratingStats} />
     </div>
   )
 }
