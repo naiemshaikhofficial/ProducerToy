@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import {
-  X,
   Search,
   Calendar,
   ChevronDown,
@@ -119,11 +118,6 @@ export function SendGiftModal({
     if (emailError) setEmailError('')
   }
 
-  const handleClearEmail = () => {
-    setRecipientEmail('')
-    setEmailError('')
-  }
-
   const handleSelectMessage = (msg: string) => {
     setSelectedMessage(msg)
     setIsMessageDropdownOpen(false)
@@ -225,46 +219,35 @@ export function SendGiftModal({
   const isFormValid = validateEmail(recipientEmail.trim())
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 font-sans touch-none">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 font-sans select-none touch-none">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/80 backdrop-blur-xs animate-in fade-in duration-200"
         onClick={onClose}
       />
 
-      {/* Modal Card (1:1 Exact Match with PC & Mobile Screenshots) */}
-      <div className="relative z-10 w-full max-w-[480px] md:max-w-[760px] lg:max-w-[800px] bg-[#1e1e1e] border border-[#2e2e2e] rounded-2xl sm:rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[88dvh] sm:max-h-[92vh]">
+      {/* Modal Card (1:1 Exact Match with Screenshot) */}
+      <div className="relative z-10 w-full max-w-[480px] md:max-w-[740px] bg-[#202020] border border-[#2b2b2b] rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.9)] overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[90dvh] sm:max-h-[92vh]">
         
-        {/* Scrollable Container (Grid on Desktop, Stack on Mobile) */}
-        <div className="overflow-y-auto overscroll-contain touch-pan-y p-5 sm:p-7 md:p-8 flex-1 min-h-0 [scrollbar-width:thin] [scrollbar-color:#383838_transparent] [-webkit-overflow-scrolling:touch]">
+        {/* Content Container (2-Column on Desktop, Stack on Mobile) */}
+        <div className="overflow-y-auto overscroll-contain touch-pan-y p-5 sm:p-6 md:p-7 flex-1 min-h-0 [scrollbar-width:thin] [scrollbar-color:#383838_transparent] [-webkit-overflow-scrolling:touch]">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-7 items-start">
             
             {/* ================= LEFT COLUMN: TITLE & FORM INPUTS ================= */}
-            <div className="space-y-5">
+            <div className="space-y-4">
               
-              {/* Header Title */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  Send gift
-                </h2>
-                {/* Mobile close button */}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="md:hidden p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
-                  aria-label="Close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              {/* Title */}
+              <h2 className="text-xl sm:text-[22px] font-bold text-white tracking-tight">
+                Send gift
+              </h2>
 
               {/* Field 1: Who's it for? */}
               <div className="space-y-1.5 relative">
                 <div className="flex items-center justify-between text-xs sm:text-[13px] font-bold text-white">
                   <div className="flex items-center gap-1">
                     <span>Who&apos;s it for?</span>
-                    <span className="text-white">*</span>
+                    <span className="text-[#f5a623]">*</span>
                   </div>
                   
                   {/* Tooltip trigger */}
@@ -287,31 +270,21 @@ export function SendGiftModal({
                   </div>
                 )}
 
-                {/* Search Input Box */}
+                {/* Search Input Box (Screenshot Match) */}
                 <div className="relative">
-                  <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="email"
                     value={recipientEmail}
                     onChange={(e) => handleEmailChange(e.target.value)}
                     placeholder="Search for a display name"
-                    className={`w-full bg-[#141414] text-white text-xs sm:text-sm pl-10 pr-9 h-[44px] rounded-xl border transition-colors outline-none placeholder:text-zinc-500 ${
+                    className={`w-full bg-[#151515] text-white text-xs sm:text-sm pl-10 pr-9 h-[42px] rounded-xl border transition-colors outline-none placeholder:text-zinc-500 ${
                       emailError
                         ? 'border-red-500/80 focus:border-red-500'
-                        : 'border-[#333333] focus:border-zinc-400'
+                        : 'border-[#2d2d2d] focus:border-zinc-400'
                     }`}
                   />
-                  {recipientEmail ? (
-                    <button
-                      type="button"
-                      onClick={handleClearEmail}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  )}
+                  <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
 
                 {emailError && (
@@ -326,7 +299,7 @@ export function SendGiftModal({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1 text-xs sm:text-[13px] font-bold text-white">
                   <span>Add a message</span>
-                  <span className="text-white">*</span>
+                  <span className="text-[#f5a623]">*</span>
                 </div>
 
                 {/* Message Dropdown */}
@@ -334,7 +307,7 @@ export function SendGiftModal({
                   <button
                     type="button"
                     onClick={() => setIsMessageDropdownOpen(!isMessageDropdownOpen)}
-                    className="w-full bg-[#141414] border border-[#333333] hover:border-[#444444] text-white text-xs sm:text-sm px-4 h-[44px] rounded-xl flex items-center justify-between cursor-pointer transition-colors text-left"
+                    className="w-full bg-[#151515] border border-[#2d2d2d] hover:border-[#3d3d3d] text-white text-xs sm:text-sm px-3.5 h-[42px] rounded-xl flex items-center justify-between cursor-pointer transition-colors text-left"
                   >
                     <span className={`truncate ${!selectedMessage ? 'text-zinc-500' : 'text-white'}`}>
                       {selectedMessage || 'Select a message'}
@@ -353,16 +326,16 @@ export function SendGiftModal({
                         className="fixed inset-0 z-20"
                         onClick={() => setIsMessageDropdownOpen(false)}
                       />
-                      <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#181818] border border-[#333333] rounded-xl shadow-2xl overflow-hidden z-30 animate-in fade-in duration-100 divide-y divide-[#282828]">
+                      <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#181818] border border-[#333333] rounded-xl shadow-2xl overflow-hidden z-30 animate-in fade-in duration-100 divide-y divide-[#262626]">
                         {PRESET_MESSAGES.map((msg) => (
                           <button
                             key={msg}
                             type="button"
                             onClick={() => handleSelectMessage(msg)}
-                            className={`w-full text-left px-4 py-3 text-xs sm:text-sm transition-colors cursor-pointer ${
+                            className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm transition-colors cursor-pointer ${
                               selectedMessage === msg
                                 ? 'bg-[#2a2a2a] text-white font-bold'
-                                : 'text-zinc-300 hover:bg-[#222222] hover:text-white'
+                                : 'text-zinc-300 hover:bg-[#202020] hover:text-white'
                             }`}
                           >
                             {msg}
@@ -380,7 +353,7 @@ export function SendGiftModal({
                     value={customMessageText}
                     onChange={(e) => setCustomMessageText(e.target.value)}
                     placeholder="Type your personal note to recipient..."
-                    className="w-full bg-[#141414] text-white text-xs p-3 rounded-xl border border-[#333333] focus:border-zinc-400 outline-none mt-2"
+                    className="w-full bg-[#151515] text-white text-xs p-3 rounded-xl border border-[#2d2d2d] focus:border-zinc-400 outline-none mt-2"
                   />
                 )}
               </div>
@@ -389,7 +362,7 @@ export function SendGiftModal({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1 text-xs sm:text-[13px] font-bold text-white">
                   <span>When shall we send the gift?</span>
-                  <span className="text-white">*</span>
+                  <span className="text-[#f5a623]">*</span>
                 </div>
 
                 <div className="relative">
@@ -398,7 +371,7 @@ export function SendGiftModal({
                     value={sendDate}
                     onChange={(e) => setSendDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full bg-[#141414] border border-[#333333] focus:border-zinc-400 text-white text-xs sm:text-sm px-4 h-[44px] rounded-xl outline-none"
+                    className="w-full bg-[#151515] border border-[#2d2d2d] focus:border-zinc-400 text-white text-xs sm:text-sm px-3.5 h-[42px] rounded-xl outline-none"
                   />
                   <Calendar className="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
@@ -410,11 +383,11 @@ export function SendGiftModal({
 
             </div>
 
-            {/* ================= RIGHT COLUMN: PRODUCT CARD ================= */}
-            <div className="bg-[#141414] border border-[#282828] rounded-2xl p-4 space-y-3.5 shadow-inner">
+            {/* ================= RIGHT COLUMN: PRODUCT CARD (Screenshot Match) ================= */}
+            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-inner">
               
               {/* Artwork Banner (Landscape 16:9) */}
-              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-[#2a2a2a] bg-[#101010]">
+              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-[#262626] bg-[#0d0d0d]">
                 <Image
                   src={product.cover_image || '/placeholder.jpg'}
                   alt={product.name}
@@ -426,7 +399,7 @@ export function SendGiftModal({
 
               {/* Product Title & Platform Icon */}
               <div className="flex items-start justify-between gap-3 pt-0.5">
-                <h3 className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-snug">
+                <h3 className="text-sm sm:text-base font-bold text-white uppercase tracking-tight leading-snug">
                   {product.name}
                 </h3>
                 <div className="flex items-center gap-1 text-zinc-400 shrink-0 pt-0.5">
@@ -436,7 +409,7 @@ export function SendGiftModal({
               </div>
 
               {/* Price */}
-              <div className="text-base sm:text-lg font-bold text-white">
+              <div className="text-base font-bold text-white">
                 {formatPrice(
                   product.price_inr ? Number(product.price_inr) : undefined,
                   Number(product.price_usd) || 0
@@ -445,7 +418,7 @@ export function SendGiftModal({
 
               {/* License / Format Badge */}
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded bg-[#222222] border border-[#333333] flex items-center justify-center text-[10px] font-black text-white shrink-0">
+                <div className="w-6 h-6 rounded bg-[#222222] border border-[#333333] flex items-center justify-center text-[9.5px] font-black text-white shrink-0">
                   100%
                 </div>
                 <span className="text-xs font-bold text-zinc-300">
@@ -454,8 +427,8 @@ export function SendGiftModal({
               </div>
 
               {/* Refund Disclaimer */}
-              <p className="text-[11.5px] text-zinc-400 leading-relaxed pt-2 border-t border-[#222222]">
-                Gifted sound tools and plugins can&apos;t be refunded unless the recipient declines the gift.
+              <p className="text-[11px] text-zinc-400 leading-relaxed pt-2 border-t border-[#202020]">
+                Gifted sound tools can&apos;t be refunded unless the recipient declines the gift.
               </p>
 
             </div>
@@ -464,12 +437,12 @@ export function SendGiftModal({
 
         </div>
 
-        {/* Modal Bottom Fixed Actions (Exact Match with Screenshot) */}
-        <div className="px-5 sm:px-7 py-4 bg-[#181818] border-t border-[#2a2a2a] flex items-center gap-4 shrink-0">
+        {/* Modal Bottom Actions (Exact Match with Screenshot: Left Cancel, Right Go to Checkout) */}
+        <div className="px-5 sm:px-6 md:px-7 pb-5 pt-2 flex items-center justify-between shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-7 py-3 rounded-xl bg-transparent hover:bg-zinc-800 border border-zinc-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer text-center"
+            className="px-6 py-2.5 rounded-xl bg-transparent hover:bg-zinc-800/80 border border-zinc-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer text-center"
           >
             Cancel
           </button>
@@ -478,10 +451,10 @@ export function SendGiftModal({
             type="button"
             onClick={handleGoToCheckout}
             disabled={!isFormValid || isCheckingEligibility}
-            className={`px-8 py-3 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 text-center ${
+            className={`px-7 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 text-center ${
               isFormValid && !isCheckingEligibility
                 ? 'bg-white hover:bg-zinc-200 text-black cursor-pointer shadow-lg active:scale-95'
-                : 'bg-[#282828] text-zinc-600 cursor-not-allowed'
+                : 'bg-[#2a2a2a] text-zinc-500 cursor-not-allowed'
             }`}
           >
             {isCheckingEligibility ? (
