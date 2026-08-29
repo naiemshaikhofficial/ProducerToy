@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogoIcon } from '@/components/Logo'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
-import { ChevronLeft, Eye, EyeOff, Mail, CheckCircle2, Lock, AlertCircle } from 'lucide-react'
+import { ChevronLeft, Eye, EyeOff, Mail, CheckCircle2, Lock, AlertCircle, KeyRound } from 'lucide-react'
 import Link from 'next/link'
 import { checkUserStatusAction } from '@/actions/authActions'
 
@@ -33,31 +33,20 @@ function GoogleIcon({ size = 20 }: { size?: number }) {
   )
 }
 
-// Spotify Icon
-function SpotifyIcon({ size = 20 }: { size?: number }) {
-  return (
-    <img
-      src="/Logo/icons8-spotify-100.png"
-      alt="Spotify"
-      width={size}
-      height={size}
-      className="flex-shrink-0 object-contain"
-    />
-  )
-}
-
 function AuthForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const nextUrl = searchParams.get('next') || '/'
   const supabase = createClient()
 
-  // Navigation mode ('signin' | 'signup') & Step ('email' | 'details')
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
+  // Navigation mode ('signin' | 'signup' | 'forgot' | 'reset') & Step ('email' | 'details')
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'reset'>('signin')
   const [step, setStep] = useState<'email' | 'details'>('email')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const [isResetEmailSent, setIsResetEmailSent] = useState(false)
+  const [resetCountdown, setResetCountdown] = useState(0)
 
   // Form Fields
   const [email, setEmail] = useState('')
@@ -74,6 +63,52 @@ function AuthForm() {
   const [wrongPassword, setWrongPassword] = useState(false)
   const [emailNotConfirmed, setEmailNotConfirmed] = useState(false)
   const [resendingEmail, setResendingEmail] = useState(false)
+
+  // Countdown timer effect for email resend
+  useEffect(() => {
+    let timer: any
+    if (resetCountdown > 0) {
+      timer = setInterval(() => {
+        setResetCountdown((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearInterval(timer)
+    }
+  }, [resetCountdown])
+
+  // Check URL params and Supabase Auth events for Password Recovery
+  useEffect(() => {
+    const modeParam = searchParams.get('mode')
+    if (modeParam === 'reset') {
+      setMode('reset')
+      setStep('details')
+    }
+
+    // Catch hash fragments (Supabase sends recovery token in hash)
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const type = hashParams.get('type')
+      if (type === 'recovery') {
+        setMode('reset')
+        setStep('details')
+      }
+    }
+
+    // Subscribe to auth state changes (handles recovery link click)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('reset')
+        setStep('details')
+        setError('')
+        setMessage('')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [searchParams, supabase])
 
   // Resend confirmation email
   const handleResendConfirmation = async () => {
@@ -98,19 +133,99 @@ function AuthForm() {
     }
   }
 
-  // Handle Forgot Password
-  const handleForgotPassword = async () => {
-    if (!email.trim()) return
+  // Handle Forgot Password Request
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email.trim() || !email.includes('@')) {
+      setError('Please enter a valid email address.')
+      return
+    }
+
     try {
       setLoading(true)
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/auth?mode=reset`,
-      })
-      if (error) throw error
-      setMessage('Password reset link sent! Check your email inbox.')
       setError('')
+      setMessage('')
+
+      // 1. Fast server check if account exists
+      const checkData = await checkUserStatusAction(email.trim())
+      if (!checkData.exists) {
+        setError('No account found with this email address. Please check your email or sign up.')
+        setLoading(false)
+        return
+      }
+
+      // 2. Request password reset email from Supabase
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth?mode=reset')}`
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: callbackUrl,
+      })
+
+      if (resetError) throw resetError
+
+      setIsResetEmailSent(true)
+      setResetCountdown(60)
     } catch (err: any) {
-      setError(err.message || 'Failed to send password reset email.')
+      const msg = err.message || ''
+      if (msg.toLowerCase().includes('rate_limit') || msg.toLowerCase().includes('security purposes')) {
+        setError('Rate limit reached. Please wait a few moments before requesting another reset email.')
+      } else {
+        setError(msg || 'Failed to send password reset email. Please try again.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Handle Resending Password Reset Link
+  const handleResendResetLink = async () => {
+    if (resetCountdown > 0 || !email.trim()) return
+    try {
+      setLoading(true)
+      setError('')
+      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth?mode=reset')}`
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: callbackUrl,
+      })
+      if (resetError) throw resetError
+      setMessage('A fresh password reset link has been sent to your email!')
+      setResetCountdown(60)
+    } catch (err: any) {
+      setError(err.message || 'Failed to resend reset email.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Handle Setting New Password (in Reset Mode)
+  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter your password.')
+      return
+    }
+
+    try {
+      setLoading(true)
+      setError('')
+      setMessage('')
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: password,
+      })
+
+      if (updateError) throw updateError
+
+      setMessage('Password updated successfully! Redirecting you to your destination...')
+      setTimeout(() => {
+        router.push(nextUrl)
+        router.refresh()
+      }, 1500)
+    } catch (err: any) {
+      setError(err.message || 'Failed to update password. Your reset link may have expired.')
     } finally {
       setLoading(false)
     }
@@ -176,26 +291,6 @@ function AuthForm() {
     }
   }
 
-  // Handle Spotify OAuth Login
-  const handleSpotifyLogin = async () => {
-    try {
-      setLoading(true)
-      setError('')
-      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'spotify',
-        options: {
-          redirectTo: callbackUrl,
-          scopes: 'user-read-email playlist-read-private',
-        },
-      })
-      if (error) throw error
-    } catch (err: any) {
-      setError(err.message || 'Spotify authentication failed.')
-      setLoading(false)
-    }
-  }
-
   // Handle Step 1 Email Continue
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault()
@@ -208,7 +303,7 @@ function AuthForm() {
     setStep('details')
   }
 
-  // Handle Step 2 Final Submission
+  // Handle Step 2 Final Submission (Sign in / Sign up)
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -286,7 +381,7 @@ function AuthForm() {
             errLower.includes('invalid credentials') ||
             errLower.includes('user not found')
           ) {
-            // Lightning fast Server Action verification
+            // Fast Server Action verification
             try {
               const checkData = await checkUserStatusAction(email.trim())
 
@@ -330,18 +425,18 @@ function AuthForm() {
   }
 
   return (
-    /* Unified Epic Games Dark Background (#121212) */
+    /* Unified Dark Background (#121212) */
     <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center px-4 py-8 sm:py-14 select-none">
       
-      {/* Epic Games Dark Auth Card Container (#161616 background, border #262626, rounded-2xl) */}
+      {/* Dark Auth Card Container (#161616 background, border #262626, rounded-2xl) */}
       <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-all">
         
-        {/* DEDICATED EMAIL CONFIRMATION SCREEN */}
+        {/* DEDICATED EMAIL CONFIRMATION SCREEN (SIGNUP) */}
         {isEmailSent ? (
-          <div className="flex flex-col items-center text-center space-y-6 py-2">
+          <div className="flex flex-col items-center text-center space-y-6 py-2 animate-in fade-in">
             <div className="w-16 h-16 rounded-full bg-[#202020] border border-[#2e2e2e] flex items-center justify-center relative">
               <Mail className="w-8 h-8 text-zinc-300" />
-              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
+              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-md">
                 <CheckCircle2 className="w-3.5 h-3.5 text-black font-bold" />
               </div>
             </div>
@@ -370,7 +465,7 @@ function AuthForm() {
                   setMode('signin')
                   setStep('email')
                 }}
-                className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all"
+                className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
               >
                 Back to Sign In
               </button>
@@ -381,13 +476,290 @@ function AuthForm() {
               <button
                 type="button"
                 onClick={handleAuthSubmit}
-                className="text-white underline font-semibold hover:text-zinc-200 transition-colors"
+                className="text-white underline font-semibold hover:text-zinc-200 transition-colors cursor-pointer"
               >
                 Resend email
               </button>
             </p>
           </div>
+        ) : mode === 'forgot' ? (
+          /* FORGOT PASSWORD FLOW */
+          <div className="space-y-5 animate-in fade-in">
+            {/* Top Back to Sign In Link */}
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signin')
+                setIsResetEmailSent(false)
+                setError('')
+                setMessage('')
+              }}
+              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white font-bold transition-colors uppercase tracking-wider cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Back to Sign In</span>
+            </button>
+
+            {isResetEmailSent ? (
+              /* DEDICATED PASSWORD RESET EMAIL SENT SCREEN */
+              <div className="flex flex-col items-center text-center space-y-6 py-2 animate-in fade-in">
+                <div className="w-16 h-16 rounded-full bg-[#202020] border border-[#2e2e2e] flex items-center justify-center relative">
+                  <KeyRound className="w-8 h-8 text-zinc-300" />
+                  <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-md">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-black font-bold" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h1 className="text-2xl font-extrabold text-white tracking-tight">Reset link sent</h1>
+                  <p className="text-xs text-zinc-400 leading-relaxed max-w-sm">
+                    We sent a secure password reset link to <span className="font-semibold text-white">{email}</span>. Click the link in the email to create your new password.
+                  </p>
+                </div>
+
+                {message && (
+                  <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{message}</span>
+                  </div>
+                )}
+
+                <div className="w-full space-y-3 pt-2">
+                  <a
+                    href="https://mail.google.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    <span>Open Mail Inbox</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin')
+                      setIsResetEmailSent(false)
+                      setError('')
+                      setMessage('')
+                    }}
+                    className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
+                  >
+                    Back to Sign In
+                  </button>
+                </div>
+
+                <p className="text-xs text-zinc-500 pt-2">
+                  Didn't receive the email?{' '}
+                  <button
+                    type="button"
+                    onClick={handleResendResetLink}
+                    disabled={resetCountdown > 0 || loading}
+                    className="text-white underline font-semibold hover:text-zinc-200 transition-colors disabled:opacity-50 disabled:no-underline cursor-pointer"
+                  >
+                    {resetCountdown > 0 ? `Resend in ${resetCountdown}s` : 'Resend link'}
+                  </button>
+                </p>
+              </div>
+            ) : (
+              /* FORGOT PASSWORD FORM */
+              <>
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <Link href="/" prefetch={true} className="hover:opacity-80 transition-opacity">
+                    <LogoIcon size={48} />
+                  </Link>
+
+                  <h1 className="text-2xl font-extrabold text-white tracking-tight">
+                    Reset your password
+                  </h1>
+                  <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
+                    Enter your registered email address and we'll send you a link to reset your password.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="bg-[#ff4053] text-black font-extrabold p-3.5 rounded-2xl text-xs text-center space-y-2 shadow-lg animate-in fade-in">
+                    <div className="flex items-center justify-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-black flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="block text-[12px] font-semibold text-zinc-300">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75"
+                  >
+                    {loading ? (
+                      <ButtonSpinner size={16} variant="dark" />
+                    ) : (
+                      <span>Send Reset Link</span>
+                    )}
+                  </button>
+                </form>
+
+                <div className="pt-3 text-center text-xs text-zinc-400 border-t border-[#262626]">
+                  <span>Remember your password? </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin')
+                      setError('')
+                      setMessage('')
+                    }}
+                    className="text-white hover:underline font-bold transition-colors ml-1 cursor-pointer"
+                  >
+                    Sign in
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        ) : mode === 'reset' ? (
+          /* RESET PASSWORD SCREEN (SET NEW PASSWORD) */
+          <div className="space-y-5 animate-in fade-in">
+            <div className="flex flex-col items-center text-center space-y-3">
+              <Link href="/" prefetch={true} className="hover:opacity-80 transition-opacity">
+                <LogoIcon size={48} />
+              </Link>
+
+              <div className="w-12 h-12 rounded-full bg-[#202020] border border-[#2e2e2e] flex items-center justify-center">
+                <Lock className="w-6 h-6 text-zinc-300" />
+              </div>
+
+              <h1 className="text-2xl font-extrabold text-white tracking-tight">
+                Create New Password
+              </h1>
+              <p className="text-xs text-zinc-400 max-w-sm leading-relaxed">
+                Choose a strong password with at least 6 characters.
+              </p>
+            </div>
+
+            {error && (
+              <div className="bg-[#ff4053] text-black font-extrabold p-3.5 rounded-2xl text-xs text-center space-y-2 shadow-lg animate-in fade-in">
+                <div className="flex items-center justify-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-black flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              </div>
+            )}
+
+            {message && (
+              <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 px-4 py-3 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 text-center">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{message}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
+              {/* New Password Input */}
+              <div className="space-y-1">
+                <label className="block text-[12px] font-semibold text-zinc-300">
+                  New Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+
+                {/* Password Strength Indicator */}
+                {password.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      {[1, 2, 3, 4].map((bar) => (
+                        <div
+                          key={bar}
+                          className={`h-1 flex-1 rounded-full transition-colors ${
+                            bar <= passwordStrength
+                              ? passwordStrength <= 2
+                                ? 'bg-zinc-400'
+                                : 'bg-white'
+                              : 'bg-[#2a2a2a]'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                      Strength:{' '}
+                      {passwordStrength <= 1
+                        ? 'Weak'
+                        : passwordStrength === 2
+                        ? 'Medium'
+                        : passwordStrength === 3
+                        ? 'Strong'
+                        : 'Very Strong'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Confirm New Password Input */}
+              <div className="space-y-1">
+                <label className="block text-[12px] font-semibold text-zinc-300">
+                  Confirm New Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-75"
+              >
+                {loading ? (
+                  <ButtonSpinner size={16} variant="dark" />
+                ) : (
+                  <span>Update Password &amp; Continue</span>
+                )}
+              </button>
+            </form>
+          </div>
         ) : (
+          /* SIGN IN / SIGN UP FLOW */
           <>
             {/* Back Button */}
             {(step === 'details' || mode === 'signup') && (
@@ -403,7 +775,7 @@ function AuthForm() {
                   setError('')
                   setAccountAlreadyExists(false)
                 }}
-                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white font-bold transition-colors uppercase tracking-wider"
+                className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white font-bold transition-colors uppercase tracking-wider cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -443,13 +815,29 @@ function AuthForm() {
               )}
             </div>
 
-            {/* Epic Games Vibrant Coral-Red Error Pill */}
+            {/* Coral-Red Error Pill */}
             {error && (
               <div className="bg-[#ff4053] text-black font-extrabold p-3.5 rounded-2xl text-xs text-center space-y-2 shadow-lg animate-in fade-in">
                 <div className="flex items-center justify-center gap-2">
                   <AlertCircle className="w-4 h-4 text-black flex-shrink-0" />
-                  <span className="font-extrabold text-xs leading-snug">{error}</span>
+                  <span>{error}</span>
                 </div>
+
+                {accountAlreadyExists && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('signin')
+                      setStep('details')
+                      setError('')
+                      setAccountAlreadyExists(false)
+                    }}
+                    className="mt-1 px-4 py-1.5 bg-black text-white rounded-full text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors shadow-md cursor-pointer block mx-auto"
+                  >
+                    Sign in with this email →
+                  </button>
+                )}
+
                 {noAccountFound && (
                   <button
                     type="button"
@@ -459,44 +847,53 @@ function AuthForm() {
                       setError('')
                       setNoAccountFound(false)
                     }}
-                    className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                    className="mt-1 px-4 py-1.5 bg-black text-white rounded-full text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors shadow-md cursor-pointer block mx-auto"
                   >
-                    <span>Sign Up with this Email</span>
+                    Create new account →
                   </button>
                 )}
-                {accountAlreadyExists && (
+
+                {wrongPassword && (
                   <button
                     type="button"
                     onClick={() => {
-                      setMode('signin')
+                      setMode('forgot')
+                      setIsResetEmailSent(false)
                       setError('')
-                      setAccountAlreadyExists(false)
+                      setMessage('')
                     }}
-                    className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+                    className="mt-1 px-4 py-1.5 bg-black text-white rounded-full text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors shadow-md cursor-pointer block mx-auto"
                   >
-                    Switch to Sign In
+                    Reset forgotten password →
                   </button>
                 )}
+
                 {emailNotConfirmed && (
-                  <button
-                    type="button"
-                    onClick={handleResendConfirmation}
-                    disabled={resendingEmail}
-                    className="w-full mt-1.5 py-2 bg-black hover:bg-zinc-900 text-white font-black text-[11px] rounded-xl uppercase tracking-wider transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-60"
-                  >
-                    {resendingEmail ? (
-                      <ButtonSpinner size={14} variant="light" />
-                    ) : (
-                      <span>Resend Confirmation Email</span>
-                    )}
-                  </button>
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={handleResendConfirmation}
+                      disabled={resendingEmail}
+                      className="px-4 py-1.5 bg-black text-white rounded-full text-xs font-black uppercase tracking-wider hover:bg-zinc-800 transition-colors shadow-md cursor-pointer inline-flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {resendingEmail ? (
+                        <>
+                          <ButtonSpinner size={12} variant="light" />
+                          <span>Sending Link...</span>
+                        </>
+                      ) : (
+                        <span>Resend confirmation email →</span>
+                      )}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
 
+            {/* Info / Success Message Pill */}
             {message && (
-              <div className="bg-[#00df81] text-black font-extrabold p-3.5 rounded-2xl text-xs text-center shadow-lg animate-in fade-in flex items-center justify-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-black flex-shrink-0" />
+              <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 p-3 rounded-xl text-xs flex items-center justify-center gap-2 font-semibold">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>{message}</span>
               </div>
             )}
@@ -523,22 +920,6 @@ function AuthForm() {
                       </>
                     )}
                   </button>
-
-                  {/* 
-                    [FUTURE USE] Spotify OAuth Login Button
-                    To enable: Uncomment the button below and configure Spotify Provider in Supabase Auth Dashboard.
-                  */}
-                  {/* 
-                  <button
-                    type="button"
-                    onClick={handleSpotifyLogin}
-                    disabled={loading}
-                    className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 shadow-sm cursor-pointer"
-                  >
-                    <SpotifyIcon size={18} />
-                    <span>{mode === 'signup' ? 'Continue with Spotify' : 'Sign in with Spotify'}</span>
-                  </button>
-                  */}
                 </div>
 
                 {/* Divider */}
@@ -551,7 +932,7 @@ function AuthForm() {
 
                 {/* Email Form */}
                 <form onSubmit={handleEmailContinue} className="space-y-4">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <label className="block text-[12px] font-semibold text-zinc-300">
                       Email Address
                     </label>
@@ -563,6 +944,24 @@ function AuthForm() {
                       placeholder="name@example.com"
                       className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
                     />
+
+                    {/* Forgot Password Link right below the Email input box */}
+                    {mode === 'signin' && (
+                      <div className="flex justify-end pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setMode('forgot')
+                            setIsResetEmailSent(false)
+                            setError('')
+                            setMessage('')
+                          }}
+                          className="text-[11.5px] text-zinc-400 hover:text-white underline font-semibold transition-colors cursor-pointer"
+                        >
+                          Forgot password?
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <button
@@ -585,7 +984,7 @@ function AuthForm() {
                           setError('')
                           setAccountAlreadyExists(false)
                         }}
-                        className="text-white hover:underline font-bold transition-colors ml-1"
+                        className="text-white hover:underline font-bold transition-colors ml-1 cursor-pointer"
                       >
                         Sign up
                       </button>
@@ -600,7 +999,7 @@ function AuthForm() {
                           setError('')
                           setAccountAlreadyExists(false)
                         }}
-                        className="text-white hover:underline font-bold transition-colors ml-1"
+                        className="text-white hover:underline font-bold transition-colors ml-1 cursor-pointer"
                       >
                         Sign in
                       </button>
@@ -631,9 +1030,26 @@ function AuthForm() {
 
                 {/* Password Input */}
                 <div className="space-y-1">
-                  <label className="block text-[12px] font-semibold text-zinc-300">
-                    Password
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[12px] font-semibold text-zinc-300">
+                      Password
+                    </label>
+                    {mode === 'signin' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMode('forgot')
+                          setIsResetEmailSent(false)
+                          setError('')
+                          setMessage('')
+                        }}
+                        className="text-[11.5px] text-zinc-400 hover:text-white underline font-semibold transition-colors cursor-pointer"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
@@ -646,7 +1062,7 @@ function AuthForm() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors cursor-pointer"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -662,8 +1078,8 @@ function AuthForm() {
                             className={`h-1 flex-1 rounded-full transition-colors ${
                               bar <= passwordStrength
                                 ? passwordStrength <= 2
-                                  ? 'bg-zinc-400'
-                                  : 'bg-white'
+                                ? 'bg-zinc-400'
+                                : 'bg-white'
                                 : 'bg-[#2a2a2a]'
                             }`}
                           />
@@ -701,23 +1117,11 @@ function AuthForm() {
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors cursor-pointer"
                       >
                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                  </div>
-                )}
-
-                {mode === 'signin' && (
-                  <div className="text-right">
-                    <button
-                      type="button"
-                      onClick={handleForgotPassword}
-                      className="text-xs text-zinc-400 hover:text-white transition-colors underline font-semibold cursor-pointer"
-                    >
-                      Forgot password?
-                    </button>
                   </div>
                 )}
 
@@ -751,7 +1155,13 @@ function AuthForm() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#121212] flex items-center justify-center text-white text-xs font-mono">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+          <ButtonSpinner size={24} variant="light" />
+        </div>
+      }
+    >
       <AuthForm />
     </Suspense>
   )
