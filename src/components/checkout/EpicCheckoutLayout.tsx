@@ -122,14 +122,18 @@ export function EpicCheckoutLayout({
   const vatAmount = (finalTotal * 18) / 118
   const discountAmount = Math.max(0, currentSubtotal - finalTotal - rewardDiscountAmount)
 
-  // Derive User Display Name and Initial
+  // Derive User Display Name and Initial (Guest vs Authenticated)
+  const isGuest = !user
   const displayName = user
     ? user.user_metadata?.full_name ||
       user.user_metadata?.name ||
-      billingDetails.fullName ||
-      (user.email ? user.email.split('@')[0] : 'Producer')
-    : billingDetails.fullName || 'Naiem Shaikh'
-  const initialLetter = displayName ? displayName[0].toUpperCase() : 'N'
+      user.user_metadata?.display_name ||
+      (user.email ? user.email.split('@')[0] : 'User')
+    : (billingDetails.fullName?.trim() || 'Guest')
+
+  const initialLetter = user
+    ? (displayName ? displayName[0].toUpperCase() : 'U')
+    : (billingDetails.fullName?.trim() ? billingDetails.fullName.trim()[0].toUpperCase() : 'G')
 
   const handlePayClick = () => {
     if (isFree) {
@@ -161,10 +165,20 @@ export function EpicCheckoutLayout({
         
         {/* Sticky Mobile Header */}
         <div className="sticky top-0 z-30 h-14 bg-[#141414] border-b border-[#222222] px-4 flex items-center justify-between flex-shrink-0">
-          {/* User Initial Circle (Left) */}
-          <div className="w-7 h-7 rounded-full bg-[#242424] border border-[#383838] text-white flex items-center justify-center text-xs font-bold shadow-xs">
-            {initialLetter}
-          </div>
+          {/* User Initial Circle / Guest Badge (Left) */}
+          {user ? (
+            <div className="w-7 h-7 rounded-full bg-[#242424] border border-[#383838] text-white flex items-center justify-center text-xs font-bold shadow-xs" title={displayName}>
+              {initialLetter}
+            </div>
+          ) : (
+            <Link
+              href="/auth?next=/checkout"
+              className="text-[11px] font-bold text-[#FA742B] hover:underline"
+              title="Sign in for faster checkout"
+            >
+              Sign In
+            </Link>
+          )}
 
           {/* Logo & Checkout (Center) */}
           <div className="flex items-center gap-2">
@@ -863,13 +877,30 @@ export function EpicCheckoutLayout({
         {/* RIGHT COLUMN: PAYMENT DETAILS & ACTIONS */}
         <div className="flex-1 bg-[#141414] p-8 lg:p-10 flex flex-col justify-between overflow-y-auto space-y-6">
           <div className="space-y-6">
-            {/* Top User Avatar & Name */}
-            <div className="flex items-center gap-2.5 text-[13px] font-normal text-zinc-300 pr-8">
-              <div className="w-6 h-6 rounded-full bg-[#242424] border border-[#333333] text-white flex items-center justify-center text-[11px] font-bold">
-                {initialLetter}
+            {/* Top User Avatar & Name / Guest Indicator */}
+            {user ? (
+              <div className="flex items-center gap-2.5 text-[13px] font-normal text-zinc-300 pr-8">
+                <div className="w-6 h-6 rounded-full bg-[#242424] border border-[#333333] text-white flex items-center justify-center text-[11px] font-bold">
+                  {initialLetter}
+                </div>
+                <span className="truncate max-w-[220px]">{displayName}</span>
               </div>
-              <span className="truncate max-w-[220px]">{displayName}</span>
-            </div>
+            ) : (
+              <div className="flex items-center justify-between text-[12.5px] font-normal text-zinc-400 pr-8">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-[#242424] border border-[#333333] text-zinc-400 flex items-center justify-center text-[10px] font-bold">
+                    G
+                  </div>
+                  <span>Guest Checkout</span>
+                </div>
+                <Link
+                  href="/auth?next=/checkout"
+                  className="text-[#FA742B] hover:underline text-xs font-bold transition-colors"
+                >
+                  Sign In
+                </Link>
+              </div>
+            )}
 
             {/* Section Title */}
             <div>

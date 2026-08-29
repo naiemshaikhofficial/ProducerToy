@@ -167,8 +167,10 @@ export default function CheckoutPage() {
         const saved = localStorage.getItem('pt_billing_details')
         if (saved) {
           const parsed = JSON.parse(saved)
-          if (!loadedFullName) loadedFullName = parsed.fullName || ''
-          if (!loadedEmail && parsed.email) loadedEmail = parsed.email || ''
+          if (currentUser) {
+            if (!loadedFullName) loadedFullName = parsed.fullName || ''
+            if (!loadedEmail && parsed.email) loadedEmail = parsed.email || ''
+          }
           if (!loadedPhone) loadedPhone = parsed.phone || ''
           if (!loadedAddress) loadedAddress = parsed.address || ''
           if (!loadedAddress2) loadedAddress2 = parsed.address2 || ''
