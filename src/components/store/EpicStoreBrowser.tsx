@@ -965,21 +965,21 @@ export function EpicStoreBrowser({
           <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-1 bg-[#121212] select-none">
             
             {/* Sidebar Top: Filters (Count) */}
-            <div className="flex items-center justify-between pb-3">
-              <h3 className="text-base font-black text-white tracking-tight">
+            <div className="flex items-center justify-between pb-3.5">
+              <h3 className="text-base sm:text-[17px] font-bold text-white tracking-tight">
                 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </h3>
             </div>
 
             {/* Keyword Search Input (Exact Epic Search Box) */}
-            <div className="relative pb-2">
+            <div className="relative pb-3">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="Keywords"
-                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#282828] text-white text-sm pl-10 pr-9 h-11 rounded-lg border border-transparent focus:border-[#383838] placeholder:text-zinc-500 font-sans transition-all outline-none"
+                className="w-full bg-[#202024] hover:bg-[#25252a] focus:bg-[#28282e] text-white text-[14.5px] pl-10 pr-9 h-12 rounded-lg border border-transparent focus:border-[#383840] placeholder:text-zinc-400 font-sans transition-all outline-none"
               />
               {searchKeyword && (
                 <button
@@ -993,7 +993,7 @@ export function EpicStoreBrowser({
             </div>
 
             {/* Dynamic Sorted Accordion Sections (Active sections automatically at TOP and OPEN) */}
-            <div className="divide-y divide-[#222222]">
+            <div className="divide-y divide-[#242428]">
               {sortedSections.map((sec) => {
                 const isOpen =
                   customSectionToggles[sec.id] !== undefined
@@ -1005,12 +1005,12 @@ export function EpicStoreBrowser({
                     <button
                       type="button"
                       onClick={() => toggleSection(sec.id, sec.defaultOpen)}
-                      className="flex items-center justify-between w-full py-3.5 text-sm font-bold text-white hover:text-zinc-200 transition-colors cursor-pointer"
+                      className="flex items-center justify-between w-full py-4 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors cursor-pointer"
                     >
-                      <span className="text-sm font-bold tracking-tight">{sec.title}</span>
+                      <span className="text-[15px] font-bold tracking-tight">{sec.title}</span>
                       <div className="flex items-center gap-2.5">
                         {sec.count > 0 && (
-                          <span className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
+                          <span className="w-5 h-5 rounded-full bg-[#26262a] border border-[#383840] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
                             {sec.count}
                           </span>
                         )}
@@ -1034,14 +1034,14 @@ export function EpicStoreBrowser({
                 <button
                   type="button"
                   onClick={handleResetAll}
-                  className="flex-1 py-3 px-4 bg-transparent hover:bg-[#202020] text-white rounded-xl border border-[#333333] hover:border-[#555555] font-bold text-sm transition-all cursor-pointer text-center"
+                  className="flex-1 h-12 bg-transparent hover:bg-[#202024] text-white rounded-[10px] border border-[#3e3e46] hover:border-[#55555e] font-bold text-[14.5px] transition-all cursor-pointer text-center flex items-center justify-center"
                 >
                   Clear
                 </button>
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="flex-1 py-3 px-4 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl font-black text-sm shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center"
+                  className="flex-1 h-12 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-[10px] font-bold text-[14.5px] shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center flex items-center justify-center"
                 >
                   Apply
                 </button>
@@ -1058,12 +1058,12 @@ export function EpicStoreBrowser({
       {/* 3. MOBILE FILTER FULL-SCREEN MODAL (< lg) (1:1 Epic Games Store)          */}
       {/* ========================================================================= */}
       {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-[100] lg:hidden bg-[#121212] flex flex-col h-[100dvh] w-screen overflow-hidden animate-in fade-in duration-150 select-none">
+        <div className="fixed inset-0 z-[100] lg:hidden bg-[#141416] flex flex-col h-[100dvh] w-screen overflow-hidden animate-in fade-in duration-150 select-none">
           
           {/* Header Area */}
-          <div className="p-5 pb-3 border-b border-[#222222] shrink-0 space-y-3 bg-[#121212]">
+          <div className="p-5 pb-4 border-b border-[#242428] shrink-0 space-y-4 bg-[#141416]">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-black text-white tracking-tight">
+              <h2 className="text-[17px] font-bold text-white tracking-tight">
                 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </h2>
             </div>
@@ -1076,7 +1076,7 @@ export function EpicStoreBrowser({
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="Keywords"
-                className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#282828] text-white text-sm pl-10 pr-9 h-11 rounded-lg border border-transparent focus:outline-none focus:border-[#383838] placeholder:text-zinc-500 font-sans transition-all"
+                className="w-full bg-[#202024] hover:bg-[#25252a] focus:bg-[#28282e] text-white text-[14.5px] pl-10 pr-9 h-12 rounded-lg border border-transparent focus:outline-none focus:border-[#383840] placeholder:text-zinc-400 font-sans transition-all"
               />
               {searchKeyword && (
                 <button
@@ -1091,7 +1091,7 @@ export function EpicStoreBrowser({
           </div>
 
           {/* Scrollable Middle Accordion Filter List */}
-          <div className="flex-1 overflow-y-auto px-5 py-1 divide-y divide-[#222222] custom-scrollbar">
+          <div className="flex-1 overflow-y-auto px-5 py-1 divide-y divide-[#242428] custom-scrollbar">
             {sortedSections.map((sec) => {
               const isOpen =
                 customSectionToggles[sec.id] !== undefined
@@ -1103,12 +1103,12 @@ export function EpicStoreBrowser({
                   <button
                     type="button"
                     onClick={() => toggleSection(sec.id, sec.defaultOpen)}
-                    className="flex items-center justify-between w-full py-4 text-sm font-bold text-white cursor-pointer"
+                    className="flex items-center justify-between w-full py-4 text-[15px] font-bold text-white cursor-pointer"
                   >
-                    <span className="text-sm font-bold tracking-tight">{sec.title}</span>
+                    <span className="text-[15px] font-bold tracking-tight">{sec.title}</span>
                     <div className="flex items-center gap-2.5">
                       {sec.count > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
+                        <span className="w-5 h-5 rounded-full bg-[#26262a] border border-[#383840] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
                           {sec.count}
                         </span>
                       )}
@@ -1127,18 +1127,18 @@ export function EpicStoreBrowser({
           </div>
 
           {/* Fixed Bottom Action Bar (1:1 Epic Games Clear & Orange Apply) */}
-          <div className="p-4 px-5 border-t border-[#222222] bg-[#121212] flex items-center gap-3 shrink-0">
+          <div className="p-4 px-5 border-t border-[#242428] bg-[#141416] flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={handleResetAll}
-              className="flex-1 h-12 bg-[#181818] hover:bg-[#202020] text-white rounded-xl border border-[#333333] hover:border-[#555555] font-bold text-sm transition-all cursor-pointer text-center flex items-center justify-center"
+              className="flex-1 h-12 bg-transparent hover:bg-[#202024] text-white rounded-[10px] border border-[#3e3e46] hover:border-[#55555e] font-bold text-[14.5px] transition-all cursor-pointer text-center flex items-center justify-center"
             >
               Clear
             </button>
             <button
               type="button"
               onClick={() => setIsMobileFilterOpen(false)}
-              className="flex-1 h-12 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl font-black text-sm shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center flex items-center justify-center"
+              className="flex-1 h-12 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-[10px] font-bold text-[14.5px] shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center flex items-center justify-center"
             >
               Apply
             </button>
