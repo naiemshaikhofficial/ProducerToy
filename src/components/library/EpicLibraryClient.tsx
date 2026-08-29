@@ -24,9 +24,11 @@ import {
   Folder,
   ShieldCheck,
   Zap,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from 'lucide-react'
 import { BillingHistory } from '@/components/BillingHistory'
+import { getSecureDownloadUrlAction } from '@/actions/downloadActions'
 
 interface PurchaseItem {
   id: string
@@ -85,6 +87,37 @@ export function EpicLibraryClient({
   // Download Modal State
   const [installProduct, setInstallProduct] = useState<PurchaseItem | null>(null)
   const [selectedPlatform, setSelectedPlatform] = useState<'windows' | 'mac' | 'universal'>('windows')
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
+
+  const handleStartDownload = async (productId: string, platform: 'windows' | 'mac' | 'universal') => {
+    try {
+      setIsDownloading(true)
+      setDownloadError(null)
+      const plat = platform === 'universal' ? 'all' : platform
+      const res = await getSecureDownloadUrlAction(productId, plat)
+
+      if (res.success && res.downloadUrl) {
+        // Trigger secure download seamlessly
+        const link = document.createElement('a')
+        link.href = res.downloadUrl
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        setTimeout(() => {
+          setIsDownloading(false)
+          setInstallProduct(null)
+        }, 1200)
+      } else {
+        setDownloadError(res.error || 'Failed to generate secure download link')
+        setIsDownloading(false)
+      }
+    } catch (err: any) {
+      setDownloadError(err.message || 'Error initializing download')
+      setIsDownloading(false)
+    }
+  }
 
   // Filter Accordions
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
@@ -1004,27 +1037,45 @@ export function EpicLibraryClient({
                   </div>
                 )}
 
+                {/* Download Error Alert */}
+                {downloadError && (
+                  <div className="bg-red-950/40 border border-red-900/60 p-2.5 rounded-lg flex items-center gap-2 text-xs text-red-300">
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <span>{downloadError}</span>
+                  </div>
+                )}
+
                 {/* Bottom Modal Actions */}
                 <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#222222]">
                   <button
                     type="button"
-                    onClick={() => setInstallProduct(null)}
+                    onClick={() => {
+                      setInstallProduct(null)
+                      setDownloadError(null)
+                    }}
                     className="bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white font-medium text-xs py-2.5 px-4 rounded-lg transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
 
-                  <a
-                    href={activeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                    onClick={() => setInstallProduct(null)}
-                    className="bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-6 rounded-lg uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5"
+                  <button
+                    type="button"
+                    disabled={isDownloading}
+                    onClick={() => handleStartDownload(product.id, selectedPlatform)}
+                    className="bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-6 rounded-lg uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download</span>
-                  </a>
+                    {isDownloading ? (
+                      <>
+                        <div className="w-3.5 h-3.5 rounded-full border-2 border-zinc-500 border-t-black animate-spin" />
+                        <span>Securing Link...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download</span>
+                      </>
+                    )}
+                  </button>
                 </div>
 
               </div>
