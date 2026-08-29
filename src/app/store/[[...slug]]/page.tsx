@@ -7,6 +7,7 @@ import { matchesSearchQuery } from '@/lib/search'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 import { CollectionPageJsonLd } from '@/components/JsonLd'
 import { EpicStoreBrowser } from '@/components/store/EpicStoreBrowser'
+import { generateStoreHeaderMeta } from '@/lib/store/metadataEngine'
 
 export const revalidate = 1800 // Cache static page for 30 minutes (instant 0ms loading, revalidated via /api/revalidate)
 
@@ -364,125 +365,18 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     products = mockProducts
   }
 
-  // Calculate Header Titles
-  const getHeaderMeta = () => {
-    if (selectedBrand) {
-      return {
-        title: selectedBrand.name,
-        description: selectedBrand.description || `Explore premier VST plugins, sample packs, and sound design tools created by ${selectedBrand.name}.`
-      }
-    }
-
-    if (subTypeSlug) {
-      const formattedSub = subTypeSlug.replace(/-/g, ' ')
-      return {
-        title: formattedSub.toUpperCase(),
-        description: `Explore top-rated ${formattedSub} plugins and presets curated for mixing, mastering, and modern sound design.`
-      }
-    }
-
-    if (categorySlug) {
-      switch (categorySlug.toLowerCase()) {
-        case 'plugins':
-        case 'effects':
-          return {
-            title: 'VST Plugins & Audio Effects',
-            description: 'Browse premier VST audio plugins, analog saturators, synths, and mixing processors crafted for professional music producers.'
-          }
-        case 'saturation':
-        case 'tape-saturation':
-        case 'harmonic-exciter':
-          return {
-            title: 'Saturation & Tape Warmth VST Plugins',
-            description: 'Download analog tape saturation, tube warmth, and harmonic exciter plugins for drums, vocals, and master bus.'
-          }
-        case 'eq':
-        case 'dynamic-eq':
-          return {
-            title: 'Equalizer (EQ) & Dynamic EQ VST Plugins',
-            description: 'Surgical mixing EQs, dynamic equalizers, and vintage analog curve processors for clean audio mastering.'
-          }
-        case 'reverb':
-          return {
-            title: 'Reverb & Space Echo VST Plugins',
-            description: 'Lush algorithmic reverbs, shimmer spaces, plate simulations, and convolution reverb plugins.'
-          }
-        case 'delay':
-        case 'tape-delay':
-          return {
-            title: 'Delay & Ping Pong Delay VST Plugins',
-            description: 'Ping-pong delays, vintage tape echoes, and stereo modulation delay effects for modern music production.'
-          }
-        case 'compressor':
-        case 'bus-compressor':
-          return {
-            title: 'Compressor & Bus Dynamics VST Plugins',
-            description: 'Glue compressors, bus processors, sidechain tools, and mastering limiters for punchy dynamic control.'
-          }
-        case 'auto-tune':
-        case 'vocal-processing':
-          return {
-            title: 'Auto-Tune & Vocal Processing Plugins',
-            description: 'Real-time pitch correction, hard-tune robotic effects, and transparent vocal tuning plugins.'
-          }
-        case 'synthesizers':
-        case 'instruments':
-          return {
-            title: 'Virtual Synthesizers & Instruments',
-            description: 'Polyphonic soft synths, wavetable instruments, and vintage analog modeling synthesizers.'
-          }
-        case 'guitars-bass':
-          return {
-            title: 'Acoustic & Electric Guitar VSTs',
-            description: 'Realistic acoustic guitar instruments, sampled electric guitars, and virtual bass plugins.'
-          }
-        case 'sample-packs':
-        case 'sounds':
-        case 'samples':
-          return {
-            title: 'Sample Packs & Royalty-Free Sounds',
-            description: 'Explore high-quality royalty-free 808 sub basses, drum kits, vocal chops, and melody loops ready for your DAW.'
-          }
-        case 'drum-kits':
-        case 'trap-drums':
-          return {
-            title: 'Drum Kits & Trap Sample Packs',
-            description: 'Hard-hitting 808s, punchy kicks, crisp snares, and royalty-free drum loops for modern beatmakers.'
-          }
-        case '808-bass':
-          return {
-            title: '808 Sub Bass Loops & One-Shots',
-            description: 'Tuned 808 sub basses, distorted glide 808s, and deep sub bass samples with instant direct download.'
-          }
-        case 'presets':
-        case 'serum-presets':
-        case 'vital-presets':
-          return {
-            title: 'Synth Presets & Soundbanks',
-            description: 'Instantly upgrade your sound with synth presets for Serum, Vital, and DAW vocal chain mixing templates.'
-          }
-        case 'templates':
-        case 'fl-studio-templates':
-          return {
-            title: 'DAW Templates & Stems',
-            description: 'Full DAW project templates designed to jumpstart your track creation and learn pro arrangement techniques.'
-          }
-        default:
-          const formattedCat = categorySlug.replace(/-/g, ' ')
-          return {
-            title: formattedCat.charAt(0).toUpperCase() + formattedCat.slice(1),
-            description: `Discover top tools and resources under ${formattedCat}.`
-          }
-      }
-    }
-
-    return {
-      title: 'Store Catalog',
-      description: 'Discover the premier marketplace for VST plugins, royalty-free sample packs, synth presets, and DAW templates.'
-    }
-  }
-
-  const { title, description } = getHeaderMeta()
+  // Calculate Header Titles & Descriptions with dynamic scalability engine
+  const { title, description } = generateStoreHeaderMeta({
+    searchQuery: queryText,
+    isFree,
+    isDeals,
+    isBundles,
+    isRentToOwn,
+    selectedBrand,
+    selectedCategorySlug: categorySlug,
+    selectedSubCategorySlug: subTypeSlug,
+    selectedPriceTier: priceParam,
+  })
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none">

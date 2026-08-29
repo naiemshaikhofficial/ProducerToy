@@ -13,6 +13,7 @@ import {
   SlidersHorizontal,
 } from 'lucide-react'
 import { Product, ProductCard } from '@/components/ProductCard'
+import { generateStoreHeaderMeta, formatAudioTitle } from '@/lib/store/metadataEngine'
 
 export interface FilterOption {
   id: string
@@ -714,25 +715,55 @@ export function EpicStoreBrowser({
     })
   }, [filterSections])
 
+  // Dynamic Page Header calculation with full future-product scalability engine
+  const currentHeaderMeta = useMemo(() => {
+    const singleBrandSlug = selectedBrands.length === 1 ? selectedBrands[0] : ''
+    const singleBrandObj = singleBrandSlug ? brands.find((b) => b.slug === singleBrandSlug) : null
+
+    return generateStoreHeaderMeta({
+      searchQuery: searchKeyword,
+      isFree: selectedEvents.free,
+      isDeals: selectedEvents.discounted,
+      isRentToOwn: selectedEvents.rentToOwn,
+      selectedBrand: singleBrandObj ? { name: singleBrandObj.name, slug: singleBrandObj.slug, description: (singleBrandObj as any).description } : null,
+      selectedCategorySlug: activeCategorySlug,
+      selectedSubCategorySlug: selectedGenres.length === 1 ? selectedGenres[0] : activeSubTypeSlug,
+      selectedProductTypeSlug: selectedProductTypes.length === 1 ? selectedProductTypes[0] : '',
+      selectedPriceTier: selectedPriceTiers.length === 1 ? selectedPriceTiers[0] : '',
+      fallbackTitle: headerTitle,
+      fallbackDescription: headerDescription,
+    })
+  }, [
+    searchKeyword,
+    selectedEvents,
+    selectedBrands,
+    selectedGenres,
+    selectedProductTypes,
+    selectedPriceTiers,
+    brands,
+    activeCategorySlug,
+    activeSubTypeSlug,
+    headerTitle,
+    headerDescription,
+  ])
+
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-24">
       <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         
         {/* ========================================================================= */}
-        {/* PAGE HEADER: TITLE & DESCRIPTION (Restored as requested)                 */}
+        {/* PAGE HEADER: TITLE & DESCRIPTION (Exact Free Page Hero Layout)             */}
         {/* ========================================================================= */}
-        {headerTitle && (
-          <div className="space-y-1.5 pb-6 pt-1">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white uppercase">
-              {headerTitle}
-            </h1>
-            {headerDescription && (
-              <p className="text-xs sm:text-sm text-zinc-400 max-w-3xl leading-relaxed">
-                {headerDescription}
-              </p>
-            )}
-          </div>
-        )}
+        <div className="space-y-2 pb-8 pt-2 max-w-4xl">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white">
+            {currentHeaderMeta.title}
+          </h1>
+          {currentHeaderMeta.description && (
+            <p className="text-sm sm:text-base text-zinc-400 leading-relaxed pt-1">
+              {currentHeaderMeta.description}
+            </p>
+          )}
+        </div>
 
         {/* ========================================================================= */}
         {/* 1. TOP BAR: SHOW DROPDOWN + ACTIVE FILTER TAGS                             */}
