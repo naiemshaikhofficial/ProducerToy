@@ -751,7 +751,11 @@ export function EpicProductDetailClient({
 
             {/* Specs & Compatibility */}
             {(activeTab === 'specs' || activeTab === 'overview') && (
-              <ProductSpecsOverview product={product} />
+              <ProductSpecsOverview
+                product={product}
+                ratingStats={ratingStats}
+                onOpenRatingModal={() => setRatingModalOpen(true)}
+              />
             )}
 
             {/* FAQ Tab & Overview FAQ Section */}
