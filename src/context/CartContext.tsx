@@ -1,7 +1,9 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useCurrency } from './CurrencyContext'
+import { useAuth } from './AuthContext'
 
 export interface CartItem {
   id: string
@@ -36,6 +38,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { exchangeRate } = useCurrency()
+  const { user } = useAuth()
+  const router = useRouter()
   const [items, setItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
@@ -114,16 +118,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (itemToBuyNow) {
       const normalized = normalizeItem(itemToBuyNow)
       const existingIndex = items.findIndex((i) => i.id === normalized.id)
+      let updated: CartItem[]
       if (existingIndex >= 0) {
-        const updated = [...items]
+        updated = [...items]
         updated[existingIndex] = normalized
-        saveCart(updated)
       } else {
-        const updated = [...items, normalized]
-        saveCart(updated)
+        updated = [...items, normalized]
       }
+      saveCart(updated)
     }
+
     setIsCartOpen(false)
+
+    if (!user) {
+      router.push('/auth?next=/checkout')
+      return
+    }
+
     setIsCheckoutOpen(true)
   }
 

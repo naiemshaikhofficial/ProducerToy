@@ -115,6 +115,11 @@ export default function CheckoutPage() {
         data: { user: currentUser },
       } = await supabase.auth.getUser()
 
+      if (!currentUser) {
+        router.push('/auth?next=/checkout')
+        return
+      }
+
       if (currentUser) {
         loadedEmail = currentUser.email || ''
         // Fetch saved profile from unified profiles table

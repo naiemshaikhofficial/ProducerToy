@@ -426,6 +426,12 @@ function AuthForm() {
                   : 'Enter your password'}
               </h1>
 
+              {nextUrl.includes('checkout') && (
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#26150b] border border-[#4a2412] text-[#FA742B] text-[11.5px] font-bold tracking-wide animate-in fade-in">
+                  <span>🔒 Sign in to complete your checkout & instant download</span>
+                </div>
+              )}
+
               {step === 'details' && (
                 <p className="text-xs text-zinc-400">
                   {mode === 'signin' ? (

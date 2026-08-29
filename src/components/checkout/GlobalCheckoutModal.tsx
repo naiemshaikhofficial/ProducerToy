@@ -98,6 +98,12 @@ export function GlobalCheckoutModal() {
 
       const { data: { user: currentUser } } = await supabase.auth.getUser()
 
+      if (!currentUser) {
+        setIsCheckoutOpen(false)
+        router.push('/auth?next=/checkout')
+        return
+      }
+
       if (currentUser) {
         loadedEmail = currentUser.email || ''
         try {
