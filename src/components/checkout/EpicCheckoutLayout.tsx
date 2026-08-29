@@ -674,7 +674,13 @@ export function EpicCheckoutLayout({
                 </div>
               ) : (
                 <span>
-                  {isFree ? 'Claim Free Download' : 'Pay Now'}
+                  {hasGiftItems
+                    ? isFree
+                      ? 'Send Gift'
+                      : 'Pay and Send Gift'
+                    : isFree
+                    ? 'Claim Free Download'
+                    : 'Pay Now'}
                 </span>
               )}
             </button>
@@ -682,7 +688,7 @@ export function EpicCheckoutLayout({
 
           {/* Legal & Compliance Disclaimer (Exact 1:1 Match) */}
           <p className="text-[10px] text-zinc-400 leading-relaxed select-none">
-            By selecting &lsquo;Pay Now&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
+            By selecting &lsquo;{hasGiftItems ? (isFree ? 'Send Gift' : 'Pay and Send Gift') : (isFree ? 'Claim Free Download' : 'Pay Now')}&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
             <Link href="/eula" target="_blank" className="text-zinc-200 hover:underline">
               End User License Agreement
             </Link>. You are paying for a digital license for this product; for terms, see{' '}

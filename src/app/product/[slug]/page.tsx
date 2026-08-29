@@ -124,7 +124,11 @@ export default async function EpicProductDetailPage({
         reviewCount={ratingStats.totalReviews}
       />
       {/* Main Epic Games Product Detail Client View */}
-      <EpicProductDetailClient product={product} initialRatingStats={ratingStats} />
+      <EpicProductDetailClient
+        product={product}
+        initialRatingStats={ratingStats}
+        initialIsOwned={isOwned}
+      />
     </div>
   )
 }

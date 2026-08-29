@@ -1,5 +1,6 @@
 'use server'
 
+import { getAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
@@ -15,15 +16,10 @@ export interface ProductRatingStats {
  */
 export async function getProductRatingStatsAction(productId: string): Promise<ProductRatingStats> {
   try {
-    const supabase = await createClient()
+    const adminSupabase = getAdminClient()
 
-    // 1. Fetch current logged-in user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    // 2. Fetch all real reviews for this product
-    const { data: reviews, error } = await supabase
+    // 1. Fetch all real reviews for this product using admin client (static-safe)
+    const { data: reviews, error } = await adminSupabase
       .from('product_reviews')
       .select('rating, user_id')
       .eq('product_id', productId)
@@ -36,9 +32,20 @@ export async function getProductRatingStatsAction(productId: string): Promise<Pr
     const totalReviews = reviewList.length
 
     let userRating: number | undefined = undefined
+    let currentUser: any = null
 
-    if (user) {
-      const existing = reviewList.find((r) => r.user_id === user.id)
+    try {
+      const supabase = await createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      currentUser = user
+    } catch {
+      // Safe fallback during SSG / static prerender
+    }
+
+    if (currentUser) {
+      const existing = reviewList.find((r) => r.user_id === currentUser.id)
       if (existing) {
         userRating = Number(existing.rating)
       }
@@ -55,7 +62,7 @@ export async function getProductRatingStatsAction(productId: string): Promise<Pr
       averageRating,
       totalReviews,
       userRating,
-      userCanRate: Boolean(user),
+      userCanRate: Boolean(currentUser),
     }
   } catch (err) {
     console.error('Error in getProductRatingStatsAction:', err)

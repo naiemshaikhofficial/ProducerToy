@@ -772,7 +772,29 @@ export async function verifyRazorpayPaymentAction(params: {
       })
     )
 
-    await adminSupabase.from('purchases').insert(purchaseRecords)
+    // Prevent duplicate personal purchases
+    const validPurchaseRecords: any[] = []
+    for (const record of purchaseRecords) {
+      if (record.user_id && record.product_id) {
+        const { data: existing } = await adminSupabase
+          .from('purchases')
+          .select('id')
+          .eq('user_id', record.user_id)
+          .eq('product_id', record.product_id)
+          .limit(1)
+          .maybeSingle()
+
+        if (!existing) {
+          validPurchaseRecords.push(record)
+        }
+      } else {
+        validPurchaseRecords.push(record)
+      }
+    }
+
+    if (validPurchaseRecords.length > 0) {
+      await adminSupabase.from('purchases').insert(validPurchaseRecords)
+    }
 
     await adminSupabase.from('orders').insert({
       user_id: targetUserId,
@@ -1092,7 +1114,29 @@ export async function capturePayPalOrderAction(params: {
       })
     )
 
-    await adminSupabase.from('purchases').insert(purchaseRecords)
+    // Prevent duplicate personal purchases
+    const validPurchaseRecords: any[] = []
+    for (const record of purchaseRecords) {
+      if (record.user_id && record.product_id) {
+        const { data: existing } = await adminSupabase
+          .from('purchases')
+          .select('id')
+          .eq('user_id', record.user_id)
+          .eq('product_id', record.product_id)
+          .limit(1)
+          .maybeSingle()
+
+        if (!existing) {
+          validPurchaseRecords.push(record)
+        }
+      } else {
+        validPurchaseRecords.push(record)
+      }
+    }
+
+    if (validPurchaseRecords.length > 0) {
+      await adminSupabase.from('purchases').insert(validPurchaseRecords)
+    }
 
     await adminSupabase.from('orders').insert({
       user_id: userId,

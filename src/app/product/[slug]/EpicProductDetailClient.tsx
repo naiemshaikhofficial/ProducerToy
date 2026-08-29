@@ -33,6 +33,7 @@ import { ProductFaqSection } from '@/components/product/ProductFaqSection'
 import { RelatedProductsSection } from '@/components/product/RelatedProductsSection'
 import { AutoLinkText } from '@/components/seo/AutoLinkText'
 import { ProductRatingStats } from '@/actions/ratingActions'
+import { createClient } from '@/lib/supabase/client'
 
 function WindowsIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
@@ -61,9 +62,11 @@ function AppleIcon({ className = 'w-4 h-4' }: { className?: string }) {
 export function EpicProductDetailClient({
   product,
   initialRatingStats,
+  initialIsOwned = false,
 }: {
   product: any
   initialRatingStats?: ProductRatingStats
+  initialIsOwned?: boolean
 }) {
   const router = useRouter()
   const { user } = useAuth()
@@ -78,9 +81,32 @@ export function EpicProductDetailClient({
   const [isDescExpanded, setIsDescExpanded] = useState(false)
   const [giftModalOpen, setGiftModalOpen] = useState(false)
   const [ratingModalOpen, setRatingModalOpen] = useState(false)
+  const [isOwned, setIsOwned] = useState<boolean>(initialIsOwned)
   const [ratingStats, setRatingStats] = useState<ProductRatingStats>(
     initialRatingStats || { averageRating: 0, totalReviews: 0, userCanRate: true }
   )
+
+  useEffect(() => {
+    if (initialIsOwned) {
+      setIsOwned(true)
+      return
+    }
+    if (!user?.id || !product?.id) return
+
+    const supabase = createClient()
+    supabase
+      .from('purchases')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('product_id', product.id)
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setIsOwned(true)
+        }
+      })
+  }, [user?.id, product?.id, initialIsOwned])
 
   const isSaved = checkWishlisted(product.id)
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
@@ -361,6 +387,11 @@ export function EpicProductDetailClient({
 
         {/* D. Price Display */}
         <div className="space-y-1 text-left">
+          {isOwned && (
+            <span className="text-xs bg-emerald-950/60 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/40 inline-block mb-1">
+              ALREADY OWNED
+            </span>
+          )}
           <div className="flex items-center gap-3 flex-wrap">
             {Number(product.price_usd) === 0 ? (
               <span className="text-3xl font-bold text-white">FREE</span>
@@ -396,6 +427,14 @@ export function EpicProductDetailClient({
               <ExternalLink className="w-4 h-4" />
               <span>{product.button_text || 'Get Now'}</span>
             </a>
+          ) : isOwned ? (
+            <Link
+              href="/library"
+              className="w-full py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#1c1c1c] hover:bg-[#252525] border border-emerald-500/50 text-white transition-all shadow-lg cursor-pointer"
+            >
+              <Check className="w-5 h-5 text-emerald-400" />
+              <span>In Library</span>
+            </Link>
           ) : (
             <div className="flex items-center gap-3">
               <button
@@ -598,28 +637,30 @@ export function EpicProductDetailClient({
               )}
             </div>
 
-            {/* Thumbnail Carousel Strip */}
+            {/* Thumbnail Carousel Strip (Clean Epic Spacing, No Clipping) */}
             {mediaItems.length > 1 && (
-              <div className="flex items-center gap-2 pt-1 w-full">
-                <button
-                  type="button"
-                  onClick={handlePrevThumb}
-                  className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                  aria-label="Previous media"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
+              <div className="flex items-center gap-3 pt-2 w-full">
+                {mediaItems.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={handlePrevThumb}
+                    className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer flex-shrink-0"
+                    aria-label="Previous media"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                )}
 
-                <div className="flex-1 flex items-center gap-2.5 overflow-x-auto py-1 custom-scrollbar">
+                <div className="flex-1 flex items-center gap-3 overflow-x-auto py-1.5 px-0.5 custom-scrollbar">
                   {mediaItems.map((item, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`relative w-24 sm:w-28 h-14 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer group ${
+                      className={`relative w-24 sm:w-28 h-14 rounded-xl overflow-hidden transition-all flex-shrink-0 cursor-pointer group ${
                         selectedImageIndex === idx
-                          ? 'border-[#FA742B] shadow-lg scale-105'
-                          : 'border-[#262626] opacity-60 hover:opacity-100'
+                          ? 'ring-2 ring-[#FA742B] opacity-100 shadow-md'
+                          : 'border border-[#282828] opacity-60 hover:opacity-100'
                       }`}
                     >
                       <Image src={item.url} alt={`Media ${idx + 1}`} fill unoptimized className="object-cover" />
@@ -634,14 +675,16 @@ export function EpicProductDetailClient({
                   ))}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleNextThumb}
-                  className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                  aria-label="Next media"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                {mediaItems.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={handleNextThumb}
+                    className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer flex-shrink-0"
+                    aria-label="Next media"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -786,6 +829,11 @@ export function EpicProductDetailClient({
           </div>
 
           <div className="space-y-2">
+            {isOwned && (
+              <span className="text-xs bg-emerald-950/60 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/40 inline-block mb-1">
+                ALREADY OWNED
+              </span>
+            )}
             <div className="flex items-center gap-3 flex-wrap">
               {Number(product.price_usd) === 0 ? (
                 <span className="text-3xl font-bold text-white">FREE</span>
@@ -809,7 +857,7 @@ export function EpicProductDetailClient({
             </div>
 
             {/* Toywards Rewards Pill */}
-            {Number(product.price_usd) > 0 && (
+            {Number(product.price_usd) > 0 && !isOwned && (
               <Link
                 href="/features/toywards"
                 target="_blank"
@@ -836,6 +884,14 @@ export function EpicProductDetailClient({
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
               </a>
+            ) : isOwned ? (
+              <Link
+                href="/library"
+                className="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#1c1c1c] hover:bg-[#252525] border border-emerald-500/50 text-white transition-all shadow-md cursor-pointer"
+              >
+                <Check className="w-5 h-5 text-emerald-400" />
+                <span>In Library</span>
+              </Link>
             ) : (
               <div className="flex items-center gap-2">
                 <button
