@@ -387,32 +387,42 @@ export function EpicProductDetailClient({
 
         {/* D. Price Display */}
         <div className="space-y-1 text-left">
-          {isOwned && (
+          {isOwned ? (
             <span className="text-xs bg-emerald-950/60 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/40 inline-block mb-1">
               ALREADY OWNED
             </span>
-          )}
-          <div className="flex items-center gap-3 flex-wrap">
-            {Number(product.price_usd) === 0 ? (
-              <span className="text-3xl font-bold text-white">FREE</span>
-            ) : (
-              <>
-                {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
-                  <>
-                    <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-0.5 rounded">
-                      -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
-                    </span>
-                    <span className="text-base text-zinc-500 line-through">
-                      {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
-                    </span>
-                  </>
-                )}
-                <span className="text-3xl font-bold text-white">
-                  {formatPrice(product.price_inr, product.price_usd)}
+          ) : product.is_coming_soon ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-2xl font-black text-white uppercase tracking-tight">COMING SOON</span>
+              {product.release_date && (
+                <span className="text-[11px] font-bold bg-[#FA742B]/15 text-[#FA742B] border border-[#FA742B]/30 px-2.5 py-0.5 rounded-full">
+                  Available {product.release_date}
                 </span>
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 flex-wrap">
+              {Number(product.price_usd) === 0 ? (
+                <span className="text-3xl font-bold text-white">FREE</span>
+              ) : (
+                <>
+                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
+                    <>
+                      <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-0.5 rounded">
+                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
+                      </span>
+                      <span className="text-base text-zinc-500 line-through">
+                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
+                      </span>
+                    </>
+                  )}
+                  <span className="text-3xl font-bold text-white">
+                    {formatPrice(product.price_inr, product.price_usd)}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* E. CTA Action Buttons */}
@@ -435,6 +445,32 @@ export function EpicProductDetailClient({
               <Check className="w-5 h-5 text-emerald-400" />
               <span>In Library</span>
             </Link>
+          ) : product.is_coming_soon ? (
+            <button
+              type="button"
+              onClick={() =>
+                toggleWishlist({
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  brand: product.brands?.name || product.brand || 'Producer Toy',
+                  product_type: product.product_type || 'plugin',
+                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                  price_usd: Number(product.price_usd) || 0,
+                  cover_image: product.cover_image,
+                  vst_format: product.vst_format,
+                  short_description: product.short_description,
+                })
+              }
+              className={`w-full py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
+                isSaved
+                  ? 'bg-rose-950/50 border border-rose-600 text-rose-300'
+                  : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20 active:scale-95'
+              }`}
+            >
+              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-300' : ''}`} />
+              <span>{isSaved ? 'In Wishlist (Get Notified)' : 'Add to Wishlist (Get Notified)'}</span>
+            </button>
           ) : (
             <div className="flex items-center gap-3">
               <button
@@ -842,35 +878,45 @@ export function EpicProductDetailClient({
           </div>
 
           <div className="space-y-2">
-            {isOwned && (
+            {isOwned ? (
               <span className="text-xs bg-emerald-950/60 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/40 inline-block mb-1">
                 ALREADY OWNED
               </span>
-            )}
-            <div className="flex items-center gap-3 flex-wrap">
-              {Number(product.price_usd) === 0 ? (
-                <span className="text-3xl font-bold text-white">FREE</span>
-              ) : (
-                <>
-                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
-                    <>
-                      <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-1 rounded">
-                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
-                      </span>
-                      <span className="text-base text-zinc-500 line-through">
-                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
-                      </span>
-                    </>
-                  )}
-                  <span className="text-3xl font-bold text-white">
-                    {formatPrice(product.price_inr, product.price_usd)}
+            ) : product.is_coming_soon ? (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-2xl font-black text-white uppercase tracking-tight">COMING SOON</span>
+                {product.release_date && (
+                  <span className="text-[11px] font-bold bg-[#FA742B]/15 text-[#FA742B] border border-[#FA742B]/30 px-2.5 py-0.5 rounded-full">
+                    Available {product.release_date}
                   </span>
-                </>
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 flex-wrap">
+                {Number(product.price_usd) === 0 ? (
+                  <span className="text-3xl font-bold text-white">FREE</span>
+                ) : (
+                  <>
+                    {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
+                      <>
+                        <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-1 rounded">
+                          -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
+                        </span>
+                        <span className="text-base text-zinc-500 line-through">
+                          {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
+                        </span>
+                      </>
+                    )}
+                    <span className="text-3xl font-bold text-white">
+                      {formatPrice(product.price_inr, product.price_usd)}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Toywards Rewards Pill */}
-            {Number(product.price_usd) > 0 && !isOwned && (
+            {Number(product.price_usd) > 0 && !isOwned && !product.is_coming_soon && (
               <Link
                 href="/features/toywards"
                 target="_blank"
@@ -905,6 +951,32 @@ export function EpicProductDetailClient({
                 <Check className="w-5 h-5 text-emerald-400" />
                 <span>In Library</span>
               </Link>
+            ) : product.is_coming_soon ? (
+              <button
+                type="button"
+                onClick={() =>
+                  toggleWishlist({
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    brand: product.brands?.name || product.brand || 'Producer Toy',
+                    product_type: product.product_type || 'plugin',
+                    price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                    price_usd: Number(product.price_usd) || 0,
+                    cover_image: product.cover_image,
+                    vst_format: product.vst_format,
+                    short_description: product.short_description,
+                  })
+                }
+                className={`w-full py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
+                  isSaved
+                    ? 'bg-rose-950/50 border border-rose-600 text-rose-300'
+                    : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20 active:scale-95'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-300' : ''}`} />
+                <span>{isSaved ? 'In Wishlist (Get Notified)' : 'Add to Wishlist (Get Notified)'}</span>
+              </button>
             ) : (
               <div className="flex items-center gap-2">
                 <button

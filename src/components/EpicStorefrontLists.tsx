@@ -64,8 +64,29 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
     })
   }, [products, convertUsdToInr])
 
-  // 2. Column 2: Coming Soon (5 upcoming flagship products)
+  // 2. Column 2: Coming Soon (Dynamically pulled from Database + curated upcoming flagship products)
   const comingSoonList = useMemo<ListItemProduct[]>(() => {
+    const dbComingSoon: ListItemProduct[] = products
+      .filter((p) => Boolean(p.is_coming_soon))
+      .map((p) => {
+        const priceUsd = Number(p.price_usd) || 0
+        return {
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          brand: p.brands?.name || p.brand || 'Producer Toy',
+          product_type: p.product_type,
+          price_usd: priceUsd,
+          price_inr: p.price_inr ? Number(p.price_inr) : convertUsdToInr(priceUsd),
+          cover_image: p.cover_image,
+          demo_audio_url: p.demo_audio_url,
+          vst_format: p.vst_format,
+          short_description: p.short_description,
+          statusBadge: p.release_date ? `Available ${p.release_date}` : 'Coming Soon',
+          statusType: 'coming_soon',
+        }
+      })
+
     const upcomingPresets: ListItemProduct[] = [
       {
         id: 'cs-1',
@@ -128,8 +149,10 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
         statusType: 'coming_soon',
       },
     ]
-    return upcomingPresets
-  }, [])
+
+    const combined = [...dbComingSoon, ...upcomingPresets.filter((p) => !dbComingSoon.some((d) => d.slug === p.slug))]
+    return combined.slice(0, 5)
+  }, [products, convertUsdToInr])
 
   // 3. Column 3: Top Deals & Free (5 products with discounts or free)
   const topDealsList = useMemo<ListItemProduct[]>(() => {
