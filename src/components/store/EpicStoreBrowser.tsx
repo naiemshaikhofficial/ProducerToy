@@ -1055,22 +1055,20 @@ export function EpicStoreBrowser({
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. 1:1 EPIC GAMES STORE FULL-SCREEN MOBILE FILTER OVERLAY (< lg)          */}
+      {/* 3. MOBILE FILTER FULL-SCREEN MODAL (< lg) (1:1 Epic Games Store)          */}
       {/* ========================================================================= */}
       {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-[100] lg:hidden bg-[#121212] flex flex-col w-full h-full overflow-hidden select-none animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[100] lg:hidden bg-[#121212] flex flex-col h-[100dvh] w-screen overflow-hidden animate-in fade-in duration-150 select-none">
           
-          {/* Scrollable Filter Body */}
-          <div className="flex-1 overflow-y-auto px-5 pt-6 pb-28 custom-scrollbar space-y-4">
-            
-            {/* Header */}
-            <div className="pb-1">
-              <h2 className="text-base font-extrabold text-white tracking-tight">
+          {/* Header Area */}
+          <div className="p-5 pb-3 border-b border-[#222222] shrink-0 space-y-3 bg-[#121212]">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-black text-white tracking-tight">
                 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
               </h2>
             </div>
 
-            {/* Keyword Search Input */}
+            {/* Keyword Search */}
             <div className="relative">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -1090,61 +1088,57 @@ export function EpicStoreBrowser({
                 </button>
               )}
             </div>
-
-            {/* Dynamic Sorted Accordion Sections */}
-            <div className="divide-y divide-[#222222]">
-              {sortedSections.map((sec) => {
-                const isOpen =
-                  customSectionToggles[sec.id] !== undefined
-                    ? customSectionToggles[sec.id]
-                    : sec.defaultOpen
-
-                return (
-                  <div key={sec.id} className="py-1">
-                    <button
-                      type="button"
-                      onClick={() => toggleSection(sec.id, sec.defaultOpen)}
-                      className="flex items-center justify-between w-full py-4 text-sm font-bold text-white cursor-pointer"
-                    >
-                      <span className="text-sm font-bold tracking-tight">{sec.title}</span>
-                      <div className="flex items-center gap-2.5">
-                        {sec.count > 0 && (
-                          <span className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
-                            {sec.count}
-                          </span>
-                        )}
-                        {isOpen ? (
-                          <ChevronUp className="w-4 h-4 text-zinc-400" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 text-zinc-400" />
-                        )}
-                      </div>
-                    </button>
-
-                    {isOpen && sec.render()}
-                  </div>
-                )
-              })}
-            </div>
-
           </div>
 
-          {/* Fixed Bottom Floating Action Bar (Exact 1:1 Epic Games: Clear & Orange Apply) */}
-          <div className="fixed bottom-0 left-0 right-0 p-4 pb-6 bg-[#121212] border-t border-[#202020] flex items-center gap-3 z-30 shadow-2xl">
+          {/* Scrollable Middle Accordion Filter List */}
+          <div className="flex-1 overflow-y-auto px-5 py-1 divide-y divide-[#222222] custom-scrollbar">
+            {sortedSections.map((sec) => {
+              const isOpen =
+                customSectionToggles[sec.id] !== undefined
+                  ? customSectionToggles[sec.id]
+                  : sec.defaultOpen
+
+              return (
+                <div key={sec.id} className="py-1">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(sec.id, sec.defaultOpen)}
+                    className="flex items-center justify-between w-full py-4 text-sm font-bold text-white cursor-pointer"
+                  >
+                    <span className="text-sm font-bold tracking-tight">{sec.title}</span>
+                    <div className="flex items-center gap-2.5">
+                      {sec.count > 0 && (
+                        <span className="w-5 h-5 rounded-full bg-[#262626] border border-[#383838] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
+                          {sec.count}
+                        </span>
+                      )}
+                      {isOpen ? (
+                        <ChevronUp className="w-4 h-4 text-zinc-400" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 text-zinc-400" />
+                      )}
+                    </div>
+                  </button>
+
+                  {isOpen && sec.render()}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Fixed Bottom Action Bar (1:1 Epic Games Clear & Orange Apply) */}
+          <div className="p-4 px-5 border-t border-[#222222] bg-[#121212] flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={handleResetAll}
-              className="flex-1 py-3 px-4 bg-transparent hover:bg-[#202020] text-white rounded-xl border border-[#333333] hover:border-[#555555] font-bold text-sm transition-all cursor-pointer text-center"
+              className="flex-1 h-12 bg-[#181818] hover:bg-[#202020] text-white rounded-xl border border-[#333333] hover:border-[#555555] font-bold text-sm transition-all cursor-pointer text-center flex items-center justify-center"
             >
               Clear
             </button>
             <button
               type="button"
-              onClick={() => {
-                setIsMobileFilterOpen(false)
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              }}
-              className="flex-1 py-3 px-4 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl font-black text-sm shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center"
+              onClick={() => setIsMobileFilterOpen(false)}
+              className="flex-1 h-12 bg-[#FA742B] hover:bg-[#E05A18] text-white rounded-xl font-black text-sm shadow-lg shadow-[#FA742B]/20 transition-all cursor-pointer text-center flex items-center justify-center"
             >
               Apply
             </button>
