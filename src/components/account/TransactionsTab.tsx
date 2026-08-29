@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { History, Package, Download, ExternalLink, ChevronRight } from 'lucide-react'
+import { History, Package, Download, ExternalLink, ChevronRight, Gift } from 'lucide-react'
 import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 interface TransactionsTabProps {
@@ -77,6 +77,8 @@ export const TransactionsTab: React.FC<TransactionsTabProps> = ({ user }) => {
         <div className="space-y-3">
           {orders.map((order) => {
             const items = Array.isArray(order.items) ? order.items : []
+            const hasGifts = items.some((i: any) => i.is_gift || i.gift_recipient_email)
+            const isGiftOnly = hasGifts && items.every((i: any) => i.is_gift || i.gift_recipient_email)
             const dateFormatted = new Date(order.created_at).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
@@ -110,25 +112,42 @@ export const TransactionsTab: React.FC<TransactionsTabProps> = ({ user }) => {
                 <div className="space-y-1.5 pt-1">
                   {items.map((item: any, idx: number) => (
                     <div key={idx} className="flex items-center justify-between text-xs text-zinc-300">
-                      <span className="font-medium truncate max-w-sm">
-                        {item.name || item.title || 'Digital Sound Product'}
+                      <span className="font-medium truncate max-w-sm flex items-center gap-1.5">
+                        <span>{item.name || item.title || 'Digital Sound Product'}</span>
+                        {(item.is_gift || item.gift_recipient_email) && (
+                          <span className="text-[10px] text-[#FA742B] font-bold inline-flex items-center gap-0.5">
+                            <Gift className="w-3 h-3" />
+                            <span>Gift {item.gift_recipient_email ? `to ${item.gift_recipient_email}` : ''}</span>
+                          </span>
+                        )}
                       </span>
                       <span className="text-zinc-400">
                         {order.currency === 'INR' ? '₹' : '$'}
-                        {Number(item.price || item.unit_amount || 0).toFixed(2)}
+                        {Number(item.price || item.price_inr || item.price_usd || item.unit_amount || 0).toFixed(2)}
                       </span>
                     </div>
                   ))}
                 </div>
 
                 <div className="flex items-center justify-end pt-2 border-t border-[#242424]">
-                  <Link
-                    href="/library"
-                    className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1 transition-colors"
-                  >
-                    <span>View in Library</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </Link>
+                  {isGiftOnly ? (
+                    <Link
+                      href="/gifts"
+                      className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1 transition-colors"
+                    >
+                      <Gift className="w-3.5 h-3.5 text-[#FA742B]" />
+                      <span>View in Gifts</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/library"
+                      className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1 transition-colors"
+                    >
+                      <span>View in Library</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
                 </div>
               </div>
             )

@@ -24,6 +24,10 @@ export interface CheckoutItemInput {
   price_inr?: number
   price_usd?: number
   product_type?: string
+  is_gift?: boolean
+  gift_recipient_email?: string
+  gift_message?: string
+  gift_send_date?: string
 }
 
 export interface CheckoutOptionsInput {
@@ -247,7 +251,10 @@ export async function processCheckoutAction(
 
     // 4. Build secure purchase records with conditional serial key issuance & billing snapshot
     const purchaseRecords = await Promise.all(
-      dbProducts.map(async (dbProduct) => {
+      items.map(async (cartItem) => {
+        const dbProduct =
+          dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
+
         let validProductId = isUUID(dbProduct.id) ? dbProduct.id : null
 
         if (!validProductId && (dbProduct.slug || dbProduct.name)) {
@@ -281,17 +288,40 @@ export async function processCheckoutAction(
           serialKey = `PT-VST-${serialPartA}-${serialPartB}-${serialPartC}`
         }
 
+        const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
+        let itemUserId: string | null = targetUserId
+        let itemCustomerEmail = targetEmail
+
+        if (isGiftItem && cartItem.gift_recipient_email) {
+          const cleanRecipientEmail = cartItem.gift_recipient_email.trim()
+          itemCustomerEmail = cleanRecipientEmail
+          itemUserId = null
+
+          // Look up if a registered user exists with that recipient email
+          try {
+            const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+            const recipientUser = usersData?.users?.find(
+              (u: any) => u.email?.toLowerCase() === cleanRecipientEmail.toLowerCase()
+            )
+            if (recipientUser) {
+              itemUserId = recipientUser.id
+            }
+          } catch (err) {
+            console.warn('Recipient lookup note:', err)
+          }
+        }
+
         return {
-          user_id: targetUserId,
+          user_id: itemUserId,
           product_id: validProductId,
           amount_paid: Number(dbProduct.price_usd || 0),
           currency: orderCurrency,
           serial_key: serialKey,
           razorpay_order_id: randomOrderId,
           razorpay_payment_id: randomPaymentId,
-          customer_email: targetEmail,
-          customer_name: billingDetails?.fullName || null,
-          customer_phone: billingDetails?.phone || null,
+          customer_email: itemCustomerEmail,
+          customer_name: isGiftItem ? null : (billingDetails?.fullName || null),
+          customer_phone: isGiftItem ? null : (billingDetails?.phone || null),
           billing_address: billingDetails?.address || null,
           billing_city: billingDetails?.city || null,
           billing_state: billingDetails?.state || null,
@@ -672,46 +702,73 @@ export async function verifyRazorpayPaymentAction(params: {
       typeof str === 'string' &&
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
-    const purchaseRecords = dbProducts.map((dbProduct) => {
-      const requiresSerialKey = Boolean(
-        dbProduct.delivery_method === 'serial_key' ||
-        dbProduct.delivery_method === 'license_key' ||
-        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
-        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
-      )
+    const purchaseRecords = await Promise.all(
+      items.map(async (cartItem) => {
+        const dbProduct =
+          dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
-      let serialKey: string | null = null
-      if (requiresSerialKey) {
-        const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-        serialKey = `PT-VST-${partA}-${partB}-${partC}`
-      }
+        const requiresSerialKey = Boolean(
+          dbProduct.delivery_method === 'serial_key' ||
+          dbProduct.delivery_method === 'license_key' ||
+          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
+          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
+        )
 
-      const itemInr = Number(dbProduct.price_inr || 0) > 0
-        ? Number(dbProduct.price_inr)
-        : Math.round(Number(dbProduct.price_usd || 0) * liveRate)
+        let serialKey: string | null = null
+        if (requiresSerialKey) {
+          const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
+          serialKey = `PT-VST-${partA}-${partB}-${partC}`
+        }
 
-      return {
-        user_id: targetUserId,
-        product_id: isUUID(dbProduct.id) ? dbProduct.id : null,
-        amount_paid: itemInr,
-        currency: 'INR',
-        serial_key: serialKey,
-        razorpay_order_id: razorpay_order_id,
-        razorpay_payment_id: razorpay_payment_id,
-        customer_email: targetEmail,
-        customer_name: billingDetails?.fullName || null,
-        customer_phone: billingDetails?.phone || null,
-        billing_address: billingDetails?.address || null,
-        billing_city: billingDetails?.city || null,
-        billing_state: billingDetails?.state || null,
-        billing_zip: billingDetails?.zip || null,
-        billing_country: billingDetails?.country || null,
-        coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
-        purchased_at: new Date().toISOString(),
-      }
-    })
+        const itemInr = Number(dbProduct.price_inr || 0) > 0
+          ? Number(dbProduct.price_inr)
+          : Math.round(Number(dbProduct.price_usd || 0) * liveRate)
+
+        const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
+        let itemUserId: string | null = targetUserId
+        let itemCustomerEmail = targetEmail
+
+        if (isGiftItem && cartItem.gift_recipient_email) {
+          const cleanRecipientEmail = cartItem.gift_recipient_email.trim()
+          itemCustomerEmail = cleanRecipientEmail
+          itemUserId = null
+
+          try {
+            const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+            const recipientUser = usersData?.users?.find(
+              (u: any) => u.email?.toLowerCase() === cleanRecipientEmail.toLowerCase()
+            )
+            if (recipientUser) {
+              itemUserId = recipientUser.id
+            }
+          } catch (err) {
+            console.warn('Recipient lookup note:', err)
+          }
+        }
+
+        return {
+          user_id: itemUserId,
+          product_id: isUUID(dbProduct.id) ? dbProduct.id : null,
+          amount_paid: itemInr,
+          currency: 'INR',
+          serial_key: serialKey,
+          razorpay_order_id: razorpay_order_id,
+          razorpay_payment_id: razorpay_payment_id,
+          customer_email: itemCustomerEmail,
+          customer_name: isGiftItem ? null : (billingDetails?.fullName || null),
+          customer_phone: isGiftItem ? null : (billingDetails?.phone || null),
+          billing_address: billingDetails?.address || null,
+          billing_city: billingDetails?.city || null,
+          billing_state: billingDetails?.state || null,
+          billing_zip: billingDetails?.zip || null,
+          billing_country: billingDetails?.country || null,
+          coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
+          purchased_at: new Date().toISOString(),
+        }
+      })
+    )
 
     await adminSupabase.from('purchases').insert(purchaseRecords)
 
@@ -969,42 +1026,69 @@ export async function capturePayPalOrderAction(params: {
       typeof str === 'string' &&
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
 
-    const purchaseRecords = dbProducts.map((dbProduct) => {
-      const requiresSerialKey = Boolean(
-        dbProduct.delivery_method === 'serial_key' ||
-        dbProduct.delivery_method === 'license_key' ||
-        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
-        (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
-      )
+    const purchaseRecords = await Promise.all(
+      items.map(async (cartItem) => {
+        const dbProduct =
+          dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
-      let serialKey: string | null = null
-      if (requiresSerialKey) {
-        const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-        serialKey = `PT-VST-${partA}-${partB}-${partC}`
-      }
+        const requiresSerialKey = Boolean(
+          dbProduct.delivery_method === 'serial_key' ||
+          dbProduct.delivery_method === 'license_key' ||
+          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
+          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
+        )
 
-      return {
-        user_id: userId,
-        product_id: isUUID(dbProduct.id) ? dbProduct.id : null,
-        amount_paid: Number(dbProduct.price_usd || 0),
-        currency: 'USD',
-        serial_key: serialKey,
-        razorpay_order_id: `paypal_${orderId}`,
-        razorpay_payment_id: captureData.id || `pp_cap_${Date.now()}`,
-        customer_email: targetEmail,
-        customer_name: billingDetails?.fullName || null,
-        customer_phone: billingDetails?.phone || null,
-        billing_address: billingDetails?.address || null,
-        billing_city: billingDetails?.city || null,
-        billing_state: billingDetails?.state || null,
-        billing_zip: billingDetails?.zip || null,
-        billing_country: billingDetails?.country || null,
-        coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
-        purchased_at: new Date().toISOString(),
-      }
-    })
+        let serialKey: string | null = null
+        if (requiresSerialKey) {
+          const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
+          serialKey = `PT-VST-${partA}-${partB}-${partC}`
+        }
+
+        const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
+        let itemUserId: string | null = userId
+        let itemCustomerEmail = targetEmail
+
+        if (isGiftItem && cartItem.gift_recipient_email) {
+          const cleanRecipientEmail = cartItem.gift_recipient_email.trim()
+          itemCustomerEmail = cleanRecipientEmail
+          itemUserId = null
+
+          try {
+            const { data: usersData } = await adminSupabase.auth.admin.listUsers()
+            const recipientUser = usersData?.users?.find(
+              (u: any) => u.email?.toLowerCase() === cleanRecipientEmail.toLowerCase()
+            )
+            if (recipientUser) {
+              itemUserId = recipientUser.id
+            }
+          } catch (err) {
+            console.warn('Recipient lookup note:', err)
+          }
+        }
+
+        return {
+          user_id: itemUserId,
+          product_id: isUUID(dbProduct.id) ? dbProduct.id : null,
+          amount_paid: Number(dbProduct.price_usd || 0),
+          currency: 'USD',
+          serial_key: serialKey,
+          razorpay_order_id: `paypal_${orderId}`,
+          razorpay_payment_id: captureData.id || `pp_cap_${Date.now()}`,
+          customer_email: itemCustomerEmail,
+          customer_name: isGiftItem ? null : (billingDetails?.fullName || null),
+          customer_phone: isGiftItem ? null : (billingDetails?.phone || null),
+          billing_address: billingDetails?.address || null,
+          billing_city: billingDetails?.city || null,
+          billing_state: billingDetails?.state || null,
+          billing_zip: billingDetails?.zip || null,
+          billing_country: billingDetails?.country || null,
+          coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
+          purchased_at: new Date().toISOString(),
+        }
+      })
+    )
 
     await adminSupabase.from('purchases').insert(purchaseRecords)
 
@@ -1106,4 +1190,92 @@ export async function capturePayPalOrderAction(params: {
     return { success: false, error: error.message || 'PayPal capture failed' }
   }
 }
+
+/**
+ * High-Speed Server Action to claim a digital gift directly to user's library vault.
+ */
+export async function claimGiftAction(params: {
+  giftId?: string
+  claimCode?: string
+  productId?: string
+  recipientEmail?: string
+}) {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return { success: false, error: 'Please log in to claim this gift.' }
+    }
+
+    const adminSupabase = getAdminClient()
+    const userEmail = (user.email || params.recipientEmail || '').toLowerCase()
+
+    if (params.productId) {
+      // 1. Check if an unassigned purchase exists for this product / recipient
+      const { data: existingPurchases } = await adminSupabase
+        .from('purchases')
+        .select('*')
+        .eq('product_id', params.productId)
+        .or(`customer_email.ilike.${userEmail},user_id.eq.${user.id},user_id.is.null`)
+        .order('purchased_at', { ascending: false })
+        .limit(1)
+
+      if (existingPurchases && existingPurchases.length > 0) {
+        const found = existingPurchases[0]
+        if (!found.user_id || found.user_id !== user.id) {
+          await adminSupabase
+            .from('purchases')
+            .update({ user_id: user.id, customer_email: userEmail })
+            .eq('id', found.id)
+        }
+      } else {
+        // Fallback: Create verified purchase record for recipient claiming the gift
+        const { data: prod } = await adminSupabase
+          .from('products')
+          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type')
+          .eq('id', params.productId)
+          .maybeSingle()
+
+        const requiresSerialKey = Boolean(
+          prod?.delivery_method === 'serial_key' ||
+          prod?.delivery_method === 'license_key' ||
+          (prod?.license_type && prod.license_type.toLowerCase().includes('serial')) ||
+          (prod?.license_type && prod.license_type.toLowerCase().includes('key'))
+        )
+
+        let serialKey: string | null = null
+        if (requiresSerialKey) {
+          const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
+          const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
+          serialKey = `PT-GIFT-${partA}-${partB}-${partC}`
+        }
+
+        await adminSupabase.from('purchases').insert({
+          user_id: user.id,
+          product_id: params.productId,
+          amount_paid: 0,
+          currency: 'USD',
+          serial_key: serialKey,
+          customer_email: userEmail,
+          customer_name: user.user_metadata?.full_name || 'Gift Recipient',
+          purchased_at: new Date().toISOString(),
+        })
+      }
+    }
+
+    revalidatePath('/library')
+    revalidatePath('/gifts')
+    revalidatePath('/account')
+
+    return { success: true }
+  } catch (err: any) {
+    console.error('[CLAIM_GIFT_ACTION_ERROR]', err)
+    return { success: false, error: err.message || 'Failed to claim gift to library' }
+  }
+}
+
 

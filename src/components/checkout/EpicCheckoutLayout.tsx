@@ -196,11 +196,16 @@ export function EpicCheckoutLayout({
 
                   {/* Gift Tag Badge (Screenshot 3 Match) */}
                   {item.is_gift && (
-                    <div className="mt-1">
+                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                       <span className="inline-flex items-center gap-1 bg-[#282828] border border-[#383838] text-zinc-200 text-[10.5px] font-bold px-2 py-0.5 rounded-full">
                         <Gift size={11} className="text-[#FA742B]" />
                         <span>Gift</span>
                       </span>
+                      {item.gift_recipient_email && (
+                        <span className="text-[11px] text-[#FA742B] font-medium truncate max-w-[200px]">
+                          to: {item.gift_recipient_email}
+                        </span>
+                      )}
                     </div>
                   )}
 

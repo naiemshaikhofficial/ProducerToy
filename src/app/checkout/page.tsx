@@ -392,6 +392,48 @@ export default function CheckoutPage() {
     })
   }
 
+  const [lastGiftInfo, setLastGiftInfo] = useState<{
+    hasGifts: boolean
+    giftRecipientEmail: string
+    hasSelfItems: boolean
+  } | null>(null)
+
+  const recordCompletedGifts = (orderItems: any[]) => {
+    try {
+      const giftItems = orderItems.filter((i) => i.is_gift || i.gift_recipient_email)
+      if (giftItems.length > 0) {
+        const existingGifts = JSON.parse(localStorage.getItem('pt_user_gifts') || '[]')
+        giftItems.forEach((item) => {
+          const giftId = `gift-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`
+          const claimCode = `PT-GIFT-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
+          existingGifts.unshift({
+            id: giftId,
+            productId: item.id,
+            productName: item.name,
+            productSlug: item.slug,
+            coverImage: item.cover_image,
+            senderEmail: user?.email || billingDetails.email || 'Producer',
+            recipientEmail: item.gift_recipient_email || 'recipient@example.com',
+            message: item.gift_message || 'Enjoy the gift!',
+            sendDate: item.gift_send_date || new Date().toISOString().split('T')[0],
+            priceUsd: item.price_usd,
+            priceInr: item.price_inr,
+            createdAt: new Date().toISOString(),
+            status: 'unopened',
+            claimCode: claimCode,
+          })
+        })
+        localStorage.setItem('pt_user_gifts', JSON.stringify(existingGifts))
+        localStorage.removeItem('pt_pending_gifts')
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('storage'))
+        }
+      }
+    } catch (e) {
+      console.error('Error recording gift order:', e)
+    }
+  }
+
   // --- 1. HANDLE FREE CHECKOUT (Direct High-Speed Server Action) ---
   const handleFreeCheckout = async () => {
     if (!user) {
@@ -415,6 +457,11 @@ export default function CheckoutPage() {
       // Save billing address to Supabase profile
       await saveBillingAddressAction(user.id, billingDetails).catch(() => {})
 
+      const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+      const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
+      const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
+      setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+
       const res = await processCheckoutOrderAction(
         items.map((i) => ({
           id: i.id,
@@ -423,6 +470,10 @@ export default function CheckoutPage() {
           price_usd: Number(i.price_usd || 0),
           price_inr: Number(i.price_inr || 0),
           product_type: i.product_type,
+          is_gift: Boolean(i.is_gift),
+          gift_recipient_email: i.gift_recipient_email || '',
+          gift_message: i.gift_message || '',
+          gift_send_date: i.gift_send_date || '',
         })),
         billingDetails,
         user.email || billingDetails.email,
@@ -436,6 +487,7 @@ export default function CheckoutPage() {
       )
 
       if (res.success) {
+        recordCompletedGifts(items)
         clearCart()
         setPaymentStatus('success')
       } else {
@@ -487,6 +539,10 @@ export default function CheckoutPage() {
           price_usd: i.price_usd,
           price_inr: i.price_inr,
           product_type: i.product_type,
+          is_gift: Boolean(i.is_gift),
+          gift_recipient_email: i.gift_recipient_email || '',
+          gift_message: i.gift_message || '',
+          gift_send_date: i.gift_send_date || '',
         })),
         coupon,
         {
@@ -521,6 +577,11 @@ export default function CheckoutPage() {
         handler: async function (response: any) {
           setPaymentStatus('processing')
           try {
+            const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+            const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
+            const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
+            setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+
             const verifyRes = await verifyRazorpayPaymentAction({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -532,6 +593,10 @@ export default function CheckoutPage() {
                 price_usd: i.price_usd,
                 price_inr: i.price_inr,
                 product_type: i.product_type,
+                is_gift: Boolean(i.is_gift),
+                gift_recipient_email: i.gift_recipient_email || '',
+                gift_message: i.gift_message || '',
+                gift_send_date: i.gift_send_date || '',
               })),
               userId: user.id,
               billingDetails: billingDetails,
@@ -541,6 +606,7 @@ export default function CheckoutPage() {
             })
 
             if (verifyRes.success) {
+              recordCompletedGifts(items)
               clearCart()
               setPaymentStatus('success')
             } else {
@@ -570,6 +636,12 @@ export default function CheckoutPage() {
 
   // --- 3. HANDLE PAYPAL CHECKOUT (INTERNATIONAL / USD) ---
   const handlePayPalSuccess = () => {
+    const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+    const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
+    const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
+    setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+
+    recordCompletedGifts(items)
     clearCart()
     setPaymentStatus('success')
   }
@@ -606,6 +678,9 @@ export default function CheckoutPage() {
         <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl">
           <CheckoutSuccessView
             email={billingDetails.email || user?.email}
+            hasGifts={lastGiftInfo?.hasGifts}
+            giftRecipientEmail={lastGiftInfo?.giftRecipientEmail}
+            hasSelfItems={lastGiftInfo?.hasSelfItems}
             onClose={() => router.push('/store')}
           />
         </div>

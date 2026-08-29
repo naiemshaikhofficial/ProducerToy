@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { X, Trash2, ArrowRight } from 'lucide-react'
+import { X, Trash2, ArrowRight, Gift } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
@@ -98,6 +98,12 @@ export function CartDrawer() {
                     <div className="text-xs font-medium text-zinc-200 truncate">
                       {item.name}
                     </div>
+                    {item.is_gift && (
+                      <div className="flex items-center gap-1 text-[10px] text-[#FA742B] font-bold mt-0.5">
+                        <Gift className="w-3 h-3" />
+                        <span className="truncate">Gift {item.gift_recipient_email ? `for ${item.gift_recipient_email}` : ''}</span>
+                      </div>
+                    )}
                     <div className="text-[11px] text-zinc-400 font-semibold mt-0.5">
                       {formatPrice(undefined, item.price_usd)}
                     </div>

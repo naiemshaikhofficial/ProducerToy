@@ -260,6 +260,12 @@ export function GlobalCheckoutModal() {
     }
   }
 
+  const [lastGiftInfo, setLastGiftInfo] = useState<{
+    hasGifts: boolean
+    giftRecipientEmail: string
+    hasSelfItems: boolean
+  } | null>(null)
+
   const recordCompletedGifts = (orderItems: any[]) => {
     try {
       const giftItems = orderItems.filter((i) => i.is_gift || i.gift_recipient_email)
@@ -281,7 +287,7 @@ export function GlobalCheckoutModal() {
             priceUsd: item.price_usd,
             priceInr: item.price_inr,
             createdAt: new Date().toISOString(),
-            status: 'sent',
+            status: 'unopened',
             claimCode: claimCode,
           })
         })
@@ -304,6 +310,11 @@ export function GlobalCheckoutModal() {
       if (user?.id) {
         await saveBillingAddressAction(user.id, billingDetails).catch(() => {})
       }
+      const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+      const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
+      const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
+      setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+
       const res = await processCheckoutOrderAction(
         items.map((i) => ({
           id: i.id,
@@ -312,6 +323,10 @@ export function GlobalCheckoutModal() {
           price_usd: Number(i.price_usd || 0),
           price_inr: Number(i.price_inr || 0),
           product_type: i.product_type,
+          is_gift: Boolean(i.is_gift),
+          gift_recipient_email: i.gift_recipient_email || '',
+          gift_message: i.gift_message || '',
+          gift_send_date: i.gift_send_date || '',
         })),
         billingDetails,
         user?.email || billingDetails.email,
@@ -367,6 +382,10 @@ export function GlobalCheckoutModal() {
           price_usd: i.price_usd,
           price_inr: i.price_inr,
           product_type: i.product_type,
+          is_gift: Boolean(i.is_gift),
+          gift_recipient_email: i.gift_recipient_email || '',
+          gift_message: i.gift_message || '',
+          gift_send_date: i.gift_send_date || '',
         })),
         coupon,
         {
@@ -395,6 +414,11 @@ export function GlobalCheckoutModal() {
         handler: async (response: any) => {
           setPaymentStatus('processing')
           try {
+            const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+            const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
+            const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
+            setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+
             const verifyRes = await verifyRazorpayPaymentAction({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -406,6 +430,10 @@ export function GlobalCheckoutModal() {
                 price_usd: i.price_usd,
                 price_inr: i.price_inr,
                 product_type: i.product_type,
+                is_gift: Boolean(i.is_gift),
+                gift_recipient_email: i.gift_recipient_email || '',
+                gift_message: i.gift_message || '',
+                gift_send_date: i.gift_send_date || '',
               })),
               userId: user?.id,
               billingDetails,
@@ -439,6 +467,11 @@ export function GlobalCheckoutModal() {
   }
 
   const handlePayPalSuccess = () => {
+    const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
+    const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
+    const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
+    setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
+
     recordCompletedGifts(items)
     clearCart()
     setPaymentStatus('success')
@@ -500,7 +533,13 @@ export function GlobalCheckoutModal() {
           </div>
         ) : paymentStatus === 'success' ? (
           <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200">
-            <CheckoutSuccessView email={billingDetails.email || user?.email} onClose={closeCheckout} />
+            <CheckoutSuccessView
+              email={billingDetails.email || user?.email}
+              hasGifts={lastGiftInfo?.hasGifts}
+              giftRecipientEmail={lastGiftInfo?.giftRecipientEmail}
+              hasSelfItems={lastGiftInfo?.hasSelfItems}
+              onClose={closeCheckout}
+            />
           </div>
         ) : (
           <EpicCheckoutLayout

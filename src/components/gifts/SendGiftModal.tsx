@@ -124,17 +124,16 @@ export function SendGiftModal({
       sendDate: sendDate || new Date().toISOString().split('T')[0],
     }
 
+    const giftItem = {
+      ...product,
+      is_gift: true,
+      gift_recipient_email: trimmed,
+      gift_message: finalMessage,
+      gift_send_date: giftPayload.sendDate,
+    }
+
     // Add item with gift metadata to cart
-    addItem(
-      {
-        ...product,
-        is_gift: true,
-        gift_recipient_email: trimmed,
-        gift_message: finalMessage,
-        gift_send_date: giftPayload.sendDate,
-      },
-      false
-    )
+    addItem(giftItem, false)
 
     // Save active gift checkout session to localStorage
     try {
@@ -162,7 +161,7 @@ export function SendGiftModal({
     }
 
     onClose()
-    openCheckout()
+    openCheckout(giftItem)
   }
 
   const isFormValid = validateEmail(recipientEmail.trim())

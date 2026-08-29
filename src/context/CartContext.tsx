@@ -87,7 +87,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (item: any, openDrawer: boolean = false) => {
     const normalized = normalizeItem(item)
-    if (!items.some((i) => i.id === normalized.id)) {
+    const existingIndex = items.findIndex((i) => i.id === normalized.id)
+    if (existingIndex >= 0) {
+      const updated = [...items]
+      updated[existingIndex] = normalized
+      saveCart(updated)
+    } else {
       const updated = [...items, normalized]
       saveCart(updated)
     }
@@ -108,7 +113,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const openCheckout = (itemToBuyNow?: any) => {
     if (itemToBuyNow) {
       const normalized = normalizeItem(itemToBuyNow)
-      if (!items.some((i) => i.id === normalized.id)) {
+      const existingIndex = items.findIndex((i) => i.id === normalized.id)
+      if (existingIndex >= 0) {
+        const updated = [...items]
+        updated[existingIndex] = normalized
+        saveCart(updated)
+      } else {
         const updated = [...items, normalized]
         saveCart(updated)
       }

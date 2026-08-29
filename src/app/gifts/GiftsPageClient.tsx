@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useCurrency } from '@/context/CurrencyContext'
+import { claimGiftAction } from '@/actions/checkoutActions'
 
 export interface UserGift {
   id: string
@@ -49,6 +50,7 @@ export function GiftsPageClient() {
   const [activeTab, setActiveTab] = useState<GiftTab>('all')
   const [gifts, setGifts] = useState<UserGift[]>([])
   const [claimedSuccessId, setClaimedSuccessId] = useState<string | null>(null)
+  const [claimLoadingId, setClaimLoadingId] = useState<string | null>(null)
 
   // Load user gifts from localStorage on mount
   useEffect(() => {
@@ -72,41 +74,50 @@ export function GiftsPageClient() {
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
-  // Filter gifts based on active tab
+  // Filter gifts based on active tab & current user
   const currentUserEmail = user?.email?.toLowerCase() || ''
   
   const filteredGifts = gifts.filter((gift) => {
     const isSentByMe = currentUserEmail
-      ? gift.senderEmail.toLowerCase() === currentUserEmail
-      : gift.status === 'sent'
+      ? gift.senderEmail?.toLowerCase() === currentUserEmail
+      : true
 
     const isReceivedByMe = currentUserEmail
-      ? gift.recipientEmail.toLowerCase() === currentUserEmail
-      : gift.status !== 'sent'
+      ? gift.recipientEmail?.toLowerCase() === currentUserEmail
+      : true
 
     if (activeTab === 'sent') {
-      return isSentByMe || gift.status === 'sent'
+      return isSentByMe
     }
     if (activeTab === 'unopened') {
-      return (isReceivedByMe || gift.status === 'unopened') && gift.status === 'unopened'
+      return isReceivedByMe && gift.status === 'unopened'
     }
     if (activeTab === 'received') {
-      return (isReceivedByMe || gift.status === 'received') && gift.status === 'received'
+      return isReceivedByMe && gift.status === 'received'
     }
-    return true // 'all' tab
+    return isSentByMe || isReceivedByMe
   })
 
   // Claim/Open Gift Action
-  const handleClaimGift = (gift: UserGift) => {
+  const handleClaimGift = async (gift: UserGift) => {
+    setClaimLoadingId(gift.id)
     try {
-      // 1. Update gift status to received
+      // 1. Update gift status to received locally
       const updatedGifts = gifts.map((g) =>
         g.id === gift.id ? { ...g, status: 'received' as const } : g
       )
       setGifts(updatedGifts)
       localStorage.setItem('pt_user_gifts', JSON.stringify(updatedGifts))
 
-      // 2. Add product to library in localStorage
+      // 2. Call server action to attach purchase to library in database
+      await claimGiftAction({
+        giftId: gift.id,
+        claimCode: gift.claimCode,
+        productId: gift.productId,
+        recipientEmail: user?.email || gift.recipientEmail,
+      })
+
+      // 3. Add product to library in localStorage fallback
       const library = JSON.parse(localStorage.getItem('pt_purchased_products') || '[]')
       if (!library.some((item: any) => item.id === gift.productId)) {
         library.push({
@@ -125,6 +136,8 @@ export function GiftsPageClient() {
       setTimeout(() => setClaimedSuccessId(null), 3000)
     } catch (err) {
       console.error('Failed to claim gift:', err)
+    } finally {
+      setClaimLoadingId(null)
     }
   }
 
@@ -182,10 +195,17 @@ export function GiftsPageClient() {
               {TABS.map((tab) => {
                 const isActive = activeTab === tab.id
                 const tabCount = gifts.filter((g) => {
-                  if (tab.id === 'sent') return g.status === 'sent'
-                  if (tab.id === 'unopened') return g.status === 'unopened'
-                  if (tab.id === 'received') return g.status === 'received'
-                  return true
+                  const isSentByMe = currentUserEmail
+                    ? g.senderEmail?.toLowerCase() === currentUserEmail
+                    : true
+                  const isReceivedByMe = currentUserEmail
+                    ? g.recipientEmail?.toLowerCase() === currentUserEmail
+                    : true
+
+                  if (tab.id === 'sent') return isSentByMe
+                  if (tab.id === 'unopened') return isReceivedByMe && g.status === 'unopened'
+                  if (tab.id === 'received') return isReceivedByMe && g.status === 'received'
+                  return isSentByMe || isReceivedByMe
                 }).length
 
                 return (
@@ -220,101 +240,117 @@ export function GiftsPageClient() {
         {/* ========================================================================= */}
         {filteredGifts.length > 0 ? (
           <div className="mt-6 sm:mt-8 space-y-4">
-            {filteredGifts.map((gift) => (
-              <div
-                key={gift.id}
-                className="bg-[#181818] border border-[#242424] hover:border-[#2e2e2e] rounded-2xl p-5 sm:p-6 transition-all shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
-              >
-                {/* Left: Artwork + Details */}
-                <div className="flex items-start gap-4">
-                  {/* Cover */}
-                  <div className="relative w-16 h-22 sm:w-20 sm:h-26 rounded-xl overflow-hidden bg-[#121212] border border-[#282828] shrink-0 shadow-md">
-                    <Image
-                      src={gift.coverImage || '/placeholder.jpg'}
-                      alt={gift.productName}
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
+            {filteredGifts.map((gift) => {
+              const isSentByMe = currentUserEmail
+                ? gift.senderEmail?.toLowerCase() === currentUserEmail
+                : false
+              const isReceivedByMe = currentUserEmail
+                ? gift.recipientEmail?.toLowerCase() === currentUserEmail
+                : true
+
+              return (
+                <div
+                  key={gift.id}
+                  className="bg-[#181818] border border-[#242424] hover:border-[#2e2e2e] rounded-2xl p-5 sm:p-6 transition-all shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5"
+                >
+                  {/* Left: Artwork + Details */}
+                  <div className="flex items-start gap-4">
+                    {/* Cover */}
+                    <div className="relative w-16 h-22 sm:w-20 sm:h-26 rounded-xl overflow-hidden bg-[#121212] border border-[#282828] shrink-0 shadow-md">
+                      <Image
+                        src={gift.coverImage || '/placeholder.jpg'}
+                        alt={gift.productName}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    </div>
+
+                    {/* Info */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className={`text-[10.5px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${
+                            gift.status === 'unopened'
+                              ? isSentByMe && !isReceivedByMe
+                                ? 'bg-amber-950/40 border-amber-600/40 text-amber-400'
+                                : 'bg-[#FA742B]/15 border-[#FA742B]/40 text-[#FA742B]'
+                              : 'bg-emerald-950/40 border-emerald-600/40 text-emerald-400'
+                          }`}
+                        >
+                          {gift.status === 'unopened'
+                            ? isSentByMe && !isReceivedByMe
+                              ? 'Sent to Friend (Unclaimed)'
+                              : 'Unopened Gift'
+                            : 'Claimed & In Library'}
+                        </span>
+
+                        <span className="text-xs text-zinc-500 font-mono">
+                          {gift.claimCode}
+                        </span>
+                      </div>
+
+                      <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
+                        {gift.productName}
+                      </h3>
+
+                      {/* Sender / Recipient Info */}
+                      <div className="flex items-center gap-2 text-xs text-zinc-400 flex-wrap">
+                        {isSentByMe ? (
+                          <span>To: <strong className="text-zinc-200">{gift.recipientEmail}</strong></span>
+                        ) : (
+                          <span>From: <strong className="text-zinc-200">{gift.senderEmail}</strong></span>
+                        )}
+                        <span>•</span>
+                        <span>{new Date(gift.sendDate || gift.createdAt).toLocaleDateString()}</span>
+                      </div>
+
+                      {/* Message Note */}
+                      {gift.message && (
+                        <p className="text-xs text-zinc-300 italic bg-[#141414] border border-[#242424] px-3 py-1.5 rounded-lg w-fit mt-1">
+                          &ldquo;{gift.message}&rdquo;
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Info */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className={`text-[10.5px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${
-                          gift.status === 'unopened'
-                            ? 'bg-[#FA742B]/15 border-[#FA742B]/40 text-[#FA742B]'
-                            : gift.status === 'received'
-                            ? 'bg-emerald-950/40 border-emerald-600/40 text-emerald-400'
-                            : 'bg-zinc-800 border-zinc-700 text-zinc-300'
-                        }`}
+                  {/* Right: Actions */}
+                  <div className="w-full sm:w-auto flex items-center justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#222222]">
+                    {isReceivedByMe && gift.status === 'unopened' ? (
+                      <button
+                        type="button"
+                        onClick={() => handleClaimGift(gift)}
+                        disabled={claimLoadingId === gift.id}
+                        className="w-full sm:w-auto bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
                       >
-                        {gift.status === 'unopened'
-                          ? 'Unopened Gift'
-                          : gift.status === 'received'
-                          ? 'Claimed & In Library'
-                          : 'Sent to Friend'}
-                      </span>
-
-                      <span className="text-xs text-zinc-500 font-mono">
-                        {gift.claimCode}
-                      </span>
-                    </div>
-
-                    <h3 className="text-base sm:text-lg font-black text-white tracking-tight">
-                      {gift.productName}
-                    </h3>
-
-                    {/* Sender / Recipient Info */}
-                    <div className="flex items-center gap-2 text-xs text-zinc-400 flex-wrap">
-                      {gift.status === 'sent' ? (
-                        <span>To: <strong className="text-zinc-200">{gift.recipientEmail}</strong></span>
-                      ) : (
-                        <span>From: <strong className="text-zinc-200">{gift.senderEmail}</strong></span>
-                      )}
-                      <span>•</span>
-                      <span>{new Date(gift.sendDate || gift.createdAt).toLocaleDateString()}</span>
-                    </div>
-
-                    {/* Message Note */}
-                    {gift.message && (
-                      <p className="text-xs text-zinc-300 italic bg-[#141414] border border-[#242424] px-3 py-1.5 rounded-lg w-fit mt-1">
-                        &ldquo;{gift.message}&rdquo;
-                      </p>
+                        <Sparkles className="w-4 h-4" />
+                        <span>
+                          {claimedSuccessId === gift.id
+                            ? 'Claimed!'
+                            : claimLoadingId === gift.id
+                            ? 'Claiming...'
+                            : 'Claim to Library'}
+                        </span>
+                      </button>
+                    ) : gift.status === 'received' ? (
+                      <Link
+                        href="/library"
+                        prefetch={true}
+                        className="w-full sm:w-auto bg-[#202020] hover:bg-[#282828] text-zinc-200 hover:text-white border border-[#2c2c2c] font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Download className="w-4 h-4 text-zinc-400" />
+                        <span>View in Library</span>
+                      </Link>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-xs text-amber-400 font-bold bg-amber-950/30 border border-amber-800/30 px-3.5 py-2 rounded-xl">
+                        <Clock className="w-4 h-4" />
+                        <span>Sent (Awaiting Claim)</span>
+                      </div>
                     )}
                   </div>
                 </div>
-
-                {/* Right: Actions */}
-                <div className="w-full sm:w-auto flex items-center justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#222222]">
-                  {gift.status === 'unopened' ? (
-                    <button
-                      type="button"
-                      onClick={() => handleClaimGift(gift)}
-                      className="w-full sm:w-auto bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      <span>{claimedSuccessId === gift.id ? 'Claimed!' : 'Claim to Library'}</span>
-                    </button>
-                  ) : gift.status === 'received' ? (
-                    <Link
-                      href="/library"
-                      prefetch={true}
-                      className="w-full sm:w-auto bg-[#202020] hover:bg-[#282828] text-zinc-200 hover:text-white border border-[#2c2c2c] font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Download className="w-4 h-4 text-zinc-400" />
-                      <span>View in Library</span>
-                    </Link>
-                  ) : (
-                    <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold bg-emerald-950/30 border border-emerald-800/30 px-3.5 py-2 rounded-xl">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Delivered</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           /* ========================================================================= */
