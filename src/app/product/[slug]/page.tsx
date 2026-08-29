@@ -127,7 +127,6 @@ export default async function EpicProductDetailPage({
       <EpicProductDetailClient
         product={product}
         initialRatingStats={ratingStats}
-        initialIsOwned={isOwned}
       />
     </div>
   )

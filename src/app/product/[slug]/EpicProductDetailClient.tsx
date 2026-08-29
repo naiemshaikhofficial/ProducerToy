@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -477,7 +477,20 @@ export function EpicProductDetailClient({
           {/* Wishlist Button */}
           <button
             type="button"
-            onClick={() => toggleWishlist(product.id)}
+            onClick={() =>
+              toggleWishlist({
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                brand: product.brands?.name || product.brand || 'Producer Toy',
+                product_type: product.product_type || 'plugin',
+                price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                price_usd: Number(product.price_usd) || 0,
+                cover_image: product.cover_image,
+                vst_format: product.vst_format,
+                short_description: product.short_description,
+              })
+            }
             className={`w-full py-3.5 px-5 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
               isSaved
                 ? 'bg-rose-950/40 border-rose-600 text-rose-400'
@@ -937,7 +950,20 @@ export function EpicProductDetailClient({
             {/* Wishlist Button */}
             <button
               type="button"
-              onClick={() => toggleWishlist(product.id)}
+              onClick={() =>
+                toggleWishlist({
+                  id: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  brand: product.brands?.name || product.brand || 'Producer Toy',
+                  product_type: product.product_type || 'plugin',
+                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                  price_usd: Number(product.price_usd) || 0,
+                  cover_image: product.cover_image,
+                  vst_format: product.vst_format,
+                  short_description: product.short_description,
+                })
+              }
               className={`w-full py-3 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                 isSaved
                   ? 'bg-white text-black border-white'
