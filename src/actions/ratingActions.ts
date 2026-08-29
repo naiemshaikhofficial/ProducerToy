@@ -1,6 +1,5 @@
 'use server'
 
-import { getAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
@@ -17,13 +16,14 @@ export interface ProductRatingStats {
 export async function getProductRatingStatsAction(productId: string): Promise<ProductRatingStats> {
   try {
     const supabase = await createClient()
-    const adminSupabase = getAdminClient()
 
     // 1. Fetch current logged-in user
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    // 2. Fetch all reviews for this product
-    const { data: reviews, error } = await adminSupabase
+    // 2. Fetch all reviews for this product using authenticated/anon client
+    const { data: reviews, error } = await supabase
       .from('product_reviews')
       .select('rating, user_id')
       .eq('product_id', productId)
@@ -34,44 +34,31 @@ export async function getProductRatingStatsAction(productId: string): Promise<Pr
 
     const reviewList = reviews || []
     const totalReviews = reviewList.length
-    const averageRating = totalReviews > 0
-      ? Math.round((reviewList.reduce((sum, r) => sum + Number(r.rating || 5), 0) / totalReviews) * 10) / 10
-      : 4.8 // Base benchmark rating if no reviews yet
 
     let userRating: number | undefined = undefined
-    let userCanRate = false
 
     if (user) {
       const existing = reviewList.find((r) => r.user_id === user.id)
       if (existing) {
-        userRating = existing.rating
+        userRating = Number(existing.rating)
       }
+    }
 
-      // Check if user owns or has acquired this product in purchases or library
-      const { data: purchase } = await adminSupabase
-        .from('purchases')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .limit(1)
-        .maybeSingle()
+    // If real reviews exist in database, calculate exact average from them
+    let averageRating = 4.8
+    let displayReviewsCount = 124
 
-      // Also allow rating if user is logged in and product is free
-      const { data: prod } = await adminSupabase
-        .from('products')
-        .select('price_usd')
-        .eq('id', productId)
-        .maybeSingle()
-
-      const isFree = Number(prod?.price_usd || 0) === 0
-      userCanRate = Boolean(purchase || isFree || userRating !== undefined)
+    if (totalReviews > 0) {
+      const sum = reviewList.reduce((acc, r) => acc + Number(r.rating || 5), 0)
+      averageRating = Math.round((sum / totalReviews) * 10) / 10
+      displayReviewsCount = totalReviews
     }
 
     return {
       averageRating,
-      totalReviews: totalReviews > 0 ? totalReviews : 124,
+      totalReviews: displayReviewsCount,
       userRating,
-      userCanRate,
+      userCanRate: Boolean(user), // Any signed in user can rate
     }
   } catch (err) {
     console.error('Error in getProductRatingStatsAction:', err)
@@ -99,19 +86,19 @@ export async function submitProductRatingAction({
 }): Promise<{ success: boolean; message?: string; stats?: ProductRatingStats }> {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
       return { success: false, message: 'Please sign in to rate this product.' }
     }
 
-    const adminSupabase = getAdminClient()
-
-    // Validate rating value
+    // Validate rating value (1 to 5)
     const cleanRating = Math.max(1, Math.min(5, Math.round(rating)))
 
-    // Upsert review record
-    const { error: upsertError } = await adminSupabase
+    // Upsert review record using authenticated client (passes RLS auth.uid() = user_id)
+    const { error: upsertError } = await supabase
       .from('product_reviews')
       .upsert(
         {
@@ -126,11 +113,13 @@ export async function submitProductRatingAction({
 
     if (upsertError) {
       console.error('Failed to save rating:', upsertError)
-      return { success: false, message: 'Failed to save rating. Please try again.' }
+      return { success: false, message: `Failed to save rating: ${upsertError.message}` }
     }
 
     // Revalidate product page cache
-    revalidatePath(`/product/${productSlug}`)
+    if (productSlug) {
+      revalidatePath(`/product/${productSlug}`)
+    }
 
     const updatedStats = await getProductRatingStatsAction(productId)
 
@@ -139,8 +128,8 @@ export async function submitProductRatingAction({
       message: 'Rating saved successfully!',
       stats: updatedStats,
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error submitting rating:', err)
-    return { success: false, message: 'An unexpected error occurred.' }
+    return { success: false, message: err.message || 'An unexpected error occurred.' }
   }
 }

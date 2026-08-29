@@ -275,15 +275,13 @@ export function EpicProductDetailClient({
           </div>
           <span className="text-white font-bold text-sm ml-0.5">{ratingStats.averageRating.toFixed(1)}</span>
           <span className="text-zinc-500 text-xs font-normal">({ratingStats.totalReviews})</span>
-          {ratingStats.userCanRate && (
-            <button
-              type="button"
-              onClick={() => setRatingModalOpen(true)}
-              className="ml-2 text-xs text-zinc-400 hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
-            >
-              {ratingStats.userRating ? `Your rating: ${ratingStats.userRating}★` : 'Rate Product'}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setRatingModalOpen(true)}
+            className="ml-2 text-xs text-zinc-400 hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+          >
+            {ratingStats.userRating ? `Your rating: ${ratingStats.userRating}★` : 'Rate Product'}
+          </button>
         </div>
       </div>
 
