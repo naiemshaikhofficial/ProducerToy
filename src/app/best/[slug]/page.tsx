@@ -23,7 +23,7 @@ interface BestOfConfig {
   faqs: Array<{ question: string; answer: string }>
 }
 
-export const BEST_OF_CONFIGS: Record<string, BestOfConfig> = {
+const BEST_OF_CONFIGS: Record<string, BestOfConfig> = {
   'free-autotune-vst-plugins': {
     slug: 'free-autotune-vst-plugins',
     title: 'Best Free Auto-Tune VST Plugins (2026)',

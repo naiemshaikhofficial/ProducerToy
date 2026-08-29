@@ -25,7 +25,7 @@ interface DawConfig {
   faqs: Array<{ question: string; answer: string }>
 }
 
-export const DAW_CONFIGS: Record<string, DawConfig> = {
+const DAW_CONFIGS: Record<string, DawConfig> = {
   'fl-studio': {
     slug: 'fl-studio',
     name: 'FL Studio',
