@@ -28,38 +28,138 @@ interface CategoryPageProps {
 
 const CATEGORY_META_MAP: Record<string, { title: string; productType?: string; description: string }> = {
   'effects': {
-    title: 'Effects',
+    title: 'Audio Effects',
     productType: 'plugin',
-    description: 'Explore premier audio effect plugins including reverbs, delays, compressors, saturators, and EQ processors.'
+    description: 'Explore premier audio effect plugins including reverbs, delays, compressors, saturators, and EQ processors on Producer Toy.'
   },
   'studio-tools': {
-    title: 'Studio Tools',
+    title: 'Studio Tools & Utilities',
     productType: 'template',
-    description: 'Utility plugins, DAW project templates, analysis tools, and studio helpers to streamline your production.'
+    description: 'Utility plugins, DAW project templates, analysis tools, and studio helpers to streamline your music production.'
   },
   'instruments': {
-    title: 'Instruments',
+    title: 'Virtual Instruments',
     productType: 'plugin',
-    description: 'Virtual synthesizers, sampled instruments, drum machines, and polyphonic sound engines.'
+    description: 'Virtual synthesizers, sampled pianos, acoustic guitars, drum machines, and polyphonic sound engines.'
   },
   'sounds': {
-    title: 'Sounds & Samples',
+    title: 'Sounds & Sample Packs',
     productType: 'sample_pack',
-    description: 'Royalty-free sample packs, 808 sub basses, drum kits, melody loops, and vocal stems.'
+    description: 'Royalty-free sample packs, 808 sub basses, trap drum kits, melody loops, and vocal stems with instant download.'
   },
   'sample-packs': {
     title: 'Sample Packs',
     productType: 'sample_pack',
-    description: 'Royalty-free sample packs, 808 sub basses, drum kits, melody loops, and vocal stems.'
+    description: '100% royalty-free sample packs, drum one-shots, melodic loops, and sound libraries for music producers.'
   },
   'presets': {
-    title: 'Synth Presets',
+    title: 'Synth Presets & Soundbanks',
     productType: 'preset',
-    description: 'Xfer Serum, Vital, and Kontakt preset banks for modern electronic and hip-hop producers.'
+    description: 'Xfer Serum, Vital, and Massive preset banks for modern electronic, trap, and pop music producers.'
   },
   'bundles': {
     title: 'Bundles & Collections',
-    description: 'Save big with complete product bundles, software suites, and producer collections.'
+    description: 'Save big with complete product bundles, software suites, and producer collections on Producer Toy.'
+  },
+  'saturation': {
+    title: 'Saturation & Tape Warmth VST Plugins',
+    productType: 'plugin',
+    description: 'Download top-rated analog tape saturation, tube warmth, and harmonic exciter plugins on Producer Toy.'
+  },
+  'tape-saturation': {
+    title: 'Tape Saturation VST Plugins',
+    productType: 'plugin',
+    description: 'Discover the best analog tape saturators, tube exciters, and warmth processors for drums, vocals, and master bus.'
+  },
+  'harmonic-exciter': {
+    title: 'Harmonic & High-End Exciter Plugins',
+    productType: 'plugin',
+    description: 'Add smooth high-end presence and analog harmonics with premier exciter plugins on Producer Toy.'
+  },
+  'eq': {
+    title: 'Equalizer (EQ) & Dynamic EQ VST Plugins',
+    productType: 'plugin',
+    description: 'Surgical mixing EQs, dynamic equalizers, and vintage analog curve processors for clean audio mastering.'
+  },
+  'dynamic-eq': {
+    title: 'Dynamic Equalizer VST Plugins',
+    productType: 'plugin',
+    description: 'Tame harsh resonances and balance your mix with high-precision dynamic EQ plugins.'
+  },
+  'reverb': {
+    title: 'Reverb & Space Echo VST Plugins',
+    productType: 'plugin',
+    description: 'Lush algorithmic reverbs, shimmer spaces, plate simulations, and convolution reverb plugins on Producer Toy.'
+  },
+  'delay': {
+    title: 'Delay & Echo VST Plugins',
+    productType: 'plugin',
+    description: 'Ping-pong delays, vintage tape echoes, and stereo modulation delay effects for modern music production.'
+  },
+  'tape-delay': {
+    title: 'Tape Delay & Ping Pong Delay VST Plugins',
+    productType: 'plugin',
+    description: 'Classic tape delay, space echo, and stereo ping-pong delay plugins for atmospheric audio production.'
+  },
+  'compressor': {
+    title: 'Compressor & Limiter VST Plugins',
+    productType: 'plugin',
+    description: 'Glue compressors, bus processors, sidechain tools, and mastering limiters for punchy dynamic control.'
+  },
+  'bus-compressor': {
+    title: 'Bus Compressor & Sidechain VST Plugins',
+    productType: 'plugin',
+    description: 'Glue your mix together with analog bus compressors and sidechain dynamics processors.'
+  },
+  'auto-tune': {
+    title: 'Auto-Tune & Pitch Correction VST Plugins',
+    productType: 'plugin',
+    description: 'Real-time pitch correction, hard-tune robotic effects, and transparent vocal tuning plugins on Producer Toy.'
+  },
+  'vocal-processing': {
+    title: 'Vocal Processing & Chain Plugins',
+    productType: 'plugin',
+    description: 'All-in-one vocal chains, pitch shifters, de-essers, and vocal compressors for pristine lead vocals.'
+  },
+  'synthesizers': {
+    title: 'Synthesizers & Soft Synth VST Plugins',
+    productType: 'plugin',
+    description: 'Polyphonic soft synths, wavetable instruments, and vintage analog modeling synthesizers.'
+  },
+  'drum-kits': {
+    title: 'Drum Kits & Percussion Sample Packs',
+    productType: 'sample_pack',
+    description: 'Hard-hitting 808s, punchy kicks, crisp snares, and royalty-free drum loops for modern beatmakers.'
+  },
+  'trap-drums': {
+    title: 'Trap & Drill Drum Kits',
+    productType: 'sample_pack',
+    description: 'Heavy 808 basses, sliding drill glides, fast hi-hat rolls, and punchy trap drums for modern producers.'
+  },
+  '808-bass': {
+    title: '808 Sub Bass Loops & One-Shots',
+    productType: 'sample_pack',
+    description: 'Tuned 808 sub basses, distorted glide 808s, and deep sub bass samples with instant direct download.'
+  },
+  'serum-presets': {
+    title: 'Xfer Serum Presets & Soundbanks',
+    productType: 'preset',
+    description: 'Download premium and free Xfer Serum soundbanks for trap, hyperpop, EDM, and cinematic music.'
+  },
+  'vital-presets': {
+    title: 'Vital Synth Presets & Wavetables',
+    productType: 'preset',
+    description: 'Custom Vital presets, custom wavetables, and patch banks for futuristic sound design.'
+  },
+  'fl-studio-templates': {
+    title: 'FL Studio Project Templates',
+    productType: 'template',
+    description: 'Full FL Studio mixing project files, vocal chain presets, and beat arrangement templates.'
+  },
+  'guitars-bass': {
+    title: 'Acoustic & Electric Guitar VSTs',
+    productType: 'plugin',
+    description: 'Realistic acoustic guitar instruments, sampled electric guitars, and virtual bass plugins.'
   }
 }
 

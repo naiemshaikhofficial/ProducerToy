@@ -26,14 +26,34 @@ interface StorePageProps {
 }
 
 const CATEGORY_TYPE_MAP: Record<string, { productType: string; categorySlugs: string[] }> = {
-  'sounds': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs'] },
-  'sample-packs': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs'] },
+  'sounds': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs', 'drum-kits', '808-bass', 'trap-drums'] },
+  'sample-packs': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs', 'drum-kits'] },
   'samples': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs'] },
-  'plugins': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'instruments'] },
-  'effects': { productType: 'plugin', categorySlugs: ['plugins', 'effects'] },
-  'instruments': { productType: 'plugin', categorySlugs: ['plugins', 'instruments'] },
-  'presets': { productType: 'preset', categorySlugs: ['presets'] },
-  'templates': { productType: 'template', categorySlugs: ['templates'] },
+  'plugins': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'instruments', 'saturation', 'tape-saturation', 'eq', 'dynamic-eq', 'reverb', 'delay', 'tape-delay', 'compressor', 'bus-compressor', 'auto-tune', 'vocal-processing'] },
+  'effects': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'saturation', 'tape-saturation', 'eq', 'dynamic-eq', 'reverb', 'delay', 'tape-delay', 'compressor', 'bus-compressor', 'auto-tune', 'vocal-processing'] },
+  'instruments': { productType: 'plugin', categorySlugs: ['plugins', 'instruments', 'synthesizers', 'guitars-bass', 'acoustic-guitar'] },
+  'saturation': { productType: 'plugin', categorySlugs: ['saturation', 'tape-saturation', 'harmonic-exciter', 'effects'] },
+  'tape-saturation': { productType: 'plugin', categorySlugs: ['tape-saturation', 'saturation', 'effects'] },
+  'harmonic-exciter': { productType: 'plugin', categorySlugs: ['harmonic-exciter', 'saturation', 'effects'] },
+  'eq': { productType: 'plugin', categorySlugs: ['eq', 'dynamic-eq', 'effects', 'mastering'] },
+  'dynamic-eq': { productType: 'plugin', categorySlugs: ['dynamic-eq', 'eq', 'effects'] },
+  'reverb': { productType: 'plugin', categorySlugs: ['reverb', 'space-reverb', 'effects', 'echo'] },
+  'delay': { productType: 'plugin', categorySlugs: ['delay', 'tape-delay', 'effects', 'echo'] },
+  'tape-delay': { productType: 'plugin', categorySlugs: ['tape-delay', 'delay', 'effects'] },
+  'compressor': { productType: 'plugin', categorySlugs: ['compressor', 'bus-compressor', 'limiter', 'effects'] },
+  'bus-compressor': { productType: 'plugin', categorySlugs: ['bus-compressor', 'compressor', 'effects'] },
+  'auto-tune': { productType: 'plugin', categorySlugs: ['auto-tune', 'vocal-processing', 'pitch-shifter', 'effects'] },
+  'vocal-processing': { productType: 'plugin', categorySlugs: ['vocal-processing', 'auto-tune', 'pitch-shifter', 'effects'] },
+  'synthesizers': { productType: 'plugin', categorySlugs: ['synthesizers', 'instruments'] },
+  'guitars-bass': { productType: 'plugin', categorySlugs: ['guitars-bass', 'instruments', 'acoustic-guitar'] },
+  'presets': { productType: 'preset', categorySlugs: ['presets', 'serum-presets', 'vital-presets'] },
+  'serum-presets': { productType: 'preset', categorySlugs: ['serum-presets', 'presets'] },
+  'vital-presets': { productType: 'preset', categorySlugs: ['vital-presets', 'presets'] },
+  'drum-kits': { productType: 'sample_pack', categorySlugs: ['drum-kits', 'trap-drums', '808-bass', 'sounds', 'sample-packs'] },
+  'trap-drums': { productType: 'sample_pack', categorySlugs: ['trap-drums', 'drum-kits', 'sounds'] },
+  '808-bass': { productType: 'sample_pack', categorySlugs: ['808-bass', 'drum-kits', 'sounds'] },
+  'templates': { productType: 'template', categorySlugs: ['templates', 'fl-studio-templates', 'ableton-templates'] },
+  'fl-studio-templates': { productType: 'template', categorySlugs: ['fl-studio-templates', 'templates'] },
 }
 
 function expandCategoryVariants(rawCats: string[]): string[] {
@@ -364,23 +384,85 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     if (categorySlug) {
       switch (categorySlug.toLowerCase()) {
         case 'plugins':
+        case 'effects':
           return {
-            title: 'VST Plugins',
+            title: 'VST Plugins & Audio Effects',
             description: 'Browse premier VST audio plugins, analog saturators, synths, and mixing processors crafted for professional music producers.'
+          }
+        case 'saturation':
+        case 'tape-saturation':
+        case 'harmonic-exciter':
+          return {
+            title: 'Saturation & Tape Warmth VST Plugins',
+            description: 'Download analog tape saturation, tube warmth, and harmonic exciter plugins for drums, vocals, and master bus.'
+          }
+        case 'eq':
+        case 'dynamic-eq':
+          return {
+            title: 'Equalizer (EQ) & Dynamic EQ VST Plugins',
+            description: 'Surgical mixing EQs, dynamic equalizers, and vintage analog curve processors for clean audio mastering.'
+          }
+        case 'reverb':
+          return {
+            title: 'Reverb & Space Echo VST Plugins',
+            description: 'Lush algorithmic reverbs, shimmer spaces, plate simulations, and convolution reverb plugins.'
+          }
+        case 'delay':
+        case 'tape-delay':
+          return {
+            title: 'Delay & Ping Pong Delay VST Plugins',
+            description: 'Ping-pong delays, vintage tape echoes, and stereo modulation delay effects for modern music production.'
+          }
+        case 'compressor':
+        case 'bus-compressor':
+          return {
+            title: 'Compressor & Bus Dynamics VST Plugins',
+            description: 'Glue compressors, bus processors, sidechain tools, and mastering limiters for punchy dynamic control.'
+          }
+        case 'auto-tune':
+        case 'vocal-processing':
+          return {
+            title: 'Auto-Tune & Vocal Processing Plugins',
+            description: 'Real-time pitch correction, hard-tune robotic effects, and transparent vocal tuning plugins.'
+          }
+        case 'synthesizers':
+        case 'instruments':
+          return {
+            title: 'Virtual Synthesizers & Instruments',
+            description: 'Polyphonic soft synths, wavetable instruments, and vintage analog modeling synthesizers.'
+          }
+        case 'guitars-bass':
+          return {
+            title: 'Acoustic & Electric Guitar VSTs',
+            description: 'Realistic acoustic guitar instruments, sampled electric guitars, and virtual bass plugins.'
           }
         case 'sample-packs':
         case 'sounds':
         case 'samples':
           return {
-            title: 'Sample Packs & Drum Kits',
+            title: 'Sample Packs & Royalty-Free Sounds',
             description: 'Explore high-quality royalty-free 808 sub basses, drum kits, vocal chops, and melody loops ready for your DAW.'
           }
-        case 'presets':
+        case 'drum-kits':
+        case 'trap-drums':
           return {
-            title: 'Synth & Mixing Presets',
+            title: 'Drum Kits & Trap Sample Packs',
+            description: 'Hard-hitting 808s, punchy kicks, crisp snares, and royalty-free drum loops for modern beatmakers.'
+          }
+        case '808-bass':
+          return {
+            title: '808 Sub Bass Loops & One-Shots',
+            description: 'Tuned 808 sub basses, distorted glide 808s, and deep sub bass samples with instant direct download.'
+          }
+        case 'presets':
+        case 'serum-presets':
+        case 'vital-presets':
+          return {
+            title: 'Synth Presets & Soundbanks',
             description: 'Instantly upgrade your sound with synth presets for Serum, Vital, and DAW vocal chain mixing templates.'
           }
         case 'templates':
+        case 'fl-studio-templates':
           return {
             title: 'DAW Templates & Stems',
             description: 'Full DAW project templates designed to jumpstart your track creation and learn pro arrangement techniques.'
