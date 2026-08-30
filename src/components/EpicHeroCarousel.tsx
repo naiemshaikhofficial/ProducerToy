@@ -205,7 +205,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               return (
                 <div
                   key={product.id}
-                  className="w-[76%] flex-shrink-0 px-2"
+                  className="w-[78%] sm:w-[74%] flex-shrink-0 px-2.5 sm:px-3"
                 >
                   <Link
                     href={`/product/${product.slug}`}
@@ -230,7 +230,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     <button
                       type="button"
                       onClick={(e) => handleWishlistToggle(e, product)}
-                      className={`absolute top-3.5 right-3.5 w-8 h-8 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
+                      className={`absolute top-4 right-4 w-8 h-8 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                         isSaved
                           ? 'bg-white text-black border-white'
                           : 'bg-black/60 text-white/90 border-white/15 hover:bg-black/80'
@@ -241,7 +241,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     </button>
 
                     {/* Content Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 space-y-2 z-10">
+                    <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7 space-y-2.5 z-10">
                       <h2 className="text-lg sm:text-2xl font-black uppercase tracking-tight text-white leading-tight font-sans line-clamp-1">
                         {product.name}
                       </h2>
@@ -291,7 +291,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
         </div>
 
         {/* Mobile Pagination Indicator Dots (Static) */}
-        <div className="relative z-20 flex items-center justify-center gap-2 mt-4 mb-4">
+        <div className="relative z-20 flex items-center justify-center gap-2.5 mt-5 mb-6">
           {featuredList.map((_, idx) => {
             const isActive = idx === selectedIndex
             return (
@@ -300,7 +300,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 type="button"
                 onClick={() => handleSelect(idx)}
                 aria-label={`Go to slide ${idx + 1}`}
-                className={`w-[5px] h-[5px] rounded-full transition-colors duration-200 cursor-pointer ${
+                className={`w-[6px] h-[6px] rounded-full transition-colors duration-200 cursor-pointer ${
                   isActive
                     ? 'bg-white'
                     : 'bg-[#787880] hover:bg-[#9a9aa2]'
@@ -315,11 +315,11 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       {/* ========================================================================= */}
       {/* 2. DESKTOP LAYOUT (>= 1024px): PC-Only Auto-Rotation Animated Carousel    */}
       {/* ========================================================================= */}
-      <div className="hidden lg:grid grid-cols-12 gap-3 lg:gap-4 items-stretch">
+      <div className="hidden lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-stretch">
         
         {/* Main Hero Banner Container (Left 9 out of 12 columns) */}
         <div 
-          className="col-span-9 relative w-full h-[430px] rounded-none overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]"
+          className="col-span-9 relative w-full h-[450px] rounded-none overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]"
           style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
         >
           {/* Horizontal Sliding Viewport (Smooth 700ms Animation) */}
@@ -389,7 +389,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   </button>
 
                   {/* Hero Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-9 max-w-xl space-y-3 z-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 max-w-xl space-y-3.5 z-10">
                     
                     {/* Main Product Title */}
                     <h1 className="text-3xl lg:text-4xl font-black uppercase tracking-tight text-white leading-tight font-sans drop-shadow-xl">
@@ -402,7 +402,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     </p>
 
                     {/* CTA Action Buttons Row */}
-                    <div className="pt-1 flex items-center gap-2.5 flex-wrap">
+                    <div className="pt-1 flex items-center gap-3 flex-wrap">
                       <span
                         className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-6 py-2.5 rounded-xl transition-colors uppercase tracking-wider shadow-lg active:scale-95 inline-flex items-center justify-center min-w-[120px]"
                       >
@@ -441,14 +441,14 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
         </div>
 
         {/* Right Sidebar Interactive Product Cards with Animated Progress Fill (PC Only) */}
-        <div className="col-span-3 flex flex-col justify-between gap-2 h-[430px]">
+        <div className="col-span-3 flex flex-col justify-between gap-2.5 h-[450px]">
           {featuredList.map((item, idx) => {
             const isActive = idx === selectedIndex
             return (
               <button
                 key={item.id}
                 onClick={() => handleSelect(idx)}
-                className={`relative flex-1 flex items-center gap-3 p-2.5 rounded-xl transition-all text-left overflow-hidden border ${
+                className={`relative flex-1 flex items-center gap-3.5 p-3 rounded-xl transition-all text-left overflow-hidden border ${
                   isActive
                     ? 'bg-[#202020] border-[#2e2e2e] shadow-lg'
                     : 'bg-[#121212]/90 hover:bg-[#181818] border-transparent hover:border-[#222222]'

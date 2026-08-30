@@ -28,9 +28,9 @@ export function EpicTrending({ products = [], title = "Trending" }: EpicTrending
   if (trendingProducts.length === 0) return null
 
   return (
-    <section className="w-full my-8 sm:my-14 select-none">
+    <section className="w-full my-10 sm:my-16 lg:my-20 select-none">
       {/* Header Row (Exact Epic Games Store Layout: 'Trending' title on left + 'View More' on right) */}
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
+      <div className="flex items-center justify-between mb-5 sm:mb-7">
         <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
           {title}
         </h2>
@@ -38,14 +38,14 @@ export function EpicTrending({ products = [], title = "Trending" }: EpicTrending
         <Link
           href="/store?sort=trending"
           prefetch={true}
-          className="border border-white/20 hover:border-white text-white text-xs sm:text-[13px] font-semibold px-3.5 sm:px-4 py-1.5 rounded-lg transition-colors cursor-pointer active:scale-95"
+          className="border border-white/20 hover:border-white text-white text-xs sm:text-[13px] font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer active:scale-95"
         >
           View More
         </Link>
       </div>
 
-      {/* Desktop 5-Column Grid / Mobile Horizontal Scroll */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+      {/* Desktop 5-Column Grid / Mobile 2-Column Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-7">
         {trendingProducts.map((product) => (
           <div key={product.id} className="w-full">
             <ProductCard product={product} />

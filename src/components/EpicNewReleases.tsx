@@ -71,11 +71,11 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
   if (sortedProducts.length === 0) return null
 
   return (
-    <section className="w-full select-none my-6 sm:my-10">
+    <section className="w-full select-none my-10 sm:my-16 lg:my-20">
       {/* Desktop Header Row with Navigation Controls */}
       {productColumns.length > 1 && (
-        <div className="hidden lg:flex items-center justify-end mb-4">
-          <div className="flex items-center gap-2">
+        <div className="hidden lg:flex items-center justify-end mb-4 sm:mb-5">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => handleScroll('left')}
               className="w-8 h-8 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/[0.06]"
@@ -100,7 +100,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
       <div className="w-full bg-[#121212] border border-white/[0.08] rounded-2xl overflow-hidden lg:bg-transparent lg:border-none lg:rounded-none lg:overflow-visible">
         
         {/* Main Grid: Left Featured Card + Right Side-Scrollable 3-Item Columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 xl:gap-10 items-stretch">
           
           {/* ========================================================================= */}
           {/* LEFT COLUMN: Featured "NEW RELEASES" Visual Card (Exact 1:1 Flush Match)  */}
@@ -184,10 +184,10 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                         key={item.id}
                         href={`/product/${item.slug}`}
                         prefetch={true}
-                        className="group flex items-center gap-3.5 p-1.5 sm:p-2 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer select-none"
+                        className="group flex items-center gap-4 p-2 sm:p-2.5 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer select-none"
                       >
                         {/* Square Thumbnail with Bookmark Icon Overlay */}
-                        <div className="relative w-[58px] h-[58px] sm:w-[64px] sm:h-[64px] rounded-xl overflow-hidden bg-[#202020] border border-white/[0.08] flex-shrink-0 shadow-md">
+                        <div className="relative w-[60px] h-[60px] sm:w-[68px] sm:h-[68px] rounded-xl overflow-hidden bg-[#202020] border border-white/[0.08] flex-shrink-0 shadow-md">
                           <Image
                             src={getCdnImageUrl(item.cover_image, { width: 240 })}
                             alt={item.name}

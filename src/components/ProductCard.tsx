@@ -181,7 +181,7 @@ export function ProductCard({ product }: { product: Product }) {
       title={`${product.name} by ${brandName}`}
     >
       {/* 3:4 Tall Epic Games Store Poster Card */}
-      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#222222] shadow-md mb-2.5">
+      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#222222] shadow-md mb-3.5 sm:mb-4">
         <Image
           src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop', { width: 600 })}
           alt={`${product.name} by ${brandName} - ${product.product_type ? product.product_type.replace('_', ' ') : 'Audio Plugin'}`}
@@ -226,14 +226,14 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Content Details Below Card (Exact Minimalist Epic Games Store Layout) */}
-      <div className="flex flex-col gap-0.5 px-0.5">
+      <div className="flex flex-col gap-1 sm:gap-1.5 px-0.5">
         {/* Subcategory / Tag */}
-        <span className="text-[11px] sm:text-xs font-medium text-zinc-400 capitalize line-clamp-1">
+        <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 capitalize line-clamp-1">
           {subCategoryLabel}
         </span>
 
         {/* Title */}
-        <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
+        <h3 className="text-sm sm:text-[15px] font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
           {product.name}
         </h3>
 
@@ -250,7 +250,7 @@ export function ProductCard({ product }: { product: Product }) {
         </span>
 
         {/* Price Row */}
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2 mt-1.5 pt-0.5">
           {product.is_coming_soon ? (
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
               {product.release_date ? `Available ${product.release_date}` : 'Coming Soon'}

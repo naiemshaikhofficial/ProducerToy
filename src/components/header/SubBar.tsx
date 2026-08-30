@@ -96,7 +96,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
-      <div className="flex md:hidden w-full px-3.5 sm:px-6 h-[50px] items-center justify-between relative z-50 bg-[#121212]">
+      <div className="flex md:hidden w-full px-4 sm:px-6 h-[54px] items-center justify-between relative z-50 bg-[#121212]">
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
@@ -115,7 +115,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store"
-                className="w-full bg-[#202020] text-white text-sm pl-10 pr-8 h-[38px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400 font-sans"
+                className="w-full bg-[#202020] text-white text-sm pl-10 pr-8 h-[40px] rounded-full border border-transparent focus:outline-none focus:bg-[#282828] placeholder:text-zinc-400 font-sans"
               />
               {searchQuery && (
                 <button
@@ -142,7 +142,7 @@ export const SubBar: React.FC<SubBarProps> = ({
             <button
               type="button"
               onClick={() => setIsMobileSearchOpen(true)}
-              className="p-1 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
+              className="p-1.5 text-zinc-300 hover:text-white transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
               aria-label="Open search"
             >
               <Search className="w-[19px] h-[19px] stroke-[1.8]" />
@@ -153,7 +153,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               <button
                 type="button"
                 onClick={() => setIsDiscoverMenuOpen(!isDiscoverMenuOpen)}
-                className="flex items-center gap-1.5 text-[14px] sm:text-[15px] font-normal text-white hover:text-zinc-200 transition-colors py-1 px-1 cursor-pointer select-none tracking-normal"
+                className="flex items-center gap-1.5 text-[14px] sm:text-[15px] font-normal text-white hover:text-zinc-200 transition-colors py-1.5 px-2 cursor-pointer select-none tracking-normal"
               >
                 <span>{currentSectionLabel}</span>
                 <ChevronDown className={`w-3.5 h-3.5 text-zinc-300 transition-transform duration-200 ${isDiscoverMenuOpen ? 'rotate-180 text-white' : ''}`} />
@@ -161,7 +161,7 @@ export const SubBar: React.FC<SubBarProps> = ({
             </div>
 
             {/* Right Icons: Wishlist, Gifts, Cart (Clean spacing, no collision with center Discover) */}
-            <div className="flex items-center gap-3 sm:gap-4 text-zinc-300">
+            <div className="flex items-center gap-3.5 sm:gap-4.5 text-zinc-300">
               <Link
                 href="/wishlist"
                 prefetch={true}
@@ -250,13 +250,13 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 2. DESKTOP SUBBAR (>= 768px): Exact 1:1 PC Screenshot Match                */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
+      <div className="hidden md:flex w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
         
         {/* Left Side: Search Capsule + Discover / Browse / News Tabs */}
         <div className="flex items-center">
           
           {/* Epic Search Pill (Exact 1:1 Size & Radius) */}
-          <div className="relative w-[230px] lg:w-[250px] flex-shrink-0">
+          <div className="relative w-[240px] lg:w-[270px] flex-shrink-0">
             <form onSubmit={onSearchSubmit} className="relative w-full">
               <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -280,7 +280,7 @@ export const SubBar: React.FC<SubBarProps> = ({
           </div>
 
           {/* Desktop Sub Navigation Links (Products ˅, Deals, Brands, Rent to Own, Blog, Free) */}
-          <nav className="flex items-center gap-6 lg:gap-8 ml-6 lg:ml-8 text-[14px]">
+          <nav className="flex items-center gap-7 lg:gap-9 ml-8 lg:ml-10 text-[14px]">
             {/* Products Mega Dropdown Trigger */}
             <div 
               className="relative flex items-center cursor-pointer py-2"

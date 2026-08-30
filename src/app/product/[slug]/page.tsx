@@ -109,7 +109,7 @@ export default async function EpicProductDetailPage({
   const ratingStats = await getProductRatingStatsAction(product.id)
 
   return (
-    <div className="max-w-[1240px] mx-auto px-6 sm:px-8 lg:px-12 py-4 space-y-4 text-white min-h-screen">
+    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-8 sm:space-y-12 text-white min-h-screen">
       <ProductJsonLd
         name={product.name}
         description={product.short_description || product.description}

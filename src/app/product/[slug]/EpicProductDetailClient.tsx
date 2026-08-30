@@ -288,11 +288,11 @@ export function EpicProductDetailClient({
     : ['Sound Kits']
 
   return (
-    <div className="space-y-6 text-white max-w-[1240px] mx-auto font-sans select-none pb-20">
+    <div className="space-y-8 sm:space-y-10 text-white max-w-[1280px] mx-auto font-sans select-none pb-28">
       {/* ========================================================================= */}
       {/* 1. TOP TITLE HEADER & EPIC RATING (Exact 1:1 Match)                       */}
       {/* ========================================================================= */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
           {product.name}
         </h1>
@@ -331,7 +331,7 @@ export function EpicProductDetailClient({
       {/* 2. SUB-NAVIGATION BAR (Exact 1:1 Match)                                   */}
       {/* ========================================================================= */}
       <div className="border-b border-[#202020]">
-        <div className="flex items-center gap-8 text-sm font-medium overflow-x-auto custom-scrollbar">
+        <div className="flex items-center gap-8 sm:gap-10 text-sm font-medium overflow-x-auto custom-scrollbar">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'addons', label: 'Presets & Sounds' },
@@ -341,7 +341,7 @@ export function EpicProductDetailClient({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-3 relative transition-colors cursor-pointer whitespace-nowrap text-[14px] ${
+              className={`py-3.5 relative transition-colors cursor-pointer whitespace-nowrap text-[14px] ${
                 activeTab === tab.id ? 'text-white font-semibold' : 'text-zinc-400 hover:text-white font-normal'
               }`}
             >
@@ -627,11 +627,11 @@ export function EpicProductDetailClient({
       {/* ========================================================================= */}
       {/* 4. MAIN 2-COLUMN GRID (DESKTOP >= lg & SHARED BODY CONTENT)               */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start pt-2">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start pt-4 sm:pt-6">
         {/* ================= LEFT COLUMN (MEDIA & DETAILS) ================= */}
-        <div className="lg:col-span-8 space-y-8 w-full">
+        <div className="lg:col-span-8 space-y-10 w-full">
           {/* Media Showcase */}
-          <div className="space-y-3 w-full">
+          <div className="space-y-3.5 w-full">
             <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
               {activeMedia.type === 'video' && activeMedia.videoId ? (
                 <div className="relative w-full h-full">
@@ -662,12 +662,10 @@ export function EpicProductDetailClient({
                         )
                       }
                     }}
-                    className="absolute top-3 right-3 z-30 bg-black/80 hover:bg-zinc-800 text-white px-3 py-1.5 rounded-full backdrop-blur-md transition-all border border-white/15 shadow-xl cursor-pointer flex items-center gap-1.5 text-xs font-semibold active:scale-95"
+                    className="absolute bottom-4 right-4 z-30 bg-black/80 hover:bg-black text-white p-2.5 rounded-full backdrop-blur-md border border-white/20 transition-all active:scale-95 shadow-xl cursor-pointer"
                     title={isVideoMuted ? 'Unmute Video' : 'Mute Video'}
-                    aria-label={isVideoMuted ? 'Unmute Video' : 'Mute Video'}
                   >
-                    {isVideoMuted ? <VolumeX className="w-3.5 h-3.5 text-zinc-400" /> : <Volume2 className="w-3.5 h-3.5 text-white" />}
-                    <span className="text-[11px] font-medium tracking-wide text-zinc-200">{isVideoMuted ? 'Unmute' : 'Mute'}</span>
+                    {isVideoMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
                   </button>
                 </div>
               ) : (
@@ -675,58 +673,35 @@ export function EpicProductDetailClient({
                   src={activeMedia.url}
                   alt={product.name}
                   fill
-                  unoptimized
-                  className="object-cover"
                   priority
+                  unoptimized
+                  className="object-cover object-center"
                 />
-              )}
-
-              {/* Audition Demo Button Overlay */}
-              {product.demo_audio_url && activeMedia.type !== 'video' && (
-                <button
-                  type="button"
-                  onClick={handleAudition}
-                  className="absolute bottom-4 right-4 bg-black/80 hover:bg-zinc-800 text-white px-4 py-2.5 rounded-full backdrop-blur-md transition-all z-20 flex items-center gap-2 text-xs font-bold shadow-2xl border border-white/10 cursor-pointer"
-                >
-                  {isCurrentPlaying ? (
-                    <>
-                      <Pause className="w-4 h-4 fill-current" />
-                      <span>Pause Demo</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4 fill-current translate-x-0.5" />
-                      <span>Audition Audio</span>
-                    </>
-                  )}
-                </button>
               )}
             </div>
 
-            {/* Thumbnail Carousel Strip (Clean Epic Spacing, No Clipping) */}
+            {/* Thumbnail Carousel Strip (Supports Video Trailers + Images) */}
             {mediaItems.length > 1 && (
-              <div className="flex items-center gap-3 pt-2 w-full">
-                {mediaItems.length > 4 && (
-                  <button
-                    type="button"
-                    onClick={handlePrevThumb}
-                    className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer flex-shrink-0"
-                    aria-label="Previous media"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                )}
+              <div className="flex items-center gap-2 pt-2 w-full">
+                <button
+                  type="button"
+                  onClick={handlePrevThumb}
+                  className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Previous media"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
 
-                <div className="flex-1 flex items-center gap-3 overflow-x-auto py-1.5 px-0.5 custom-scrollbar">
+                <div className="flex-1 flex items-center gap-2.5 overflow-x-auto py-1 custom-scrollbar">
                   {mediaItems.map((item, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => setSelectedImageIndex(idx)}
-                      className={`relative w-24 sm:w-28 h-14 rounded-xl overflow-hidden transition-all flex-shrink-0 cursor-pointer group ${
+                      className={`relative w-24 sm:w-28 h-14 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer group ${
                         selectedImageIndex === idx
-                          ? 'ring-2 ring-[#FA742B] opacity-100 shadow-md'
-                          : 'border border-[#282828] opacity-60 hover:opacity-100'
+                          ? 'border-[#FA742B] shadow-lg scale-105'
+                          : 'border-[#262626] opacity-60 hover:opacity-100'
                       }`}
                     >
                       <Image src={item.url} alt={`Media ${idx + 1}`} fill unoptimized className="object-cover" />
@@ -741,33 +716,31 @@ export function EpicProductDetailClient({
                   ))}
                 </div>
 
-                {mediaItems.length > 4 && (
-                  <button
-                    type="button"
-                    onClick={handleNextThumb}
-                    className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer flex-shrink-0"
-                    aria-label="Next media"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={handleNextThumb}
+                  className="p-2.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Next media"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             )}
           </div>
 
-          {/* Lead Hook Tagline / Description */}
-          <div className="space-y-6 w-full">
+          {/* Lead Hook Tagline / Description (Screenshot 3 Match) */}
+          <div className="space-y-8 w-full">
             {product.short_description && (
               <p className="text-base sm:text-lg text-zinc-200 leading-relaxed font-medium">
                 {product.short_description}
               </p>
             )}
 
-            {/* Genres & Features Badges */}
+            {/* Genres & Features Badges (2-column layout with vertical divider - Screenshot 3 Match) */}
             {activeTab === 'overview' && (
-              <div className="grid grid-cols-2 gap-6 pt-5 pb-2 border-t border-[#202020]">
-                {/* Genres / Categories */}
-                <div className="space-y-2.5 pr-4 border-r border-[#262626]">
+              <div className="grid grid-cols-2 gap-6 pt-6 pb-2 border-t border-[#202020]">
+                {/* Genres / Categories (Left Column) */}
+                <div className="space-y-3 pr-4 border-r border-[#262626]">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                     Genres
                   </span>
@@ -786,8 +759,8 @@ export function EpicProductDetailClient({
                   </div>
                 </div>
 
-                {/* Features */}
-                <div className="space-y-2.5 pl-2">
+                {/* Features (Right Column) */}
+                <div className="space-y-3 pl-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                     Features
                   </span>
@@ -805,17 +778,17 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Highlight Promo Card: Toywards */}
-            <div className="p-6 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-4 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center">
+            {/* Highlight Promo Card: Producer Toy Club / Toywards (Screenshot 3 Match) */}
+            <div className="p-6 sm:p-7 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-4 shadow-xl">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center flex-shrink-0">
                   <ToywardsSparkleIcon size={20} className="text-[#FA742B]" />
                 </div>
                 <div>
                   <h4 className="text-base font-extrabold text-white tracking-tight">
                     Earn with Toywards Rewards
                   </h4>
-                  <p className="text-xs text-zinc-300 mt-0.5">
+                  <p className="text-xs text-zinc-300 mt-0.5 leading-relaxed">
                     Earn up to 20% cashback in Toywards balance on eligible purchases. Spend 1:1 on plugins and sound kits at checkout.
                   </p>
                 </div>
@@ -825,19 +798,19 @@ export function EpicProductDetailClient({
                 <Link
                   href="/features/toywards"
                   prefetch={true}
-                  className="inline-flex items-center justify-center px-5 py-2 rounded-xl bg-[#242424] hover:bg-[#2c2c2c] text-white border border-[#383838] text-xs font-bold uppercase tracking-wider transition-colors"
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-[#242424] hover:bg-[#2c2c2c] text-white border border-[#383838] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
                 >
                   Explore Toywards
                 </Link>
               </div>
             </div>
 
-            {/* Detailed Description & Read More */}
+            {/* Detailed Description & Read More (Screenshot 4 Match) */}
             {activeTab === 'overview' && product.full_description && (
-              <div className="space-y-3 pt-2">
-                <h3 className="text-xl font-bold text-white tracking-tight">About {product.name}</h3>
+              <div className="space-y-3.5 pt-4">
+                <h3 className="text-xl font-black text-white tracking-tight">About {product.name}</h3>
                 <div
-                  className={`text-sm text-zinc-300 leading-relaxed space-y-4 font-normal transition-all ${
+                  className={`text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal transition-all ${
                     !isDescExpanded ? 'max-h-48 overflow-hidden relative' : ''
                   }`}
                 >
@@ -846,15 +819,28 @@ export function EpicProductDetailClient({
                     <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#121212] to-transparent pointer-events-none" />
                   )}
                 </div>
-
                 <button
                   type="button"
                   onClick={() => setIsDescExpanded(!isDescExpanded)}
-                  className="text-xs font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 pt-1 cursor-pointer transition-colors"
+                  className="text-xs font-bold text-zinc-300 hover:text-white uppercase tracking-wider transition-colors flex items-center gap-1 cursor-pointer pt-1"
                 >
-                  <span>{isDescExpanded ? 'Show less' : 'Show more'}</span>
+                  <span>{isDescExpanded ? 'Show Less' : 'Read More'}</span>
                   {isDescExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
+              </div>
+            )}
+
+            {/* Add-ons Tab */}
+            {activeTab === 'addons' && (
+              <div className="space-y-4 pt-4">
+                <h3 className="text-xl font-black text-white tracking-tight">Presets & Add-on Sounds</h3>
+                <p className="text-xs text-zinc-400">
+                  Expansion banks, preset kits, and complementary sound libraries designed for this release.
+                </p>
+                <div className="bg-[#181818] border border-[#242424] p-6 rounded-2xl text-center space-y-2">
+                  <p className="text-sm font-semibold text-white">No standalone add-on packs registered for this product.</p>
+                  <p className="text-xs text-zinc-400">All standard factory presets and sound banks are included with your primary license download.</p>
+                </div>
               </div>
             )}
 
@@ -875,7 +861,7 @@ export function EpicProductDetailClient({
         </div>
 
         {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
-        <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-4 w-full">
+        <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-6 space-y-5 w-full bg-[#161616] border border-[#242424] rounded-2xl p-6 sm:p-7 shadow-xl">
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image

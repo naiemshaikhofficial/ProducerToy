@@ -166,21 +166,21 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
   if (products.length === 0) return null
 
   return (
-    <section className="w-full my-8 sm:my-14 select-none">
+    <section className="w-full my-10 sm:my-16 lg:my-20 select-none">
       
       {/* ========================================================================= */}
       {/* 1. DESKTOP 3-COLUMN GRID (>= 1024px) (Exact 1:1 Epic Games Store Layout)  */}
       {/* ========================================================================= */}
-      <div className="hidden lg:grid grid-cols-3 gap-6 xl:gap-8 items-start">
+      <div className="hidden lg:grid grid-cols-3 gap-8 xl:gap-12 items-start">
         {columnsData.map((col, colIdx) => (
-          <div key={colIdx} className="flex flex-col space-y-3">
+          <div key={colIdx} className="flex flex-col space-y-4">
             
             {/* Column Header with Link */}
-            <div className="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+            <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
               <Link 
                 href={col.href}
                 prefetch={true}
-                className="group inline-flex items-center gap-1 text-[17px] font-bold text-white hover:text-zinc-300 transition-colors"
+                className="group inline-flex items-center gap-1.5 text-[17px] font-bold text-white hover:text-zinc-300 transition-colors"
               >
                 <span>{col.title}</span>
                 <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
@@ -188,7 +188,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
             </div>
 
             {/* 5 Stacked Item Rows */}
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               {col.items.map((item) => {
                 const isSaved = isWishlisted(item.id)
                 const isComingSoon = item.statusType === 'coming_soon'
@@ -202,10 +202,10 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                     key={item.id}
                     href={isComingSoon ? `/store?coming_soon=true` : `/product/${item.slug}`}
                     prefetch={true}
-                    className="group flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer select-none"
+                    className="group flex items-center gap-4 p-2.5 sm:p-3 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer select-none"
                   >
                     {/* Square Thumbnail with Bookmark Icon */}
-                    <div className="relative w-[58px] h-[58px] rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.08] flex-shrink-0 shadow-sm">
+                    <div className="relative w-[62px] h-[62px] sm:w-[66px] sm:h-[66px] rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.08] flex-shrink-0 shadow-sm">
                       <Image
                         src={getCdnImageUrl(item.cover_image, { width: 160 })}
                         alt={item.name}
@@ -284,23 +284,23 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
       {/* ========================================================================= */}
       <div className="block lg:hidden w-full">
         {/* Horizontal Track of 3 Column Lists */}
-        <div 
+        <div
           ref={mobileScrollRef}
           onScroll={handleMobileScroll}
-          className="flex gap-4 overflow-x-auto scrollbar-none snap-x snap-mandatory px-4 pb-2"
+          className="flex gap-5 overflow-x-auto scrollbar-none snap-x snap-mandatory px-4 pb-3"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {columnsData.map((col, colIdx) => (
             <div
               key={colIdx}
-              className="w-[85vw] max-w-[340px] flex-shrink-0 snap-start flex flex-col space-y-2.5"
+              className="w-[88vw] max-w-[360px] flex-shrink-0 snap-start flex flex-col space-y-3"
             >
               {/* Column Title with Chevron */}
-              <div className="flex items-center justify-between pb-1 border-b border-white/[0.06]">
+              <div className="flex items-center justify-between pb-1.5 border-b border-white/[0.08]">
                 <Link
                   href={col.href}
                   prefetch={true}
-                  className="group inline-flex items-center gap-1 text-[16px] font-bold text-white hover:text-zinc-300"
+                  className="group inline-flex items-center gap-1.5 text-[16px] font-bold text-white hover:text-zinc-300"
                 >
                   <span>{col.title}</span>
                   <ChevronRight className="w-4 h-4 text-zinc-400" />
@@ -308,7 +308,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
               </div>
 
               {/* 5 Stacked Item Rows */}
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1.5">
                 {col.items.map((item) => {
                   const isSaved = isWishlisted(item.id)
                   const isComingSoon = item.statusType === 'coming_soon'
@@ -322,10 +322,10 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                       key={item.id}
                       href={isComingSoon ? `/store?coming_soon=true` : `/product/${item.slug}`}
                       prefetch={true}
-                      className="group flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer select-none"
+                      className="group flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer select-none"
                     >
                       {/* Square Thumbnail */}
-                      <div className="relative w-[52px] h-[52px] rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.08] flex-shrink-0 shadow-sm">
+                      <div className="relative w-[56px] h-[56px] rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.08] flex-shrink-0 shadow-sm">
                         <Image
                           src={getCdnImageUrl(item.cover_image, { width: 160 })}
                           alt={item.name}

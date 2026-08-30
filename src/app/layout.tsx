@@ -143,7 +143,7 @@ export default function RootLayout({
                     
                     <Header />
                     
-                    <main className="flex-1 pb-24">
+                    <main className="flex-1 pb-28 sm:pb-36">
                       {children}
                     </main>
                     

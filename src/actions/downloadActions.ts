@@ -39,7 +39,7 @@ export async function getSecureDownloadUrlAction(
     
     let productQuery = adminSupabase
       .from('products')
-      .select('id, name, slug, product_type, price_usd, price_inr, is_free')
+      .select('id, name, slug, product_type, price_usd')
 
     if (isUuid) {
       productQuery = productQuery.eq('id', productId)
@@ -54,7 +54,7 @@ export async function getSecureDownloadUrlAction(
       // Fallback try opposite field or direct lookup
       const { data: fallbackProduct } = await adminSupabase
         .from('products')
-        .select('id, name, slug, product_type, price_usd, price_inr, is_free')
+        .select('id, name, slug, product_type, price_usd')
         .or(`id.eq.${productId},slug.eq.${productId}`)
         .maybeSingle()
 
@@ -64,30 +64,38 @@ export async function getSecureDownloadUrlAction(
       activeProduct = fallbackProduct
     }
 
-    const isFree =
-      Boolean(activeProduct.is_free) ||
-      (Number(activeProduct.price_usd || 0) <= 0 && Number(activeProduct.price_inr || 0) <= 0)
+    const isFree = Number(activeProduct.price_usd || 0) <= 0
 
     // 2. If not free, verify ownership in purchases OR claimed gifts
     if (!isFree) {
-      // Check purchases table (matching both id and slug)
-      const { data: purchaseRecord } = await adminSupabase
+      let isOwner = false
+      const userEmail = user.email?.trim().toLowerCase()
+
+      // Check purchases table (matching user_id OR customer_email)
+      let purchaseQuery = adminSupabase
         .from('purchases')
         .select('id')
-        .eq('user_id', user.id)
         .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
-        .maybeSingle()
 
-      let isOwner = Boolean(purchaseRecord)
+      if (userEmail) {
+        purchaseQuery = purchaseQuery.or(`user_id.eq.${user.id},customer_email.ilike.${userEmail}`)
+      } else {
+        purchaseQuery = purchaseQuery.eq('user_id', user.id)
+      }
 
-      if (!isOwner && user.email) {
+      const { data: purchaseRecord } = await purchaseQuery.maybeSingle()
+      if (purchaseRecord) {
+        isOwner = true
+      }
+
+      if (!isOwner && userEmail) {
         // Check claimed gifts table
         const { data: giftRecord } = await adminSupabase
           .from('gifts')
           .select('id')
           .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
           .eq('status', 'claimed')
-          .or(`recipient_user_id.eq.${user.id},recipient_email.ilike.${user.email.toLowerCase()}`)
+          .or(`recipient_user_id.eq.${user.id},recipient_email.ilike.${userEmail}`)
           .maybeSingle()
 
         if (giftRecord) {

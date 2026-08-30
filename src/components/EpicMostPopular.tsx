@@ -32,9 +32,9 @@ export function EpicMostPopular({ products = [], title = "Most Popular" }: EpicM
   if (popularProducts.length === 0) return null
 
   return (
-    <section className="w-full my-8 sm:my-14 select-none">
+    <section className="w-full my-10 sm:my-16 lg:my-20 select-none">
       {/* Header Row (Exact Epic Games Store: 'Most Popular >' on left + Scroll Arrows on right) */}
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
+      <div className="flex items-center justify-between mb-5 sm:mb-7">
         <Link
           href="/store?sort=popular"
           prefetch={true}
@@ -45,7 +45,7 @@ export function EpicMostPopular({ products = [], title = "Most Popular" }: EpicM
         </Link>
 
         {/* Scroll Control Arrows (< >) */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => scroll('left')}
             className="w-8 h-8 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/[0.06]"
@@ -68,13 +68,13 @@ export function EpicMostPopular({ products = [], title = "Most Popular" }: EpicM
       {/* Side-Scrollable Horizontal 5-Card Viewport */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-none snap-x snap-mandatory pb-2"
+        className="flex gap-4 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none snap-x snap-mandatory pb-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {popularProducts.map((product) => (
           <div
             key={product.id}
-            className="flex-none w-[140px] sm:w-[185px] lg:w-[calc(20%-16px)] snap-start"
+            className="flex-none w-[155px] sm:w-[195px] lg:w-[calc(20%-18px)] snap-start"
           >
             <ProductCard product={product} />
           </div>

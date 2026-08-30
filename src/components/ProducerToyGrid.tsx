@@ -29,30 +29,30 @@ export function ProducerToyGrid({ products, title = "Producer Toy Originals" }: 
   if (displayProducts.length === 0) return null
 
   return (
-    <section className="w-full my-8 sm:my-12 select-none">
+    <section className="w-full my-10 sm:my-16 lg:my-20 select-none">
       {/* Header Row with Arrow Navigation */}
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
+      <div className="flex items-center justify-between mb-5 sm:mb-7">
         <Link 
           href="/store?brand=producer-toy" 
           prefetch={true}
-          className="group inline-flex items-center gap-1 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
+          className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
         >
           <span>{title}</span>
           <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-1 transition-transform" />
         </Link>
 
         {/* Scroll Control Arrows */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95"
+            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer"
             aria-label="Scroll left"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95"
+            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-5 h-5" />
@@ -63,13 +63,13 @@ export function ProducerToyGrid({ products, title = "Producer Toy Originals" }: 
       {/* Epic Games Store Poster Card Grid / Scroll Container */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-none pb-4 snap-x snap-mandatory"
+        className="flex gap-4 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none pb-4 snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {displayProducts.map((product) => (
           <div 
             key={product.id} 
-            className="flex-none w-[140px] sm:w-[175px] lg:w-[210px] snap-start"
+            className="flex-none w-[155px] sm:w-[190px] lg:w-[225px] snap-start"
           >
             <ProductCard product={product} />
           </div>

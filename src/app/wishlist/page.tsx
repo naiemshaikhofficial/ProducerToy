@@ -106,8 +106,8 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#121212] text-white select-none pb-24 font-sans">
-      <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+    <div className="w-full min-h-screen bg-[#121212] text-white select-none pb-28 font-sans">
+      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         
         {/* ========================================================================= */}
         {/* 1. TOP HEADER: My Wishlist + Producer Rewards Balance                      */}
@@ -254,7 +254,7 @@ export default function WishlistPage() {
         {/* ========================================================================= */}
         {/* 4. MAIN CONTENT (2 Columns: Left Wishlist Cards + Right Filters Sidebar)  */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-14 items-start pt-3">
           
           {/* ======================================================================= */}
           {/* LEFT COLUMN: Wishlist Cards List (Spans 9 cols)                         */}
@@ -296,7 +296,7 @@ export default function WishlistPage() {
                 return (
                   <div
                     key={item.id}
-                    className="w-full bg-[#181818] border border-[#242424] hover:border-[#303030] rounded-2xl p-5 flex flex-col sm:flex-row gap-5 relative transition-all shadow-md group"
+                    className="w-full bg-[#181818] border border-[#242424] hover:border-[#303030] rounded-2xl p-6 flex flex-col sm:flex-row gap-6 relative transition-all shadow-md group"
                   >
                     {/* 3:4 Poster Thumbnail */}
                     <div className="relative w-full sm:w-[120px] h-[160px] bg-[#121212] border border-[#282828] rounded-xl overflow-hidden flex-shrink-0 shadow-md">

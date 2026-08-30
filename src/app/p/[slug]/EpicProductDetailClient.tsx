@@ -234,7 +234,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         : ['Sound Kits']
 
   return (
-    <div className="space-y-6 text-white max-w-[1240px] mx-auto font-sans select-none pb-20">
+    <div className="space-y-8 sm:space-y-10 text-white max-w-[1280px] mx-auto font-sans select-none pb-28">
       
       {/* ========================================================================= */}
       {/* 1. TOP TITLE HEADER (Exact 1:1 Match)                                     */}
@@ -249,7 +249,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       {/* 2. SUB-NAVIGATION BAR (Exact 1:1 Match)                                   */}
       {/* ========================================================================= */}
       <div className="border-b border-[#202020]">
-        <div className="flex items-center gap-8 text-sm font-semibold overflow-x-auto custom-scrollbar">
+        <div className="flex items-center gap-8 sm:gap-10 text-sm font-semibold overflow-x-auto custom-scrollbar">
           {[
             { id: 'overview', label: 'Overview' },
             { id: 'addons', label: 'Presets & Sounds' },
@@ -259,7 +259,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-3 relative transition-colors cursor-pointer whitespace-nowrap text-[14px] ${
+              className={`py-3.5 relative transition-colors cursor-pointer whitespace-nowrap text-[14px] ${
                 activeTab === tab.id ? 'text-white font-bold' : 'text-zinc-400 hover:text-white font-normal'
               }`}
             >
@@ -532,13 +532,13 @@ export function EpicProductDetailClient({ product }: { product: any }) {
       {/* ========================================================================= */}
       {/* 4. MAIN 2-COLUMN GRID (DESKTOP >= lg & SHARED BODY CONTENT)               */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start pt-2">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start pt-4 sm:pt-6">
         
         {/* ================= LEFT COLUMN (MEDIA & DETAILS) ================= */}
-        <div className="lg:col-span-8 space-y-8 w-full">
+        <div className="lg:col-span-8 space-y-10 w-full">
           
           {/* Media Showcase (Audio/Video Trailer + Thumbnails) */}
-          <div className="space-y-3 w-full">
+          <div className="space-y-3.5 w-full">
             <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
               {activeMedia.type === 'video' && activeMedia.videoId ? (
                 <div className="relative w-full h-full">
@@ -788,7 +788,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         </div>
 
         {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
-        <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-4 space-y-4 w-full">
+        <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-6 space-y-5 w-full bg-[#161616] border border-[#242424] rounded-2xl p-6 sm:p-7 shadow-xl">
           
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">

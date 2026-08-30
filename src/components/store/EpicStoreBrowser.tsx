@@ -748,13 +748,13 @@ export function EpicStoreBrowser({
   ])
 
   return (
-    <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-24">
-      <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+    <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-28">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
         
         {/* ========================================================================= */}
         {/* PAGE HEADER: TITLE & DESCRIPTION (Exact Free Page Hero Layout)             */}
         {/* ========================================================================= */}
-        <div className="space-y-2 pb-8 pt-2 max-w-4xl">
+        <div className="space-y-3 pb-8 pt-2 max-w-4xl">
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white">
             {currentHeaderMeta.title}
           </h1>
@@ -768,7 +768,7 @@ export function EpicStoreBrowser({
         {/* ========================================================================= */}
         {/* 1. TOP BAR: SHOW DROPDOWN + ACTIVE FILTER TAGS                             */}
         {/* ========================================================================= */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-[#202020]">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-[#202020]">
           
           {/* Left: Show Sort Selector + Active Filter Pills */}
           <div className="flex items-center gap-3 flex-wrap">
@@ -960,7 +960,7 @@ export function EpicStoreBrowser({
         {/* ========================================================================= */}
         {/* 2. TWO-COLUMN MAIN STORE LAYOUT (Active Filters Auto-Top & Open)          */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 pt-8 items-start">
           
           {/* ================= LEFT COLUMN: PRODUCTS GRID (9 Cols) ================= */}
           <div className="lg:col-span-9 w-full">
@@ -983,7 +983,7 @@ export function EpicStoreBrowser({
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-8 sm:gap-x-5 sm:gap-y-10">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-6 lg:gap-x-7 gap-y-9 sm:gap-y-12 lg:gap-y-14">
                 {sortedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

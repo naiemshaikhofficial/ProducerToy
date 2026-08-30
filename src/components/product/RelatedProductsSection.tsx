@@ -78,13 +78,13 @@ export function RelatedProductsSection({
   if (!loading && products.length === 0) return null
 
   return (
-    <div className="space-y-4 pt-10 border-t border-[#202020] select-none">
+    <div className="space-y-6 pt-14 sm:pt-18 border-t border-[#202020] select-none">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
             Similar & Recommended Plugins
           </h3>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-zinc-400 mt-1">
             More tools and sounds curated for your production workflow.
           </p>
         </div>
@@ -96,7 +96,7 @@ export function RelatedProductsSection({
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 lg:gap-7 pt-2">
         {products.map((item) => {
           const itemBrand = item.brands?.name || item.brand || brandName
           const isFree = Number(item.price_usd) === 0
@@ -109,7 +109,7 @@ export function RelatedProductsSection({
               className="group flex flex-col cursor-pointer"
               title={`${item.name} by ${itemBrand}`}
             >
-              <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-[#181818] border border-[#262626] mb-2 shadow-md">
+              <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-[#181818] border border-[#262626] mb-3 shadow-md">
                 <Image
                   src={item.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop'}
                   alt={`${item.name} by ${itemBrand}`}
@@ -120,8 +120,8 @@ export function RelatedProductsSection({
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
               </div>
 
-              <div className="space-y-0.5">
-                <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+              <div className="space-y-1">
+                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
                   {itemBrand}
                 </span>
                 <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-200 line-clamp-1">
