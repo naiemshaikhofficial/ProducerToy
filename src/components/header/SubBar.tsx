@@ -21,8 +21,8 @@ interface SubBarProps {
 const NAV_LINKS = [
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
-  { label: 'Rent to Own', href: '/store' },
-  { label: 'Blog', href: '/store' },
+  // { label: 'Rent to Own', href: '/store' },
+  // { label: 'Blog', href: '/store' },
   { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 
@@ -30,8 +30,8 @@ const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Products', href: '/store' },
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
-  { label: 'Rent to Own', href: '/store' },
-  { label: 'Blog', href: '/store' },
+  // { label: 'Rent to Own', href: '/store' },
+  // { label: 'Blog', href: '/store' },
   { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 

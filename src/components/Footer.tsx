@@ -36,10 +36,10 @@ export function Footer() {
               {/* Left Sub-column */}
               <div className="space-y-2.5">
                 <div><Link href="/free-vst-plugins" prefetch={true} className="text-[#FA742B] font-semibold hover:underline">Free VST Plugins</Link></div>
-                <div><Link href="/best/free-autotune-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Free Auto-Tune</Link></div>
-                <div><Link href="/best/free-saturation-plugins" prefetch={true} className="hover:text-white transition-colors">Best Saturation VSTs</Link></div>
-                <div><Link href="/best/free-compressor-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Compressors</Link></div>
-                <div><Link href="/best/free-reverb-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Reverb Plugins</Link></div>
+                {/* <div><Link href="/best/free-autotune-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Free Auto-Tune</Link></div> */}
+                {/* <div><Link href="/best/free-saturation-plugins" prefetch={true} className="hover:text-white transition-colors">Best Saturation VSTs</Link></div> */}
+                {/* <div><Link href="/best/free-compressor-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Compressors</Link></div> */}
+                {/* <div><Link href="/best/free-reverb-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Best Reverb Plugins</Link></div> */}
                 <div><Link href="/categories/instruments" prefetch={true} className="hover:text-white transition-colors">Virtual Instruments</Link></div>
                 <div><Link href="/categories/sounds" prefetch={true} className="hover:text-white transition-colors">Sample Packs</Link></div>
                 <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands & Developers</Link></div>
@@ -47,13 +47,13 @@ export function Footer() {
 
               {/* Right Sub-column */}
               <div className="space-y-2.5">
-                <div><Link href="/daw/fl-studio" prefetch={true} className="hover:text-white transition-colors">FL Studio Plugins</Link></div>
-                <div><Link href="/daw/ableton-live" prefetch={true} className="hover:text-white transition-colors">Ableton Live Plugins</Link></div>
-                <div><Link href="/daw/logic-pro" prefetch={true} className="hover:text-white transition-colors">Logic Pro AU Plugins</Link></div>
-                <div><Link href="/best/free-trap-drum-kits-808" prefetch={true} className="hover:text-white transition-colors">Free Trap 808 Kits</Link></div>
+                {/* <div><Link href="/daw/fl-studio" prefetch={true} className="hover:text-white transition-colors">FL Studio Plugins</Link></div> */}
+                {/* <div><Link href="/daw/ableton-live" prefetch={true} className="hover:text-white transition-colors">Ableton Live Plugins</Link></div> */}
+                {/* <div><Link href="/daw/logic-pro" prefetch={true} className="hover:text-white transition-colors">Logic Pro AU Plugins</Link></div> */}
+                {/* <div><Link href="/best/free-trap-drum-kits-808" prefetch={true} className="hover:text-white transition-colors">Free Trap 808 Kits</Link></div> */}
                 <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Deals & Discounts</Link></div>
-                <div><Link href="/features/toywards" prefetch={true} className="hover:text-white transition-colors">Toywards Rewards</Link></div>
-                <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Developer Portal</Link></div>
+                <div><Link href="/account?tab=rewards" prefetch={true} className="hover:text-white transition-colors">Toywards Rewards</Link></div>
+                {/* <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Developer Portal</Link></div> */}
               </div>
             </div>
           </div>
@@ -75,7 +75,7 @@ export function Footer() {
             <h4 className="text-base font-bold text-white tracking-tight mb-4">Help</h4>
             <div className="space-y-2.5 text-xs text-zinc-400">
               <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Contact Us</Link></div>
-              <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">About Us</Link></div>
+              {/* <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">About Us</Link></div> */}
             </div>
           </div>
 

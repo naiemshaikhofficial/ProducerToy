@@ -337,8 +337,9 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
             {/* Primary Menu Links */}
             <div className="flex flex-col space-y-4">
+              {/* 
               <Link
-                href="/store"
+                href="/contact"
                 prefetch={true}
                 onClick={onClose}
                 className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
@@ -355,6 +356,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 <span>Distribute</span>
                 <ChevronRight className="w-5 h-5 text-zinc-500" />
               </Link>
+              */}
 
               <Link
                 href="/manufacturers"

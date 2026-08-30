@@ -100,8 +100,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             STORE
           </Link>
 
+          {/* Placeholder links commented out
           <Link 
-            href="/store" 
+            href="/contact" 
             prefetch={true}
             className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors"
           >
@@ -112,6 +113,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span>Distribute</span>
             <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
           </div>
+          */}
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}
