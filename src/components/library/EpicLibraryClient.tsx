@@ -493,7 +493,7 @@ export function EpicLibraryClient({
                       >
                         {/* 3:4 Poster Image Container */}
                         <div
-                          className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#242424] shadow-md mb-2 block cursor-pointer transition-transform duration-200 group-hover:scale-[1.01]"
+                          className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#242424] shadow-md mb-2 block cursor-pointer"
                           title={`Click to Download ${product.name}`}
                         >
                           <Image
@@ -501,8 +501,9 @@ export function EpicLibraryClient({
                             alt={product.name}
                             fill
                             unoptimized
-                            className="object-cover object-center group-hover:brightness-105 transition-all"
+                            className="object-cover object-center group-hover:brightness-110 transition-all duration-200"
                           />
+                          <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
                           {/* Subtle Favorite Bookmark Button in top corner */}
                           <button

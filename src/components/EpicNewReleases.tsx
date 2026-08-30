@@ -193,8 +193,9 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                             alt={item.name}
                             fill
                             sizes="80px"
-                            className="object-cover object-center"
+                            className="object-cover object-center group-hover:brightness-110 transition-all duration-200"
                           />
+                          <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
                           
                           {/* Wishlist Bookmark Button Overlay on Thumbnail */}
                           <button

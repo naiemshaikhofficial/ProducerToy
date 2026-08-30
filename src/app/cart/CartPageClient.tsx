@@ -370,8 +370,9 @@ export function CartPageClient() {
                           alt={item.name}
                           fill
                           unoptimized
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover group-hover:brightness-110 transition-all duration-200"
                         />
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
                         <div className="absolute bottom-2 left-2 bg-black/80 backdrop-blur-xs p-1.5 rounded-md border border-white/10 shadow-sm">
                           <svg className="w-3.5 h-3.5 text-white fill-current" viewBox="0 0 24 24">
                             <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />

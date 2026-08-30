@@ -144,8 +144,10 @@ export default function ManufacturersClient({ initialBrands }: ManufacturersClie
                   key={brand.id}
                   href={`/manufacturers/${brand.slug}`}
                   prefetch={true}
-                  className="group relative bg-[#161616] hover:bg-[#1f1f1f] rounded-2xl p-5 flex flex-col items-center justify-between transition-all duration-200 hover:-translate-y-1 overflow-hidden min-h-[140px]"
+                  className="group relative bg-[#161616] hover:bg-[#1f1f1f] rounded-2xl p-5 flex flex-col items-center justify-between transition-all duration-200 overflow-hidden min-h-[140px]"
                 >
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+
                   {/* Logo Direct Container - Seamless Without Inner Box */}
                   <div className="w-full h-16 flex items-center justify-center p-1 mb-3">
                     {hasLogo ? (
@@ -153,7 +155,7 @@ export default function ManufacturersClient({ initialBrands }: ManufacturersClie
                         src={brand.logo_url!}
                         alt={`${brand.name} logo`}
                         onError={() => handleImageError(brand.id)}
-                        className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-200"
+                        className="max-h-full max-w-full object-contain filter grayscale group-hover:grayscale-0 group-hover:brightness-110 transition-all duration-200"
                         loading="lazy"
                       />
                     ) : (

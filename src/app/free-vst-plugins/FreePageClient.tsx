@@ -143,9 +143,10 @@ export function FreePageClient({ products }: FreePageClientProps) {
                 alt={featuredGiveaway.name}
                 fill
                 sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover object-center group-hover:scale-[1.02] transition-transform duration-300 ease-out"
+                className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
                 priority
               />
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
               <div className="absolute top-3.5 left-3.5 bg-[#FA742B] text-black font-black text-xs px-3.5 py-1 rounded-md uppercase tracking-wider shadow-md">
                 Featured Free Toy
               </div>
@@ -219,8 +220,9 @@ export function FreePageClient({ products }: FreePageClientProps) {
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover object-center group-hover:scale-105 group-hover:brightness-110 transition-all duration-300 ease-out"
+                    className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
                   />
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
                   {/* Flush Bottom Status Bar on the Image */}
                   <div
@@ -278,9 +280,10 @@ export function FreePageClient({ products }: FreePageClientProps) {
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover object-center group-hover:scale-105 group-hover:brightness-90 transition-all duration-300 ease-out"
+                    className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
                   <div className="relative z-10 space-y-1.5">
                     <span className="bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
