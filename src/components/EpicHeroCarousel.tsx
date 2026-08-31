@@ -469,10 +469,6 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   />
                 )}
 
-                {/* Left Active Accent Bar */}
-                {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FA742B] rounded-l-xl z-20" aria-hidden="true" />
-                )}
 
                 {/* SQUARE Thumbnail Box */}
                 <div className="relative w-[48px] h-[48px] aspect-square rounded-xl overflow-hidden flex-shrink-0 border border-[#2a2a2a] z-10 shadow-sm">
