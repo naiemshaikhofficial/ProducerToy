@@ -33,12 +33,12 @@ export function Footer() {
           <div className="md:col-span-4 md:pr-6 md:border-r md:border-[#26262b] space-y-4">
             <h4 className="text-sm sm:text-base font-bold text-white tracking-tight uppercase tracking-wider">Discover</h4>
             <div className="space-y-2.5 text-xs text-zinc-400">
-              <div><Link href="/free-vst-plugins" prefetch={true} className="text-[#FA742B] font-semibold hover:underline">Free VST Plugins</Link></div>
+              <div><Link href="/free-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Free VST Plugins</Link></div>
               <div><Link href="/categories/instruments" prefetch={true} className="hover:text-white transition-colors">Virtual Instruments</Link></div>
               <div><Link href="/categories/sounds" prefetch={true} className="hover:text-white transition-colors">Sample Packs</Link></div>
               <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands & Developers</Link></div>
               <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Deals & Discounts</Link></div>
-              <div><Link href="/account?tab=rewards" prefetch={true} className="hover:text-white transition-colors">Toywards Rewards</Link></div>
+              <div><Link href="/account?tab=rewards" prefetch={true} className="hover:text-white transition-colors">Producer Toy Rewards</Link></div>
             </div>
           </div>
 

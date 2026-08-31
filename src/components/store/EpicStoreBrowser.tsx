@@ -964,6 +964,7 @@ export function EpicStoreBrowser({
           
           {/* ================= LEFT COLUMN: PRODUCTS GRID (9 Cols) ================= */}
           <div className="lg:col-span-9 w-full">
+            <h2 className="sr-only">Product Catalog</h2>
             {sortedProducts.length === 0 ? (
               <div className="text-center py-20 px-6 rounded-2xl bg-[#161616] border border-[#242424] max-w-xl mx-auto my-6 space-y-3">
                 <p className="text-lg font-bold text-white tracking-tight">
@@ -993,29 +994,31 @@ export function EpicStoreBrowser({
 
 
           {/* ================= RIGHT COLUMN: STICKY FILTERS SIDEBAR (3 Cols) ====== */}
-          <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-1 bg-[#121212] select-none">
+          <div className="hidden lg:block lg:col-span-3 sticky top-4 space-y-2 bg-[#121212] select-none">
             
             {/* Sidebar Top: Filters (Count) */}
-            <div className="flex items-center justify-between pb-3.5">
-              <h3 className="text-base sm:text-[17px] font-bold text-white tracking-tight">
+            <div className="flex items-center justify-between pb-2 pt-1">
+              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
-              </h3>
+              </h2>
             </div>
 
-            {/* Keyword Search Input (Exact Epic Search Box) */}
-            <div className="relative pb-3">
+            {/* Keyword Search Input (Exact Epic Search Box) with Bottom Divider */}
+            <div className="relative pb-3 border-b border-white/[0.08]">
               <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="Keywords"
-                className="w-full bg-[#202024] hover:bg-[#25252a] focus:bg-[#28282e] text-white text-[14.5px] pl-10 pr-9 h-12 rounded-lg border border-transparent focus:border-[#383840] placeholder:text-zinc-400 font-sans transition-all outline-none"
+                aria-label="Filter products by keywords"
+                className="w-full bg-[#202024] hover:bg-[#25252a] focus:bg-[#28282e] text-white text-sm pl-10 pr-9 h-11 rounded-xl border border-transparent focus:border-[#383840] placeholder:text-zinc-400 font-sans transition-all outline-none"
               />
               {searchKeyword && (
                 <button
                   type="button"
                   onClick={() => setSearchKeyword('')}
+                  aria-label="Clear keyword search"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -1023,7 +1026,7 @@ export function EpicStoreBrowser({
               )}
             </div>
 
-            {/* Dynamic Sorted Accordion Sections (Active sections automatically at TOP and OPEN) */}
+            {/* Dynamic Sorted Accordion Sections with Compact 38-42px Row Height */}
             <div className="divide-y divide-[#242428]">
               {sortedSections.map((sec) => {
                 const isOpen =
@@ -1032,14 +1035,14 @@ export function EpicStoreBrowser({
                     : sec.defaultOpen
 
                 return (
-                  <div key={sec.id} className="py-1">
+                  <div key={sec.id} className="py-0.5">
                     <button
                       type="button"
                       onClick={() => toggleSection(sec.id, sec.defaultOpen)}
-                      className="flex items-center justify-between w-full py-4 text-[15px] font-bold text-white hover:text-zinc-200 transition-colors cursor-pointer"
+                      className="flex items-center justify-between w-full py-2.5 sm:py-3 text-sm font-bold text-white hover:text-zinc-200 transition-colors cursor-pointer"
                     >
-                      <span className="text-[15px] font-bold tracking-tight">{sec.title}</span>
-                      <div className="flex items-center gap-2.5">
+                      <span className="text-sm font-bold tracking-tight">{sec.title}</span>
+                      <div className="flex items-center gap-2">
                         {sec.count > 0 && (
                           <span className="w-5 h-5 rounded-full bg-[#26262a] border border-[#383840] text-zinc-200 text-[11px] font-extrabold flex items-center justify-center">
                             {sec.count}

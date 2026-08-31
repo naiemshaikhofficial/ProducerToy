@@ -335,11 +335,11 @@ export const TopBar: React.FC<TopBarProps> = ({
             </Link>
           )}
 
-          {/* Library Button (Producer Toy Light Orange Accent) */}
+          {/* Library Button (Balanced Minimalist Style) */}
           <Link
             href="/library"
             prefetch={true}
-            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[13px] px-5 py-2.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center cursor-pointer uppercase tracking-wider"
+            className="bg-[#202020] hover:bg-[#2a2a2a] text-white hover:text-white border border-[#303030] hover:border-zinc-400 font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
           >
             Library
           </Link>
@@ -347,11 +347,11 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
 
         {/* Mobile Right Controls: Library Button + Menu Hamburger */}
-        <div className="flex md:hidden items-center gap-3">
+        <div className="flex md:hidden items-center gap-2.5">
           <Link
             href="/library"
             prefetch={true}
-            className="bg-[#FA742B] hover:bg-[#E05A18] text-white font-bold text-[12px] px-3.5 py-1.5 rounded-[6px] active:scale-95 transition-all shadow-sm flex items-center justify-center uppercase tracking-normal"
+            className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
           >
             Library
           </Link>

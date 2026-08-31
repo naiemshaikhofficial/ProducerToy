@@ -227,32 +227,35 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      {/* Content Details Below Card (Exact Minimalist Epic Games Store Layout) */}
-      <div className="flex flex-col gap-1.5 px-0.5">
-        {/* Subcategory / Tag */}
-        <span className="text-xs font-semibold text-zinc-400 capitalize line-clamp-1">
-          {subCategoryLabel}
-        </span>
+      {/* Content Details Below Card (Exact Minimalist Epic Games Store Layout with Fixed Baseline Alignment) */}
+      <div className="flex flex-col justify-between flex-1 px-0.5 min-h-[92px]">
+        <div className="space-y-1">
+          {/* Subcategory / Tag with High Contrast */}
+          <span className="text-xs font-semibold text-zinc-300 capitalize line-clamp-1 block">
+            {subCategoryLabel}
+          </span>
 
-        {/* Title */}
-        <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-normal line-clamp-1 group-hover:text-zinc-200 transition-colors">
-          {product.name}
-        </h3>
+          {/* Title with Uniform Height */}
+          <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
+            {product.name}
+          </h3>
 
-        {/* Brand Name */}
-        <span className="text-xs text-zinc-400 font-medium line-clamp-1 z-20">
-          by{' '}
-          <button
-            type="button"
-            onClick={handleBrandClick}
-            className="text-zinc-300 font-semibold hover:text-[#FC6301] transition-colors cursor-pointer inline-block"
-          >
-            {brandName}
-          </button>
-        </span>
+          {/* Brand Name with Accessible Hit Area */}
+          <span className="text-xs text-zinc-400 font-medium line-clamp-1 z-20 block">
+            by{' '}
+            <button
+              type="button"
+              onClick={handleBrandClick}
+              aria-label={`View brand ${brandName}`}
+              className="text-zinc-300 font-semibold hover:text-[#FC6301] transition-colors cursor-pointer inline-block py-1 -my-1"
+            >
+              {brandName}
+            </button>
+          </span>
+        </div>
 
-        {/* Price Row */}
-        <div className="flex items-center gap-2 mt-1 pt-0.5">
+        {/* Price Row (Pinned to Consistent Horizontal Baseline) */}
+        <div className="flex items-center gap-2 mt-2 pt-1 border-t border-white/[0.04]">
           {product.is_coming_soon ? (
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
               {product.release_date ? `Available ${product.release_date}` : 'Coming Soon'}
