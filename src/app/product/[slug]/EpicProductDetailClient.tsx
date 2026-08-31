@@ -294,10 +294,15 @@ export function EpicProductDetailClient({
       {/* ========================================================================= */}
       {/* 1. TOP TITLE HEADER & EPIC RATING (Exact 1:1 Match)                       */}
       {/* ========================================================================= */}
-      <div className="space-y-2.5">
+      <div className="space-y-1.5">
         <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
           {product.name}
         </h1>
+
+        {/* Minimalist Gray Product Type Exactly Below Name (No Box) */}
+        <div className="text-sm sm:text-base font-medium text-zinc-400">
+          {formattedType(product.product_type)}
+        </div>
 
         {/* Epic Games Store Static Minimalist Star Rating */}
         <div className="flex items-center gap-2 pt-0.5 text-sm">
@@ -384,17 +389,10 @@ export function EpicProductDetailClient({
           </div>
         </div>
 
-        {/* C. Category Tag Pill (Centered) */}
-        <div className="flex justify-center">
-          <span className="bg-[#242424] text-zinc-300 text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-lg border border-[#303030]">
-            {formattedType(product.product_type)}
-          </span>
-        </div>
-
         {/* D. Price Display */}
         <div className="space-y-1 text-left">
           {isOwned ? (
-            <span className="text-xs bg-emerald-950/60 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/40 inline-block mb-1">
+            <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-2.5 py-1 rounded-md border border-[#303030] inline-block mb-1 tracking-wider">
               ALREADY OWNED
             </span>
           ) : product.is_coming_soon ? (
@@ -446,9 +444,9 @@ export function EpicProductDetailClient({
           ) : isOwned ? (
             <Link
               href="/library"
-              className="w-full py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#1c1c1c] hover:bg-[#252525] border border-emerald-500/50 text-white transition-all shadow-lg cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl border border-[#333333] text-sm font-bold flex items-center justify-center gap-2 bg-[#222222] hover:bg-[#2a2a2a] text-zinc-200 hover:text-white transition-colors cursor-pointer"
             >
-              <Check className="w-5 h-5 text-emerald-400" />
+              <Check className="w-4 h-4 text-zinc-300" />
               <span>In Library</span>
             </Link>
           ) : product.is_coming_soon ? (
@@ -876,15 +874,9 @@ export function EpicProductDetailClient({
             />
           </div>
 
-          <div>
-            <span className="bg-[#242424] text-zinc-200 text-xs font-semibold px-3 py-1 rounded-md inline-block uppercase tracking-wider border border-[#303030]">
-              {formattedType(product.product_type)}
-            </span>
-          </div>
-
           <div className="space-y-2">
             {isOwned ? (
-              <span className="text-xs bg-emerald-950/60 text-emerald-400 font-bold px-2.5 py-1 rounded-md border border-emerald-500/40 inline-block mb-1">
+              <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-2.5 py-1 rounded-md border border-[#303030] inline-block mb-1 tracking-wider">
                 ALREADY OWNED
               </span>
             ) : product.is_coming_soon ? (
@@ -951,9 +943,9 @@ export function EpicProductDetailClient({
             ) : isOwned ? (
               <Link
                 href="/library"
-                className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#1c1c1c] hover:bg-[#252525] border border-emerald-500/50 text-white transition-all shadow-md cursor-pointer"
+                className="w-full h-12 px-4 rounded-xl border border-[#333333] text-sm font-bold flex items-center justify-center gap-2 bg-[#222222] hover:bg-[#2a2a2a] text-zinc-200 hover:text-white transition-colors cursor-pointer"
               >
-                <Check className="w-5 h-5 text-emerald-400" />
+                <Check className="w-4 h-4 text-zinc-300" />
                 <span>In Library</span>
               </Link>
             ) : product.is_coming_soon ? (
