@@ -255,7 +255,9 @@ export default async function BlogPostPage({
               <span className="text-xs text-[#FA742B] font-semibold">Author</span>
             </div>
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
-              Contributing audio engineer and music producer at Producer Toy. Passionate about analog hardware emulations, sound synthesis, and modern beatmaking workflows.
+              {post.author_name === 'Naiem Shaikh'
+                ? 'Founder & Lead Audio Engineer at Producer Toy. Dedicated to empowering music producers worldwide with cutting-edge VSTs, pristine soundware, and battle-tested studio workflows.'
+                : 'Contributing audio engineer and music producer at Producer Toy. Passionate about analog hardware emulations, sound synthesis, and modern beatmaking workflows.'}
             </p>
           </div>
         </section>

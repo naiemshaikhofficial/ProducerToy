@@ -48,8 +48,7 @@ export default async function BlogPage() {
             cover_image:
               'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop',
             author_name: 'Naiem Shaikh',
-            author_avatar:
-              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop',
+            author_avatar: '/authors/naiem-shaikh.jpg',
             author_role: 'Founder & Lead Audio Engineer',
             category: 'Plugins & VSTs',
             tags: ['vst', 'free-plugins', 'mixing'],
