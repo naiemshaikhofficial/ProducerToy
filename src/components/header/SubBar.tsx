@@ -3,7 +3,14 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Search, ChevronDown, X, ShoppingCart, Bookmark, Gift } from 'lucide-react'
+import {
+  Search,
+  ChevronDown,
+  X,
+  ShoppingCart,
+  Bookmark,
+  Gift,
+} from 'lucide-react'
 import { useGifts } from '@/context/GiftContext'
 
 interface SubBarProps {
@@ -14,6 +21,9 @@ interface SubBarProps {
   isProductsMegaOpen: boolean
   onMouseEnterProducts: () => void
   onMouseLeaveProducts: () => void
+  isFreeMegaOpen: boolean
+  onMouseEnterFree: () => void
+  onMouseLeaveFree: () => void
   itemCount?: number
   onOpenCart?: () => void
 }
@@ -22,7 +32,6 @@ const NAV_LINKS = [
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
   { label: 'Blog', href: '/blog' },
-  { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 
 const MOBILE_DISCOVER_OPTIONS = [
@@ -30,7 +39,9 @@ const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
   { label: 'Blog', href: '/blog' },
-  { label: 'Free VSTs', href: '/free-vst-plugins' },
+  { label: 'Free VSTs & Plugins', href: '/free-vst-plugins' },
+  { label: 'Free Samples & Loops', href: '/store/sounds?price=free' },
+  { label: 'Free Presets', href: '/store/presets?price=free' },
 ]
 
 export const SubBar: React.FC<SubBarProps> = ({
@@ -41,6 +52,9 @@ export const SubBar: React.FC<SubBarProps> = ({
   isProductsMegaOpen,
   onMouseEnterProducts,
   onMouseLeaveProducts,
+  isFreeMegaOpen,
+  onMouseEnterFree,
+  onMouseLeaveFree,
   itemCount = 0,
   onOpenCart,
 }) => {
@@ -48,6 +62,7 @@ export const SubBar: React.FC<SubBarProps> = ({
   const { unopenedCount } = useGifts()
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const [isDiscoverMenuOpen, setIsDiscoverMenuOpen] = useState(false)
+
   const mobileInputRef = useRef<HTMLInputElement>(null)
   const discoverButtonRef = useRef<HTMLDivElement>(null)
   const discoverMenuRef = useRef<HTMLDivElement>(null)
@@ -64,7 +79,7 @@ export const SubBar: React.FC<SubBarProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
       if (
-        discoverMenuRef.current && 
+        discoverMenuRef.current &&
         !discoverMenuRef.current.contains(target) &&
         discoverButtonRef.current &&
         !discoverButtonRef.current.contains(target)
@@ -89,6 +104,12 @@ export const SubBar: React.FC<SubBarProps> = ({
     return 'Discover'
   })()
 
+  const isFreeActive =
+    pathname === '/free-vst-plugins' ||
+    pathname === '/free' ||
+    pathname.includes('price=free') ||
+    pathname.includes('free=true')
+
   return (
     <div className="w-full bg-[#121212] relative z-50">
       
@@ -99,11 +120,11 @@ export const SubBar: React.FC<SubBarProps> = ({
         
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
-          <form 
+          <form
             onSubmit={(e) => {
               onSearchSubmit(e)
               setIsMobileSearchOpen(false)
-            }} 
+            }}
             className="w-full flex items-center gap-2 animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="relative flex-1">
@@ -147,7 +168,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               <Search className="w-[19px] h-[19px] stroke-[1.8]" />
             </button>
 
-            {/* Discover ▾ Selector Dropdown (Exact True Screen Center, Clean Non-Bold Epic Style) */}
+            {/* Discover ▾ Selector Dropdown */}
             <div ref={discoverButtonRef} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-30">
               <button
                 type="button"
@@ -159,7 +180,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               </button>
             </div>
 
-            {/* Right Icons: Wishlist, Gifts, Cart (Clean spacing, no collision with center Discover) */}
+            {/* Right Icons: Wishlist, Gifts, Cart */}
             <div className="flex items-center gap-3.5 sm:gap-4.5 text-zinc-300">
               <Link
                 href="/wishlist"
@@ -194,7 +215,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               >
                 <ShoppingCart className="w-[19px] h-[19px] stroke-[1.8]" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-[#FA742B] text-white text-[10px] font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-md leading-none">
+                  <span className="bg-[#FA742B] text-white text-[11px] font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-md leading-none">
                     {itemCount}
                   </span>
                 )}
@@ -206,17 +227,15 @@ export const SubBar: React.FC<SubBarProps> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* Exact Epic Games Store Mobile Dropdown Menu (Unified Seamless Surface)     */}
+      {/* Mobile Discover Menu Overlay                                               */}
       {/* ========================================================================= */}
       {isDiscoverMenuOpen && (
         <div ref={discoverMenuRef} className="md:hidden">
-          {/* Dark Dimmed Backdrop (Behind Subbar and Dropdown) */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/75 z-40"
             onClick={() => setIsDiscoverMenuOpen(false)}
           />
 
-          {/* Epic Centered Card with Prominent Left & Right Cut Margins & Exact #121212 Color */}
           <div className="absolute top-full left-5 right-5 max-w-[285px] mx-auto bg-[#121212] rounded-none border-none shadow-2xl z-50 animate-in fade-in duration-150 pb-6 pt-2">
             <div className="px-6 flex flex-col">
               {MOBILE_DISCOVER_OPTIONS.map((item, idx) => {
@@ -245,16 +264,15 @@ export const SubBar: React.FC<SubBarProps> = ({
         </div>
       )}
 
-
       {/* ========================================================================= */}
-      {/* 2. DESKTOP SUBBAR (>= 768px): Exact 1:1 PC Screenshot Match                */}
+      {/* 2. DESKTOP SUBBAR (>= 768px): Products ˅, Deals, Brands, Blog, Free ˅      */}
       {/* ========================================================================= */}
       <div className="hidden md:flex w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
         
-        {/* Left Side: Search Capsule + Discover / Browse / News Tabs */}
+        {/* Left Side: Search Capsule + Navigation Links */}
         <div className="flex items-center">
           
-          {/* Epic Search Pill (Exact 1:1 Size & Radius) */}
+          {/* Search Pill */}
           <div className="relative w-[240px] lg:w-[270px] flex-shrink-0">
             <form onSubmit={onSearchSubmit} className="relative w-full">
               <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -278,15 +296,15 @@ export const SubBar: React.FC<SubBarProps> = ({
             </form>
           </div>
 
-          {/* Desktop Sub Navigation Links (Products ˅, Deals, Brands, Rent to Own, Blog, Free) */}
+          {/* Desktop Sub Navigation Links */}
           <nav className="flex items-center gap-7 lg:gap-9 ml-8 lg:ml-10 text-[14px]">
             {/* Products Mega Dropdown Trigger */}
-            <div 
+            <div
               className="relative flex items-center cursor-pointer py-2"
               onMouseEnter={onMouseEnterProducts}
               onMouseLeave={onMouseLeaveProducts}
             >
-              <button 
+              <button
                 type="button"
                 className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${
                   isProductsMegaOpen ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
@@ -297,17 +315,17 @@ export const SubBar: React.FC<SubBarProps> = ({
               </button>
             </div>
 
-            {/* Mapped Sub Links */}
+            {/* Mapped Sub Links: Deals, Brands, Blog */}
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href
               return (
-                <Link 
-                  key={link.label} 
-                  href={link.href} 
+                <Link
+                  key={link.label}
+                  href={link.href}
                   prefetch={true}
                   className={`transition-colors py-2 font-medium ${
-                    isActive 
-                      ? 'text-white font-bold' 
+                    isActive
+                      ? 'text-white font-bold'
                       : 'text-zinc-400 font-normal hover:text-white'
                   }`}
                 >
@@ -315,10 +333,30 @@ export const SubBar: React.FC<SubBarProps> = ({
                 </Link>
               )
             })}
+
+            {/* FREE Mega Dropdown Trigger (Exact Minimalist Architecture like Products) */}
+            <div
+              className="relative flex items-center cursor-pointer py-2"
+              onMouseEnter={onMouseEnterFree}
+              onMouseLeave={onMouseLeaveFree}
+            >
+              <button
+                type="button"
+                className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${
+                  isFreeActive || isFreeMegaOpen
+                    ? 'text-white font-bold'
+                    : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                <span>Free</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isFreeMegaOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
+              </button>
+            </div>
+
           </nav>
         </div>
 
-        {/* Right Side: Wishlist, Gifts, Cart (Exact 1:1 Match) */}
+        {/* Right Side: Wishlist, Gifts, Cart */}
         <div className="flex items-center gap-7 text-[14px]">
           <Link
             href="/wishlist"
@@ -365,3 +403,5 @@ export const SubBar: React.FC<SubBarProps> = ({
     </div>
   )
 }
+
+export default SubBar

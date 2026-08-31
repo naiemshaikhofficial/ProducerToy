@@ -64,7 +64,7 @@ export default async function BlogPage() {
   const activeFeatured = featuredPost || posts[0]
 
   return (
-    <div className="w-full bg-[#121212] min-h-screen text-white select-none font-sans">
+    <div className="w-full bg-[#121212] min-h-screen text-white font-sans">
       {/* Schema.org Structured Data for Google Indexing */}
       <BlogListJsonLd
         title="Producer Toy News & Music Production Guides"

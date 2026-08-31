@@ -76,7 +76,7 @@ export default async function BlogPostPage({
   const articleUrl = `https://producertoy.com/blog/${post.slug}`
 
   return (
-    <article className="w-full bg-[#121212] min-h-screen text-white select-none">
+    <article className="w-full bg-[#121212] min-h-screen text-white">
       {/* Schema.org Structured Data */}
       <ArticleJsonLd
         title={post.title}

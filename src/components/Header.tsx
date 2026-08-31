@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext'
 import { TopBar } from './header/TopBar'
 import { SubBar } from './header/SubBar'
 import { MegaMenu } from './header/MegaMenu'
+import { FreeMegaMenu } from './header/FreeMegaMenu'
 import { MobileDrawer } from './header/MobileDrawer'
 
 export const Header: React.FC = () => {
@@ -20,24 +21,47 @@ export const Header: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('')
   const [isScrolled, setIsScrolled] = useState(false)
   const [isProductsMegaOpen, setIsProductsMegaOpen] = useState(false)
+  const [isFreeMegaOpen, setIsFreeMegaOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const closeFreeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleMouseEnterMenu = () => {
+  // Products Mega Menu Handlers
+  const handleMouseEnterProducts = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current)
       closeTimeoutRef.current = null
     }
+    setIsFreeMegaOpen(false)
     setIsProductsMegaOpen(true)
   }
 
-  const handleMouseLeaveMenu = () => {
+  const handleMouseLeaveProducts = () => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current)
     }
     closeTimeoutRef.current = setTimeout(() => {
       setIsProductsMegaOpen(false)
+    }, 250)
+  }
+
+  // Free Mega Menu Handlers (Exact same minimalist full-width architecture)
+  const handleMouseEnterFree = () => {
+    if (closeFreeTimeoutRef.current) {
+      clearTimeout(closeFreeTimeoutRef.current)
+      closeFreeTimeoutRef.current = null
+    }
+    setIsProductsMegaOpen(false)
+    setIsFreeMegaOpen(true)
+  }
+
+  const handleMouseLeaveFree = () => {
+    if (closeFreeTimeoutRef.current) {
+      clearTimeout(closeFreeTimeoutRef.current)
+    }
+    closeFreeTimeoutRef.current = setTimeout(() => {
+      setIsFreeMegaOpen(false)
     }, 250)
   }
 
@@ -50,7 +74,6 @@ export const Header: React.FC = () => {
         window.requestAnimationFrame(() => {
           const currentScroll = window.scrollY
           setIsScrolled((prev) => {
-            // Buffer threshold to prevent lag during fast scrolling
             if (!prev && currentScroll > 100) return true
             if (prev && currentScroll < 30) return false
             return prev
@@ -65,10 +88,11 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Auto close mobile drawer & mega menu on route changes
+  // Auto close mobile drawer & mega menus on route changes
   useEffect(() => {
     setIsMobileMenuOpen(false)
     setIsProductsMegaOpen(false)
+    setIsFreeMegaOpen(false)
   }, [pathname])
 
   // Freeze background scrolling completely when mobile menu drawer is open
@@ -105,6 +129,7 @@ export const Header: React.FC = () => {
       router.push('/')
     }
     setIsProductsMegaOpen(false)
+    setIsFreeMegaOpen(false)
     setIsMobileMenuOpen(false)
   }
 
@@ -124,18 +149,21 @@ export const Header: React.FC = () => {
     pathname?.startsWith('/product/') ||
     pathname?.startsWith('/p/') ||
     pathname?.startsWith('/brands') ||
-    pathname?.startsWith('/blog')
+    pathname?.startsWith('/blog') ||
+    pathname === '/free-vst-plugins' ||
+    pathname === '/free'
 
   return (
     <>
-      {/* Tier 1 Top Header Bar (Fixed when mobile menu is open, sticky/relative otherwise) */}
+      {/* Tier 1 Top Header Bar */}
       <div
-        className={`${isMobileMenuOpen
-          ? 'fixed top-0 left-0 right-0 z-[60]'
-          : isShopPage
+        className={`${
+          isMobileMenuOpen
+            ? 'fixed top-0 left-0 right-0 z-[60]'
+            : isShopPage
             ? 'relative z-[60]'
             : 'sticky top-0 z-[60]'
-          } w-full bg-[#121212] select-none border-none`}
+        } w-full bg-[#121212] select-none border-none`}
       >
         <TopBar
           currency={currency}
@@ -158,8 +186,11 @@ export const Header: React.FC = () => {
             onSearchSubmit={handleSearch}
             isScrolled={isScrolled}
             isProductsMegaOpen={isProductsMegaOpen}
-            onMouseEnterProducts={handleMouseEnterMenu}
-            onMouseLeaveProducts={handleMouseLeaveMenu}
+            onMouseEnterProducts={handleMouseEnterProducts}
+            onMouseLeaveProducts={handleMouseLeaveProducts}
+            isFreeMegaOpen={isFreeMegaOpen}
+            onMouseEnterFree={handleMouseEnterFree}
+            onMouseLeaveFree={handleMouseLeaveFree}
             itemCount={items.length}
             onOpenCart={() => setIsCartOpen(true)}
           />
@@ -168,13 +199,21 @@ export const Header: React.FC = () => {
           <MegaMenu
             isOpen={isProductsMegaOpen}
             onClose={() => setIsProductsMegaOpen(false)}
-            onMouseEnter={handleMouseEnterMenu}
-            onMouseLeave={handleMouseLeaveMenu}
+            onMouseEnter={handleMouseEnterProducts}
+            onMouseLeave={handleMouseLeaveProducts}
+          />
+
+          {/* Desktop Free Mega Dropdown Overlay (Exact Minimalist Products Style) */}
+          <FreeMegaMenu
+            isOpen={isFreeMegaOpen}
+            onClose={() => setIsFreeMegaOpen(false)}
+            onMouseEnter={handleMouseEnterFree}
+            onMouseLeave={handleMouseLeaveFree}
           />
         </header>
       )}
 
-      {/* Mobile Touch-Friendly Drawer Navigation (Available on all pages) */}
+      {/* Mobile Touch-Friendly Drawer Navigation */}
       <MobileDrawer
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
@@ -186,3 +225,5 @@ export const Header: React.FC = () => {
     </>
   )
 }
+
+export default Header
