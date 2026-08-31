@@ -342,3 +342,114 @@ export function ItemListJsonLd({
   )
 }
 
+export function ArticleJsonLd({
+  title,
+  description,
+  url,
+  image,
+  datePublished,
+  dateModified,
+  authorName = 'Producer Toy Team',
+  authorRole = 'Audio Engineer & Sound Designer',
+  category = 'Guides',
+  tags = [],
+}: {
+  title: string
+  description?: string
+  url: string
+  image?: string | null
+  datePublished: string
+  dateModified?: string
+  authorName?: string
+  authorRole?: string | null
+  category?: string
+  tags?: string[]
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    headline: title,
+    description: description || title,
+    image: image ? [image] : ['https://producertoy.com/Icon.png'],
+    datePublished: datePublished,
+    dateModified: dateModified || datePublished,
+    author: {
+      '@type': 'Person',
+      name: authorName,
+      jobTitle: authorRole || 'Music Production Specialist',
+      url: 'https://producertoy.com',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Producer Toy',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://producertoy.com/Icon.png',
+      },
+    },
+    articleSection: category,
+    keywords: tags.join(', '),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+export function BlogListJsonLd({
+  title = 'Producer Toy Blog & Guides',
+  description = 'Tutorials, VST plugin guides, sound design walkthroughs, and mixing tips from the Producer Toy team.',
+  url = 'https://producertoy.com/blog',
+  posts,
+}: {
+  title?: string
+  description?: string
+  url?: string
+  posts: Array<{
+    title: string
+    url: string
+    image?: string | null
+    datePublished?: string
+    description?: string | null
+  }>
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: title,
+    description: description,
+    url: url,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Producer Toy',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://producertoy.com/Icon.png',
+      },
+    },
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      url: post.url,
+      image: post.image || 'https://producertoy.com/Icon.png',
+      datePublished: post.datePublished,
+      description: post.description || post.title,
+    })),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+

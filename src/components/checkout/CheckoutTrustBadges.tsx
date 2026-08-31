@@ -2,38 +2,44 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { ShieldCheck, Zap, DownloadCloud } from 'lucide-react'
+import { ShieldCheck, Zap, DownloadCloud, Lock } from 'lucide-react'
 
 export function CheckoutTrustBadges() {
   return (
     <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 sm:p-5 space-y-3.5">
-      <div className="space-y-2 text-xs">
+      <div className="space-y-2.5 text-xs">
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <Zap size={13} className="text-zinc-400 flex-shrink-0" />
+          <Zap size={13} className="text-[#FA742B] flex-shrink-0" />
           <span>Instant direct download &amp; vault license sync</span>
         </div>
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <ShieldCheck size={13} className="text-zinc-400 flex-shrink-0" />
+          <ShieldCheck size={13} className="text-[#FA742B] flex-shrink-0" />
           <span>100% Royalty-Free clearance for commercial use</span>
         </div>
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <DownloadCloud size={13} className="text-zinc-400 flex-shrink-0" />
-          <span>Lifetime access across all your DAW systems</span>
+          <DownloadCloud size={13} className="text-[#FA742B] flex-shrink-0" />
+          <span>Lifetime access &amp; re-downloads in user library</span>
+        </div>
+        <div className="flex items-center gap-2.5 text-zinc-300">
+          <Lock size={13} className="text-[#FA742B] flex-shrink-0" />
+          <span>PCI-DSS Level 1 Encrypted Payment Gateway</span>
         </div>
       </div>
 
       <div className="pt-3 border-t border-[#222222] flex items-center justify-between text-[10px] text-zinc-500">
         <div className="flex items-center gap-1.5 font-medium">
-          <span>Accepted:</span>
+          <span>Secured by</span>
+          <span className="text-zinc-300 font-bold">Razorpay</span>
+          <span>&bull;</span>
           <span className="text-zinc-400">UPI</span>
           <span>&bull;</span>
-          <span className="text-zinc-400">Cards</span>
+          <span className="text-zinc-400">RuPay</span>
           <span>&bull;</span>
-          <span className="text-zinc-400">NetBanking</span>
+          <span className="text-zinc-400">Cards</span>
         </div>
 
         <Link href="/contact" className="text-zinc-400 hover:text-white transition-colors">
-          Need Help?
+          Support Desk
         </Link>
       </div>
     </div>

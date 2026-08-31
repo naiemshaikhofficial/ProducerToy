@@ -21,8 +21,7 @@ interface SubBarProps {
 const NAV_LINKS = [
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
-  // { label: 'Rent to Own', href: '/store' },
-  // { label: 'Blog', href: '/store' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 
@@ -30,8 +29,7 @@ const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Products', href: '/store' },
   { label: 'Deals', href: '/store?on_sale=true' },
   { label: 'Brands', href: '/manufacturers' },
-  // { label: 'Rent to Own', href: '/store' },
-  // { label: 'Blog', href: '/store' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Free VSTs', href: '/free-vst-plugins' },
 ]
 
@@ -87,6 +85,7 @@ export const SubBar: React.FC<SubBarProps> = ({
     if (pathname === '/manufacturers') return 'Brands'
     if (pathname.includes('on_sale')) return 'Deals'
     if (pathname.includes('free')) return 'Free'
+    if (pathname?.startsWith('/blog')) return 'Blog'
     return 'Discover'
   })()
 

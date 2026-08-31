@@ -2,18 +2,20 @@ import React from 'react'
 import Link from 'next/link'
 import { Metadata } from 'next'
 import { generatePageMetadata } from '@/lib/seo/metadata'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, ShieldCheck, Scale, FileText, AlertCircle } from 'lucide-react'
 
 export const metadata: Metadata = generatePageMetadata({
-  title: 'Terms and Conditions — Producer Toy',
+  title: 'Terms of Use & Payment Terms — Producer Toy',
   description:
-    'Complete Terms and Conditions, Account Rules, Rent to Own, Brand Disclaimers, and Acceptable Use Policy for Producer Toy Store.',
+    'Terms of Use, Payment Aggregator compliance (RBI & Razorpay), Digital Licensing, Anti-Piracy, and Customer Due Diligence for Producer Toy.',
   path: '/terms',
   keywords: [
     'Producer Toy terms',
     'Terms and conditions',
-    'Music store policy',
-    'Producer Toy legal',
+    'Payment terms',
+    'Razorpay payment aggregator terms',
+    'Music store legal',
+    'Producer Toy policies',
   ],
 })
 
@@ -33,137 +35,169 @@ export default function TermsAndConditionsPage() {
             Back to Store
           </Link>
 
-          <div>
+          <div className="space-y-2">
+            <span className="text-xs font-bold text-[#FA742B] tracking-wider uppercase">
+              Legal Agreement &amp; Compliance
+            </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Terms and Conditions
+              Terms of Use &amp; Payment Conditions
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-2">
-              Last updated: February 25, 2026 • Producer Toy Store (India Operations & Global Distribution)
+            <p className="text-xs sm:text-sm text-zinc-400">
+              Published in terms of Rule 3 of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 &amp; RBI Payment Aggregator Guidelines.
             </p>
           </div>
         </div>
 
-        {/* Minimalist Content Body */}
+        {/* Regulatory Summary Alert */}
+        <div className="bg-[#181818] border border-[#2a2a2a] rounded-xl p-5 space-y-2 text-xs text-zinc-300">
+          <div className="flex items-center gap-2 text-[#FA742B] font-bold text-sm">
+            <ShieldCheck size={18} />
+            <span>Payment Aggregation &amp; Security Notice</span>
+          </div>
+          <p className="leading-relaxed text-zinc-400">
+            Payment aggregation services on <strong>Producer Toy</strong> are operated by <strong>Razorpay Payments Private Limited</strong> (an RBI-authorised Payment Aggregator). All monetary transactions, tokenisation protocols, and settlement flows strictly adhere to Reserve Bank of India (RBI) Master Directions and Payment Card Industry Data Security Standards (PCI-DSS Level 1).
+          </p>
+        </div>
+
+        {/* Legal Body Sections */}
         <div className="space-y-10 text-sm text-zinc-300 leading-relaxed">
           
+          {/* Section 1: Introduction & Legal Status */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              1. Introduction
+            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <Scale size={18} className="text-[#FA742B]" />
+              1. General Understanding &amp; Agreement
             </h2>
             <p className="text-zinc-400">
-              These terms and conditions govern your use of the website <strong>producertoy.com</strong>; by using our website, you accept these terms and conditions in full. If you disagree with any part of these terms and conditions, do not use our website.
+              This electronic document is published in accordance with the Information Technology Act, 2000 (as amended) and rules made thereunder. By accessing, browsing, registering for, or making a purchase on <strong>producertoy.com</strong> (&quot;Platform&quot; or &quot;Website&quot;), you (&quot;User&quot;, &quot;Customer&quot;, or &quot;Merchant&quot;) agree to be legally bound by these Terms of Use, together with our{' '}
+              <Link href="/privacy" className="text-[#FA742B] hover:underline font-semibold">Privacy Policy</Link>,{' '}
+              <Link href="/refund-policy" className="text-[#FA742B] hover:underline font-semibold">Refund Policy</Link>, and{' '}
+              <Link href="/purchase-policy" className="text-[#FA742B] hover:underline font-semibold">Purchase Policy</Link>.
             </p>
             <p className="text-zinc-400">
-              Producer Toy is an Indian registered entity operating a premier digital audio marketplace, providing VST/AU plugins, sample packs, synth presets, and DAW templates to music producers globally.
+              Producer Toy is an Indian registered digital media and software marketplace entity providing original virtual instruments (VST/AU), audio soundbanks, sample packs, MIDI files, and DAW production templates to creators worldwide.
             </p>
           </section>
 
+          {/* Section 2: Payment Aggregation & Processing */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              2. Payment Methods & Currency
+            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <FileText size={18} className="text-[#FA742B]" />
+              2. Payment Aggregation &amp; Processing (Razorpay &amp; RBI Compliance)
             </h2>
             <p className="text-zinc-400">
-              Producer Toy currently accepts Visa, Mastercard, American Express, Apple Pay, Google Pay, UPI, Net Banking, and PayPal. We do not accept cash, bank checks, or unauthorized third-party gift cards. The customer agrees to pay all applicable unit prices, taxes, and transaction fees.
+              All domestic and supported international payment collection is facilitated via licensed Facility Providers and Payment Aggregators:
             </p>
-            <p className="text-zinc-400">
-              All core prices on Producer Toy are listed in <strong>United States Dollars (USD)</strong>. For customers in India or other regions, local currency displays are for approximation; the actual exchange rate applied by your issuing bank or payment gateway at the time of purchase may vary.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              3. Account Registration & Email Requirements (Strict Disposable Email Ban)
-            </h2>
-            <p className="text-zinc-400">
-              To register for an account, you must use a valid and permanent personal or professional email address. <strong>The use of disposable, temporary, or &apos;alias&apos; email services (e.g. TempMail, 10MinuteMail, GuerillaMail) designed to anonymise the user or circumvent registration limits is strictly prohibited.</strong>
-            </p>
-            <p className="text-zinc-400">
-              We reserve the right, in our sole discretion, to refuse registration, revoke software license keys, or permanently block access if we detect the use of a prohibited email domain. You represent and warrant that all registration information provided is truthful and accurate.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              4. Rent to Own Payment Plans
-            </h2>
-            <p className="text-zinc-400">
-              If you choose to purchase a product through a Rent to Own payment plan, you will be purchasing a month-to-month license for the duration of the plan. Upon completion of the plan, if all installment payments have been made without any refund, chargeback, or payment issue, your monthly license will be converted into a perpetual license once your final payment has been processed.
-            </p>
-            <p className="text-zinc-400">
-              If you cancel or pause your Rent to Own payment plan, you will forfeit your month-to-month license to the relevant product, and access to the product will be suspended until payments resume. Aside from any free trial, one payment is required every 30 days. You authorize Producer Toy to charge your payment method on file each month until the full price is completed.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              5. Termination of Distribution Rights
-            </h2>
-            <p className="text-zinc-400">
-              Producer Toy may at any time lose the right to distribute and sell selected third-party products. Should such a case occur, you will no longer be able to access or download such products from your account, and they will no longer be listed in the Producer Toy catalogue.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              6. Limitation on Sales & Reseller Restrictions
-            </h2>
-            <p className="text-zinc-400">
-              The Producer Toy online shop sells products to end customers only. Music dealers, distributors, wholesalers, and any other businesses purchasing products in the Producer Toy store with the intent to resell or sub-license them will be refused access and sales. Coupon codes cannot be stacked or applied to sale items unless explicitly stated.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              7. Brand Names & Trademarks Disclaimer
-            </h2>
-            <p className="text-zinc-400">
-              Any references to third-party brands on this site (e.g. FL Studio, Ableton Live, Logic Pro, Cubase, Xfer Serum, Native Instruments, Roland, Moog) are provided for descriptive compatibility purposes only (to describe the sound of an instrument or host DAW compatibility). Producer Toy does not claim any official association with or endorsement by these brand owners. All goodwill attached to those trademarks rests with their respective owners.
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              8. Acceptable Use Policy & Anti-Piracy
-            </h2>
-            <p className="text-zinc-400">You agree and undertake that you will not post, employ, or transmit content or engage in activity that:</p>
             <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
-              <li>Is unlawful, fraudulent, or gives rise to civil or criminal liability under Indian IT Act 2000.</li>
-              <li>Infringes the intellectual property or copyright of Producer Toy or sound designers.</li>
-              <li>Employs third-party bots, automated scrapers, scripts, or takes advantage of bugs to access restricted parts of our website or download vaults.</li>
-              <li>Uploads or transmits computer viruses, malware, trojans, or logic bombs.</li>
-              <li>Attempts to crack, reverse-engineer, or decompile VST/AU plugin binaries or serial key generators.</li>
+              <li>
+                <strong className="text-zinc-200">Payment Aggregator:</strong> Payments are processed via Razorpay Payments Private Limited (RBI Authorised Payment Aggregator) and PayPal for international multi-currency processing.
+              </li>
+              <li>
+                <strong className="text-zinc-200">Permitted Instruments:</strong> We support UPI (Google Pay, PhonePe, Paytm, BHIM, CRED), RuPay Debit/Credit Cards, Visa, Mastercard, American Express, and NetBanking across major scheduled commercial banks.
+              </li>
+              <li>
+                <strong className="text-zinc-200">Zero Storage of Sensitive Card Credentials:</strong> In compliance with RBI Circular CO.DPSS.POLC.No.s-516/02-14-003/2021-22, Producer Toy does not store or view raw card numbers (PAN), CVVs, expiry dates, or bank passwords. All card saving is conducted via explicit consent-driven Tokenisation (TokenHQ).
+              </li>
+              <li>
+                <strong className="text-zinc-200">Convenience &amp; Merchant Fees:</strong> Producer Toy does not levy unfair surcharge fees on domestic UPI or RuPay debit transactions.
+              </li>
             </ul>
           </section>
 
+          {/* Section 3: Digital Fulfillment & Customer Due Diligence */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight">
-              9. Right to Challenge a Transaction
+              3. Digital Delivery, License Issuance &amp; Account Security
             </h2>
             <p className="text-zinc-400">
-              Producer Toy reserves the right to challenge the legal standing of a transaction under suspicious or high-risk circumstances. In such cases, the user will be contacted individually to verify their identity. Failure to verify identity will result in order cancellation and account suspension within 30 days.
+              Upon successful payment authorization by the payment aggregator:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li>Your purchased digital audio assets, serial license keys, and downloadable archives are instantly attached to your personal account library.</li>
+              <li>An itemized digital GST tax invoice and confirmation receipt are transmitted to your registered email address.</li>
+              <li>You are responsible for maintaining the confidentiality of your account credentials and multi-factor security access. Disposable or temporary alias email domains (TempMail, 10MinuteMail, etc.) are strictly prohibited.</li>
+            </ul>
+          </section>
+
+          {/* Section 4: Prohibited Products, Anti-Piracy & Usage Restrictions */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <AlertCircle size={18} className="text-[#FA742B]" />
+              4. Prohibited Activities &amp; Anti-Piracy Governance
+            </h2>
+            <p className="text-zinc-400">
+              In alignment with Indian Law, RBI regulations, and Payment Aggregator merchant mandates, you agree not to use the Platform to:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li>Upload, distribute, crack, reverse-engineer, decompile, or tamper with VST/AU software binaries or serial key generators.</li>
+              <li>Sell or distribute unauthorized copies of copyrighted audio recordings, sound libraries, or patented DSP code.</li>
+              <li>Engage in any money laundering, fraudulent credit card usage, bot scraping, or unauthorized reselling of digital licenses.</li>
+              <li>Engage in any activities related to unregulated virtual currencies, NFTs, or gambling as restricted under Applicable Laws.</li>
+            </ul>
+          </section>
+
+          {/* Section 5: Marketplace Sellers & Sub-Merchants */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              5. Marketplace Creators &amp; Sound Designer Obligations
+            </h2>
+            <p className="text-zinc-400">
+              Third-party sound designers, preset creators, and audio brands onboarded as sellers on Producer Toy confirm that:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li>All uploaded audio samples, synth patches, and MIDI progressions are 100% original, cleared, and royalty-free for commercial use.</li>
+              <li>Sellers have valid contractual onboarding agreements with Producer Toy and undergo mandatory Know Your Customer (KYC) verification.</li>
+              <li>TDS obligations under Section 194-O of the Income Tax Act, 1961 and GST compliance are maintained as prescribed under Indian Law.</li>
+            </ul>
+          </section>
+
+          {/* Section 6: Chargeback, Disputes & Failed Transactions */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              6. Chargeback Resolution &amp; Failed Transaction Turnaround (TAT)
+            </h2>
+            <p className="text-zinc-400">
+              In the event of a banking or gateway discrepancy:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li>
+                <strong className="text-zinc-200">Failed Transaction Auto-Refund:</strong> If money is deducted from your bank account but the transaction fails or times out, the funds will be automatically reversed to your source account within 5 business days pursuant to RBI Circular DPSS.CO.PD No.629/02.01.014/2019-20.
+              </li>
+              <li>
+                <strong className="text-zinc-200">Grievance Resolution Timeline:</strong> All customer queries, license retrieval requests, or transaction clarifications will be responded to within 24 hours and fully resolved within <strong>D+4 business days</strong>.
+              </li>
+              <li>
+                <strong className="text-zinc-200">Fraudulent Chargebacks:</strong> Filing unfounded chargebacks after downloading digital assets will lead to immediate account termination and serial key revocation.
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 7: Limitation of Liability & Third-Party Disclaimer */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              7. Limitation of Liability &amp; Intermediary Disclaimer
+            </h2>
+            <p className="text-zinc-400">
+              To the maximum extent permitted by Applicable Law:
+            </p>
+            <p className="text-zinc-400">
+              Razorpay Payments Private Limited, partner acquiring banks, and card networks act solely as payment facilitators/aggregators and shall not be held liable for any product quality, digital compatibility, or after-sales technical requests pertaining to goods sold by Producer Toy. Producer Toy assumes full merchant responsibility for product delivery and license fulfillment.
             </p>
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              10. Limitations of Liability
-            </h2>
-            <p className="text-zinc-400">
-              To the full extent permissible by applicable law, Producer Toy disclaims all warranties, express or implied. Producer Toy will not be liable for any direct, indirect, incidental, or consequential damages arising from the use of this site or downloaded audio assets.
-            </p>
-          </section>
-
+          {/* Section 8: Governing Law & Jurisdiction */}
           <section className="space-y-3 pt-6 border-t border-zinc-800/60">
             <h2 className="text-lg font-bold text-white tracking-tight">
-              11. Governing Law & Jurisdiction (India)
+              8. Governing Law, Dispute Redressal &amp; Nodal Details
             </h2>
             <p className="text-zinc-400">
-              These Terms and Conditions shall be governed by and construed in accordance with the laws of <strong>India</strong> (including the Information Technology Act, 2000 and Consumer Protection Act). Any disputes relating to this notice shall be subject to the exclusive jurisdiction of the competent courts in Sangamner / Ahmednagar, Maharashtra, India.
+              These Terms shall be governed by and construed in accordance with the substantive laws of <strong>India</strong>. Any legal action or dispute arising in connection with these Terms shall be subject to the exclusive jurisdiction of the competent courts in Sangamner / Pune / Bengaluru, India.
             </p>
-            <div className="space-y-1 text-xs text-zinc-400 pt-2 leading-relaxed">
-              <p><strong className="text-zinc-200">Entity Name:</strong> Producer Toy Pvt. Ltd.</p>
-              <p><strong className="text-zinc-200">Headquarters:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</p>
-              <p><strong className="text-zinc-200">Contact Email:</strong> <a href="mailto:support@producertoy.com" className="text-[#FC6301] hover:underline">support@producertoy.com</a></p>
+            <div className="bg-[#161616] border border-[#242424] rounded-xl p-4 space-y-1.5 text-xs text-zinc-400 mt-3">
+              <p><strong className="text-zinc-200">Merchant Entity:</strong> Producer Toy Store (Operated in India)</p>
+              <p><strong className="text-zinc-200">Registered Office:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</p>
+              <p><strong className="text-zinc-200">Compliance &amp; Legal Desk:</strong> <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Statutory Nodal / Grievance Officer:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">grievance@producertoy.com</a></p>
             </div>
           </section>
 

@@ -123,7 +123,8 @@ export const Header: React.FC = () => {
     pathname?.startsWith('/categories') ||
     pathname?.startsWith('/product/') ||
     pathname?.startsWith('/p/') ||
-    pathname?.startsWith('/brands')
+    pathname?.startsWith('/brands') ||
+    pathname?.startsWith('/blog')
 
   return (
     <>

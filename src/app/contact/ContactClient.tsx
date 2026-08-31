@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { Send, CheckCircle2, ArrowLeft } from 'lucide-react'
+import { Send, CheckCircle2, ArrowLeft, Building2, ShieldCheck, Mail, Clock, MapPin } from 'lucide-react'
 import { submitContactFormAction } from '@/actions/contactActions'
 
 export function ContactClient() {
@@ -34,6 +34,7 @@ export function ContactClient() {
   return (
     <div className="min-h-screen bg-[#121212] text-white py-14 px-6 sm:px-10 lg:px-16 font-sans">
       <div className="max-w-4xl mx-auto space-y-10">
+        
         {/* Back Link & Minimal Header */}
         <div className="space-y-4 pb-6 border-b border-zinc-800/60">
           <Link
@@ -45,8 +46,11 @@ export function ContactClient() {
             <span>Back to Store</span>
           </Link>
           <div className="space-y-1">
+            <span className="text-xs font-bold text-[#FA742B] tracking-wider uppercase">
+              Customer Support &amp; Grievance Redressal
+            </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Customer Care & Technical Support
+              Customer Care &amp; Technical Support
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400">
               Need assistance with license keys, Toywards balance, downloads, or billing? We are here to help.
@@ -154,13 +158,61 @@ export function ContactClient() {
 
             <button
               type="submit"
-              className="w-full sm:w-auto bg-[#fa742b] hover:bg-[#e05800] text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-[#fa742b] hover:bg-[#e05800] text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
             >
               <Send size={16} />
               <span>Send Message</span>
             </button>
           </form>
         )}
+
+        {/* Merchant Statutory & Grievance Information Card */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-zinc-800/60 text-xs text-zinc-300">
+          
+          {/* Box 1: Registered Merchant Entity */}
+          <div className="bg-[#181818] border border-zinc-800 rounded-xl p-5 space-y-3">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
+              <Building2 size={16} className="text-[#fa742b]" />
+              <span>Registered Business Details</span>
+            </div>
+            <div className="space-y-2 text-zinc-400">
+              <p className="flex items-start gap-2">
+                <MapPin size={14} className="text-zinc-500 flex-shrink-0 mt-0.5" />
+                <span><strong>Address:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <Mail size={14} className="text-zinc-500 flex-shrink-0" />
+                <span><strong>Support Email:</strong> <a href="mailto:support@producertoy.com" className="text-[#fa742b] hover:underline">support@producertoy.com</a></span>
+              </p>
+              <p className="flex items-center gap-2">
+                <Clock size={14} className="text-zinc-500 flex-shrink-0" />
+                <span><strong>Support Hours:</strong> Mon–Sat (9:00 AM – 8:00 PM IST)</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Box 2: Statutory Grievance & Nodal Officer */}
+          <div className="bg-[#181818] border border-zinc-800 rounded-xl p-5 space-y-3">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
+              <ShieldCheck size={16} className="text-[#fa742b]" />
+              <span>Grievance Redressal (RBI &amp; IT Act)</span>
+            </div>
+            <div className="space-y-2 text-zinc-400">
+              <p>
+                <strong>Grievance / Nodal Officer:</strong> Compliance Officer, Producer Toy
+              </p>
+              <p className="flex items-center gap-2">
+                <Mail size={14} className="text-zinc-500 flex-shrink-0" />
+                <span><strong>Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#fa742b] hover:underline">grievance@producertoy.com</a></span>
+              </p>
+              <p className="text-[11px] text-zinc-500 leading-relaxed">
+                In compliance with Consumer Protection Rules 2020 and RBI Payment Aggregator Directions, grievances are acknowledged within 24 hours and resolved within <strong>D+4 business days</strong>.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   )

@@ -261,12 +261,26 @@ export function CheckoutOrderSummary({
           )
         )}
 
-        <p className="text-[10px] text-zinc-500 text-center mt-2">
-          Encrypted 256-bit SSL • Instant vault delivery •{' '}
-          <Link href="/terms" className="text-zinc-400 hover:underline">
-            Terms
-          </Link>
-        </p>
+        <div className="space-y-1.5 text-center mt-2.5">
+          <p className="text-[10.5px] text-zinc-400 leading-normal">
+            By completing this purchase, you agree to our{' '}
+            <Link href="/terms" target="_blank" className="text-zinc-200 hover:text-white underline underline-offset-2">
+              Terms
+            </Link>
+            ,{' '}
+            <Link href="/privacy" target="_blank" className="text-zinc-200 hover:text-white underline underline-offset-2">
+              Privacy
+            </Link>
+            , &amp;{' '}
+            <Link href="/refund-policy" target="_blank" className="text-zinc-200 hover:text-white underline underline-offset-2">
+              Refund Policy
+            </Link>
+            .
+          </p>
+          <p className="text-[9.5px] text-zinc-500">
+            Encrypted 256-bit TLS • Secured by Razorpay &amp; PayPal • Instant Delivery
+          </p>
+        </div>
 
         {/* Accepted Payment Methods Vector Logos */}
         <div className="pt-3 border-t border-[#222222]/80 mt-3 space-y-2">

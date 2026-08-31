@@ -11,7 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}`, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${baseUrl}/store`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
-    { url: `${baseUrl}/store?free=true`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
     { url: `${baseUrl}/categories`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
     { url: `${baseUrl}/manufacturers`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
 
@@ -49,6 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Features & Programs
     { url: `${baseUrl}/features/toywards`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${baseUrl}/brands`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
+    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
 
     // Institutional & Legal Pages
     { url: `${baseUrl}/licensing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
@@ -63,14 +63,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let productEntries: MetadataRoute.Sitemap = []
   let categoryEntries: MetadataRoute.Sitemap = []
   let brandEntries: MetadataRoute.Sitemap = []
+  let blogEntries: MetadataRoute.Sitemap = []
 
   try {
-    // 2. Fetch ALL Active Products, Categories, Subcategories, and Brands from Database
-    const [productsRes, categoriesRes, subcategoriesRes, brandsRes] = await Promise.all([
+    // 2. Fetch ALL Active Products, Categories, Subcategories, Brands, and Blogs from Database
+    const [productsRes, categoriesRes, subcategoriesRes, brandsRes, blogsRes] = await Promise.all([
       supabase.from('products').select('slug, name, cover_image, updated_at, created_at').eq('is_active', true),
       supabase.from('categories').select('slug, created_at'),
       supabase.from('subcategories').select('slug, created_at'),
       supabase.from('brands').select('slug, created_at'),
+      supabase.from('blogs').select('slug, cover_image, updated_at, published_at, created_at').eq('is_published', true),
     ])
 
     // 3. Dynamic Products URLs with Direct Image Linking (Priority: 1.0)
@@ -121,12 +123,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
       ])
     }
+
+    // 6. Dynamic Blog Article URLs (Priority: 0.85)
+    if (blogsRes.data && blogsRes.data.length > 0) {
+      blogEntries = blogsRes.data.map((b) => ({
+        url: `${baseUrl}/blog/${encodeURIComponent(b.slug)}`,
+        lastModified: new Date(b.updated_at || b.published_at || b.created_at || new Date()),
+        changeFrequency: 'weekly' as const,
+        priority: 0.85,
+        images: b.cover_image ? [b.cover_image] : undefined,
+      }))
+    }
   } catch (err) {
     console.error('ProducerToy Sitemap generation error:', err)
   }
 
   // Combine all routes cleanly without duplicates
-  const allEntries = [...staticRoutes, ...productEntries, ...categoryEntries, ...brandEntries]
+  const allEntries = [...staticRoutes, ...productEntries, ...categoryEntries, ...brandEntries, ...blogEntries]
   const uniqueUrlsMap = new Map<string, MetadataRoute.Sitemap[number]>()
 
   allEntries.forEach((entry) => {

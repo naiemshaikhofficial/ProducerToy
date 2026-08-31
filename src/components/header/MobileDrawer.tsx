@@ -368,6 +368,16 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
+                href="/blog"
+                prefetch={true}
+                onClick={onClose}
+                className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
+              >
+                <span>Blog & Guides</span>
+                <ChevronRight className="w-5 h-5 text-zinc-500" />
+              </Link>
+
+              <Link
                 href="/store?free=true"
                 prefetch={true}
                 onClick={onClose}
