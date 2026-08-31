@@ -54,7 +54,7 @@ export const DataPrivacySection: React.FC = () => {
           Delete account
         </h2>
         <p className="text-xs text-zinc-400 leading-relaxed max-w-xl">
-          Delete your ProducerToy account including all personal information, purchases, sound packs, VST licenses, your account balance and projects. Your account will be permanently deleted in 30 days.
+          Delete your ProducerToy account including all personal information, purchases, sound packs, VST licenses, your Toywards balance and projects. Your account will be permanently deleted in 30 days.
         </p>
 
         <div>

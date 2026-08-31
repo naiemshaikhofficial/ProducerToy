@@ -10,7 +10,6 @@ import {
   CreditCard,
   Clock,
   Tag,
-  Coins,
   Key,
   ChevronDown,
 } from 'lucide-react'
@@ -25,7 +24,6 @@ export type AccountTab =
   | 'payment'
   | 'transactions'
   | 'subscriptions'
-  | 'currency'
   | 'rewards'
   | 'redeem'
 
@@ -160,19 +158,6 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
           >
             <Tag className={`w-4 h-4 ${activeTab === 'subscriptions' ? 'text-white' : 'text-zinc-400'}`} />
             <span>Subscriptions</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onSelectTab('currency')}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] font-medium transition-all text-left w-full cursor-pointer ${
-              activeTab === 'currency'
-                ? 'bg-[#242424] text-white font-semibold shadow-sm'
-                : 'text-zinc-400 hover:text-white hover:bg-[#1c1c1c]'
-            }`}
-          >
-            <Coins className={`w-4 h-4 ${activeTab === 'currency' ? 'text-white' : 'text-zinc-400'}`} />
-            <span>Wallet & Credits</span>
           </button>
 
           <button

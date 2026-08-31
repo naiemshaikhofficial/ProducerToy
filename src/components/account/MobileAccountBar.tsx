@@ -10,7 +10,6 @@ import {
   CreditCard,
   Clock,
   Tag,
-  Coins,
   Key,
   ChevronDown,
   X,
@@ -32,7 +31,6 @@ const TAB_CONFIG: Record<AccountTab, { label: string; icon: React.ReactNode }> =
   payment: { label: 'Payment settings', icon: <CreditCard className="w-4 h-4 text-zinc-400" /> },
   transactions: { label: 'Transactions', icon: <Clock className="w-4 h-4 text-zinc-400" /> },
   subscriptions: { label: 'Subscriptions', icon: <Tag className="w-4 h-4 text-zinc-400" /> },
-  currency: { label: 'Wallet & Credits', icon: <Coins className="w-4 h-4 text-zinc-400" /> },
   rewards: { label: 'Toywards', icon: <ToywardsSparkleIcon size={16} className="text-zinc-400" /> },
   redeem: { label: 'Redeem code', icon: <Key className="w-4 h-4 text-zinc-400" /> },
 }
@@ -116,7 +114,7 @@ export const MobileAccountBar: React.FC<MobileAccountBarProps> = ({
                 Payment and rewards
               </span>
               <div className="flex flex-col space-y-1">
-                {(['payment', 'transactions', 'subscriptions', 'currency', 'rewards', 'redeem'] as AccountTab[]).map((tabKey) => {
+                {(['payment', 'transactions', 'subscriptions', 'rewards', 'redeem'] as AccountTab[]).map((tabKey) => {
                   const cfg = TAB_CONFIG[tabKey]
                   const isActive = activeTab === tabKey
                   return (

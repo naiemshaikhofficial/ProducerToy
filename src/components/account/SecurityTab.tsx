@@ -140,7 +140,7 @@ export const SecurityTab: React.FC = () => {
             )}
           </h3>
           <p className="text-xs text-zinc-400 mt-1 max-w-md">
-            Add an extra layer of security to prevent unauthorized access to your licenses and wallet.
+            Add an extra layer of security to prevent unauthorized access to your licenses and Toywards.
           </p>
           {twoFactorMsg && (
             <p className="text-xs font-bold text-green-400 mt-2 flex items-center gap-1.5 animate-in fade-in">

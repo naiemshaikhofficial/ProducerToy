@@ -11,7 +11,6 @@ import {
   LogOut,
   Trophy,
   Sparkles,
-  CreditCard,
   Gift,
   Tag,
   Key,
@@ -124,16 +123,6 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               >
                 <ToywardsIcon size={18} />
                 <span>Toywards</span>
-              </Link>
-
-              <Link
-                href="/account?tab=currency"
-                prefetch={true}
-                onClick={onClose}
-                className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
-              >
-                <CreditCard className="w-5 h-5 text-zinc-400" />
-                <span>Account Balance</span>
               </Link>
 
               <Link

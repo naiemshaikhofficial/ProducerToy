@@ -32,7 +32,6 @@ export default function EpicAccountClient() {
     'payment',
     'transactions',
     'subscriptions',
-    'currency',
     'rewards',
     'redeem',
   ]
@@ -238,11 +237,6 @@ export default function EpicAccountClient() {
             {/* TAB: EPIC REWARDS */}
             {activeTab === 'rewards' && (
               <RewardsAndWalletTab type="rewards" profile={profile} />
-            )}
-
-            {/* TAB: IN-GAME CURRENCY / WALLET */}
-            {activeTab === 'currency' && (
-              <RewardsAndWalletTab type="currency" profile={profile} />
             )}
 
             {/* TAB: PAYMENT SETTINGS */}

@@ -6,10 +6,6 @@ import {
   AlertCircle,
   Info,
   ChevronRight,
-  ExternalLink,
-  ShoppingBag,
-  Coins,
-  History
 } from 'lucide-react'
 import { getToywardsDataAction } from '@/actions/accountActions'
 import { useCurrency } from '@/context/CurrencyContext'
@@ -40,15 +36,13 @@ export const ToywardsSparkleIcon: React.FC<{ className?: string; size?: number }
 )
 
 interface RewardsAndWalletTabProps {
-  type: 'rewards' | 'currency'
+  type?: 'rewards'
   profile: any
 }
 
 export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
-  type,
   profile,
 }) => {
-  const isRewards = type === 'rewards'
   const { currency, exchangeRate } = useCurrency()
 
   const [loading, setLoading] = useState(false)
@@ -73,7 +67,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
 
   // Load live reward activity data for authenticated profile
   useEffect(() => {
-    if (isRewards && profile?.id) {
+    if (profile?.id) {
       setLoading(true)
       getToywardsDataAction(profile.id)
         .then((res) => {
@@ -92,12 +86,9 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
         .catch((err) => console.warn('Could not load rewards data:', err))
         .finally(() => setLoading(false))
     }
-  }, [isRewards, profile?.id])
+  }, [profile?.id])
 
-  const balanceUsd = isRewards
-    ? toywardsData.rewardBalance
-    : Number(profile?.wallet_balance || 0)
-
+  const balanceUsd = toywardsData.rewardBalance
   const balanceInr = Math.round(balanceUsd * (exchangeRate || 95.0))
   const currencySymbol = currency === 'INR' ? '₹' : '$'
   const displayAmount =
@@ -114,30 +105,24 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
       {/* 1. Header Section (Toywards Branding with Clean Typography) */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
-          {isRewards ? 'Toywards' : 'Wallet & Store Credits'}
+          Toywards
         </h1>
         <p className="text-sm sm:text-[15px] text-zinc-400 mt-2 leading-relaxed max-w-3xl">
-          {isRewards ? (
-            <>
-              Earn up to 20% back on purchases using ProducerToy's payment system. Plus, enjoy instant rewards
-              for sound kits, synth presets, and audio plugins.{' '}
-              <Link
-                href="/features/toywards"
-                className="text-white underline hover:text-[#FA742B] transition-colors inline-block"
-              >
-                Learn More.
-              </Link>
-            </>
-          ) : (
-            'Store balance and credits available for instant sound kits, presets, and audio plugin purchases.'
-          )}
+          Earn up to 20% back on purchases using ProducerToy's payment system. Plus, enjoy instant rewards
+          for sound kits, synth presets, and audio plugins.{' '}
+          <Link
+            href="/features/toywards"
+            className="text-white underline hover:text-[#FA742B] transition-colors inline-block"
+          >
+            Learn More.
+          </Link>
         </p>
       </div>
 
       {/* 2. Balance Section */}
       <div className="pt-2">
         <h2 className="text-xl font-bold text-white tracking-tight">
-          {isRewards ? 'Toywards Balance' : 'Current Balance'}
+          Toywards Balance
         </h2>
 
         {/* Large Clean Balance Display */}
@@ -170,7 +155,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
 
             {activeTooltip === 'pending' && (
               <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-[#242424] border border-[#383838] rounded-xl text-xs text-zinc-200 shadow-2xl z-20 animate-in fade-in zoom-in-95">
-                Pending rewards are credited to your account balance 14 days after purchase completion.
+                Pending rewards are credited to your Toywards balance 14 days after purchase completion.
               </div>
             )}
           </div>
@@ -216,9 +201,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
               <AlertCircle className="w-10 h-10 stroke-[1.5] text-zinc-400" />
             </div>
             <p className="text-sm sm:text-[15px] font-semibold text-zinc-400 max-w-lg leading-normal">
-              {isRewards
-                ? 'No transactions have been completed that are eligible for Toywards'
-                : 'No transactions have been completed for wallet currency'}
+              No transactions have been completed that are eligible for Toywards
             </p>
           </div>
         ) : (

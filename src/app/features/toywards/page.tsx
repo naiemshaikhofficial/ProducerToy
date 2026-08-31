@@ -31,7 +31,7 @@ const FAQ_ITEMS = [
   {
     question: 'Where can I check my Toywards balance?',
     answer:
-      'You can check your current Toywards balance anytime in your Account Settings under the Rewards & Wallet tab. There, you will find additional information including your active balance, pending rewards, and full redemption history.',
+      'You can check your current Toywards balance anytime in your Account Settings under the Toywards tab. There, you will find additional information including your active balance, pending rewards, and full redemption history.',
   },
   {
     question: 'How do I redeem Toywards at checkout?',

@@ -13,7 +13,6 @@ import {
   Check,
   Trophy,
   Sparkles,
-  CreditCard,
   Gift,
   Tag,
   Key,
@@ -224,16 +223,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                     >
                       <ToywardsIcon size={16} />
                       <span>Toywards</span>
-                    </Link>
-
-                    <Link
-                      href="/account?tab=currency"
-                      prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
-                    >
-                      <CreditCard className="w-4 h-4 text-zinc-400" />
-                      <span>Account Balance</span>
                     </Link>
 
                     <Link
