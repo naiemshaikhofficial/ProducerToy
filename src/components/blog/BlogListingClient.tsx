@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react'
 import { BlogPost } from '@/lib/data/blogs'
 import { BlogCard } from './BlogCard'
-import { Search, X, BookOpen } from 'lucide-react'
+import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react'
 
 interface BlogListingClientProps {
   initialPosts: BlogPost[]
@@ -16,143 +16,148 @@ const CATEGORIES = [
   'Sound Design',
   'Guides',
   'Tutorials',
-  'Freebies',
 ]
+
+const POSTS_PER_PAGE = 6
 
 export function BlogListingClient({
   initialPosts,
   featuredPostId,
 }: BlogListingClientProps) {
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
 
-  // Filter out featured post if on 'All' tab without search query to avoid duplicate display, but include it if searching
+  // Filter posts by category
   const filteredPosts = useMemo(() => {
     return initialPosts.filter((post) => {
-      const matchesCategory =
-        selectedCategory === 'All' ||
-        post.category?.toLowerCase() === selectedCategory.toLowerCase()
+      // If featured post is shown in hero on 'All' view, don't duplicate on page 1
+      if (selectedCategory === 'All' && featuredPostId && post.id === featuredPostId) {
+        return false
+      }
 
-      const query = searchQuery.trim().toLowerCase()
-      const matchesSearch =
-        !query ||
-        post.title.toLowerCase().includes(query) ||
-        (post.excerpt && post.excerpt.toLowerCase().includes(query)) ||
-        (post.tags && post.tags.some((t) => t.toLowerCase().includes(query)))
-
-      return matchesCategory && matchesSearch
+      if (selectedCategory === 'All') return true
+      return post.category?.toLowerCase() === selectedCategory.toLowerCase()
     })
-  }, [initialPosts, selectedCategory, searchQuery])
+  }, [initialPosts, selectedCategory, featuredPostId])
 
-  // Split posts if on default view (exclude hero item)
-  const displayPosts = useMemo(() => {
-    if (selectedCategory === 'All' && !searchQuery.trim() && featuredPostId) {
-      return filteredPosts.filter((p) => p.id !== featuredPostId)
+  // Total pages
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE))
+
+  // Sliced posts for current page
+  const currentPosts = useMemo(() => {
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE
+    return filteredPosts.slice(startIndex, startIndex + POSTS_PER_PAGE)
+  }, [filteredPosts, currentPage])
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category)
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+      // Smooth scroll to top of grid
+      const gridElem = document.getElementById('news-grid-section')
+      if (gridElem) {
+        gridElem.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
     }
-    return filteredPosts
-  }, [filteredPosts, selectedCategory, searchQuery, featuredPostId])
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Filter & Search Bar Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#242424]">
-        
-        {/* Category Pills (Horizontal Scroll on Mobile) */}
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 md:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
-          {CATEGORIES.map((cat) => {
-            const isSelected = selectedCategory === cat
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`text-xs sm:text-sm font-bold px-4 py-2 rounded-xl transition-all whitespace-nowrap cursor-pointer border ${
-                  isSelected
-                    ? 'bg-white text-black border-white shadow-md'
-                    : 'bg-[#181818] hover:bg-[#222222] text-zinc-300 hover:text-white border-[#2c2c2c]'
-                }`}
-              >
-                {cat}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Live Search Input */}
-        <div className="relative w-full md:w-[280px] lg:w-[320px] flex-shrink-0">
-          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search articles, topics..."
-            className="w-full bg-[#1c1c1c] hover:bg-[#222222] focus:bg-[#242424] text-white text-xs sm:text-sm pl-10 pr-9 h-[42px] rounded-xl border border-[#2c2c2c] focus:border-zinc-500 focus:outline-none placeholder:text-zinc-500 transition-all"
-          />
-          {searchQuery && (
+    <div id="news-grid-section" className="space-y-10 sm:space-y-12">
+      {/* Category Pills Header */}
+      <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2">
+        {CATEGORIES.map((cat) => {
+          const isSelected = selectedCategory === cat
+          return (
             <button
+              key={cat}
               type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1 rounded-full cursor-pointer"
-              title="Clear search"
+              onClick={() => handleCategoryChange(cat)}
+              className={`text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all whitespace-nowrap cursor-pointer border ${
+                isSelected
+                  ? 'bg-white text-black border-white shadow-md'
+                  : 'bg-[#181818] hover:bg-[#242424] text-zinc-400 hover:text-white border-[#2c2c2c]'
+              }`}
             >
-              <X className="w-3.5 h-3.5" />
+              {cat}
             </button>
-          )}
-        </div>
-
+          )
+        })}
       </div>
 
-      {/* Grid Results Header */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
-          <span>{selectedCategory === 'All' ? 'Latest Articles' : `${selectedCategory} Articles`}</span>
-          <span className="text-xs text-zinc-500 font-normal">({displayPosts.length})</span>
-        </h3>
-
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => {
-              setSearchQuery('')
-              setSelectedCategory('All')
-            }}
-            className="text-xs text-[#FA742B] hover:underline font-semibold cursor-pointer"
-          >
-            Clear Filters
-          </button>
-        )}
-      </div>
-
-      {/* Posts Responsive Grid */}
-      {displayPosts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {displayPosts.map((post, idx) => (
+      {/* 3-Column Responsive Grid (Exact Epic Games News 1:1 Layout) */}
+      {currentPosts.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
+          {currentPosts.map((post, idx) => (
             <BlogCard key={post.id} post={post} priority={idx < 3} />
           ))}
         </div>
       ) : (
         /* Empty State */
-        <div className="bg-[#181818] border border-[#262626] rounded-2xl p-12 text-center space-y-4 my-8">
+        <div className="bg-[#181818] border border-[#262626] rounded-[24px] p-12 text-center space-y-4 my-8">
           <div className="w-12 h-12 rounded-full bg-[#242424] text-zinc-400 flex items-center justify-center mx-auto">
             <BookOpen className="w-6 h-6" />
           </div>
           <div className="space-y-1">
             <h4 className="text-lg font-bold text-white">No articles found</h4>
             <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
-              We couldn&apos;t find any articles matching &ldquo;{searchQuery || selectedCategory}&rdquo;. Try another search term or reset your filters.
+              There are no articles currently listed under {selectedCategory}.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Epic Games Circular Pagination Controls (Exact 1:1 Match) */}
+      {totalPages > 1 && (
+        <nav
+          aria-label="Pagination"
+          className="flex items-center justify-center gap-2 sm:gap-3 pt-6 sm:pt-10"
+        >
+          {/* Previous Page Arrow */}
           <button
             type="button"
-            onClick={() => {
-              setSearchQuery('')
-              setSelectedCategory('All')
-            }}
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-bold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            aria-label="Previous page"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
           >
-            Show All Articles
+            <ChevronLeft className="w-4 h-4" />
           </button>
-        </div>
+
+          {/* Page Number Circles */}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+            const isActive = pageNum === currentPage
+            return (
+              <button
+                key={pageNum}
+                type="button"
+                onClick={() => handlePageChange(pageNum)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`w-9 h-9 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-white text-black shadow-md'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                }`}
+              >
+                {pageNum}
+              </button>
+            )
+          })}
+
+          {/* Next Page Arrow */}
+          <button
+            type="button"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            aria-label="Next page"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </nav>
       )}
     </div>
   )
