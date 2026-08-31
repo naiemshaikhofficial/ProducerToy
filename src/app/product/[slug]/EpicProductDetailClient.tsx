@@ -14,6 +14,8 @@ import {
   ChevronRight,
   Bookmark,
   ShoppingCart,
+  ShoppingBag,
+  Download,
   Gift,
   Info,
   ChevronDown,
@@ -778,37 +780,10 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Highlight Promo Card: Producer Toy Club / Toywards (Screenshot 3 Match) */}
-            <div className="p-6 sm:p-7 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-4 shadow-xl">
-              <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center flex-shrink-0">
-                  <ToywardsSparkleIcon size={20} className="text-[#FA742B]" />
-                </div>
-                <div>
-                  <h4 className="text-base font-extrabold text-white tracking-tight">
-                    Earn with Toywards Rewards
-                  </h4>
-                  <p className="text-xs text-zinc-300 mt-0.5 leading-relaxed">
-                    Earn up to 20% cashback in Toywards balance on eligible purchases. Spend 1:1 on plugins and sound kits at checkout.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-1">
-                <Link
-                  href="/features/toywards"
-                  prefetch={true}
-                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-[#242424] hover:bg-[#2c2c2c] text-white border border-[#383838] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
-                >
-                  Explore Toywards
-                </Link>
-              </div>
-            </div>
-
-            {/* Detailed Description & Read More (Screenshot 4 Match) */}
+            {/* Detailed Description & Read More */}
             {activeTab === 'overview' && product.full_description && (
-              <div className="space-y-3.5 pt-4">
-                <h3 className="text-xl font-black text-white tracking-tight">About {product.name}</h3>
+              <div className="space-y-3.5 pt-2">
+                <h2 className="text-xl font-bold text-white tracking-tight">About {product.name}</h2>
                 <div
                   className={`text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal transition-all ${
                     !isDescExpanded ? 'max-h-48 overflow-hidden relative' : ''
@@ -816,7 +791,7 @@ export function EpicProductDetailClient({
                 >
                   <AutoLinkText text={product.full_description} />
                   {!isDescExpanded && (
-                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#121212] to-transparent pointer-events-none" />
+                    <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#121212] via-[#121212]/80 to-transparent pointer-events-none" />
                   )}
                 </div>
                 <button
@@ -829,6 +804,33 @@ export function EpicProductDetailClient({
                 </button>
               </div>
             )}
+
+            {/* Highlight Promo Card: Producer Toy Club / Toywards (Positioned cleanly below description) */}
+            <div className="p-5 sm:p-6 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-3 shadow-xl">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center flex-shrink-0">
+                  <ToywardsSparkleIcon size={20} className="text-[#FA742B]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white tracking-tight">
+                    Earn with Producer Toy Rewards
+                  </h3>
+                  <p className="text-xs text-zinc-300 mt-0.5 leading-relaxed">
+                    Earn cashback in Toywards balance on eligible purchases. Spend 1:1 on plugins and sound kits at checkout.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <Link
+                  href="/features/toywards"
+                  prefetch={true}
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-[#242424] hover:bg-[#2c2c2c] text-white border border-[#383838] text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Explore Toywards
+                </Link>
+              </div>
+            </div>
 
             {/* Add-ons Tab */}
             {activeTab === 'addons' && (
@@ -870,7 +872,7 @@ export function EpicProductDetailClient({
               width={360}
               height={144}
               unoptimized
-              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto filter brightness-200 contrast-200 drop-shadow-xl"
+              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto drop-shadow-md rounded-lg"
             />
           </div>
 
@@ -934,14 +936,14 @@ export function EpicProductDetailClient({
             )}
           </div>
 
-          {/* Desktop CTA Action Buttons */}
+          {/* Desktop CTA Action Buttons (Standardized h-12 Height & Icons) */}
           <div className="space-y-2.5 pt-1">
             {product.external_url ? (
               <a
                 href={product.external_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-3.5 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+                className="bg-[#FA742B] hover:bg-[#E05A18] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
@@ -949,7 +951,7 @@ export function EpicProductDetailClient({
             ) : isOwned ? (
               <Link
                 href="/library"
-                className="w-full py-3.5 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#1c1c1c] hover:bg-[#252525] border border-emerald-500/50 text-white transition-all shadow-md cursor-pointer"
+                className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#1c1c1c] hover:bg-[#252525] border border-emerald-500/50 text-white transition-all shadow-md cursor-pointer"
               >
                 <Check className="w-5 h-5 text-emerald-400" />
                 <span>In Library</span>
@@ -958,7 +960,7 @@ export function EpicProductDetailClient({
               <button
                 type="button"
                 disabled
-                className="w-full py-3.5 px-6 rounded-xl text-sm font-black uppercase tracking-wider bg-[#222222] border border-[#333333] text-zinc-400 cursor-not-allowed flex items-center justify-center select-none shadow-sm"
+                className="w-full h-12 px-6 rounded-xl text-sm font-black uppercase tracking-wider bg-[#222222] border border-[#333333] text-zinc-400 cursor-not-allowed flex items-center justify-center select-none shadow-sm"
               >
                 <span>COMING SOON</span>
               </button>
@@ -967,8 +969,13 @@ export function EpicProductDetailClient({
                 <button
                   type="button"
                   onClick={handleGetNow}
-                  className="flex-1 py-3.5 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
+                  className="flex-1 h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
                 >
+                  {Number(product.price_usd) === 0 ? (
+                    <Download className="w-4 h-4" />
+                  ) : (
+                    <ShoppingBag className="w-4 h-4" />
+                  )}
                   <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
                 </button>
                 <button
@@ -996,7 +1003,7 @@ export function EpicProductDetailClient({
               <button
                 type="button"
                 onClick={() => setGiftModalOpen(true)}
-                className="w-full py-3 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
+                className="w-full h-12 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
               >
                 <Gift className="w-4 h-4 text-zinc-300" />
                 <span>Gift</span>
@@ -1023,7 +1030,7 @@ export function EpicProductDetailClient({
                   short_description: product.short_description,
                 })
               }
-              className={`w-full py-3 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+              className={`w-full h-12 px-4 rounded-xl border text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                 isSaved
                   ? 'bg-white text-black border-white'
                   : 'bg-[#222222] hover:bg-[#2a2a2a] border-[#333333] text-white'
@@ -1079,10 +1086,10 @@ export function EpicProductDetailClient({
             <button
               type="button"
               onClick={handleShare}
-              className="w-full bg-[#161616] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full bg-[#1e1e1e] hover:bg-[#282828] border border-[#2e2e2e] text-zinc-300 hover:text-white h-11 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>{copied ? 'Copied!' : 'Share'}</span>
+              <Share2 className="w-4 h-4" />
+              <span>{copied ? 'Copied Link!' : 'Share'}</span>
             </button>
           </div>
         </div>

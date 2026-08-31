@@ -1003,27 +1003,29 @@ export function EpicStoreBrowser({
               </h2>
             </div>
 
-            {/* Keyword Search Input (Exact Epic Search Box) with Bottom Divider */}
-            <div className="relative pb-3 border-b border-white/[0.08]">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                placeholder="Keywords"
-                aria-label="Filter products by keywords"
-                className="w-full bg-[#202024] hover:bg-[#25252a] focus:bg-[#28282e] text-white text-sm pl-10 pr-9 h-11 rounded-xl border border-transparent focus:border-[#383840] placeholder:text-zinc-400 font-sans transition-all outline-none"
-              />
-              {searchKeyword && (
-                <button
-                  type="button"
-                  onClick={() => setSearchKeyword('')}
-                  aria-label="Clear keyword search"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
+            {/* Keyword Search Input with Clean Isolated Relative Container */}
+            <div className="pb-3.5 mb-1 border-b border-white/[0.08]">
+              <div className="relative flex items-center w-full">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <input
+                  type="text"
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder="Keywords"
+                  aria-label="Filter products by keywords"
+                  className="w-full bg-[#202024] hover:bg-[#25252a] focus:bg-[#28282e] text-white text-sm pl-10 pr-9 h-11 rounded-xl border border-transparent focus:border-[#383840] placeholder:text-zinc-500 font-sans transition-all outline-none"
+                />
+                {searchKeyword && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchKeyword('')}
+                    aria-label="Clear keyword search"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-0.5 cursor-pointer z-10"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Dynamic Sorted Accordion Sections with Compact 38-42px Row Height */}
