@@ -198,11 +198,45 @@ export function EpicProductDetailClient({
     }
   }
 
-  const handleShare = () => {
-    if (typeof window !== 'undefined') {
-      navigator.clipboard.writeText(window.location.href)
+  const handleShare = async () => {
+    if (typeof window === 'undefined') return
+    const shareUrl = window.location.href
+    const shareTitle = `${product.name} - Producer Toy`
+    const shareText = `Check out ${product.name} on Producer Toy Store!`
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        })
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2500)
+        return
+      } catch (err: any) {
+        if (err?.name === 'AbortError') return
+      }
+    }
+
+    // Fallback: Copy to clipboard
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = shareUrl
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
       setCopied(true)
       setTimeout(() => setCopied(false), 2500)
+    } catch (e) {
+      console.error('Failed to copy share link:', e)
     }
   }
 
@@ -390,11 +424,13 @@ export function EpicProductDetailClient({
         </div>
 
         {/* D. Price Display */}
-        <div className="space-y-1 text-left">
+        <div className="space-y-1">
           {isOwned ? (
-            <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-2.5 py-1 rounded-md border border-[#303030] inline-block mb-1 tracking-wider">
-              ALREADY OWNED
-            </span>
+            <div className="flex justify-center w-full">
+              <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-3 py-1 rounded-md border border-[#303030] tracking-wider text-center">
+                ALREADY OWNED
+              </span>
+            </div>
           ) : product.is_coming_soon ? (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-2xl font-black text-white uppercase tracking-tight">COMING SOON</span>
@@ -545,6 +581,29 @@ export function EpicProductDetailClient({
               )}
             </button>
           )}
+
+          {/* Mobile Share Button */}
+          <button
+            type="button"
+            onClick={handleShare}
+            className={`w-full py-3 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+              copied
+                ? 'bg-zinc-800 text-white border-zinc-500 shadow-md'
+                : 'bg-[#1c1c1c] hover:bg-[#252525] border-[#303030] text-zinc-200 hover:text-white'
+            }`}
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>Link Copied to Clipboard!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4 text-zinc-300" />
+                <span>Share Product</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* F. Metadata Specs List */}
@@ -876,9 +935,11 @@ export function EpicProductDetailClient({
 
           <div className="space-y-2">
             {isOwned ? (
-              <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-2.5 py-1 rounded-md border border-[#303030] inline-block mb-1 tracking-wider">
-                ALREADY OWNED
-              </span>
+              <div className="flex justify-center w-full">
+                <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-3 py-1 rounded-md border border-[#303030] tracking-wider text-center">
+                  ALREADY OWNED
+                </span>
+              </div>
             ) : product.is_coming_soon ? (
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-2xl font-black text-white uppercase tracking-tight">COMING SOON</span>
@@ -1078,10 +1139,23 @@ export function EpicProductDetailClient({
             <button
               type="button"
               onClick={handleShare}
-              className="w-full bg-[#1e1e1e] hover:bg-[#282828] border border-[#2e2e2e] text-zinc-300 hover:text-white h-11 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className={`w-full h-11 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+                copied
+                  ? 'bg-zinc-800 text-white border-zinc-500 shadow-md'
+                  : 'bg-[#1e1e1e] hover:bg-[#282828] border-[#2e2e2e] text-zinc-300 hover:text-white'
+              }`}
             >
-              <Share2 className="w-4 h-4" />
-              <span>{copied ? 'Copied Link!' : 'Share'}</span>
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>Link Copied to Clipboard!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 text-zinc-300" />
+                  <span>Share</span>
+                </>
+              )}
             </button>
           </div>
         </div>
