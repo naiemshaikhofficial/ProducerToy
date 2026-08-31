@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Mail, Sparkles, Check } from 'lucide-react'
 
-export const BlogNewsletterCard: React.FC = () => {
+export function BlogNewsletterCard() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
 
@@ -28,7 +28,7 @@ export const BlogNewsletterCard: React.FC = () => {
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-          Get Free VSTs & Mixing Guides Delivered
+          Get Free VSTs &amp; Mixing Guides Delivered
         </h2>
         <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-normal">
           Join 15,000+ modern music producers receiving our curated weekly sample packs, freeware alerts, and studio tutorials. No spam ever.
@@ -66,3 +66,5 @@ export const BlogNewsletterCard: React.FC = () => {
     </section>
   )
 }
+
+export default BlogNewsletterCard

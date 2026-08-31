@@ -6,7 +6,7 @@ interface BlogContentRendererProps {
   content: string
 }
 
-export const BlogContentRenderer: React.FC<BlogContentRendererProps> = ({ content }) => {
+export function BlogContentRenderer({ content }: BlogContentRendererProps) {
   if (!content) return null
 
   return (
@@ -318,3 +318,5 @@ export const BlogContentRenderer: React.FC<BlogContentRendererProps> = ({ conten
     </div>
   )
 }
+
+export default BlogContentRenderer

@@ -11,7 +11,7 @@ interface BlogCardProps {
   priority?: boolean
 }
 
-export const BlogCard: React.FC<BlogCardProps> = ({ post, priority = false }) => {
+export function BlogCard({ post, priority = false }: BlogCardProps) {
   const formattedDate = new Date(post.published_at || post.created_at).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -112,3 +112,5 @@ export const BlogCard: React.FC<BlogCardProps> = ({ post, priority = false }) =>
     </article>
   )
 }
+
+export default BlogCard

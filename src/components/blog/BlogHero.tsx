@@ -10,7 +10,7 @@ interface BlogHeroProps {
   post: BlogPost
 }
 
-export const BlogHero: React.FC<BlogHeroProps> = ({ post }) => {
+export function BlogHero({ post }: BlogHeroProps) {
   const formattedDate = new Date(post.published_at || post.created_at).toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -129,3 +129,5 @@ export const BlogHero: React.FC<BlogHeroProps> = ({ post }) => {
     </section>
   )
 }
+
+export default BlogHero

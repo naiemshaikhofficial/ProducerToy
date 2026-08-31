@@ -8,7 +8,7 @@ interface BlogShareButtonsProps {
   title: string
 }
 
-export const BlogShareButtons: React.FC<BlogShareButtonsProps> = ({ url, title }) => {
+export function BlogShareButtons({ url, title }: BlogShareButtonsProps) {
   const [copied, setCopied] = useState(false)
 
   const shareLinks = [
@@ -90,3 +90,5 @@ export const BlogShareButtons: React.FC<BlogShareButtonsProps> = ({ url, title }
     </div>
   )
 }
+
+export default BlogShareButtons

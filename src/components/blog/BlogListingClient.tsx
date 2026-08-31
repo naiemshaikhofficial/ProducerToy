@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react'
 import { BlogPost } from '@/lib/data/blogs'
 import { BlogCard } from './BlogCard'
-import { Search, X, SlidersHorizontal, BookOpen } from 'lucide-react'
+import { Search, X, BookOpen } from 'lucide-react'
 
 interface BlogListingClientProps {
   initialPosts: BlogPost[]
@@ -19,10 +19,10 @@ const CATEGORIES = [
   'Freebies',
 ]
 
-export const BlogListingClient: React.FC<BlogListingClientProps> = ({
+export function BlogListingClient({
   initialPosts,
   featuredPostId,
-}) => {
+}: BlogListingClientProps) {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -139,7 +139,7 @@ export const BlogListingClient: React.FC<BlogListingClientProps> = ({
           <div className="space-y-1">
             <h4 className="text-lg font-bold text-white">No articles found</h4>
             <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto">
-              We couldn't find any articles matching &ldquo;{searchQuery || selectedCategory}&rdquo;. Try another search term or reset your filters.
+              We couldn&apos;t find any articles matching &ldquo;{searchQuery || selectedCategory}&rdquo;. Try another search term or reset your filters.
             </p>
           </div>
           <button
@@ -157,3 +157,5 @@ export const BlogListingClient: React.FC<BlogListingClientProps> = ({
     </div>
   )
 }
+
+export default BlogListingClient
