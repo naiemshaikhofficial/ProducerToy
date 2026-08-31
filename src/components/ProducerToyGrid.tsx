@@ -32,28 +32,32 @@ export function ProducerToyGrid({ products, title = "Producer Toy Originals" }: 
     <section className="w-full my-10 sm:my-16 lg:my-20 select-none">
       {/* Header Row with Arrow Navigation */}
       <div className="flex items-center justify-between mb-5 sm:mb-7">
-        <Link 
-          href="/store?brand=producer-toy" 
-          prefetch={true}
-          className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
-        >
-          <span>{title}</span>
-          <ChevronRight className="w-6 h-6 text-white group-hover:translate-x-1 transition-transform" />
-        </Link>
+        <h2>
+          <Link 
+            href="/store?brand=producer-toy" 
+            prefetch={true}
+            className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
+          >
+            <span>{title}</span>
+            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </h2>
 
         {/* Scroll Control Arrows */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer"
+            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
             aria-label="Scroll left"
+            title="Previous items"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer"
+            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
             aria-label="Scroll right"
+            title="Next items"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

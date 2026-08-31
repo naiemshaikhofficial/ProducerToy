@@ -60,7 +60,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
           demo_audio_url: p.demo_audio_url,
           vst_format: p.vst_format,
           short_description: p.short_description,
-          statusBadge: isFree ? 'Free' : 'Now On Producer Toy',
+          statusBadge: isFree ? 'Free' : (p.subcategory_name || (p as any).category_name || (p.product_type ? p.product_type.replace('_', ' ') : 'Audio Tool')),
           statusType: isFree ? 'free' : 'new',
           releaseDate: `Available 08/${24 + idx}/26`,
         }
@@ -119,7 +119,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
         demo_audio_url: p.demo_audio_url,
         vst_format: p.vst_format,
         short_description: p.short_description,
-        statusBadge: hasDiscount ? `-${discountPercent}%` : isFree ? 'Free' : 'Now On Producer Toy',
+        statusBadge: hasDiscount ? `-${discountPercent}%` : isFree ? 'Free' : (p.subcategory_name || (p as any).category_name || 'Original'),
         statusType: hasDiscount ? 'discount' : isFree ? 'free' : 'regular',
       }
     })
@@ -219,21 +219,22 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                       <button
                         type="button"
                         onClick={(e) => handleBookmarkClick(e, item)}
-                        className={`absolute top-1 right-1 w-5 h-5 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
+                        aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
+                        className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/20 z-10 ${
                           isSaved
-                            ? 'bg-white text-black opacity-100'
-                            : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80 opacity-0 group-hover:opacity-100'
+                            ? 'bg-white text-black opacity-100 shadow-md'
+                            : 'bg-black/75 text-white/90 hover:text-white hover:bg-white hover:text-black opacity-0 group-hover:opacity-100 shadow-sm'
                         }`}
                         title={isSaved ? 'Saved in Wishlist' : 'Save to Wishlist'}
                       >
-                        <Bookmark className={`w-2.5 h-2.5 ${isSaved ? 'fill-current' : ''}`} />
+                        <Bookmark className={`w-3 h-3 ${isSaved ? 'fill-current' : ''}`} />
                       </button>
                     </div>
 
                     {/* Metadata & Price Row */}
                     <div className="flex-1 min-w-0 flex flex-col justify-center space-y-1">
                       {/* Product Title */}
-                      <h3 className="font-bold text-white text-[14px] leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
+                      <h3 className="font-bold text-white text-sm sm:text-base leading-normal line-clamp-1 group-hover:text-zinc-200 transition-colors">
                         {item.name}
                       </h3>
 
@@ -246,7 +247,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         </div>
                       ) : isDiscount ? (
                         <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                          <span className="bg-[#FA742B] text-white font-black text-[10.5px] px-1.5 py-0.5 rounded">
+                          <span className="bg-[#FA742B] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
                             {item.statusBadge}
                           </span>
                           <span className="line-through text-zinc-500 text-xs font-normal">

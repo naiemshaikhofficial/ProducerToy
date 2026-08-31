@@ -378,10 +378,11 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   <button
                     type="button"
                     onClick={(e) => handleWishlistToggle(e, product)}
-                    className={`absolute top-4 right-4 w-9 h-9 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
+                    aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
+                    className={`absolute top-4 right-4 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                       isSaved
-                        ? 'bg-white text-black border-white'
-                        : 'bg-black/60 text-white/90 border-white/15 hover:bg-black/80'
+                        ? 'bg-white text-black border-white shadow-xl'
+                        : 'bg-black/75 text-white border-white/20 hover:bg-white hover:text-black shadow-lg'
                     }`}
                     title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
                   >
@@ -391,10 +392,10 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   {/* Hero Content Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 max-w-xl space-y-3.5 z-10">
                     
-                    {/* Main Product Title */}
-                    <h1 className="text-3xl lg:text-4xl font-black uppercase tracking-tight text-white leading-tight font-sans drop-shadow-xl">
+                    {/* Main Product Title (H2 for clean hierarchy, Natural Title Case) */}
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight font-sans drop-shadow-xl">
                       {product.name}
-                    </h1>
+                    </h2>
 
                     {/* Short Description */}
                     <p className="text-sm text-zinc-200 font-normal leading-relaxed line-clamp-2 drop-shadow-md max-w-md">
@@ -404,7 +405,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     {/* CTA Action Buttons Row */}
                     <div className="pt-1 flex items-center gap-3 flex-wrap">
                       <span
-                        className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs px-6 py-2.5 rounded-xl transition-colors uppercase tracking-wider shadow-lg active:scale-95 inline-flex items-center justify-center min-w-[120px]"
+                        className="bg-white hover:bg-zinc-200 text-black font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-colors uppercase tracking-wider shadow-lg active:scale-95 inline-flex items-center justify-center min-w-[120px]"
                       >
                         {isFree ? 'Get Free' : 'Buy Now'}
                       </span>
@@ -425,8 +426,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                             brand: product.brand
                           })
                         }}
-                        className="bg-[#1e1e1e]/80 hover:bg-[#282828] text-white border border-white/10 p-2.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center"
+                        className="bg-[#1e1e1e]/80 hover:bg-[#282828] text-white border border-white/15 p-2.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center"
                         title="Add to Cart"
+                        aria-label="Add to Cart"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -441,27 +443,35 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
         </div>
 
         {/* Right Sidebar Interactive Product Cards with Animated Progress Fill (PC Only) */}
-        <div className="col-span-3 flex flex-col justify-between gap-2.5 h-[450px]">
+        <div className="col-span-3 flex flex-col justify-between gap-2.5 h-[450px]" role="tablist" aria-label="Featured slides">
           {featuredList.map((item, idx) => {
             const isActive = idx === selectedIndex
             return (
               <button
                 key={item.id}
+                role="tab"
+                aria-selected={isActive}
+                aria-current={isActive ? 'true' : undefined}
                 onClick={() => handleSelect(idx)}
                 className={`relative flex-1 flex items-center gap-3.5 p-3 rounded-xl transition-all text-left overflow-hidden border ${
                   isActive
-                    ? 'bg-[#202020] border-[#2e2e2e] shadow-lg'
-                    : 'bg-[#121212]/90 hover:bg-[#181818] border-transparent hover:border-[#222222]'
+                    ? 'bg-[#222222] border-[#383838] shadow-lg ring-1 ring-white/10'
+                    : 'bg-[#161616] hover:bg-[#1c1c1c] border-[#262626] hover:border-[#383838] opacity-80 hover:opacity-100'
                 }`}
               >
                 {/* Active Animated Progress Fill Layer (PC Only) */}
                 {isActive && (
                   <div 
-                    className="absolute inset-0 bg-[#282828] transition-all duration-75 ease-linear origin-left pointer-events-none"
+                    className="absolute inset-0 bg-white/[0.08] transition-all duration-75 ease-linear origin-left pointer-events-none"
                     style={{ 
                       width: `${progress}%`
                     }}
                   />
+                )}
+
+                {/* Left Active Accent Bar */}
+                {isActive && (
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FA742B] rounded-l-xl z-20" aria-hidden="true" />
                 )}
 
                 {/* SQUARE Thumbnail Box */}

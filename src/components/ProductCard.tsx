@@ -198,10 +198,11 @@ export function ProductCard({ product }: { product: Product }) {
         <button 
           type="button"
           onClick={handleWishlistToggle}
-          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
+          aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
+          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/20 z-10 ${
             isSaved
-              ? 'bg-white text-black opacity-100 scale-105'
-              : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80 opacity-100 sm:opacity-0 group-hover:opacity-100'
+              ? 'bg-white text-black opacity-100 shadow-md'
+              : 'bg-black/75 text-white/90 hover:text-white hover:bg-white hover:text-black opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-sm'
           }`}
           title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
         >
@@ -213,27 +214,28 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             type="button"
             onClick={handlePlayToggle}
-            className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 bg-black/80 hover:bg-white hover:text-black text-white p-2 sm:p-2.5 rounded-full backdrop-blur-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all z-20 shadow-xl transform active:scale-95 border border-white/10"
-            aria-label="Audition audio"
+            className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-black/85 hover:bg-white hover:text-black text-white rounded-full backdrop-blur-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all z-20 shadow-xl active:scale-95 border border-white/20"
+            aria-label={isCurrentPlaying ? "Pause audio preview" : "Preview sound demo"}
+            title={isCurrentPlaying ? "Pause preview" : "Play preview"}
           >
             {isCurrentPlaying ? (
-              <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
+              <Pause className="w-4 h-4 fill-current" />
             ) : (
-              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current translate-x-0.5" />
+              <Play className="w-4 h-4 fill-current translate-x-0.5" />
             )}
           </button>
         )}
       </div>
 
       {/* Content Details Below Card (Exact Minimalist Epic Games Store Layout) */}
-      <div className="flex flex-col gap-1 sm:gap-1.5 px-0.5">
+      <div className="flex flex-col gap-1.5 px-0.5">
         {/* Subcategory / Tag */}
-        <span className="text-[11px] sm:text-xs font-semibold text-zinc-400 capitalize line-clamp-1">
+        <span className="text-xs font-semibold text-zinc-400 capitalize line-clamp-1">
           {subCategoryLabel}
         </span>
 
         {/* Title */}
-        <h3 className="text-sm sm:text-[15px] font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
+        <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-normal line-clamp-1 group-hover:text-zinc-200 transition-colors">
           {product.name}
         </h3>
 
@@ -250,7 +252,7 @@ export function ProductCard({ product }: { product: Product }) {
         </span>
 
         {/* Price Row */}
-        <div className="flex items-center gap-2 mt-1.5 pt-0.5">
+        <div className="flex items-center gap-2 mt-1 pt-0.5">
           {product.is_coming_soon ? (
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
               {product.release_date ? `Available ${product.release_date}` : 'Coming Soon'}
@@ -260,7 +262,7 @@ export function ProductCard({ product }: { product: Product }) {
           ) : (
             <>
               {discountPercent > 0 && (
-                <span className="text-[11px] bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded">
+                <span className="text-xs bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded">
                   -{discountPercent}%
                 </span>
               )}

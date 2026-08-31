@@ -71,14 +71,14 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
   if (sortedProducts.length === 0) return null
 
   return (
-    <section className="w-full select-none my-10 sm:my-16 lg:my-20">
+    <section className="w-full select-none my-10 sm:my-16 lg:my-20" aria-label="New Releases">
       {/* Desktop Header Row with Navigation Controls */}
       {productColumns.length > 1 && (
         <div className="hidden lg:flex items-center justify-end mb-4 sm:mb-5">
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => handleScroll('left')}
-              className="w-8 h-8 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/[0.06]"
+              className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
               aria-label="Previous releases"
               title="Previous"
             >
@@ -86,7 +86,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
             </button>
             <button
               onClick={() => handleScroll('right')}
-              className="w-8 h-8 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/[0.06]"
+              className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
               aria-label="Next releases"
               title="Next"
             >
@@ -99,13 +99,13 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
       {/* Outer Container (Flush with poster on mobile with border extending downwards from poster edges) */}
       <div className="w-full bg-[#121212] border border-white/[0.08] rounded-2xl overflow-hidden lg:bg-transparent lg:border-none lg:rounded-none lg:overflow-visible">
         
-        {/* Main Grid: Left Featured Card + Right Side-Scrollable 3-Item Columns */}
+        {/* Main Grid: Left Featured Card (3 cols) + Right Side-Scrollable 3-Item Columns (9 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-8 xl:gap-10 items-stretch">
           
           {/* ========================================================================= */}
-          {/* LEFT COLUMN: Featured "NEW RELEASES" Visual Card (Exact 1:1 Flush Match)  */}
+          {/* LEFT COLUMN: Featured "NEW RELEASES" Visual Card                          */}
           {/* ========================================================================= */}
-          <div className="lg:col-span-4 xl:col-span-4 flex flex-col">
+          <div className="lg:col-span-3 xl:col-span-3 flex flex-col">
             <Link
               href="/store?sort=newest"
               prefetch={true}
@@ -114,7 +114,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                 background: 'linear-gradient(135deg, #150600 0%, #2b0e02 30%, #581d03 65%, #180701 100%)',
               }}
             >
-              {/* 3D Glowing Crystal Prisms Background (Exact Epic Games Aesthetic in Producer Toy Orange) */}
+              {/* 3D Glowing Crystal Prisms Background */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Prism 1: Top Right Diamond Crystal */}
                 <div 
@@ -134,19 +134,18 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                 <div className="absolute bottom-16 right-1/4 w-2 h-2 bg-[#FFAE74] rounded-full blur-[0.5px] shadow-[0_0_10px_#FFAE74]" />
               </div>
 
-              {/* Glowing Polygonal Prisms Decor & Huge Condensed Typography */}
+              {/* Typography */}
               <div className="relative z-10 w-full flex-1 flex items-center justify-center pt-2 sm:pt-4">
                 <div className="space-y-2">
-                  {/* 1:1 Exact Epic Games Condensed Tall Bold Typography */}
-                  <h2 className="text-[44px] sm:text-[52px] lg:text-[54px] font-black uppercase tracking-tight text-white leading-[0.88] drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] font-sans">
+                  <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black uppercase tracking-tight text-white leading-[0.92] drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] font-sans">
                     NEW<br />RELEASES
                   </h2>
                 </div>
               </div>
 
-              {/* "See All" Action Button (Exact Epic Games Solid White Pill) */}
+              {/* "See All" Action Button */}
               <div className="relative z-10 w-full flex justify-center pb-2">
-                <span className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-8 sm:px-9 py-2 sm:py-2.5 rounded-lg shadow-xl transition-colors active:scale-95">
+                <span className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-7 py-2 sm:py-2.5 rounded-xl shadow-xl transition-colors active:scale-95">
                   See All
                 </span>
               </div>
@@ -156,7 +155,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
           {/* ========================================================================= */}
           {/* RIGHT COLUMN: Side-Scrollable Horizontal Carousel (3 Items Per Column)    */}
           {/* ========================================================================= */}
-          <div className="lg:col-span-8 xl:col-span-8 p-3.5 sm:p-4 lg:p-0">
+          <div className="lg:col-span-9 xl:col-span-9 p-3.5 sm:p-4 lg:p-0">
             <div 
               ref={scrollContainerRef}
               className="flex gap-4 overflow-x-auto scrollbar-none snap-x snap-mandatory pb-1"
@@ -201,51 +200,52 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                           <button
                             type="button"
                             onClick={(e) => handleBookmarkClick(e, item)}
-                            className={`absolute top-1 right-1 w-5 h-5 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/10 z-10 ${
+                            aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
+                            className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/20 z-10 ${
                               isSaved
-                                ? 'bg-white text-black opacity-100'
-                                : 'bg-black/60 text-white/80 hover:text-white hover:bg-black/80'
+                                ? 'bg-white text-black opacity-100 shadow-md'
+                                : 'bg-black/75 text-white/90 hover:text-white hover:bg-white hover:text-black opacity-0 group-hover:opacity-100 shadow-sm'
                             }`}
                             title={isSaved ? 'Saved in Wishlist' : 'Save to Wishlist'}
                           >
-                            <Bookmark className={`w-2.5 h-2.5 ${isSaved ? 'fill-current' : ''}`} />
+                            <Bookmark className={`w-3 h-3 ${isSaved ? 'fill-current' : ''}`} />
                           </button>
                         </div>
 
                         {/* Meta & Price Info */}
                         <div className="flex-1 min-w-0 flex flex-col justify-center space-y-1">
                           {/* Product Title */}
-                          <h3 className="font-bold text-white text-[13.5px] sm:text-[15px] leading-snug line-clamp-1">
+                          <h3 className="font-bold text-white text-sm sm:text-base leading-normal line-clamp-1">
                             {item.name}
                           </h3>
 
-                          {/* "Now on Producer Toy" Pill Badge */}
+                          {/* Dynamic Category / Brand metadata */}
                           <div>
-                            <span className="bg-[#242424] text-zinc-300 text-[10.5px] sm:text-[11px] font-medium px-2 py-0.5 rounded inline-block truncate max-w-full">
-                              Now On Producer Toy
+                            <span className="text-zinc-400 text-xs font-medium inline-block truncate max-w-full">
+                              {item.subcategory_name || (item as any).category_name || item.brand || (item.product_type ? item.product_type.replace('_', ' ') : 'Audio Tool')}
                             </span>
                           </div>
 
                           {/* Pricing Row */}
                           <div className="flex items-center gap-2 pt-0.5">
                             {isFree ? (
-                              <span className="text-white font-extrabold text-xs sm:text-sm tracking-tight">
+                              <span className="text-white font-bold text-xs sm:text-sm tracking-tight">
                                 Free
                               </span>
                             ) : hasDiscount ? (
                               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                                <span className="bg-[#FA742B] text-white font-black text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded">
+                                <span className="bg-[#FA742B] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
                                   -{discountPercent}%
                                 </span>
-                                <span className="line-through text-zinc-500 text-[11px] sm:text-xs font-normal">
+                                <span className="line-through text-zinc-500 text-xs font-normal">
                                   {formatPrice(originalPriceInr, originalPriceUsd)}
                                 </span>
-                                <span className="text-white font-extrabold text-xs sm:text-sm">
+                                <span className="text-white font-bold text-xs sm:text-sm">
                                   {formatPrice(priceInr, priceUsd)}
                                 </span>
                               </div>
                             ) : (
-                              <span className="text-white font-extrabold text-xs sm:text-sm">
+                              <span className="text-white font-bold text-xs sm:text-sm">
                                 {formatPrice(priceInr, priceUsd)}
                               </span>
                             )}

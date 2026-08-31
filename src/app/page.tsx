@@ -109,6 +109,7 @@ export default async function HomePage() {
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white flex flex-col items-center select-none">
+      <h1 className="sr-only">Producer Toy — Music Production VST Plugins, Samples & Presets</h1>
       
       {/* 1st Section: Epic Store Billboard Poster Banner (Desktop only - Hidden on Mobile) */}
       <section className="hidden lg:block w-full mt-3 sm:mt-4 mb-12 sm:mb-16">

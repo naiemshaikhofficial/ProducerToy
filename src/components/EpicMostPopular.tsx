@@ -35,20 +35,22 @@ export function EpicMostPopular({ products = [], title = "Most Popular" }: EpicM
     <section className="w-full my-10 sm:my-16 lg:my-20 select-none">
       {/* Header Row (Exact Epic Games Store: 'Most Popular >' on left + Scroll Arrows on right) */}
       <div className="flex items-center justify-between mb-5 sm:mb-7">
-        <Link
-          href="/store?sort=popular"
-          prefetch={true}
-          className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-zinc-300 transition-colors"
-        >
-          <span>{title}</span>
-          <ChevronRight className="w-5 h-5 text-white/80 group-hover:translate-x-1 transition-transform" />
-        </Link>
+        <h2>
+          <Link
+            href="/store?sort=popular"
+            prefetch={true}
+            className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-zinc-300 transition-colors"
+          >
+            <span>{title}</span>
+            <ChevronRight className="w-5 h-5 text-white/80 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </h2>
 
         {/* Scroll Control Arrows (< >) */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => scroll('left')}
-            className="w-8 h-8 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/[0.06]"
+            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
             aria-label="Scroll previous products"
             title="Previous"
           >
@@ -56,7 +58,7 @@ export function EpicMostPopular({ products = [], title = "Most Popular" }: EpicM
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-8 h-8 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/[0.06]"
+            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
             aria-label="Scroll next products"
             title="Next"
           >
