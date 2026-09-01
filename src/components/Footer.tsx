@@ -59,9 +59,11 @@ export function Footer() {
           <div className="md:col-span-2 md:px-6 md:border-r md:border-[#26262b] space-y-4">
             <h4 className="text-sm sm:text-base font-bold text-white tracking-tight uppercase tracking-wider">Help & Support</h4>
             <div className="space-y-2.5 text-xs text-zinc-400">
-              <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Contact Us</Link></div>
-              <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Order Support</Link></div>
+              <div><Link href="/support" prefetch={true} className="hover:text-white transition-colors">Help Center &amp; FAQs</Link></div>
+              <div><Link href="/support?tab=raise-ticket" prefetch={true} className="hover:text-white transition-colors">Raise Support Ticket</Link></div>
+              <div><Link href="/support?tab=track-ticket" prefetch={true} className="hover:text-white transition-colors">Track Ticket Status</Link></div>
               <div><Link href="/library" prefetch={true} className="hover:text-white transition-colors">License Retrieval</Link></div>
+              <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Contact &amp; Grievance</Link></div>
             </div>
           </div>
 
