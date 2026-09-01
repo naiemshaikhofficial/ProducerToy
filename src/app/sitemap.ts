@@ -3,8 +3,30 @@ import { getAdminClient } from '@/lib/supabase/admin'
 
 export const revalidate = 21600 // Revalidate sitemap every 6 hours automatically
 
+/**
+ * Escapes XML entities in URLs/locs to ensure valid XML sitemap output
+ * according to Google Sitemaps and XML 1.0 standard.
+ */
+function sanitizeXmlUrl(url: string | null | undefined): string | null {
+  if (!url || typeof url !== 'string' || !url.trim()) return null
+  const trimmed = url.trim()
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    return null
+  }
+  return trimmed
+    .replace(/&amp;/g, '&')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://producertoy.com'
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
+      : 'https://producertoy.com'
   const supabase = getAdminClient()
 
   // 1. Core Static Pages & High-Value SEO Hub Pages
@@ -78,13 +100,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // 3. Dynamic Products URLs with Direct Image Linking (Priority: 1.0)
     if (productsRes.data && productsRes.data.length > 0) {
-      productEntries = productsRes.data.map((p) => ({
-        url: `${baseUrl}/product/${encodeURIComponent(p.slug)}`,
-        lastModified: new Date(p.updated_at || p.created_at || new Date()),
-        changeFrequency: 'daily' as const,
-        priority: 1.0,
-        images: p.cover_image ? [p.cover_image] : undefined,
-      }))
+      productEntries = productsRes.data.map((p) => {
+        const sanitizedImg = sanitizeXmlUrl(p.cover_image)
+        return {
+          url: `${baseUrl}/product/${encodeURIComponent(p.slug)}`,
+          lastModified: new Date(p.updated_at || p.created_at || new Date()),
+          changeFrequency: 'daily' as const,
+          priority: 1.0,
+          images: sanitizedImg ? [sanitizedImg] : undefined,
+        }
+      })
     }
 
     // 4. Dynamic Categories & Subcategories URLs (Priority: 0.85)
@@ -127,25 +152,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // 6. Dynamic Blog Article URLs (Priority: 0.85)
     if (blogsRes.data && blogsRes.data.length > 0) {
-      blogEntries = blogsRes.data.map((b) => ({
-        url: `${baseUrl}/blog/${encodeURIComponent(b.slug)}`,
-        lastModified: new Date(b.updated_at || b.published_at || b.created_at || new Date()),
-        changeFrequency: 'weekly' as const,
-        priority: 0.85,
-        images: b.cover_image ? [b.cover_image] : undefined,
-      }))
+      blogEntries = blogsRes.data.map((b) => {
+        const sanitizedImg = sanitizeXmlUrl(b.cover_image)
+        return {
+          url: `${baseUrl}/blog/${encodeURIComponent(b.slug)}`,
+          lastModified: new Date(b.updated_at || b.published_at || b.created_at || new Date()),
+          changeFrequency: 'weekly' as const,
+          priority: 0.85,
+          images: sanitizedImg ? [sanitizedImg] : undefined,
+        }
+      })
     }
   } catch (err) {
     console.error('ProducerToy Sitemap generation error:', err)
   }
 
-  // Combine all routes cleanly without duplicates
+  // Combine all routes cleanly without duplicates and sanitize all XML entries
   const allEntries = [...staticRoutes, ...productEntries, ...categoryEntries, ...brandEntries, ...blogEntries]
   const uniqueUrlsMap = new Map<string, MetadataRoute.Sitemap[number]>()
 
   allEntries.forEach((entry) => {
-    if (!uniqueUrlsMap.has(entry.url)) {
-      uniqueUrlsMap.set(entry.url, entry)
+    const cleanUrl = sanitizeXmlUrl(entry.url)
+    if (cleanUrl && !uniqueUrlsMap.has(cleanUrl)) {
+      const cleanImages = entry.images
+        ?.map((img) => sanitizeXmlUrl(img))
+        .filter((img): img is string => Boolean(img))
+
+      uniqueUrlsMap.set(cleanUrl, {
+        ...entry,
+        url: cleanUrl,
+        images: cleanImages && cleanImages.length > 0 ? cleanImages : undefined,
+      })
     }
   })
 
