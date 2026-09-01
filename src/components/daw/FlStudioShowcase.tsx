@@ -827,6 +827,16 @@ export function FlStudioShowcase() {
 
       </div>
 
+      {/* 7. Legal Disclaimer & Affiliate Disclosure */}
+      <div className="pt-8 pb-4 border-t border-zinc-800/80 text-[11px] text-zinc-500 space-y-3 leading-relaxed max-w-4xl mx-auto text-center">
+        <p>
+          <strong className="text-zinc-400">Affiliate Disclosure:</strong> Producer Toy is an official Image-Line Affiliate Partner. When you click through our links and purchase an FL Studio license or upgrade, we may receive an affiliate commission at no additional cost to you. All prices, payment processing, product fulfillment, customer support, and serial activation are managed directly and securely by Image-Line Software NV, Belgium.
+        </p>
+        <p>
+          FL Studio®, Image-Line™, and their respective logos are registered trademarks of Image-Line Software NV. All rights reserved.
+        </p>
+      </div>
+
     </div>
   )
 }
