@@ -799,47 +799,28 @@ export function FlStudioShowcase() {
           </a>
         </div>
 
-        {/* Laptop / Screen Frame Display */}
+        {/* Laptop / Screen Frame Display with Real FL Studio WebM Demo */}
         <div className="relative mt-12 pt-4">
           <div className="absolute inset-0 bg-radial from-[#9333ea]/15 via-transparent to-transparent blur-3xl pointer-events-none" />
           
-          <div className="relative mx-auto max-w-4xl bg-[#141416] border border-zinc-800 rounded-2xl sm:rounded-3xl p-3 sm:p-5 shadow-2xl overflow-hidden">
-            <div className="flex items-center gap-1.5 pb-3 px-1 border-b border-zinc-800/80 text-[11px] text-zinc-500">
+          <div className="relative mx-auto max-w-5xl bg-[#141416] border border-zinc-800 rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 shadow-2xl overflow-hidden">
+            <div className="flex items-center gap-1.5 pb-3 px-2 border-b border-zinc-800/80 text-[11px] text-zinc-500">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block"></span>
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block"></span>
               <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block"></span>
-              <span className="ml-2 font-mono text-[10px] text-zinc-400">FL Studio 24 — Channel Rack &amp; Playlist</span>
+              <span className="ml-2 font-mono text-[10px] text-zinc-400">FL Studio 24 — Official Workflow &amp; Playlist Demo</span>
             </div>
 
-            {/* Interface Preview Graphic */}
-            <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden bg-[#101012] mt-3 border border-zinc-800/60 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#18181c] via-[#121214] to-[#0d0d0f] flex flex-col justify-between p-6">
-                <div className="flex items-center justify-between text-xs text-zinc-400 font-mono">
-                  <span>TEMPO: 128.00 BPM</span>
-                  <span>TIME: 20:07:02</span>
-                  <span>CPU: 4% (64-Bit)</span>
-                </div>
-                
-                <div className="flex items-center justify-center gap-6 py-8">
-                  <Image
-                    src="/images/daws/fl-studio.png"
-                    alt="FL Studio 24"
-                    width={100}
-                    height={100}
-                    className="object-contain drop-shadow-[0_12px_24px_rgba(255,107,0,0.4)]"
-                  />
-                  <div className="text-left space-y-1">
-                    <div className="text-xl sm:text-2xl font-black text-white">FL Studio 24 Workstation</div>
-                    <div className="text-xs text-zinc-400">Award-Winning Music Production Environment</div>
-                    <div className="text-xs text-[#FA742B] font-bold">Lifetime Free Updates Included</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-zinc-500">
-                  <span>Channel Rack • Piano Roll • Playlist • Mixer</span>
-                  <span>Image-Line NV</span>
-                </div>
-              </div>
+            {/* Official WebM Video Demo */}
+            <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-xl overflow-hidden bg-black mt-2.5 border border-zinc-800/60 shadow-inner">
+              <video
+                src="https://www.image-line.com/static/assets/fl-studio-screen-demo.17f534b.webm"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover object-center"
+              />
             </div>
           </div>
         </div>
