@@ -78,12 +78,7 @@ export default async function HomePage() {
           <FreeProducerToys products={products} />
         </div>
 
-        {/* 4th Section: Choose Your Favourite DAW */}
-        <div className="px-4 sm:px-0">
-          <ChooseYourDaw />
-        </div>
-
-        {/* 5th Section: 1:1 Epic Games New Releases (Sorted by created_at) */}
+        {/* 4th Section: 1:1 Epic Games New Releases (Sorted by created_at) */}
         <div className="px-4 sm:px-0">
           <EpicNewReleases products={products} />
         </div>
@@ -101,6 +96,11 @@ export default async function HomePage() {
         {/* 7th Section: 1:1 Epic Games Trending Row (High Demand & Latest Products) */}
         <div className="px-4 sm:px-0">
           <EpicTrending products={products} />
+        </div>
+
+        {/* 8th Section: Choose Your Favourite DAW (Last Section) */}
+        <div className="px-4 sm:px-0">
+          <ChooseYourDaw />
         </div>
 
       </div>
