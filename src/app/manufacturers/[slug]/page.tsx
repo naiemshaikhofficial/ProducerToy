@@ -10,7 +10,7 @@ import { CollectionPageJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { LocalDataCache } from '@/components/LocalDataCache'
 import { ArrowLeft, Building2, ExternalLink, Handshake, Sparkles, CheckCircle2, SlidersHorizontal } from 'lucide-react'
 
-export const revalidate = 3600 // Cache brand pages for 1 hour with on-demand ISR
+export const revalidate = false // 🟢 Infinite edge cache (purged on-demand via /api/revalidate)
 
 interface BrandPageProps {
   params: Promise<{ slug: string }>

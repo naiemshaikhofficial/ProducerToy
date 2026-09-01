@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 
-export async function createClient() {
+export const createClient = cache(async () => {
   const cookieStore = await cookies()
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://voalgeyexfhfitlyorfl.supabase.co'
@@ -17,8 +18,9 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
+            const domain = process.env.NODE_ENV === 'production' ? '.producertoy.com' : undefined
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, { ...options, domain })
             )
           } catch {
             // Server Component cookie set fallback
@@ -27,4 +29,21 @@ export async function createClient() {
       },
     }
   )
-}
+})
+
+/**
+ * 🟢 ZERO-RESOURCE USER FETCHER:
+ * Bypasses expensive Supabase Auth HTTP network calls if visitor has no session cookies (guest/bot).
+ * Deduplicates calls across the entire server component render tree via React.cache().
+ */
+export const getUser = cache(async () => {
+  const cookieStore = await cookies()
+
+  const hasSessionCookie = cookieStore.getAll().some(c => c.name.startsWith('sb-') || c.name.includes('-auth-token'))
+  if (!hasSessionCookie) {
+    return { data: { user: null }, error: null }
+  }
+
+  const supabase = await createClient()
+  return await supabase.auth.getUser()
+})

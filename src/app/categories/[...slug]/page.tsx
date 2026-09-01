@@ -9,7 +9,7 @@ import { matchesSearchQuery } from '@/lib/search'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 import { CollectionPageJsonLd } from '@/components/JsonLd'
 
-export const revalidate = 1800 // Cache category pages with ISR for 30 minutes (0ms instant page loads)
+export const revalidate = false // 🟢 Infinite edge cache (purged on-demand via /api/revalidate)
 
 interface CategoryPageProps {
   params: Promise<{ slug?: string[] }>

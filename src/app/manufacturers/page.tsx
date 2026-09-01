@@ -5,7 +5,7 @@ import { generatePageMetadata } from '@/lib/seo/metadata'
 import { CollectionPageJsonLd } from '@/components/JsonLd'
 import { Metadata } from 'next'
 
-export const revalidate = 3600 // Cache for 1 hour
+export const revalidate = false // 🟢 Infinite edge cache
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'Audio Plugin Manufacturers & Brands — Producer Toy',

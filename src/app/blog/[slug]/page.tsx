@@ -16,7 +16,7 @@ import { BlogShareButtons } from '@/components/blog/BlogShareButtons'
 import { BlogCard } from '@/components/blog/BlogCard'
 import { Clock, Calendar, ArrowLeft, Tag, BookOpen, Sparkles } from 'lucide-react'
 
-export const revalidate = 3600 // Edge Cache 1 Hour with on-demand instant purge
+export const revalidate = false // 🟢 Infinite edge cache
 
 export async function generateStaticParams() {
   const slugs = await getAllBlogSlugs()

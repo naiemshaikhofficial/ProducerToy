@@ -9,7 +9,7 @@ import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ProductCard, Product } from '@/components/ProductCard'
 import { FolderCheck, Cpu, HardDrive, CheckCircle2 } from 'lucide-react'
 
-export const revalidate = 1800 // Cache for 30 minutes
+export const revalidate = false // 🟢 Infinite edge cache
 
 interface DawConfig {
   slug: string

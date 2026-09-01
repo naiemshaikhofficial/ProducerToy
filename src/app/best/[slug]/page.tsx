@@ -8,7 +8,7 @@ import { ItemListJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from '@/components/Js
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { Star, Download, ExternalLink, ShieldCheck, Cpu } from 'lucide-react'
 
-export const revalidate = 1800 // Cache for 30 minutes
+export const revalidate = false // 🟢 Infinite edge cache
 
 interface BestOfConfig {
   slug: string

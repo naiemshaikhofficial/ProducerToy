@@ -6,7 +6,7 @@ import { CollectionPageJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from '@/compone
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { FreePageClient } from './FreePageClient'
 
-export const revalidate = 1800 // Cache static page for 30 minutes
+export const revalidate = false // 🟢 Infinite edge cache
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'Free Toys — Download Free VST Plugins, Samples & Sounds (2026)',

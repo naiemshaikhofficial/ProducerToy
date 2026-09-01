@@ -9,7 +9,8 @@ import { ProductJsonLd } from '@/components/JsonLd'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 import { getProductRatingStatsAction } from '@/actions/ratingActions'
 
-export const revalidate = 3600 // Cache static page for 1 hour (revalidate via /api/revalidate)
+// 🟢 ZERO-RESOURCE CDN CACHING: Infinite cache (purged on-demand via /api/revalidate webhook).
+export const revalidate = false
 
 // React cache wrapper: Ensures Database is queried EXACTLY ONCE per request instead of twice!
 const getCachedProduct = cache(async (slug: string) => {

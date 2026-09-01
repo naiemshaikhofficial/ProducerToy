@@ -9,7 +9,7 @@ import { CollectionPageJsonLd } from '@/components/JsonLd'
 import { EpicStoreBrowser } from '@/components/store/EpicStoreBrowser'
 import { generateStoreHeaderMeta } from '@/lib/store/metadataEngine'
 
-export const revalidate = 1800 // Cache static page for 30 minutes (instant 0ms loading, revalidated via /api/revalidate)
+export const revalidate = false // 🟢 Infinite edge cache (purged on-demand via /api/revalidate)
 
 interface StorePageProps {
   params: Promise<{ slug?: string[] }>

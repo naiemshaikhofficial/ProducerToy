@@ -7,7 +7,7 @@ import { BlogHero } from '@/components/blog/BlogHero'
 import { BlogListingClient } from '@/components/blog/BlogListingClient'
 import { BlogNewsletterCard } from '@/components/blog/BlogNewsletterCard'
 
-export const revalidate = 3600 // Edge Cache 1 Hour with on-demand instant purge
+export const revalidate = false // 🟢 Infinite edge cache
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'News & Production Guides | Music Production, Mixing & VST Tutorials',

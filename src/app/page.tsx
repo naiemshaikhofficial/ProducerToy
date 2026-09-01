@@ -16,7 +16,9 @@ import { EpicMostPopular } from '@/components/EpicMostPopular'
 import { EpicTrending } from '@/components/EpicTrending'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
-export const revalidate = 86400 // 24-hour Edge Cache (instant on-demand revalidation via /api/revalidate & Server Actions)
+// 🟢 ZERO-RESOURCE CDN CACHING: Infinite cache (purged on-demand via /api/revalidate webhook).
+// Secures 0 DB hits and 0 serverless executions under normal traffic.
+export const revalidate = false
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
