@@ -50,64 +50,7 @@ export const metadata: Metadata = generatePageMetadata({
 })
 
 export default async function HomePage() {
-  let products: Product[] = await getHomepageProducts()
-
-  if (products.length === 0) {
-    products = [
-      {
-        id: '1',
-        name: 'Analog Warmth Saturator VST',
-        slug: 'analog-warmth-saturator-vst',
-        brand: 'Producer Toy',
-        product_type: 'plugin',
-        price_inr: 1499,
-        price_usd: 19.99,
-        cover_image: 'https://imagizer.imageshack.com/img921/4770/lbZQ86.png',
-        demo_audio_url: 'https://cdn.freesound.org/previews/612/612683_5674468-lq.mp3',
-        vst_format: 'VST3, AU, AAX (64-Bit)',
-        short_description: 'Vintage analog saturation & tube warmth plugin for vocals, drums, and mixbus.',
-      },
-      {
-        id: '2',
-        name: 'Skull And Love Trap Drum Kit',
-        slug: 'skull-and-love',
-        brand: 'Producer Toy',
-        product_type: 'sample_pack',
-        price_inr: 999,
-        price_usd: 9.99,
-        cover_image: 'https://imagizer.imageshack.com/img922/1539/4FyC2M.png',
-        demo_audio_url: 'https://cdn.freesound.org/previews/573/573582_11861866-lq.mp3',
-        vst_format: 'WAV 24-Bit / 44.1kHz',
-        short_description: 'Dark UK & Brooklyn drill melodies, aggressive 808s, and hard-hitting drum loops.',
-      },
-      {
-        id: '3',
-        name: 'Serum Polyphonic Synth Presets',
-        slug: 'serum-polyphonic-synth-presets',
-        brand: 'Producer Toy',
-        product_type: 'preset',
-        price_inr: 799,
-        price_usd: 9.99,
-        cover_image: 'https://imagizer.imageshack.com/img924/8785/ZZlWA9.png',
-        demo_audio_url: 'https://cdn.freesound.org/previews/456/456123_1234567-lq.mp3',
-        vst_format: 'Xfer Serum v1.357+',
-        short_description: '64 Lush ambient pads, cyberpunk leads, and heavy Reese basses for Xfer Serum.',
-      },
-      {
-        id: '4',
-        name: 'FL Studio Trap Mixing Template',
-        slug: 'fl-studio-trap-mixing-template',
-        brand: 'Producer Toy',
-        product_type: 'template',
-        price_inr: 1199,
-        price_usd: 14.99,
-        cover_image: 'https://imagizer.imageshack.com/img922/4266/oEGOCb.png',
-        demo_audio_url: 'https://cdn.freesound.org/previews/321/321987_7654321-lq.mp3',
-        vst_format: 'FL Studio 20 / 21',
-        short_description: 'Pro mix bus routing, vocal chain preset, and punchy drum bus for FL Studio 21.',
-      }
-    ]
-  }
+  const products: Product[] = await getHomepageProducts()
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white flex flex-col items-center select-none">

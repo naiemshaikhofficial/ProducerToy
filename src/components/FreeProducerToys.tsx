@@ -25,68 +25,18 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
     (p) => Number(p.price_usd) === 0
   )
 
-  // Default curated fallback showcase if DB has fewer items
-  const defaultFreeShowcase: FreeItemDisplay[] = [
-    {
-      id: 'free-1',
-      name: 'TDR Nova Dynamic Precision EQ',
-      slug: 'tdr-nova',
-      cover_image: 'https://imagizer.imageshack.com/img922/4266/oEGOCb.png',
-      brand: 'Tokyo Dawn Labs',
-    },
-    {
-      id: 'free-2',
-      name: 'Valhalla Supermassive Space Echo',
-      slug: 'supermassive',
-      cover_image: 'https://imagizer.imageshack.com/img924/8785/ZZlWA9.png',
-      brand: 'Valhalla DSP',
-    },
-    {
-      id: 'free-3',
-      name: 'Fresh Air Dynamic High Exciter',
-      slug: 'fresh-air',
-      cover_image: 'https://imagizer.imageshack.com/img921/4770/lbZQ86.png',
-      brand: 'Slate Digital',
-    },
-    {
-      id: 'free-4',
-      name: 'Ample Guitar M Lite Acoustic VST',
-      slug: 'Ample-Guitar-M-Lite-II',
-      cover_image: 'https://imagizer.imageshack.com/img924/3264/Qym6pY.png',
-      brand: 'Ample Sound',
-    },
-  ]
+  // If no free products in database, do not render the section
+  if (freeProductsFromDb.length === 0) {
+    return null
+  }
 
-  // Merge DB free products with showcase items to ensure exactly 4 cards
-  const displayItems: FreeItemDisplay[] = (() => {
-    if (freeProductsFromDb.length >= 4) {
-      return freeProductsFromDb.slice(0, 4).map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        cover_image: p.cover_image,
-        brand: p.brand || 'Producer Toy',
-      }))
-    }
-
-    // Fill in from default showcase
-    const items: FreeItemDisplay[] = freeProductsFromDb.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      cover_image: p.cover_image,
-      brand: p.brand || 'Producer Toy',
-    }))
-
-    for (const def of defaultFreeShowcase) {
-      if (items.length >= 4) break
-      if (!items.some((it) => it.slug === def.slug)) {
-        items.push(def)
-      }
-    }
-
-    return items.slice(0, 4)
-  })()
+  const displayItems: FreeItemDisplay[] = freeProductsFromDb.slice(0, 4).map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    cover_image: p.cover_image,
+    brand: p.brand || 'Producer Toy',
+  }))
 
   return (
     <section className="w-full select-none">
