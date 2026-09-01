@@ -31,10 +31,10 @@ const DAW_CONFIGS: Record<string, DawConfig> = {
     slug: 'fl-studio',
     name: 'FL Studio',
     developer: 'Image-Line',
-    metaTitle: 'Buy FL Studio 24 (2026) — Official Pricing, Editions Comparison & Lifetime Free Updates',
-    headline: 'Buy FL Studio 24 — Official Pricing & Editions Comparison',
+    metaTitle: 'Buy FL Studio 26 (2026) — Official Pricing, Editions Comparison & Lifetime Free Updates',
+    headline: 'Buy FL Studio 26 — Official Pricing & Editions Comparison',
     description:
-      'Buy Image-Line FL Studio 24 with Lifetime Free Updates. Compare Fruity (₹2,599), Producer (₹7,500), Signature (₹15,000) & All Plugins Edition (₹21,750). Official Affiliate Partner.',
+      'Buy Image-Line FL Studio 26 with Lifetime Free Updates. Compare Fruity (₹2,599), Producer (₹7,500), Signature (₹15,000) & All Plugins Edition (₹21,750). Official Affiliate Partner.',
     supportedFormats: 'VST3, VST2, AU, CLAP (64-Bit)',
     vstFolderWindows: 'C:\\Program Files\\Common Files\\VST3',
     vstFolderMac: '/Library/Audio/Plug-Ins/VST3',
@@ -47,8 +47,8 @@ const DAW_CONFIGS: Record<string, DawConfig> = {
       'FL Studio All Plugins Edition price',
       'FL Studio Fruity Edition',
       'FL Studio Signature Bundle',
-      'FL Studio 24 buy',
-      'FL Studio 24 download',
+      'FL Studio 26 buy',
+      'FL Studio 26 download',
       'FL Studio Lifetime Free Updates',
       'FL Studio editions comparison 2026',
       'Image-Line FL Studio official license',
@@ -290,13 +290,13 @@ export default async function DawLandingPage({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': ['SoftwareApplication', 'Product'],
-              name: 'FL Studio 24',
+              name: 'FL Studio 26',
               alternateName: ['FL Studio', 'Image-Line FL Studio', 'FL Studio Producer Edition', 'FruityLoops'],
               applicationCategory: 'MultimediaApplication',
               operatingSystem: 'Windows 10, Windows 11 (64-Bit), macOS 10.15+ (Apple Silicon M1/M2/M3/M4 & Intel)',
-              softwareVersion: '24 (2026)',
+              softwareVersion: '26 (2026)',
               description:
-                'Buy Image-Line FL Studio 24 with Lifetime Free Updates. Complete DAW workstation featuring audio recording, stem separation, 100+ native instruments and effects, and lifetime license.',
+                'Buy Image-Line FL Studio 26 with Lifetime Free Updates. Complete DAW workstation featuring audio recording, stem separation, 100+ native instruments and effects, and lifetime license.',
               image: 'https://producertoy.com/images/daws/fl-studio.png',
               brand: {
                 '@type': 'Brand',
@@ -324,7 +324,7 @@ export default async function DawLandingPage({
                 offers: [
                   {
                     '@type': 'Offer',
-                    name: 'FL Studio 24 Fruity Edition',
+                    name: 'FL Studio 26 Fruity Edition',
                     price: '2599',
                     priceCurrency: 'INR',
                     url: 'https://go.image-line.com/qWL015',
@@ -332,7 +332,7 @@ export default async function DawLandingPage({
                   },
                   {
                     '@type': 'Offer',
-                    name: 'FL Studio 24 Producer Edition',
+                    name: 'FL Studio 26 Producer Edition',
                     price: '7500',
                     priceCurrency: 'INR',
                     url: 'https://go.image-line.com/qWL015',
@@ -340,7 +340,7 @@ export default async function DawLandingPage({
                   },
                   {
                     '@type': 'Offer',
-                    name: 'FL Studio 24 Signature Bundle',
+                    name: 'FL Studio 26 Signature Bundle',
                     price: '15000',
                     priceCurrency: 'INR',
                     url: 'https://go.image-line.com/qWL015',
@@ -348,7 +348,7 @@ export default async function DawLandingPage({
                   },
                   {
                     '@type': 'Offer',
-                    name: 'FL Studio 24 All Plugins Edition',
+                    name: 'FL Studio 26 All Plugins Edition',
                     price: '21750',
                     priceCurrency: 'INR',
                     url: 'https://go.image-line.com/qWL015',

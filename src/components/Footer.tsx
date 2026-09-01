@@ -166,7 +166,7 @@ export function Footer() {
           {/* Copyright Text Centered/Balanced with Back to Top */}
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-right">
             <p className="text-xs text-zinc-500 font-normal">
-              Producer Toy Limited. Copyright © 2011-2026 Producer Toy. All rights reserved.
+              Copyright © 2011-2026 Producer Toy. All rights reserved.
             </p>
 
             <button

@@ -19,11 +19,11 @@ interface DawCardItem {
 const DAW_ITEMS: DawCardItem[] = [
   {
     id: 'fl-studio',
-    name: 'FL Studio 24',
+    name: 'FL Studio 26',
     developer: 'Image-Line',
     slug: 'fl-studio',
     categoryTag: 'Digital Audio Workstation',
-    format: 'VST3 • VST2',
+    format: '',
     coverImage: '/images/daws/fl-studio.png',
     glowColor: 'rgba(255, 107, 0, 0.25)',
   },
@@ -46,7 +46,7 @@ export function ChooseYourDaw() {
             </Link>
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Browse compatible VST plugins, synth presets, and tools made for your workstation.
+            Official Image-Line FL Studio licenses with Lifetime Free Updates.
           </p>
         </div>
       </div>
@@ -84,11 +84,6 @@ export function ChooseYourDaw() {
 
               {/* Minimal Epic Games Store Light Glow Overlay on Hover */}
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-
-              {/* Format Badge (Top Left Pill) */}
-              <span className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] font-bold text-zinc-300 uppercase tracking-wider border border-white/10 z-10">
-                {daw.format}
-              </span>
             </div>
 
             {/* Content Details Below Card (Exact 1:1 ProductCard Layout) */}
@@ -112,10 +107,11 @@ export function ChooseYourDaw() {
 
               {/* Bottom Baseline Action */}
               <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/[0.04]">
-                <span className="text-xs font-bold text-zinc-400 group-hover:text-white transition-colors">
-                  Explore
+                <span className="text-xs font-bold text-zinc-400">
+                  From ₹2,599
                 </span>
-                <span className="text-xs text-white group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-1 font-bold">
+                <span className="text-xs text-white group-hover:text-[#FA742B] group-hover:translate-x-0.5 transition-all inline-flex items-center gap-1 font-bold">
+                  <span>Buy Now</span>
                   <ChevronRight size={14} />
                 </span>
               </div>
