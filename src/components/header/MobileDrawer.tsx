@@ -126,6 +126,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 <span>Toywards</span>
               </Link>
 
+              {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
               <Link
                 href="/gifts"
                 prefetch={true}
@@ -142,6 +143,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   </span>
                 )}
               </Link>
+              */}
 
               <Link
                 href="/store?on_sale=true"

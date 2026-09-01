@@ -519,7 +519,7 @@ export function EpicProductDetailClient({
             </div>
           )}
 
-          {/* Gift Button (Only if not coming soon) */}
+          {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
           {!product.is_coming_soon && (
             <button
               type="button"
@@ -533,6 +533,7 @@ export function EpicProductDetailClient({
               </span>
             </button>
           )}
+          */}
 
           {/* Wishlist Button */}
           <button
@@ -1051,7 +1052,7 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Gift Button (Only for paid items) */}
+            {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
             {!product.is_coming_soon && (Number(product.price_usd || 0) > 0 || Number(product.price_inr || 0) > 0) && (
               <button
                 type="button"
@@ -1065,6 +1066,7 @@ export function EpicProductDetailClient({
                 </span>
               </button>
             )}
+            */}
 
             {/* Wishlist Button */}
             <button
@@ -1186,9 +1188,9 @@ export function EpicProductDetailClient({
       />
 
       {/* ========================================================================= */}
-      {/* 6. 1:1 SEND GIFT MODAL POPUP                                              */}
+      {/* 6. 1:1 SEND GIFT MODAL POPUP (Temporarily Commented Out for Future Launch) */}
       {/* ========================================================================= */}
-      <SendGiftModal isOpen={giftModalOpen} onClose={() => setGiftModalOpen(false)} product={product} />
+      {/* <SendGiftModal isOpen={giftModalOpen} onClose={() => setGiftModalOpen(false)} product={product} /> */}
     </div>
   )
 }

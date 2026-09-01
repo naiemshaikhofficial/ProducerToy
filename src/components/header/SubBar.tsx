@@ -191,6 +191,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                 <Bookmark className="w-[19px] h-[19px] stroke-[1.8]" />
               </Link>
 
+              {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
               <Link
                 href="/gifts"
                 prefetch={true}
@@ -206,6 +207,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                   </span>
                 )}
               </Link>
+              */}
 
               <Link
                 href="/cart"
@@ -368,6 +370,7 @@ export const SubBar: React.FC<SubBarProps> = ({
             Wishlist
           </Link>
 
+          {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
           <Link
             href="/gifts"
             prefetch={true}
@@ -382,6 +385,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               </span>
             )}
           </Link>
+          */}
 
           <Link
             href="/cart"
