@@ -296,8 +296,6 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   }
 
   // Calculate Header Titles & Descriptions with dynamic scalability engine
-
-  // Calculate Header Titles & Descriptions with dynamic scalability engine
   const { title, description } = generateStoreHeaderMeta({
     searchQuery: queryText,
     isFree,
