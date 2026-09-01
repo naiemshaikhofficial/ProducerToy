@@ -118,6 +118,21 @@ export function EpicProductDetailClient({
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
   const added = isInCart(product.id)
 
+  // Free action for 100% free toys
+  const handleFreeAction = () => {
+    if (product.external_url) {
+      window.open(product.external_url, '_blank')
+      return
+    }
+    if (product.download_url || product.download_url_win || product.download_url_mac) {
+      const targetUrl = product.download_url || product.download_url_win || product.download_url_mac
+      window.open(targetUrl, '_blank')
+      return
+    }
+    addItem(product, true)
+  }
+
+  /* SLUG CHECKOUT (Temporarily Commented Out for Future Launch)
   const handleGetNow = () => {
     if (product.external_url) {
       window.open(product.external_url, '_blank')
@@ -139,6 +154,7 @@ export function EpicProductDetailClient({
       brand: product.brands?.name || product.brand || 'Producer Toy',
     })
   }
+  */
 
   const ytVideoId = (() => {
     const url = product.youtube_url || product.video_url
@@ -495,27 +511,29 @@ export function EpicProductDetailClient({
             </button>
           ) : (
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleGetNow}
-                className="flex-1 py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.98] shadow-lg shadow-[#FA742B]/20"
-              >
-                <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => addItem(product, true)}
-                className={`w-14 h-14 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
-                  added
-                    ? 'bg-[#282828] hover:bg-[#303030] border-[#383838] text-white'
-                    : 'bg-[#202020] hover:bg-[#2c2c2c] border-[#303030] text-zinc-200 hover:text-white'
-                }`}
-                aria-label="Add to cart"
-                title={added ? 'In Cart' : 'Add to Cart'}
-              >
-                {added ? <Check className="w-5 h-5 text-white" /> : <ShoppingCart className="w-5 h-5" />}
-              </button>
+              {Number(product.price_usd) === 0 ? (
+                <button
+                  type="button"
+                  onClick={handleFreeAction}
+                  className="w-full py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.98] shadow-lg shadow-[#FA742B]/20"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Free</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => addItem(product, true)}
+                  className={`w-full py-4 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] shadow-lg ${
+                    added
+                      ? 'bg-[#282828] hover:bg-[#303030] border border-[#383838] text-white'
+                      : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20'
+                  }`}
+                >
+                  {added ? <Check className="w-4 h-4 text-white" /> : <ShoppingCart className="w-4 h-4" />}
+                  <span>{added ? 'In Cart' : 'Add to Cart'}</span>
+                </button>
+              )}
             </div>
           )}
 
@@ -1019,36 +1037,30 @@ export function EpicProductDetailClient({
                 <span>COMING SOON</span>
               </button>
             ) : (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleGetNow}
-                  className="flex-1 h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
-                >
-                  {Number(product.price_usd) === 0 ? (
+              <div className="w-full">
+                {Number(product.price_usd) === 0 ? (
+                  <button
+                    type="button"
+                    onClick={handleFreeAction}
+                    className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
+                  >
                     <Download className="w-4 h-4" />
-                  ) : (
-                    <ShoppingBag className="w-4 h-4" />
-                  )}
-                  <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => addItem(product, true)}
-                  className={`w-12 h-12 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
-                    added
-                      ? 'bg-[#282828] hover:bg-[#303030] border-[#383838] text-white'
-                      : 'bg-[#222222] hover:bg-[#2c2c2c] border-[#303030] text-zinc-200 hover:text-white'
-                  }`}
-                  aria-label="Add to cart"
-                  title={added ? 'In Cart' : 'Add to Cart'}
-                >
-                  {added ? (
-                    <Check className="w-5 h-5 text-white" />
-                  ) : (
-                    <ShoppingCart className="w-5 h-5" />
-                  )}
-                </button>
+                    <span>Download Free</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => addItem(product, true)}
+                    className={`w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] shadow-lg ${
+                      added
+                        ? 'bg-[#282828] hover:bg-[#303030] border border-[#383838] text-white'
+                        : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20'
+                    }`}
+                  >
+                    {added ? <Check className="w-4 h-4 text-white" /> : <ShoppingCart className="w-4 h-4" />}
+                    <span>{added ? 'In Cart' : 'Add to Cart'}</span>
+                  </button>
+                )}
               </div>
             )}
 
