@@ -295,75 +295,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     console.error('Supabase store page query exception:', err)
   }
 
-  // Fallback Mock Products
-  if (!isFromDatabase && products.length === 0) {
-    let mockProducts: Product[] = [
-      {
-        id: 'valhalla-supermassive',
-        name: 'Valhalla Supermassive',
-        slug: 'valhalla-supermassive',
-        brand: 'Valhalla DSP',
-        category_slugs: ['reverb', 'delay', 'effects'],
-        brands: { id: 'valhalla', name: 'Valhalla DSP', slug: 'valhalla-dsp' },
-        product_type: 'plugin',
-        price_usd: 0,
-        original_price_usd: 49.99,
-        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
-        short_description: 'Lush reverbs, harmonic delays, and space echo clouds in one plugin.',
-      },
-      {
-        id: 'c527a285-1440-431e-a06e-ca798cbf4538',
-        name: 'Fresh Air',
-        slug: 'fresh-air',
-        brand: 'Slate Digital',
-        category_slugs: ['saturation', 'effects'],
-        brand_id: '3d6f7802-69f4-4bf9-af36-dd8ba37bca08',
-        brands: {
-          id: '3d6f7802-69f4-4bf9-af36-dd8ba37bca08',
-          name: 'Slate Digital',
-          slug: 'slate-digital',
-          logo_url: 'https://images.equipboard.com/uploads/item/image/93658/slate-digital-fresh-air-xl.webp?v=1785999836'
-        },
-        product_type: 'plugin',
-        price_inr: 0,
-        price_usd: 0,
-        cover_image: 'https://images.equipboard.com/uploads/item/image/93658/slate-digital-fresh-air-xl.webp?v=1785999836',
-        vst_format: 'VST3, AU, AAX (64-Bit)',
-        short_description: 'Add the smoothest high end you’ve ever heard without even a hint of harshness.',
-      },
-      {
-        id: 'b19c8010-7fdd-4569-96e3-957d1993e45a',
-        name: 'TDR Nova',
-        slug: 'tdr-nova',
-        brand: 'Tokyo Dawn Records',
-        category_slugs: ['eq'],
-        brands: { id: 'tdr', name: 'Tokyo Dawn Records', slug: 'tokyo-dawn-records' },
-        product_type: 'plugin',
-        price_usd: 0,
-        original_price_usd: 29.99,
-        cover_image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop',
-        short_description: 'Parallel dynamic equalizer plugin.',
-      },
-      {
-        id: '866725e6-9a20-4b09-8033-386bb83a5e83',
-        name: 'iZotope Ozone EQ',
-        slug: 'ozone-eq',
-        brand: 'iZotope',
-        category_slugs: ['eq'],
-        brands: { id: 'izotope', name: 'iZotope', slug: 'izotope' },
-        product_type: 'plugin',
-        price_usd: 0,
-        cover_image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop',
-        short_description: 'Surgical mixing and mastering EQ with transient processing.',
-      }
-    ]
-
-    if (isFree) {
-      mockProducts = mockProducts.filter(p => p.price_usd === 0)
-    }
-
-    products = mockProducts
-  }
+  // Calculate Header Titles & Descriptions with dynamic scalability engine
 
   // Calculate Header Titles & Descriptions with dynamic scalability engine
   const { title, description } = generateStoreHeaderMeta({
