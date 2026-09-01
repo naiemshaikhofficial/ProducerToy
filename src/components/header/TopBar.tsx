@@ -225,6 +225,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <span>Toywards</span>
                     </Link>
 
+                    {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
                     <Link
                       href="/gifts"
                       prefetch={true}
@@ -241,6 +242,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         </span>
                       )}
                     </Link>
+                    */}
 
                     <Link
                       href="/store?on_sale=true"

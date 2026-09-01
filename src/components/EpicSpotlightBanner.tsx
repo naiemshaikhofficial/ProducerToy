@@ -6,12 +6,12 @@ import Image from 'next/image'
 
 export function EpicSpotlightBanner() {
   return (
-    <div 
+    <div
       className="w-full relative overflow-hidden rounded-none shadow-2xl min-h-[380px] sm:min-h-[320px] lg:min-h-0 lg:aspect-[2008/783] bg-[#121212] flex flex-col justify-center select-none"
       style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
     >
       {/* Responsive Background Banner Image */}
-      <div 
+      <div
         className="absolute inset-0 z-0"
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'hidden' }}
       >
@@ -31,10 +31,10 @@ export function EpicSpotlightBanner() {
 
       {/* Epic Games Store Overlay Text & Button Block */}
       <div className="relative z-20 p-5 sm:p-6 pl-5 sm:pl-[8%] lg:pl-[10%] max-w-[540px] flex flex-col items-start text-left gap-2.5 sm:gap-3">
-        
+
         {/* Title Heading - Exact Epic Games Store Bold White */}
         <h2 className="text-[22px] sm:text-[26px] lg:text-[32px] font-bold text-white tracking-tight leading-[1.2] drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] font-sans">
-          World&apos;s Upcoming Platform For Music Production Toys
+          World&apos;s Upcoming Platform For Music Production Tools, plugins, software, preset and sample pack
         </h2>
 
         {/* Subtitle / Description - Exact Epic Games Store Clean Light Text */}
@@ -42,14 +42,14 @@ export function EpicSpotlightBanner() {
           Explore elite VST plugins, analog saturators, sample packs, 808s, synth presets, and DAW tools with your favorite producers.
         </p>
 
-        {/* "Play Now" Button - Pure White Button with Black Text (Exact Epic Games Store Style) */}
+        {/* "Browse Now" Button - Pure White Button with Black Text (Exact Epic Games Store Style) */}
         <div className="mt-2 sm:mt-3">
           <Link
             href="/store"
             prefetch={true}
             className="inline-flex items-center justify-center min-w-[150px] sm:min-w-[175px] h-[42px] sm:h-[48px] bg-white hover:bg-zinc-200 text-black font-bold text-[14px] sm:text-[15px] rounded-lg active:scale-95 transition-all shadow-xl tracking-wide font-sans cursor-pointer"
           >
-            Play Now
+            Browse Now
           </Link>
         </div>
       </div>
