@@ -11,7 +11,7 @@ interface DawCardItem {
   developer: string
   slug: string
   categoryTag: string
-  format: string
+  price: string
   coverImage: string
   glowColor: string
 }
@@ -22,8 +22,8 @@ const DAW_ITEMS: DawCardItem[] = [
     name: 'FL Studio 26',
     developer: 'Image-Line',
     slug: 'fl-studio',
-    categoryTag: 'Digital Audio Workstation',
-    format: '',
+    categoryTag: 'DAW Software',
+    price: 'From ₹2,599',
     coverImage: '/images/daws/fl-studio.png',
     glowColor: 'rgba(255, 107, 0, 0.25)',
   },
@@ -46,7 +46,7 @@ export function ChooseYourDaw() {
             </Link>
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Official Image-Line FL Studio licenses with Lifetime Free Updates.
+            Buy official digital audio workstation software licenses and upgrades.
           </p>
         </div>
       </div>
@@ -89,7 +89,7 @@ export function ChooseYourDaw() {
             {/* Content Details Below Card (Exact 1:1 ProductCard Layout) */}
             <div className="flex flex-col justify-between flex-1 px-0.5 min-h-[92px]">
               <div className="space-y-1">
-                {/* Category / Subcategory Tag */}
+                {/* Category Tag */}
                 <span className="text-xs font-semibold text-zinc-400 capitalize line-clamp-1 block">
                   {daw.categoryTag}
                 </span>
@@ -108,7 +108,7 @@ export function ChooseYourDaw() {
               {/* Bottom Baseline Action */}
               <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/[0.04]">
                 <span className="text-xs font-bold text-zinc-400">
-                  From ₹2,599
+                  {daw.price}
                 </span>
                 <span className="text-xs text-white group-hover:text-[#FA742B] group-hover:translate-x-0.5 transition-all inline-flex items-center gap-1 font-bold">
                   <span>Buy Now</span>
