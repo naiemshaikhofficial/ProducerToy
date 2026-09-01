@@ -10,9 +10,10 @@ interface EpicTrendingProps {
 }
 
 export function EpicTrending({ products = [], title = "Trending" }: EpicTrendingProps) {
-  // Sort products prioritizing featured + latest high-demand products
+  // Sort products prioritizing featured + latest released products (excluding coming soon)
   const trendingProducts = useMemo(() => {
     return [...products]
+      .filter((p) => !p.is_coming_soon)
       .sort((a, b) => {
         // 1. Featured items first
         if (a.is_featured && !b.is_featured) return -1

@@ -13,13 +13,15 @@ interface EpicMostPopularProps {
 export function EpicMostPopular({ products = [], title = "Most Popular" }: EpicMostPopularProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Sort by popularity & sales (featured products and top-performing audio tools)
+  // Sort by popularity & sales (excluding coming soon items)
   const popularProducts = useMemo(() => {
-    return [...products].sort((a, b) => {
-      if (a.is_featured && !b.is_featured) return -1
-      if (!a.is_featured && b.is_featured) return 1
-      return 0
-    })
+    return products
+      .filter((p) => !p.is_coming_soon)
+      .sort((a, b) => {
+        if (a.is_featured && !b.is_featured) return -1
+        if (!a.is_featured && b.is_featured) return 1
+        return 0
+      })
   }, [products])
 
   const scroll = (direction: 'left' | 'right') => {

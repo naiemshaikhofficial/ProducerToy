@@ -18,13 +18,15 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
   const { isWishlisted, toggleWishlist } = useWishlist()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // 1. Sort products strictly by created_at (newest releases first)
+  // 1. Sort released products strictly by created_at (excluding coming soon items)
   const sortedProducts = useMemo(() => {
-    return [...products].sort((a, b) => {
-      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
-      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
-      return dateB - dateA
-    })
+    return products
+      .filter((p) => !p.is_coming_soon)
+      .sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0
+        return dateB - dateA
+      })
   }, [products])
 
   // 2. Group products into columns of exactly 3 products per vertical slide
