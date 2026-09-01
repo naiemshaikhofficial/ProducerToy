@@ -6,7 +6,6 @@ import {
   AlertCircle,
   Clock,
   CheckCircle2,
-  HelpCircle,
   Send,
   MessageSquare,
   User,
@@ -50,7 +49,7 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
 
   const handleLookup = async (numToSearch = ticketNumber, emailToSearch = email) => {
     if (!numToSearch?.trim() || !emailToSearch?.trim()) {
-      setErrorMessage('Please provide both Ticket Number and Email Address.')
+      setErrorMessage('Please enter both Ticket Number and Email Address.')
       return
     }
 
@@ -89,7 +88,7 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
       if (res.success && res.newMessage) {
         setMessages((prev) => [...prev, res.newMessage!])
         setReplyText('')
-        setReplySuccess('Your reply has been posted successfully.')
+        setReplySuccess('Reply posted successfully.')
         setTimeout(() => setReplySuccess(''), 4000)
       } else {
         setErrorMessage(res.error || 'Failed to post reply.')
@@ -105,41 +104,41 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
     switch (status) {
       case 'OPEN':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            OPEN
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-200 border border-zinc-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Open
           </span>
         )
       case 'IN_PROGRESS':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-500/10 text-sky-400 border border-sky-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-            IN PROGRESS
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-950/50 text-blue-300 border border-blue-800/60">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            In Progress
           </span>
         )
       case 'WAITING_ON_CUSTOMER':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-400 border border-purple-500/30">
-            <Clock size={12} />
-            ACTION REQUIRED
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300 border border-zinc-700">
+            <Clock size={11} />
+            Action Required
           </span>
         )
       case 'RESOLVED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-            <CheckCircle2 size={12} />
-            RESOLVED
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/40 text-emerald-300 border border-emerald-800/60">
+            <CheckCircle2 size={11} />
+            Resolved
           </span>
         )
       case 'CLOSED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-zinc-700/40 text-zinc-400 border border-zinc-700">
-            CLOSED
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-900 text-zinc-500 border border-zinc-800">
+            Closed
           </span>
         )
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-zinc-800 text-zinc-300">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-300">
             {status}
           </span>
         )
@@ -149,24 +148,24 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'URGENT':
-        return <span className="text-[10px] font-bold uppercase text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded">Urgent</span>
+        return <span className="text-[10px] font-semibold uppercase text-rose-300 bg-rose-950/50 border border-rose-800/50 px-1.5 py-0.5 rounded">Urgent</span>
       case 'HIGH':
-        return <span className="text-[10px] font-bold uppercase text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded">High</span>
+        return <span className="text-[10px] font-semibold uppercase text-amber-300 bg-amber-950/50 border border-amber-800/50 px-1.5 py-0.5 rounded">High</span>
       case 'LOW':
-        return <span className="text-[10px] font-bold uppercase text-zinc-400 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded">Low</span>
+        return <span className="text-[10px] font-semibold uppercase text-zinc-400 bg-zinc-800 border border-zinc-700 px-1.5 py-0.5 rounded">Low</span>
       default:
-        return <span className="text-[10px] font-bold uppercase text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2 py-0.5 rounded">Normal</span>
+        return <span className="text-[10px] font-semibold uppercase text-zinc-300 bg-zinc-800 border border-zinc-700 px-1.5 py-0.5 rounded">Normal</span>
     }
   }
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       {/* Lookup Card */}
-      <div className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
+      <div className="bg-[#161618] border border-zinc-800/90 rounded-2xl p-5 sm:p-7 shadow-xl space-y-4">
         <div className="space-y-1">
-          <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">Lookup Support Ticket</h3>
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">Lookup Support Ticket</h3>
           <p className="text-xs text-zinc-400">
-            Enter your Ticket Reference ID (e.g. <span className="text-[#FA742B] font-mono font-bold">PT-TK-XXXXX</span>) and registered email.
+            Enter your Ticket ID (e.g. <span className="font-mono text-zinc-300">PT-TK-XXXXX</span>) and registered email address.
           </p>
         </div>
 
@@ -175,11 +174,11 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
             e.preventDefault()
             handleLookup()
           }}
-          className="grid grid-cols-1 sm:grid-cols-12 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-12 gap-3"
         >
-          <div className="sm:col-span-5 space-y-1.5">
-            <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              Ticket Number
+          <div className="sm:col-span-5 space-y-1">
+            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+              Ticket ID
             </label>
             <input
               type="text"
@@ -187,12 +186,12 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
               value={ticketNumber}
               onChange={(e) => setTicketNumber(e.target.value.toUpperCase())}
               placeholder="PT-TK-XXXXX"
-              className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm font-mono text-white focus:outline-none focus:border-[#FA742B] transition-colors uppercase"
+              className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono text-white focus:outline-none focus:border-zinc-600 transition-colors uppercase"
             />
           </div>
 
-          <div className="sm:col-span-5 space-y-1.5">
-            <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">
+          <div className="sm:col-span-5 space-y-1">
+            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider">
               Email Address
             </label>
             <input
@@ -200,8 +199,8 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. producer@domain.com"
-              className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors"
+              placeholder="producer@example.com"
+              className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors"
             />
           </div>
 
@@ -209,13 +208,13 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#FA742B] hover:bg-[#E05A18] disabled:opacity-50 text-white font-extrabold text-xs py-3.5 px-4 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-1.5 cursor-pointer h-[46px]"
+              className="w-full bg-white hover:bg-zinc-200 disabled:opacity-50 text-black font-extrabold text-xs py-2.5 px-4 rounded-xl uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer h-[42px]"
             >
               {loading ? (
                 <span>...</span>
               ) : (
                 <>
-                  <Search size={15} />
+                  <Search size={14} />
                   <span>Check</span>
                 </>
               )}
@@ -224,8 +223,8 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
         </form>
 
         {errorMessage && (
-          <div className="bg-rose-950/40 border border-rose-800/80 rounded-xl p-4 flex items-center gap-3 text-xs sm:text-sm text-rose-200">
-            <AlertCircle size={18} className="text-rose-400 flex-shrink-0" />
+          <div className="bg-rose-950/30 border border-rose-900/60 rounded-xl p-3 flex items-center gap-2.5 text-xs text-rose-300">
+            <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
@@ -233,46 +232,46 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
 
       {/* Ticket Details & Timeline */}
       {ticket && (
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Main Info Card */}
-          <div className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80">
+          <div className="bg-[#161618] border border-zinc-800/90 rounded-2xl p-5 sm:p-7 space-y-5 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-zinc-800/80">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-[#FA742B] font-bold">{ticket.ticket_number}</span>
+                  <span className="text-xs font-mono text-zinc-300 font-bold">{ticket.ticket_number}</span>
                   {getPriorityBadge(ticket.priority)}
                 </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">{ticket.subject}</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">{ticket.subject}</h2>
               </div>
               <div className="flex-shrink-0">{getStatusBadge(ticket.status)}</div>
             </div>
 
             {/* Metadata Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-              <div className="bg-[#121212] border border-zinc-800/80 rounded-xl p-3 space-y-1">
-                <span className="text-zinc-500 font-bold uppercase flex items-center gap-1.5">
-                  <Layers size={12} className="text-[#FA742B]" /> Category
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="bg-[#111113] border border-zinc-800/80 rounded-xl p-3 space-y-1">
+                <span className="text-zinc-500 font-semibold uppercase flex items-center gap-1.5">
+                  <Layers size={12} className="text-zinc-400" /> Category
                 </span>
                 <p className="text-white font-medium truncate">{ticket.category}</p>
               </div>
 
-              <div className="bg-[#121212] border border-zinc-800/80 rounded-xl p-3 space-y-1">
-                <span className="text-zinc-500 font-bold uppercase flex items-center gap-1.5">
-                  <Music2 size={12} className="text-[#FA742B]" /> DAW
+              <div className="bg-[#111113] border border-zinc-800/80 rounded-xl p-3 space-y-1">
+                <span className="text-zinc-500 font-semibold uppercase flex items-center gap-1.5">
+                  <Music2 size={12} className="text-zinc-400" /> DAW
                 </span>
                 <p className="text-white font-medium truncate">{ticket.daw || 'N/A'}</p>
               </div>
 
-              <div className="bg-[#121212] border border-zinc-800/80 rounded-xl p-3 space-y-1">
-                <span className="text-zinc-500 font-bold uppercase flex items-center gap-1.5">
-                  <Laptop size={12} className="text-[#FA742B]" /> Platform
+              <div className="bg-[#111113] border border-zinc-800/80 rounded-xl p-3 space-y-1">
+                <span className="text-zinc-500 font-semibold uppercase flex items-center gap-1.5">
+                  <Laptop size={12} className="text-zinc-400" /> Platform
                 </span>
                 <p className="text-white font-medium truncate">{ticket.os_platform || 'N/A'}</p>
               </div>
 
-              <div className="bg-[#121212] border border-zinc-800/80 rounded-xl p-3 space-y-1">
-                <span className="text-zinc-500 font-bold uppercase flex items-center gap-1.5">
-                  <Calendar size={12} className="text-[#FA742B]" /> Created
+              <div className="bg-[#111113] border border-zinc-800/80 rounded-xl p-3 space-y-1">
+                <span className="text-zinc-500 font-semibold uppercase flex items-center gap-1.5">
+                  <Calendar size={12} className="text-zinc-400" /> Date
                 </span>
                 <p className="text-white font-medium">
                   {new Date(ticket.created_at).toLocaleDateString('en-US', {
@@ -286,13 +285,13 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
           </div>
 
           {/* Messages & Conversation Thread */}
-          <div className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-center gap-2 pb-4 border-b border-zinc-800/60">
-              <MessageSquare size={18} className="text-[#FA742B]" />
-              <h3 className="text-base sm:text-lg font-bold text-white">Conversation Thread</h3>
+          <div className="bg-[#161618] border border-zinc-800/90 rounded-2xl p-5 sm:p-7 space-y-5 shadow-xl">
+            <div className="flex items-center gap-2 pb-3.5 border-b border-zinc-800/60">
+              <MessageSquare size={16} className="text-zinc-400" />
+              <h3 className="text-sm sm:text-base font-bold text-white">Conversation History</h3>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {messages.length === 0 ? (
                 <p className="text-xs text-zinc-500 italic">No messages found in this thread.</p>
               ) : (
@@ -301,27 +300,27 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                   return (
                     <div
                       key={msg.id}
-                      className={`p-4 sm:p-5 rounded-2xl space-y-2 border ${
+                      className={`p-4 rounded-xl space-y-2 border ${
                         isSupport
-                          ? 'bg-[#1b2333] border-blue-900/60 ml-0 sm:mr-8'
-                          : 'bg-[#141414] border-zinc-800/80 mr-0 sm:ml-8'
+                          ? 'bg-[#1a2130] border-blue-900/40 ml-0 sm:mr-6'
+                          : 'bg-[#111113] border-zinc-800/80 mr-0 sm:ml-6'
                       }`}
                     >
                       <div className="flex items-center justify-between gap-2 text-xs">
                         <div className="flex items-center gap-2">
                           <div
-                            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                              isSupport ? 'bg-blue-600 text-white' : 'bg-[#FA742B] text-white'
+                            className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                              isSupport ? 'bg-blue-600 text-white' : 'bg-zinc-700 text-zinc-200'
                             }`}
                           >
-                            {isSupport ? <Headphones size={13} /> : <User size={13} />}
+                            {isSupport ? <Headphones size={11} /> : <User size={11} />}
                           </div>
-                          <span className="font-bold text-white">
-                            {isSupport ? 'Producer Toy Audio Desk' : msg.sender_name || 'Customer'}
+                          <span className="font-semibold text-white">
+                            {isSupport ? 'Producer Toy Support' : msg.sender_name || 'Customer'}
                           </span>
                           {isSupport && (
-                            <span className="bg-blue-500/20 text-blue-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded">
-                              Official Support
+                            <span className="bg-blue-500/10 text-blue-300 text-[10px] uppercase font-bold px-1.5 py-0.2 rounded">
+                              Official
                             </span>
                           )}
                         </div>
@@ -335,7 +334,7 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                         </span>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed pl-8">
+                      <p className="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed pl-7">
                         {msg.message}
                       </p>
                     </div>
@@ -346,22 +345,22 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
 
             {/* Reply Box */}
             {ticket.status !== 'CLOSED' ? (
-              <form onSubmit={handleSendReply} className="pt-4 border-t border-zinc-800/80 space-y-3">
-                <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                  Post a Follow-Up Reply
+              <form onSubmit={handleSendReply} className="pt-3.5 border-t border-zinc-800/80 space-y-2.5">
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                  Post a Reply
                 </label>
                 <textarea
                   required
                   rows={3}
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
-                  placeholder="Provide additional details, system specs, or answer technician questions..."
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors resize-none"
+                  placeholder="Type additional details or answer questions from the support desk..."
+                  className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors resize-none"
                 />
 
                 {replySuccess && (
                   <p className="text-xs text-emerald-400 font-medium flex items-center gap-1.5">
-                    <CheckCircle2 size={14} />
+                    <CheckCircle2 size={13} />
                     <span>{replySuccess}</span>
                   </p>
                 )}
@@ -370,13 +369,13 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                   <button
                     type="submit"
                     disabled={replying || !replyText.trim()}
-                    className="bg-[#FA742B] hover:bg-[#E05A18] disabled:opacity-50 text-white font-bold text-xs py-2.5 px-6 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+                    className="bg-white hover:bg-zinc-200 disabled:opacity-50 text-black font-bold text-xs py-2 px-5 rounded-lg uppercase tracking-wider transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
                   >
                     {replying ? (
                       <span>Sending...</span>
                     ) : (
                       <>
-                        <Send size={13} />
+                        <Send size={12} />
                         <span>Send Reply</span>
                       </>
                     )}
@@ -384,8 +383,8 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                 </div>
               </form>
             ) : (
-              <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-xl text-center text-xs text-zinc-400">
-                This ticket has been marked as closed. If you have new questions, please raise a new ticket.
+              <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-xl text-center text-xs text-zinc-400">
+                This ticket has been marked as closed.
               </div>
             )}
           </div>

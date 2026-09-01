@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { ChevronDown, Sparkles, HelpCircle, Layers, Key, Download, Laptop, ShieldCheck } from 'lucide-react'
+import { ChevronDown, HelpCircle, Layers, Key, Download, Laptop, ShieldCheck, ShoppingBag } from 'lucide-react'
 
 export interface FAQItem {
   id: string
@@ -145,11 +145,11 @@ const FAQ_DATA: FAQItem[] = [
 
 const CATEGORIES = [
   { id: 'all', label: 'All FAQs', icon: Layers },
-  { id: 'orders', label: 'Orders & Billing', icon: Sparkles },
-  { id: 'licenses', label: 'License Keys & Serials', icon: Key },
-  { id: 'downloads', label: 'Downloads & Installation', icon: Download },
-  { id: 'daw', label: 'DAW & Troubleshooting', icon: Laptop },
-  { id: 'account', label: 'Account & Security', icon: ShieldCheck },
+  { id: 'orders', label: 'Orders & Billing', icon: ShoppingBag },
+  { id: 'licenses', label: 'Serial Keys', icon: Key },
+  { id: 'downloads', label: 'Downloads', icon: Download },
+  { id: 'daw', label: 'DAW Setup', icon: Laptop },
+  { id: 'account', label: 'Account', icon: ShieldCheck },
 ]
 
 interface FaqSectionProps {
@@ -190,9 +190,9 @@ export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps
   }, [selectedCategory, searchQuery])
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Category Filter Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon
           const isActive = selectedCategory === cat.id
@@ -200,10 +200,10 @@ export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer border ${
                 isActive
-                  ? 'bg-[#FA742B] border-[#FA742B] text-white shadow-lg shadow-[#FA742B]/20'
-                  : 'bg-[#181818] border-[#28282e] text-zinc-400 hover:text-white hover:border-zinc-600'
+                  ? 'bg-zinc-100 border-zinc-100 text-zinc-900 shadow-sm'
+                  : 'bg-[#161618] border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -215,19 +215,19 @@ export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps
 
       {/* FAQs List */}
       {filteredFaqs.length === 0 ? (
-        <div className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-10 text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-zinc-800/60 border border-zinc-700 flex items-center justify-center mx-auto text-zinc-400">
-            <HelpCircle className="w-6 h-6" />
+        <div className="bg-[#161618] border border-zinc-800 rounded-xl p-8 text-center space-y-3">
+          <div className="w-10 h-10 rounded-full bg-zinc-800/80 border border-zinc-700 flex items-center justify-center mx-auto text-zinc-400">
+            <HelpCircle className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-white">No exact matching answers found</h3>
-          <p className="text-xs text-zinc-400 max-w-md mx-auto">
-            Can&apos;t find what you&apos;re looking for? Our dedicated technical support engineering team is ready to help.
+          <h3 className="text-sm font-bold text-white">No matching answers found</h3>
+          <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+            Need further help? Reach out directly by submitting a support ticket.
           </p>
           {onSelectRaiseTicket && (
             <div className="pt-2">
               <button
                 onClick={onSelectRaiseTicket}
-                className="bg-[#FA742B] hover:bg-[#E05A18] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl transition-all shadow-lg cursor-pointer"
+                className="bg-white hover:bg-zinc-200 text-black text-xs font-bold px-4 py-2 rounded-lg transition-all cursor-pointer"
               >
                 Raise a Support Ticket
               </button>
@@ -235,43 +235,43 @@ export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps
           )}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredFaqs.map((faq) => {
             const isOpen = openIds.has(faq.id)
             return (
               <div
                 key={faq.id}
-                className={`bg-[#181818] border transition-all rounded-xl overflow-hidden ${
-                  isOpen ? 'border-[#FA742B]/60 shadow-lg shadow-black/40' : 'border-zinc-800/80 hover:border-zinc-700'
+                className={`bg-[#161618] border transition-all rounded-xl overflow-hidden ${
+                  isOpen ? 'border-zinc-700 bg-[#1a1a1d]' : 'border-zinc-800/80 hover:border-zinc-700'
                 }`}
               >
                 <button
                   onClick={() => toggleOpen(faq.id)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 transition-colors cursor-pointer"
+                  className="w-full px-4.5 py-4 text-left flex items-center justify-between gap-3 transition-colors cursor-pointer"
                   aria-expanded={isOpen}
                 >
-                  <span className="text-sm sm:text-base font-bold text-white tracking-tight flex items-start gap-3">
-                    <span className="text-[#FA742B] font-mono text-xs mt-1">Q.</span>
+                  <span className="text-xs sm:text-sm font-semibold text-white tracking-tight flex items-start gap-2.5">
+                    <span className="text-zinc-500 font-mono text-xs mt-0.5">Q.</span>
                     <span>{faq.question}</span>
                   </span>
                   <div
-                    className={`w-7 h-7 rounded-lg bg-[#202025] flex items-center justify-center flex-shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-[#FA742B]' : 'text-zinc-400'
+                    className={`w-6 h-6 rounded-md bg-[#202023] flex items-center justify-center flex-shrink-0 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-white' : 'text-zinc-400'
                     }`}
                   >
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-3.5 h-3.5" />
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-zinc-800/40">
-                    <div className="pl-6 pt-2 space-y-3">
+                  <div className="px-4.5 pb-4.5 pt-0 text-xs text-zinc-300 leading-relaxed border-t border-zinc-800/50">
+                    <div className="pl-5 pt-3 space-y-2.5">
                       <p>{faq.answer}</p>
                       <div className="flex flex-wrap items-center gap-1.5 pt-1">
                         {faq.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="bg-[#202025] border border-zinc-700/50 text-[10px] text-zinc-400 px-2 py-0.5 rounded-md uppercase font-medium"
+                            className="bg-[#202023] border border-zinc-800 text-[10px] text-zinc-400 px-2 py-0.5 rounded uppercase font-medium"
                           >
                             #{tag}
                           </span>

@@ -9,7 +9,6 @@ import {
   Receipt,
   FileText,
   Clock,
-  Sparkles,
   HelpCircle,
   ShieldCheck,
   Building2,
@@ -60,23 +59,23 @@ function SupportClientInner() {
       <div className="max-w-5xl mx-auto space-y-12">
         
         {/* Hero Header Section */}
-        <div className="text-center space-y-5 pt-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FA742B]/10 border border-[#FA742B]/30 text-[#FA742B] text-xs font-extrabold uppercase tracking-wider">
-            <Headphones size={14} />
-            <span>Producer Toy Support Hub</span>
+        <div className="text-center space-y-4 pt-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 text-xs font-semibold tracking-wider uppercase">
+            <Headphones size={13} className="text-zinc-400" />
+            <span>Support Desk</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            How can we help you today?
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+            How can we help?
           </h1>
-          <p className="text-xs sm:text-sm text-zinc-400 max-w-xl mx-auto leading-relaxed">
-            Search our instant knowledge base for VST activation, DAW setup, order retrieval, or open a direct ticket with our audio engineering team.
+          <p className="text-xs sm:text-sm text-zinc-400 max-w-lg mx-auto leading-relaxed">
+            Search answers for VST activation, DAW setup, order inquiries, or raise a ticket with our technical team.
           </p>
 
-          {/* Interactive Search Bar */}
-          <div className="max-w-2xl mx-auto relative pt-2">
+          {/* Minimal Search Bar */}
+          <div className="max-w-2xl mx-auto relative pt-3">
             <div className="relative flex items-center">
-              <Search className="w-5 h-5 text-zinc-500 absolute left-4 pointer-events-none" />
+              <Search className="w-4 h-4 text-zinc-500 absolute left-4 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
@@ -86,13 +85,13 @@ function SupportClientInner() {
                     setActiveTab('faq')
                   }
                 }}
-                placeholder="Search solutions (e.g. FL Studio VST3 rescan, missing serial, invoice, refund)..."
-                className="w-full bg-[#181818] border border-zinc-700/80 rounded-2xl pl-12 pr-4 py-4 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#FA742B] focus:ring-1 focus:ring-[#FA742B] transition-all shadow-xl"
+                placeholder="Search articles, DAW setups, serial keys, invoices..."
+                className="w-full bg-[#181818] border border-zinc-800 rounded-xl pl-11 pr-4 py-3.5 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 focus:bg-[#1a1a1a] transition-all shadow-sm"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 text-xs text-zinc-400 hover:text-white bg-zinc-800 px-2 py-1 rounded-md"
+                  className="absolute right-3.5 text-xs text-zinc-400 hover:text-white bg-zinc-800 px-2 py-0.5 rounded-md"
                 >
                   Clear
                 </button>
@@ -101,67 +100,67 @@ function SupportClientInner() {
 
             {/* Quick Topic Chips */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-3 text-[11px] text-zinc-400">
-              <span className="text-zinc-500 font-bold uppercase">Popular:</span>
+              <span className="text-zinc-600 font-medium">Quick links:</span>
               <button
                 onClick={() => {
                   setSearchQuery('serial key')
                   setActiveTab('faq')
                 }}
-                className="hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+                className="hover:text-white transition-colors cursor-pointer text-zinc-400 underline underline-offset-2"
               >
-                Serial Key Retrieval
+                Serial Keys
               </button>
-              <span className="text-zinc-700">•</span>
+              <span className="text-zinc-800">•</span>
               <button
                 onClick={() => {
                   setSearchQuery('FL Studio')
                   setActiveTab('faq')
                 }}
-                className="hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+                className="hover:text-white transition-colors cursor-pointer text-zinc-400 underline underline-offset-2"
               >
-                FL Studio VST3
+                FL Studio
               </button>
-              <span className="text-zinc-700">•</span>
+              <span className="text-zinc-800">•</span>
               <button
                 onClick={() => {
                   setSearchQuery('invoice')
                   setActiveTab('faq')
                 }}
-                className="hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+                className="hover:text-white transition-colors cursor-pointer text-zinc-400 underline underline-offset-2"
               >
-                GST / Tax Invoices
+                Invoices
               </button>
-              <span className="text-zinc-700">•</span>
+              <span className="text-zinc-800">•</span>
               <button
                 onClick={() => {
                   setSearchQuery('apple silicon')
                   setActiveTab('faq')
                 }}
-                className="hover:text-white underline underline-offset-2 transition-colors cursor-pointer"
+                className="hover:text-white transition-colors cursor-pointer text-zinc-400 underline underline-offset-2"
               >
-                Apple Silicon (M1-M4)
+                Apple Silicon
               </button>
             </div>
           </div>
         </div>
 
-        {/* Quick Self-Service Action Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Minimal Self-Service Action Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           <Link
             href="/library"
             prefetch={true}
-            className="group bg-[#181818] hover:bg-[#202025] border border-zinc-800/80 hover:border-zinc-700 rounded-2xl p-5 transition-all space-y-3 shadow-lg"
+            className="group bg-[#181818] hover:bg-[#1f1f23] border border-zinc-800/90 hover:border-zinc-700 rounded-xl p-4.5 transition-all space-y-2.5 shadow-sm"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#251b14] border border-[#FA742B]/30 flex items-center justify-center text-[#FA742B] group-hover:scale-110 transition-transform">
-              <Key size={20} />
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:text-white group-hover:border-zinc-700 transition-colors">
+              <Key size={16} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FA742B] transition-colors flex items-center gap-1.5">
+              <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-200 transition-colors flex items-center gap-1.5">
                 <span>My Library &amp; Serials</span>
-                <ArrowRight size={13} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-zinc-400" />
               </h4>
-              <p className="text-[11px] text-zinc-400 mt-1">
-                Instant access to serial numbers, downloads &amp; authorization guides.
+              <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
+                Access serial numbers &amp; installer downloads.
               </p>
             </div>
           </Link>
@@ -169,110 +168,110 @@ function SupportClientInner() {
           <Link
             href="/account?tab=transactions"
             prefetch={true}
-            className="group bg-[#181818] hover:bg-[#202025] border border-zinc-800/80 hover:border-zinc-700 rounded-2xl p-5 transition-all space-y-3 shadow-lg"
+            className="group bg-[#181818] hover:bg-[#1f1f23] border border-zinc-800/90 hover:border-zinc-700 rounded-xl p-4.5 transition-all space-y-2.5 shadow-sm"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#251b14] border border-[#FA742B]/30 flex items-center justify-center text-[#FA742B] group-hover:scale-110 transition-transform">
-              <Receipt size={20} />
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:text-white group-hover:border-zinc-700 transition-colors">
+              <Receipt size={16} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FA742B] transition-colors flex items-center gap-1.5">
+              <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-200 transition-colors flex items-center gap-1.5">
                 <span>Orders &amp; Invoices</span>
-                <ArrowRight size={13} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-zinc-400" />
               </h4>
-              <p className="text-[11px] text-zinc-400 mt-1">
-                View order history, payment receipts, and download GST tax invoices.
+              <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
+                View purchase history and tax receipts.
               </p>
             </div>
           </Link>
 
           <button
             onClick={() => setActiveTab('raise')}
-            className={`group text-left border rounded-2xl p-5 transition-all space-y-3 shadow-lg cursor-pointer ${
+            className={`group text-left border rounded-xl p-4.5 transition-all space-y-2.5 shadow-sm cursor-pointer ${
               activeTab === 'raise'
-                ? 'bg-[#202025] border-[#FA742B]'
-                : 'bg-[#181818] hover:bg-[#202025] border-zinc-800/80 hover:border-zinc-700'
+                ? 'bg-[#1f1f23] border-zinc-600'
+                : 'bg-[#181818] hover:bg-[#1f1f23] border-zinc-800/90 hover:border-zinc-700'
             }`}
           >
-            <div className="w-10 h-10 rounded-xl bg-[#251b14] border border-[#FA742B]/30 flex items-center justify-center text-[#FA742B] group-hover:scale-110 transition-transform">
-              <FileText size={20} />
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:text-white group-hover:border-zinc-700 transition-colors">
+              <FileText size={16} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FA742B] transition-colors flex items-center gap-1.5">
+              <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-200 transition-colors flex items-center gap-1.5">
                 <span>Raise a Ticket</span>
-                <ArrowRight size={13} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-zinc-400" />
               </h4>
-              <p className="text-[11px] text-zinc-400 mt-1">
-                Open a dedicated technical inquiry for audio desk engineering support.
+              <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
+                Submit an inquiry to audio technicians.
               </p>
             </div>
           </button>
 
           <button
             onClick={() => setActiveTab('track')}
-            className={`group text-left border rounded-2xl p-5 transition-all space-y-3 shadow-lg cursor-pointer ${
+            className={`group text-left border rounded-xl p-4.5 transition-all space-y-2.5 shadow-sm cursor-pointer ${
               activeTab === 'track'
-                ? 'bg-[#202025] border-[#FA742B]'
-                : 'bg-[#181818] hover:bg-[#202025] border-zinc-800/80 hover:border-zinc-700'
+                ? 'bg-[#1f1f23] border-zinc-600'
+                : 'bg-[#181818] hover:bg-[#1f1f23] border-zinc-800/90 hover:border-zinc-700'
             }`}
           >
-            <div className="w-10 h-10 rounded-xl bg-[#251b14] border border-[#FA742B]/30 flex items-center justify-center text-[#FA742B] group-hover:scale-110 transition-transform">
-              <Clock size={20} />
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:text-white group-hover:border-zinc-700 transition-colors">
+              <Clock size={16} />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white group-hover:text-[#FA742B] transition-colors flex items-center gap-1.5">
-                <span>Track Active Ticket</span>
-                <ArrowRight size={13} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-200 transition-colors flex items-center gap-1.5">
+                <span>Track Ticket</span>
+                <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all text-zinc-400" />
               </h4>
-              <p className="text-[11px] text-zinc-400 mt-1">
-                Check status &amp; post follow-up replies to existing tickets.
+              <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
+                Check status &amp; reply to open tickets.
               </p>
             </div>
           </button>
         </div>
 
-        {/* Main Tab Navigation */}
-        <div className="flex items-center justify-center border-b border-zinc-800/80 pb-px">
-          <div className="inline-flex bg-[#181818] border border-zinc-800/80 p-1.5 rounded-2xl gap-2">
+        {/* Minimal Tab Switcher */}
+        <div className="flex items-center justify-center border-b border-zinc-800 pb-px">
+          <div className="inline-flex bg-[#161618] border border-zinc-800/90 p-1 rounded-xl gap-1">
             <button
               onClick={() => setActiveTab('faq')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'faq'
-                  ? 'bg-[#FA742B] text-white shadow-md'
+                  ? 'bg-white text-black shadow-sm'
                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
               }`}
             >
-              <HelpCircle size={15} />
+              <HelpCircle size={14} />
               <span>Knowledge Base &amp; FAQs</span>
             </button>
 
             <button
               onClick={() => setActiveTab('raise')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'raise'
-                  ? 'bg-[#FA742B] text-white shadow-md'
+                  ? 'bg-white text-black shadow-sm'
                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
               }`}
             >
-              <FileText size={15} />
+              <FileText size={14} />
               <span>Raise a Ticket</span>
             </button>
 
             <button
               onClick={() => setActiveTab('track')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'track'
-                  ? 'bg-[#FA742B] text-white shadow-md'
+                  ? 'bg-white text-black shadow-sm'
                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
               }`}
             >
-              <Clock size={15} />
+              <Clock size={14} />
               <span>Track Ticket</span>
             </button>
           </div>
         </div>
 
         {/* Active Tab View */}
-        <div className="pt-2">
+        <div className="pt-1">
           {activeTab === 'faq' && (
             <FaqSection
               searchQuery={searchQuery}
@@ -294,45 +293,45 @@ function SupportClientInner() {
           )}
         </div>
 
-        {/* Statutory Merchant & Grievance Redressal Banner */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-10 border-t border-zinc-800/80 text-xs text-zinc-400">
+        {/* Minimal Merchant & Grievance Footer */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-8 border-t border-zinc-800/80 text-xs text-zinc-400">
           
-          <div className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-6 space-y-3 shadow-lg">
-            <div className="flex items-center gap-2 text-white font-bold text-sm">
-              <Building2 size={16} className="text-[#FA742B]" />
-              <span>Customer Care &amp; Studio Office</span>
+          <div className="bg-[#161618] border border-zinc-800/80 rounded-xl p-5 space-y-2.5">
+            <div className="flex items-center gap-2 text-white font-bold text-xs uppercase tracking-wider">
+              <Building2 size={15} className="text-zinc-400" />
+              <span>Customer Care &amp; Support Office</span>
             </div>
-            <div className="space-y-2 text-zinc-400">
+            <div className="space-y-1.5 text-zinc-400 text-xs">
               <p className="flex items-start gap-2">
-                <MapPin size={14} className="text-zinc-500 flex-shrink-0 mt-0.5" />
+                <MapPin size={13} className="text-zinc-500 flex-shrink-0 mt-0.5" />
                 <span>Producer Toy Studios, Sangamner, Maharashtra - 422605, India</span>
               </p>
               <p className="flex items-center gap-2">
-                <Mail size={14} className="text-zinc-500 flex-shrink-0" />
-                <span><strong>Direct Support:</strong> <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline">support@producertoy.com</a></span>
+                <Mail size={13} className="text-zinc-500 flex-shrink-0" />
+                <span>Email: <a href="mailto:support@producertoy.com" className="text-zinc-200 hover:underline">support@producertoy.com</a></span>
               </p>
               <p className="flex items-center gap-2">
-                <Clock size={14} className="text-zinc-500 flex-shrink-0" />
-                <span><strong>Support Operating Hours:</strong> 24/7 Priority Desk (Standard response &lt; 4 hours)</span>
+                <Clock size={13} className="text-zinc-500 flex-shrink-0" />
+                <span>Hours: 24/7 Desk (Average response &lt; 4 hours)</span>
               </p>
             </div>
           </div>
 
-          <div className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-6 space-y-3 shadow-lg">
-            <div className="flex items-center gap-2 text-white font-bold text-sm">
-              <ShieldCheck size={16} className="text-[#FA742B]" />
-              <span>Statutory Grievance Redressal (IT Act &amp; RBI)</span>
+          <div className="bg-[#161618] border border-zinc-800/80 rounded-xl p-5 space-y-2.5">
+            <div className="flex items-center gap-2 text-white font-bold text-xs uppercase tracking-wider">
+              <ShieldCheck size={15} className="text-zinc-400" />
+              <span>Statutory Grievance Redressal</span>
             </div>
-            <div className="space-y-2 text-zinc-400">
+            <div className="space-y-1.5 text-zinc-400 text-xs">
               <p>
-                <strong>Grievance &amp; Compliance Officer:</strong> Producer Toy Legal &amp; Compliance
+                <strong>Compliance Officer:</strong> Producer Toy Legal &amp; Compliance
               </p>
               <p className="flex items-center gap-2">
-                <Mail size={14} className="text-zinc-500 flex-shrink-0" />
-                <span><strong>Grievance Desk:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#FA742B] hover:underline">grievance@producertoy.com</a></span>
+                <Mail size={13} className="text-zinc-500 flex-shrink-0" />
+                <span>Grievance Email: <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:underline">grievance@producertoy.com</a></span>
               </p>
               <p className="text-[11px] text-zinc-500 leading-relaxed">
-                In adherence to the Consumer Protection (E-Commerce) Rules 2020, all tickets are acknowledged instantaneously and grievances escalated to senior technical staff.
+                In compliance with Consumer Protection Rules 2020, tickets are processed directly by senior technical staff.
               </p>
             </div>
           </div>

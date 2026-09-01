@@ -109,43 +109,43 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
 
   if (createdTicket) {
     return (
-      <div className="bg-[#181818] border border-zinc-800 rounded-2xl p-8 sm:p-12 text-center space-y-6 shadow-2xl max-w-2xl mx-auto">
-        <div className="w-16 h-16 bg-[#251b14] border border-[#FA742B]/40 rounded-full flex items-center justify-center mx-auto text-[#FA742B]">
-          <CheckCircle2 size={36} />
+      <div className="bg-[#161618] border border-zinc-800 rounded-2xl p-8 sm:p-10 text-center space-y-5 shadow-xl max-w-xl mx-auto">
+        <div className="w-12 h-12 bg-zinc-900 border border-zinc-700 rounded-full flex items-center justify-center mx-auto text-zinc-200">
+          <CheckCircle2 size={28} />
         </div>
 
-        <div className="space-y-2">
-          <span className="text-xs font-bold text-[#FA742B] tracking-wider uppercase">Ticket Submitted</span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">We&apos;ve Received Your Request</h2>
-          <p className="text-xs sm:text-sm text-zinc-300 max-w-lg mx-auto leading-relaxed">
-            Your ticket has been prioritized and assigned to our technical audio engineering desk. We strive to reply within <strong>2 to 4 hours</strong>.
+        <div className="space-y-1.5">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Ticket Submitted</span>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">We&apos;ve Received Your Request</h2>
+          <p className="text-xs text-zinc-400 max-w-md mx-auto leading-relaxed">
+            Your inquiry has been assigned to our audio support desk. Average resolution turnaround is within <strong>2–4 hours</strong>.
           </p>
         </div>
 
         {/* Ticket Reference Code Badge */}
-        <div className="bg-[#121212] border border-zinc-700/80 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-md mx-auto">
+        <div className="bg-[#111113] border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 max-w-sm mx-auto">
           <div className="text-left">
-            <span className="text-[11px] uppercase tracking-wider text-zinc-500 font-bold block">Your Ticket Reference ID</span>
-            <span className="text-lg font-mono font-bold text-white tracking-widest text-[#FA742B]">
+            <span className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold block">Ticket Reference ID</span>
+            <span className="text-base font-mono font-bold text-white tracking-wider">
               {createdTicket.ticketNumber}
             </span>
           </div>
           <button
             onClick={handleCopyTicket}
-            className="flex items-center gap-2 bg-[#202025] hover:bg-[#2a2a30] text-zinc-300 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border border-zinc-700/50"
+            className="flex items-center gap-1.5 bg-[#202023] hover:bg-[#28282c] text-zinc-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer border border-zinc-700/60"
           >
-            {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-            <span>{copied ? 'Copied!' : 'Copy Code'}</span>
+            {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+            <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
           {onTicketCreated && (
             <button
               onClick={() => onTicketCreated(createdTicket.ticketNumber, createdTicket.email)}
-              className="w-full sm:w-auto bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs py-3 px-6 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-5 rounded-xl uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Search size={14} />
+              <Search size={13} />
               <span>Track Ticket Status</span>
             </button>
           )}
@@ -164,9 +164,9 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
                 description: '',
               })
             }}
-            className="w-full sm:w-auto bg-[#202020] hover:bg-[#2a2a2a] text-zinc-300 hover:text-white font-bold text-xs py-3 px-6 rounded-xl uppercase tracking-wider transition-all border border-zinc-700 cursor-pointer"
+            className="w-full sm:w-auto bg-[#202023] hover:bg-[#28282c] text-zinc-300 hover:text-white font-semibold text-xs py-2.5 px-5 rounded-xl uppercase tracking-wider transition-all border border-zinc-700/70 cursor-pointer"
           >
-            Submit Another Ticket
+            Submit Another
           </button>
         </div>
       </div>
@@ -176,128 +176,128 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-[#181818] border border-zinc-800/80 rounded-2xl p-6 sm:p-10 space-y-6 shadow-2xl"
+      className="bg-[#161618] border border-zinc-800/90 rounded-2xl p-6 sm:p-8 space-y-5 shadow-xl"
     >
       <div className="flex items-center gap-3 pb-4 border-b border-zinc-800/60">
-        <div className="w-10 h-10 rounded-xl bg-[#251b14] border border-[#FA742B]/30 flex items-center justify-center text-[#FA742B]">
-          <FileText size={20} />
+        <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+          <FileText size={16} />
         </div>
         <div>
-          <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">Raise a Technical Support Ticket</h3>
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">Open a Support Ticket</h3>
           <p className="text-xs text-zinc-400">
-            Submit your issue with technical specifics for faster resolution.
+            Provide technical details for prompt diagnosis.
           </p>
         </div>
       </div>
 
       {errorMessage && (
-        <div className="bg-rose-950/40 border border-rose-800/80 rounded-xl p-4 flex items-center gap-3 text-xs sm:text-sm text-rose-200">
-          <AlertCircle size={18} className="text-rose-400 flex-shrink-0" />
+        <div className="bg-rose-950/30 border border-rose-900/60 rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-rose-300">
+          <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
       {/* Row 1: Name & Email */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-            Your Full Name <span className="text-[#FA742B]">*</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+            Full Name
           </label>
           <input
             type="text"
             required
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="e.g. John Doe"
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors"
+            placeholder="John Doe"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors"
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-            Registered Email Address <span className="text-[#FA742B]">*</span>
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+            Email Address
           </label>
           <input
             type="email"
             required
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            placeholder="e.g. producer@domain.com"
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors"
+            placeholder="producer@example.com"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors"
           />
         </div>
       </div>
 
       {/* Row 2: Category & Priority */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-            <Tag size={13} className="text-[#FA742B]" />
-            <span>Issue Category <span className="text-[#FA742B]">*</span></span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+            <Tag size={12} className="text-zinc-400" />
+            <span>Category</span>
           </label>
           <select
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors cursor-pointer"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
           >
             {ISSUE_CATEGORIES.map((cat) => (
-              <option key={cat} value={cat} className="bg-[#141414] text-white">
+              <option key={cat} value={cat} className="bg-[#161618] text-white">
                 {cat}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-            <ShieldAlert size={13} className="text-[#FA742B]" />
-            <span>Priority Level</span>
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+            <ShieldAlert size={12} className="text-zinc-400" />
+            <span>Priority</span>
           </label>
           <select
             value={formData.priority}
             onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors cursor-pointer"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
           >
-            <option value="LOW" className="bg-[#141414] text-white">Low — General question / feedback</option>
-            <option value="NORMAL" className="bg-[#141414] text-white">Normal — Standard request</option>
-            <option value="HIGH" className="bg-[#141414] text-white">High — Cannot download or activate</option>
-            <option value="URGENT" className="bg-[#141414] text-white">Urgent — Production blocker / Live session</option>
+            <option value="LOW" className="bg-[#161618] text-white">Low — General inquiry</option>
+            <option value="NORMAL" className="bg-[#161618] text-white">Normal — Standard request</option>
+            <option value="HIGH" className="bg-[#161618] text-white">High — Activation/download blocked</option>
+            <option value="URGENT" className="bg-[#161618] text-white">Urgent — Live session blocker</option>
           </select>
         </div>
       </div>
 
       {/* Row 3: OS & DAW */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-            <Laptop size={13} className="text-[#FA742B]" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+            <Laptop size={12} className="text-zinc-400" />
             <span>Operating System</span>
           </label>
           <select
             value={formData.osPlatform}
             onChange={(e) => setFormData({ ...formData, osPlatform: e.target.value })}
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors cursor-pointer"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
           >
             {OS_OPTIONS.map((os) => (
-              <option key={os} value={os} className="bg-[#141414] text-white">
+              <option key={os} value={os} className="bg-[#161618] text-white">
                 {os}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-            <Music2 size={13} className="text-[#FA742B]" />
-            <span>Digital Audio Workstation (DAW)</span>
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+            <Music2 size={12} className="text-zinc-400" />
+            <span>DAW</span>
           </label>
           <select
             value={formData.daw}
             onChange={(e) => setFormData({ ...formData, daw: e.target.value })}
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors cursor-pointer"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
           >
             {DAW_OPTIONS.map((daw) => (
-              <option key={daw} value={daw} className="bg-[#141414] text-white">
+              <option key={daw} value={daw} className="bg-[#161618] text-white">
                 {daw}
               </option>
             ))}
@@ -305,67 +305,67 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
         </div>
       </div>
 
-      {/* Row 4: Order ID (Optional) & Subject */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-            Order / Invoice # (Optional)
+      {/* Row 4: Order ID & Subject */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+            Order ID (Optional)
           </label>
           <input
             type="text"
             value={formData.orderId}
             onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
-            placeholder="e.g. PT-ORD-92812"
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors"
+            placeholder="PT-ORD-XXXXX"
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors"
           />
         </div>
 
-        <div className="sm:col-span-2 space-y-2">
-          <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-            Subject Title <span className="text-[#FA742B]">*</span>
+        <div className="sm:col-span-2 space-y-1.5">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+            Subject
           </label>
           <input
             type="text"
             required
             value={formData.subject}
             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-            placeholder="Brief summary of the issue (e.g. Serial key failed on Arturia portal)"
-            className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors"
+            placeholder="Brief summary of the issue..."
+            className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors"
           />
         </div>
       </div>
 
       {/* Row 5: Detailed Description */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-          Detailed Description &amp; Error Messages <span className="text-[#FA742B]">*</span>
+      <div className="space-y-1.5">
+        <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+          Details &amp; Error Description
         </label>
         <textarea
           required
-          rows={5}
+          rows={4}
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          placeholder="Please describe what happened, steps you took, any exact error message strings or screenshot links (e.g. Imgur, Drive)..."
-          className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#FA742B] transition-colors resize-none"
+          placeholder="Describe what occurred, steps to reproduce, or link error screenshots..."
+          className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors resize-none"
         />
       </div>
 
       {/* Submit Button */}
-      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-[11px] text-zinc-500">
-          By submitting, you consent to our support technicians reviewing your order details.
+          Our support desk will reply directly to your email.
         </p>
         <button
           type="submit"
           disabled={loading}
-          className="w-full sm:w-auto bg-[#FA742B] hover:bg-[#E05A18] disabled:opacity-50 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
+          className="w-full sm:w-auto bg-white hover:bg-zinc-200 disabled:opacity-50 text-black font-extrabold text-xs py-3 px-6 rounded-xl uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer flex-shrink-0"
         >
           {loading ? (
             <span>Submitting...</span>
           ) : (
             <>
-              <Send size={15} />
-              <span>Submit Support Ticket</span>
+              <Send size={13} />
+              <span>Submit Ticket</span>
             </>
           )}
         </button>

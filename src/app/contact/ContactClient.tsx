@@ -59,34 +59,34 @@ export function ContactClient() {
         </div>
 
         {/* Support Center Quick Banner */}
-        <div className="bg-[#181818] border border-[#FA742B]/30 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#251b14] border border-[#FA742B]/40 flex items-center justify-center text-[#FA742B] flex-shrink-0">
-              <Headphones size={24} />
+        <div className="bg-[#161618] border border-zinc-800 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 flex-shrink-0">
+              <Headphones size={20} />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-white">Looking for faster resolution?</h3>
+              <h3 className="text-sm font-bold text-white">Looking for faster resolution?</h3>
               <p className="text-xs text-zinc-400">
-                Check our instant Knowledge Base, FAQs, or raise &amp; track a formal engineering ticket.
+                Browse our instant FAQs or raise &amp; track a formal engineering ticket.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2.5 w-full sm:w-auto flex-shrink-0">
+          <div className="flex items-center gap-2 w-full sm:w-auto flex-shrink-0">
             <Link
               href="/support"
               prefetch={true}
-              className="w-full sm:w-auto bg-[#FA742B] hover:bg-[#E05A18] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto bg-white hover:bg-zinc-200 text-black text-xs font-bold px-4 py-2 rounded-lg transition-all shadow-sm flex items-center justify-center gap-1.5"
             >
-              <Search size={14} />
-              <span>Help Center &amp; FAQs</span>
+              <Search size={13} />
+              <span>Help Center</span>
             </Link>
             <Link
               href="/support?tab=track"
               prefetch={true}
-              className="w-full sm:w-auto bg-[#202025] hover:bg-[#2a2a30] text-zinc-300 hover:text-white border border-zinc-700 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/60 text-xs font-semibold px-3.5 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5"
             >
               <span>Track Ticket</span>
-              <ArrowRight size={13} />
+              <ArrowRight size={12} />
             </Link>
           </div>
         </div>
