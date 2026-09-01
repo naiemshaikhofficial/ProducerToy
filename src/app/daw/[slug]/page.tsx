@@ -8,6 +8,7 @@ import { CollectionPageJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from '@/compone
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ProductCard, Product } from '@/components/ProductCard'
 import { FolderCheck, Cpu, HardDrive, CheckCircle2 } from 'lucide-react'
+import { FlStudioShowcase } from '@/components/daw/FlStudioShowcase'
 
 export const revalidate = false // 🟢 Infinite edge cache
 
@@ -227,8 +228,10 @@ export default async function DawLandingPage({
 
   const products: Product[] = (rawProducts as any[]) || []
 
+  const isFlStudio = slug === 'fl-studio'
+
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 text-white min-h-screen">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12 sm:space-y-16 text-white min-h-screen">
       {/* Schema.org Structured Data */}
       <CollectionPageJsonLd
         title={config.headline}
@@ -250,120 +253,143 @@ export default async function DawLandingPage({
         ]}
       />
 
-      {/* Hero Header Section */}
-      <div className="space-y-4 pt-2 border-b border-[#202020] pb-8">
-        <div className="flex items-center gap-2 text-xs text-zinc-400">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
-          <span>/</span>
-          <Link href="/free-vst-plugins" className="hover:text-white transition-colors">Free Plugins</Link>
-          <span>/</span>
-          <span className="text-white font-medium">{config.name}</span>
-        </div>
-
-        <div className="space-y-2">
-          <span className="bg-[#1f1f1f] text-[#FA742B] border border-[#FA742B]/30 text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider inline-block">
-            {config.developer} Compatible
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-            {config.headline}
-          </h1>
-          <p className="text-sm sm:text-base text-zinc-300 max-w-3xl leading-relaxed">
-            {config.description}
-          </p>
-        </div>
-
-        {/* Quick DAW Switcher Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pt-2">
-          {Object.values(DAW_CONFIGS).map((daw) => (
-            <Link
-              key={daw.slug}
-              href={`/daw/${daw.slug}`}
-              prefetch={true}
-              className={`text-xs font-semibold px-4 py-2 rounded-xl border whitespace-nowrap transition-colors ${
-                daw.slug === config.slug
-                  ? 'bg-white text-black border-white'
-                  : 'bg-[#181818] hover:bg-[#222222] text-zinc-300 hover:text-white border-[#2c2c2c]'
-              }`}
-            >
-              {daw.name}
-            </Link>
-          ))}
-        </div>
+      {/* Breadcrumbs */}
+      <div className="flex items-center gap-2 text-xs text-zinc-400">
+        <Link href="/" className="hover:text-white transition-colors">Home</Link>
+        <span>/</span>
+        <Link href="/store" className="hover:text-white transition-colors">DAW Hub</Link>
+        <span>/</span>
+        <span className="text-white font-medium">{config.name}</span>
       </div>
 
-      {/* DAW Quick Specs / VST Folder Guide Card */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
-          <div className="flex items-center gap-2 text-[#FA742B]">
-            <Cpu className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase tracking-wider text-white">Supported Formats</span>
+      {/* 🟢 Dedicated FL Studio Showcase (When slug is fl-studio) */}
+      {isFlStudio ? (
+        <FlStudioShowcase />
+      ) : (
+        /* Standard DAW Landing Page */
+        <div className="space-y-4 border-b border-[#202020] pb-8">
+          <div className="space-y-2">
+            <span className="bg-[#1f1f1f] text-[#FA742B] border border-[#FA742B]/30 text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider inline-block">
+              {config.developer} Compatible
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+              {config.headline}
+            </h1>
+            <p className="text-sm sm:text-base text-zinc-300 max-w-3xl leading-relaxed">
+              {config.description}
+            </p>
           </div>
-          <p className="text-sm font-semibold text-zinc-200">{config.supportedFormats}</p>
-          <p className="text-[11px] text-zinc-400">64-bit Architecture on Windows & macOS</p>
-        </div>
 
-        <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
-          <div className="flex items-center gap-2 text-sky-400">
-            <HardDrive className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase tracking-wider text-white">Windows VST3 Folder</span>
+          {/* Quick DAW Switcher Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pt-2">
+            {Object.values(DAW_CONFIGS).map((daw) => (
+              <Link
+                key={daw.slug}
+                href={`/daw/${daw.slug}`}
+                prefetch={true}
+                className={`text-xs font-semibold px-4 py-2 rounded-xl border whitespace-nowrap transition-colors ${
+                  daw.slug === config.slug
+                    ? 'bg-white text-black border-white'
+                    : 'bg-[#181818] hover:bg-[#222222] text-zinc-300 hover:text-white border-[#2c2c2c]'
+                }`}
+              >
+                {daw.name}
+              </Link>
+            ))}
           </div>
-          <code className="text-xs font-mono bg-[#1c1c1c] text-zinc-300 px-2 py-1 rounded block truncate">
-            {config.vstFolderWindows}
-          </code>
-          <p className="text-[11px] text-zinc-400">Default universal directory</p>
         </div>
+      )}
 
-        <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
-          <div className="flex items-center gap-2 text-emerald-400">
-            <FolderCheck className="w-4 h-4" />
-            <span className="text-xs font-bold uppercase tracking-wider text-white">macOS Audio Folder</span>
+      {/* DAW Quick Specs / VST Folder Guide Card (Non-FL Studio DAWs Only) */}
+      {!isFlStudio && (
+        <div className="space-y-4 pt-4 border-t border-zinc-800/80">
+          <div className="space-y-1">
+            <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+              {config.name} Technical Specifications &amp; VST Paths
+            </h3>
+            <p className="text-xs text-zinc-400">
+              Universal plugin format support and standard system directories.
+            </p>
           </div>
-          <code className="text-xs font-mono bg-[#1c1c1c] text-zinc-300 px-2 py-1 rounded block truncate">
-            {config.vstFolderMac}
-          </code>
-          <p className="text-[11px] text-zinc-400">Apple Silicon M1/M2/M3/M4 & Intel</p>
-        </div>
-      </div>
 
-      {/* Compatible Products Grid */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            Verified {config.name} Plugins & Sounds ({products.length})
-          </h2>
-          <span className="text-xs text-emerald-400 flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>100% Tested & Verified</span>
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
-
-      {/* FAQ Section */}
-      <div className="pt-10 border-t border-[#202020] space-y-6">
-        <div className="space-y-1">
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            {config.name} Plugin Installation FAQ
-          </h2>
-          <p className="text-xs text-zinc-400">
-            Common questions about installing and configuring audio plugins in {config.name}.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {config.faqs.map((faq, idx) => (
-            <div key={idx} className="bg-[#161616] border border-[#242424] rounded-xl p-5 space-y-2">
-              <h3 className="text-sm font-bold text-white">{faq.question}</h3>
-              <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">{faq.answer}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
+              <div className="flex items-center gap-2 text-[#FA742B]">
+                <Cpu className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-white">Supported Formats</span>
+              </div>
+              <p className="text-sm font-semibold text-zinc-200">{config.supportedFormats}</p>
+              <p className="text-[11px] text-zinc-400">64-bit Native on Windows &amp; macOS</p>
             </div>
-          ))}
+
+            <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
+              <div className="flex items-center gap-2 text-sky-400">
+                <HardDrive className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-white">Windows VST3 Folder</span>
+              </div>
+              <code className="text-xs font-mono bg-[#1c1c1c] text-zinc-300 px-2 py-1 rounded block truncate">
+                {config.vstFolderWindows}
+              </code>
+              <p className="text-[11px] text-zinc-400">Default universal directory</p>
+            </div>
+
+            <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <FolderCheck className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-wider text-white">macOS Audio Folder</span>
+              </div>
+              <code className="text-xs font-mono bg-[#1c1c1c] text-zinc-300 px-2 py-1 rounded block truncate">
+                {config.vstFolderMac}
+              </code>
+              <p className="text-[11px] text-zinc-400">Apple Silicon M1/M2/M3/M4 &amp; Intel</p>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Compatible Products Grid (Non-FL Studio DAWs Only) */}
+      {!isFlStudio && products.length > 0 && (
+        <div className="space-y-6 pt-4 border-t border-zinc-800/80">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Verified {config.name} Plugins, Presets &amp; Sounds ({products.length})
+            </h2>
+            <span className="text-xs text-emerald-400 flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>100% Tested &amp; Verified</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* FAQ Section (For Non-FL Studio DAWs) */}
+      {!isFlStudio && (
+        <div className="pt-10 border-t border-[#202020] space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              {config.name} Plugin Installation FAQ
+            </h2>
+            <p className="text-xs text-zinc-400">
+              Common questions about installing and configuring audio plugins in {config.name}.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {config.faqs.map((faq, idx) => (
+              <div key={idx} className="bg-[#161616] border border-[#242424] rounded-xl p-5 space-y-2">
+                <h3 className="text-sm font-bold text-white">{faq.question}</h3>
+                <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

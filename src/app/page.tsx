@@ -9,6 +9,7 @@ import { generatePageMetadata } from '@/lib/seo/metadata'
 import { EpicHeroCarousel } from '@/components/EpicHeroCarousel'
 import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
 import { FreeProducerToys } from '@/components/FreeProducerToys'
+import { ChooseYourDaw } from '@/components/ChooseYourDaw'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
@@ -77,7 +78,12 @@ export default async function HomePage() {
           <FreeProducerToys products={products} />
         </div>
 
-        {/* 4th Section: 1:1 Epic Games New Releases (Sorted by created_at) */}
+        {/* 4th Section: Choose Your Favourite DAW */}
+        <div className="px-4 sm:px-0">
+          <ChooseYourDaw />
+        </div>
+
+        {/* 5th Section: 1:1 Epic Games New Releases (Sorted by created_at) */}
         <div className="px-4 sm:px-0">
           <EpicNewReleases products={products} />
         </div>
