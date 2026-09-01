@@ -39,7 +39,7 @@ export function Footer() {
               <div><Link href="/categories/sounds" prefetch={true} className="hover:text-white transition-colors">Sample Packs</Link></div>
               <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands & Developers</Link></div>
               <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Deals & Discounts</Link></div>
-              <div><Link href="/account?tab=rewards" prefetch={true} className="hover:text-white transition-colors">Producer Toy Rewards</Link></div>
+              {/* <div><Link href="/account?tab=rewards" prefetch={true} className="hover:text-white transition-colors">Producer Toy Rewards</Link></div> */}
             </div>
           </div>
 
@@ -116,7 +116,7 @@ export function Footer() {
             </div>
 
             {/* Producer Toy Rewards Section */}
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">Producer Toy Rewards</h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Discover the most rewarding loyalty programme among all plugin retailers.
@@ -143,7 +143,7 @@ export function Footer() {
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-            </div>
+            </div> */}
 
           </div>
 
