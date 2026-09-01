@@ -271,6 +271,7 @@ export default async function DawLandingPage({
           url: `https://producertoy.com/product/${p.slug}`,
           price: Number(p.price_usd) || 0,
           image: p.cover_image,
+          brand: p.brands?.name || p.brand || 'Producer Toy',
         }))}
       />
       <FAQPageJsonLd faqs={config.faqs} />

@@ -2,7 +2,7 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import ManufacturersClient from './ManufacturersClient'
 import { LocalDataCache } from '@/components/LocalDataCache'
 import { generatePageMetadata } from '@/lib/seo/metadata'
-import { CollectionPageJsonLd } from '@/components/JsonLd'
+import { ItemListJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { Metadata } from 'next'
 
 export const revalidate = false // 🟢 Infinite edge cache
@@ -42,17 +42,24 @@ export default async function ManufacturersPage() {
 
   return (
     <main className="min-h-screen bg-[#121212] text-white">
-      <ManufacturersClient initialBrands={brands} />
-      <CollectionPageJsonLd
-        title="Audio Plugin Manufacturers & Brands"
+      <BreadcrumbJsonLd
+        breadcrumbs={[
+          { name: 'Home', url: 'https://producertoy.com' },
+          { name: 'Manufacturers', url: 'https://producertoy.com/manufacturers' },
+        ]}
+      />
+      <ItemListJsonLd
+        name="Audio Plugin Manufacturers & Brands"
         description="Browse VST plugins, sample toolkits, and virtual instruments from top music production brands."
-        url="https://producertoy.com/manufacturers"
-        items={brands.map((b) => ({
+        itemListElement={brands.map((b, idx) => ({
+          position: idx + 1,
           name: b.name,
-          url: `https://producertoy.com/store?brand=${b.slug}`,
-          image: b.logo_url || undefined,
+          url: `https://producertoy.com/manufacturers/${b.slug}`,
+          image: b.logo_url || 'https://producertoy.com/Icon.png',
+          description: `Explore official audio plugins and virtual instruments by ${b.name}.`,
         }))}
       />
+      <ManufacturersClient initialBrands={brands} />
       <LocalDataCache data={{ brands }} />
     </main>
   )

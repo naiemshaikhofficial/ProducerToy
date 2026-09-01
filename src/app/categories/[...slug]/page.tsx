@@ -607,6 +607,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             url: `https://producertoy.com/product/${p.slug}`,
             price: p.price_usd,
             image: p.cover_image,
+            brand: p.brands?.name || p.brand || 'Producer Toy',
           }))}
         />
 

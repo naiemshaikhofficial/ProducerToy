@@ -178,6 +178,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
           url: `https://producertoy.com/product/${p.slug}`,
           price: p.price_usd,
           image: p.cover_image,
+          brand: brand.name,
         }))}
       />
 

@@ -72,6 +72,7 @@ export default async function FreeVstPluginsHubPage() {
           url: `https://producertoy.com/product/${p.slug}`,
           price: 0,
           image: p.cover_image,
+          brand: p.brands?.name || p.brand || 'Producer Toy',
         }))}
       />
       <FAQPageJsonLd faqs={FREE_VST_FAQS} />

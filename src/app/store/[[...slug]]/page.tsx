@@ -340,6 +340,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
           url: `https://producertoy.com/product/${p.slug}`,
           price: p.price_usd,
           image: p.cover_image,
+          brand: p.brands?.name || p.brand || 'Producer Toy',
         }))}
       />
     </div>
