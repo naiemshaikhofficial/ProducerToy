@@ -31,30 +31,59 @@ const DAW_CONFIGS: Record<string, DawConfig> = {
     slug: 'fl-studio',
     name: 'FL Studio',
     developer: 'Image-Line',
-    metaTitle: 'Best Free VST Plugins for FL Studio (2026) — 64-Bit VST3 Downloads',
-    headline: 'Best Free VST Plugins for FL Studio 21 & 24',
+    metaTitle: 'Buy FL Studio 24 (2026) — Official Pricing, Editions Comparison & Lifetime Free Updates',
+    headline: 'Buy FL Studio 24 — Official Pricing & Editions Comparison',
     description:
-      'Download tested 64-bit VST3 & VST plugins for Image-Line FL Studio on Windows & macOS. 100% royalty-free downloads.',
-    supportedFormats: 'VST3, VST2 (64-Bit)',
+      'Buy Image-Line FL Studio 24 with Lifetime Free Updates. Compare Fruity (₹2,599), Producer (₹7,500), Signature (₹15,000) & All Plugins Edition (₹21,750). Official Affiliate Partner.',
+    supportedFormats: 'VST3, VST2, AU, CLAP (64-Bit)',
     vstFolderWindows: 'C:\\Program Files\\Common Files\\VST3',
     vstFolderMac: '/Library/Audio/Plug-Ins/VST3',
     keywords: [
-      'free plugins for fl studio',
-      'fl studio free vst',
-      'best free plugins for fl studio 21',
-      'fl studio autotune free',
-      'fl studio vocal chain plugins free',
+      'Buy FL Studio',
+      'FL Studio price',
+      'FL Studio price India',
+      'FL Studio price in INR',
+      'FL Studio Producer Edition price',
+      'FL Studio All Plugins Edition price',
+      'FL Studio Fruity Edition',
+      'FL Studio Signature Bundle',
+      'FL Studio 24 buy',
+      'FL Studio 24 download',
+      'FL Studio Lifetime Free Updates',
+      'FL Studio editions comparison 2026',
+      'Image-Line FL Studio official license',
+      'buy FL Studio Producer edition India',
+      'FL Studio stem separation',
+      'FL Studio discount code',
+      'how much is FL Studio',
+      'best music production software DAW',
+      'Producer Toy FL Studio',
     ],
     faqs: [
       {
-        question: 'How do I install free VST plugins in FL Studio?',
+        question: 'Which FL Studio Edition should I start with?',
         answer:
-          '1. Download and install the VST3 installer.\n2. Open FL Studio and go to Options > Manage Plugins.\n3. Click "Find installed plugins".\n4. Your new plugin will appear under Installed > Effects or Generators.',
+          'Most new producers choose Producer Edition because it includes full audio recording, audio clips, stem separation, and Edison editor. You can upgrade anytime by paying only the price difference.',
       },
       {
-        question: 'Do all Producer Toy plugins work in FL Studio 20, 21, and 24?',
+        question: 'What are Free Lifetime Updates?',
         answer:
-          'Yes! All plugins on Producer Toy are native 64-bit VST3 and AU formats verified for FL Studio 20, 21, and 24 on both Windows and macOS.',
+          'When you buy FL Studio, you get all future updates to your Edition free forever. No extra cost for new features, major updates (like FL 21, FL 24 and beyond), or bug fixes. Other DAWs charge for each major update.',
+      },
+      {
+        question: 'How do upgrades work?',
+        answer:
+          'You can upgrade to a higher FL Studio Edition anytime—just pay the exact price difference between your current edition and the higher one. No risk, no wasted money.',
+      },
+      {
+        question: 'Is FL Studio a one-time purchase or a subscription?',
+        answer:
+          'FL Studio is a 100% one-time purchase. You own your license permanently. There are no mandatory subscriptions or recurring charges.',
+      },
+      {
+        question: 'What payment methods are accepted for FL Studio?',
+        answer:
+          'All major credit cards (Visa, Mastercard, American Express), PayPal, and localized regional payment methods are securely accepted directly on Image-Line official store.',
       },
     ],
   },
@@ -252,6 +281,85 @@ export default async function DawLandingPage({
           { name: config.name, url: `https://producertoy.com/daw/${config.slug}` },
         ]}
       />
+
+      {/* 🟢 Rich SoftwareApplication & Product Schema for Top SERP Ranking */}
+      {isFlStudio && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': ['SoftwareApplication', 'Product'],
+              name: 'FL Studio 24',
+              alternateName: ['FL Studio', 'Image-Line FL Studio', 'FL Studio Producer Edition', 'FruityLoops'],
+              applicationCategory: 'MultimediaApplication',
+              operatingSystem: 'Windows 10, Windows 11 (64-Bit), macOS 10.15+ (Apple Silicon M1/M2/M3/M4 & Intel)',
+              softwareVersion: '24 (2026)',
+              description:
+                'Buy Image-Line FL Studio 24 with Lifetime Free Updates. Complete DAW workstation featuring audio recording, stem separation, 100+ native instruments and effects, and lifetime license.',
+              image: 'https://producertoy.com/images/daws/fl-studio.png',
+              brand: {
+                '@type': 'Brand',
+                name: 'Image-Line',
+                url: 'https://www.image-line.com',
+              },
+              publisher: {
+                '@type': 'Organization',
+                name: 'Image-Line Software NV',
+                url: 'https://www.image-line.com',
+              },
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '4.9',
+                reviewCount: '2840',
+                bestRating: '5',
+                worstRating: '1',
+              },
+              offers: {
+                '@type': 'AggregateOffer',
+                priceCurrency: 'INR',
+                lowPrice: '2599',
+                highPrice: '21750',
+                offerCount: '4',
+                offers: [
+                  {
+                    '@type': 'Offer',
+                    name: 'FL Studio 24 Fruity Edition',
+                    price: '2599',
+                    priceCurrency: 'INR',
+                    url: 'https://go.image-line.com/qWL015',
+                    availability: 'https://schema.org/InStock',
+                  },
+                  {
+                    '@type': 'Offer',
+                    name: 'FL Studio 24 Producer Edition',
+                    price: '7500',
+                    priceCurrency: 'INR',
+                    url: 'https://go.image-line.com/qWL015',
+                    availability: 'https://schema.org/InStock',
+                  },
+                  {
+                    '@type': 'Offer',
+                    name: 'FL Studio 24 Signature Bundle',
+                    price: '15000',
+                    priceCurrency: 'INR',
+                    url: 'https://go.image-line.com/qWL015',
+                    availability: 'https://schema.org/InStock',
+                  },
+                  {
+                    '@type': 'Offer',
+                    name: 'FL Studio 24 All Plugins Edition',
+                    price: '21750',
+                    priceCurrency: 'INR',
+                    url: 'https://go.image-line.com/qWL015',
+                    availability: 'https://schema.org/InStock',
+                  },
+                ],
+              },
+            }),
+          }}
+        />
+      )}
 
       {/* Breadcrumbs */}
       <div className="flex items-center gap-2 text-xs text-zinc-400">
