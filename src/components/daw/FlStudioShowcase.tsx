@@ -799,27 +799,21 @@ export function FlStudioShowcase() {
           </a>
         </div>
 
-        {/* Laptop / Screen Frame Display with Real FL Studio WebM Demo */}
-        <div className="relative mt-12 pt-4">
-          <div className="absolute inset-0 bg-radial from-[#9333ea]/15 via-transparent to-transparent blur-3xl pointer-events-none" />
+        {/* Sleek Hardware Display Frame (Exact 1:1 match with reference) */}
+        <div className="relative mt-12 pt-6">
+          {/* Ambient Studio Backlight Glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-[#7c3aed]/20 rounded-full blur-[100px] pointer-events-none" />
           
-          <div className="relative mx-auto max-w-5xl bg-[#141416] border border-zinc-800 rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 shadow-2xl overflow-hidden">
-            <div className="flex items-center gap-1.5 pb-3 px-2 border-b border-zinc-800/80 text-[11px] text-zinc-500">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500/80 inline-block"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 inline-block"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block"></span>
-              <span className="ml-2 font-mono text-[10px] text-zinc-400">FL Studio 24 — Official Workflow &amp; Playlist Demo</span>
-            </div>
-
+          <div className="relative mx-auto max-w-5xl bg-[#09090b] border-[10px] sm:border-[16px] md:border-[22px] border-[#09090b] rounded-t-[28px] sm:rounded-t-[38px] md:rounded-t-[44px] shadow-[0_-15px_60px_rgba(0,0,0,0.95)] ring-1 ring-white/10 overflow-hidden">
             {/* Official WebM Video Demo */}
-            <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-xl overflow-hidden bg-black mt-2.5 border border-zinc-800/60 shadow-inner">
+            <div className="relative aspect-[16/10] w-full rounded-t-[14px] sm:rounded-t-[20px] overflow-hidden bg-black">
               <video
                 src="https://www.image-line.com/static/assets/fl-studio-screen-demo.17f534b.webm"
                 autoPlay
                 loop
                 muted
                 playsInline
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-top"
               />
             </div>
           </div>
