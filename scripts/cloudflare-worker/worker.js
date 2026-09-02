@@ -180,13 +180,7 @@ async function getGoogleAccessToken(clientEmail, privateKeyPem) {
     return cachedToken
   }
 
-  const cleanKey = privateKeyPem
-    .replace(/-----BEGIN (RSA )?PRIVATE KEY-----/g, '')
-    .replace(/-----END (RSA )?PRIVATE KEY-----/g, '')
-    .replace(/\\n/g, '')
-    .replace(/\s+/g, '')
-
-  const keyBytes = Uint8Array.from(atob(cleanKey), (c) => c.charCodeAt(0))
+  const keyBytes = decodeBase64(privateKeyPem)
 
   const privateCryptoKey = await crypto.subtle.importKey(
     'pkcs8',
@@ -247,6 +241,27 @@ function hexToUint8Array(hexString) {
   const bytes = new Uint8Array(hexString.length / 2)
   for (let i = 0; i < hexString.length; i += 2) {
     bytes[i / 2] = parseInt(hexString.substring(i, i + 2), 16)
+  }
+  return bytes
+}
+
+function decodeBase64(base64Str) {
+  let clean = (base64Str || '')
+    .replace(/-----BEGIN (RSA )?PRIVATE KEY-----/g, '')
+    .replace(/-----END (RSA )?PRIVATE KEY-----/g, '')
+    .replace(/\\n/g, '')
+    .replace(/\\r/g, '')
+    .replace(/[\r\n\s"']/g, '')
+    .replace(/[^A-Za-z0-9+/=]/g, '')
+
+  while (clean.length % 4 !== 0) {
+    clean += '='
+  }
+
+  const binaryString = atob(clean)
+  const bytes = new Uint8Array(binaryString.length)
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
   }
   return bytes
 }
