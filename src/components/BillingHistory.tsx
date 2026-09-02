@@ -62,9 +62,11 @@ export function BillingHistory({
       hour: '2-digit',
       minute: '2-digit',
     })
+    const rawCurrency = (item.currency || '').toUpperCase()
+    const isINR = rawCurrency === 'INR' || rawCurrency === '₹'
+    const currency = isINR ? '₹' : '$'
+    const currencyCode = isINR ? 'INR' : 'USD'
     const price = Number(item.amount_paid ?? product.price_usd ?? 0)
-    const currency = item.currency === 'INR' ? '₹' : '$'
-    const currencyCode = item.currency || (item.currency === 'INR' ? 'INR' : 'USD')
     const discount = Number(item.discount_amount || 0)
     const subtotal = price + discount
 
@@ -756,6 +758,9 @@ export function BillingHistory({
               {purchases.map((item) => {
                 const product = item.products
                 if (!product) return null
+                const rawCurrency = (item.currency || '').toUpperCase()
+                const isINR = rawCurrency === 'INR' || rawCurrency === '₹'
+                const currSymbol = isINR ? '₹' : '$'
                 const price = item.amount_paid ?? product.price_usd ?? 0
 
                 return (
@@ -771,7 +776,7 @@ export function BillingHistory({
                       {product.product_type || 'Digital'}
                     </td>
                     <td className="py-3.5 px-4 font-mono font-bold text-[#fc6301] text-right whitespace-nowrap">
-                      ${price.toFixed(2)}
+                      {currSymbol}{price.toFixed(2)}
                     </td>
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">
