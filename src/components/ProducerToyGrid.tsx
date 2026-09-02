@@ -13,12 +13,12 @@ interface ProducerToyGridProps {
 export function ProducerToyGrid({ products, title = "Producer Toy Originals" }: ProducerToyGridProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Filter products by Producer Toy brand (excluding coming soon items)
+  // Filter products strictly by Producer Toy brand (excluding coming soon items)
   const releasedProducts = products.filter((p) => !p.is_coming_soon)
-  const producerToyProducts = releasedProducts.filter(
-    (p) => p.brand?.toLowerCase() === 'producer toy' || p.brand?.toLowerCase() === 'producertoy'
-  )
-  const displayProducts = producerToyProducts.length > 0 ? producerToyProducts : releasedProducts
+  const displayProducts = releasedProducts.filter((p) => {
+    const brandName = (p.brands?.name || p.brand || '').toLowerCase().trim()
+    return brandName === 'producer toy' || brandName === 'producertoy' || brandName === 'nemo studio'
+  })
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {

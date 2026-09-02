@@ -386,24 +386,24 @@ export function EpicLibraryClient({
         </div>
 
         {/* ================= SUB TABS BAR (EXACT EPIC LAUNCHER) ================= */}
-        <div className="flex items-center gap-6 border-b border-[#242424] pb-2 text-sm font-bold">
+        <div className="flex items-center gap-4 sm:gap-6 border-b border-[#242424] pb-2 text-xs sm:text-sm font-bold overflow-x-auto scrollbar-none whitespace-nowrap">
           <button
             onClick={() => setActiveTab('all')}
-            className={`pb-2 relative transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2 relative transition-colors cursor-pointer flex items-center gap-1.5 flex-shrink-0 ${
               activeTab === 'all'
                 ? 'text-white border-b-2 border-white'
                 : 'text-zinc-400 hover:text-white'
             }`}
           >
             <span>All</span>
-            <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-[#202020] text-zinc-400 font-normal">
+            <span className="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full bg-[#202020] text-zinc-400 font-normal">
               {purchases.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab('favorites')}
-            className={`pb-2 relative transition-colors cursor-pointer flex items-center gap-1.5 ${
+            className={`pb-2 relative transition-colors cursor-pointer flex items-center gap-1.5 flex-shrink-0 ${
               activeTab === 'favorites'
                 ? 'text-white border-b-2 border-white'
                 : 'text-zinc-400 hover:text-white'
@@ -411,7 +411,7 @@ export function EpicLibraryClient({
           >
             <span>Favorites</span>
             {favorites.length > 0 && (
-              <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-[#202020] text-zinc-400 font-normal">
+              <span className="text-[10px] sm:text-[11px] px-1.5 py-0.2 rounded-full bg-[#202020] text-zinc-400 font-normal">
                 {favorites.length}
               </span>
             )}
@@ -419,7 +419,7 @@ export function EpicLibraryClient({
 
           <button
             onClick={() => setActiveTab('plugins')}
-            className={`pb-2 relative transition-colors cursor-pointer ${
+            className={`pb-2 relative transition-colors cursor-pointer flex-shrink-0 ${
               activeTab === 'plugins'
                 ? 'text-white border-b-2 border-white'
                 : 'text-zinc-400 hover:text-white'
@@ -430,7 +430,7 @@ export function EpicLibraryClient({
 
           <button
             onClick={() => setActiveTab('sounds')}
-            className={`pb-2 relative transition-colors cursor-pointer ${
+            className={`pb-2 relative transition-colors cursor-pointer flex-shrink-0 ${
               activeTab === 'sounds'
                 ? 'text-white border-b-2 border-white'
                 : 'text-zinc-400 hover:text-white'
@@ -441,7 +441,7 @@ export function EpicLibraryClient({
 
           <button
             onClick={() => setActiveTab('receipts')}
-            className={`pb-2 relative transition-colors cursor-pointer ${
+            className={`pb-2 relative transition-colors cursor-pointer flex-shrink-0 ${
               activeTab === 'receipts'
                 ? 'text-white border-b-2 border-white'
                 : 'text-zinc-400 hover:text-white'
@@ -449,7 +449,6 @@ export function EpicLibraryClient({
           >
             Receipts
           </button>
-
           <button
             className="text-zinc-400 hover:text-white p-1 rounded-full hover:bg-[#222222] transition-colors cursor-pointer"
             title="Add Custom Collection"
@@ -966,20 +965,23 @@ export function EpicLibraryClient({
 
           return (
             <div
-              className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4 animate-in fade-in duration-200"
               onClick={() => setInstallProduct(null)}
             >
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 text-white animate-in zoom-in-95 duration-200 relative max-h-[92vh] overflow-y-auto"
+                className="w-full max-w-lg bg-[#141414] border-t sm:border border-[#282828] rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 text-white animate-in slide-in-from-bottom sm:zoom-in-95 duration-200 relative max-h-[88vh] sm:max-h-[92vh] overflow-y-auto pb-8 sm:pb-6"
               >
+                {/* Mobile Grab Handle Bar */}
+                <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto sm:hidden mb-1 -mt-1 cursor-pointer" />
+
                 {/* Close X */}
                 <button
                   onClick={() => {
                     setInstallProduct(null)
                     setDownloadError(null)
                   }}
-                  className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-[#202020] transition-colors cursor-pointer"
+                  className="absolute top-4 right-4 sm:top-4 sm:right-4 text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-[#202020] transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
