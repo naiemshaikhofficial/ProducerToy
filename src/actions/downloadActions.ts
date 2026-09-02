@@ -77,7 +77,7 @@ export async function getSecureDownloadUrlAction(
         .from('purchases')
         .select('id')
         .eq('user_id', user.id)
-        .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+        .eq('product_id', activeProduct.id)
         .limit(1)
 
       if (userPurchases && userPurchases.length > 0) {
@@ -90,7 +90,7 @@ export async function getSecureDownloadUrlAction(
           .from('purchases')
           .select('id')
           .eq('user_id', user.id)
-          .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+          .eq('product_id', activeProduct.id)
           .limit(1)
 
         if (adminPurchases && adminPurchases.length > 0) {
@@ -104,7 +104,7 @@ export async function getSecureDownloadUrlAction(
           .from('purchases')
           .select('id')
           .ilike('customer_email', userEmail)
-          .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+          .eq('product_id', activeProduct.id)
           .limit(1)
 
         if (emailPurchases && emailPurchases.length > 0) {
@@ -119,7 +119,7 @@ export async function getSecureDownloadUrlAction(
           .select('id')
           .eq('recipient_user_id', user.id)
           .eq('status', 'claimed')
-          .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+          .eq('product_id', activeProduct.id)
           .limit(1)
 
         if (userGift && userGift.length > 0) {
@@ -132,7 +132,7 @@ export async function getSecureDownloadUrlAction(
             .select('id')
             .ilike('recipient_email', userEmail)
             .eq('status', 'claimed')
-            .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+            .eq('product_id', activeProduct.id)
             .limit(1)
 
           if (emailGift && emailGift.length > 0) {
