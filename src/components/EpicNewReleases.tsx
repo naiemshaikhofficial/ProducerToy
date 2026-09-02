@@ -203,10 +203,10 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                             type="button"
                             onClick={(e) => handleBookmarkClick(e, item)}
                             aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
-                            className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/20 z-10 ${
+                            className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
                               isSaved
-                                ? 'bg-white text-black opacity-100 shadow-md'
-                                : 'bg-black/75 text-white/90 hover:text-white hover:bg-white hover:text-black opacity-0 group-hover:opacity-100 shadow-sm'
+                                ? 'bg-[#FC6301] text-white border border-[#FC6301] shadow-[0_0_10px_rgba(252,99,1,0.4)] opacity-100 hover:bg-[#e05700]'
+                                : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#FC6301]/70 hover:text-[#FC6301] hover:bg-[#1c1c20] opacity-0 group-hover:opacity-100 shadow-sm hover:scale-105'
                             }`}
                             title={isSaved ? 'Saved in Wishlist' : 'Save to Wishlist'}
                           >

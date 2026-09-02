@@ -971,19 +971,22 @@ export function EpicLibraryClient({
             >
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="w-full max-w-lg bg-[#141414] border border-[#242424] rounded-xl p-6 shadow-2xl space-y-5 text-white animate-in zoom-in-95 duration-200 relative"
+                className="w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-4 sm:p-6 shadow-2xl space-y-4 sm:space-y-5 text-white animate-in zoom-in-95 duration-200 relative max-h-[92vh] overflow-y-auto"
               >
                 {/* Close X */}
                 <button
-                  onClick={() => setInstallProduct(null)}
-                  className="absolute top-4 right-4 text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-[#202020] transition-colors cursor-pointer"
+                  onClick={() => {
+                    setInstallProduct(null)
+                    setDownloadError(null)
+                  }}
+                  className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-[#202020] transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
 
                 {/* Top Header with 3:4 Artwork Thumbnail */}
-                <div className="flex items-start gap-3.5">
-                  <div className="relative w-16 aspect-[3/4] rounded-lg overflow-hidden bg-[#1a1a1a] border border-[#262626] flex-shrink-0">
+                <div className="flex items-start gap-3 sm:gap-3.5 pr-6">
+                  <div className="relative w-14 sm:w-16 aspect-[3/4] rounded-lg overflow-hidden bg-[#1a1a1a] border border-[#262626] flex-shrink-0">
                     <Image
                       src={product.cover_image}
                       alt={product.name}
@@ -993,26 +996,26 @@ export function EpicLibraryClient({
                     />
                   </div>
 
-                  <div className="space-y-0.5 min-w-0 flex-1 pr-6">
-                    <h2 className="text-base font-bold text-white tracking-tight truncate">
+                  <div className="space-y-0.5 min-w-0 flex-1">
+                    <h2 className="text-sm sm:text-base font-bold text-white tracking-tight truncate">
                       {product.name}
                     </h2>
                     <p className="text-xs text-zinc-400 truncate">
                       {product.brands?.name || product.brand || 'Producer Toy'}
                     </p>
-                    <p className="text-[11px] text-zinc-500 pt-0.5">
+                    <p className="text-[10.5px] sm:text-[11px] text-zinc-500 pt-0.5">
                       {isSamplePack
                         ? 'Audio Sample Pack (WAV / 24-bit)'
-                        : `${product.vst_format || 'VST3 / AU'} &bull; 64-Bit`}
+                        : `${product.vst_format || 'VST3 / AU'} • 64-Bit`}
                     </p>
                   </div>
                 </div>
 
                 {/* Serial Key Section (Only if genuinely exists) */}
                 {installProduct.serial_key && (
-                  <div className="bg-[#181818] border border-[#262626] rounded-lg p-3 flex items-center justify-between gap-3">
+                  <div className="bg-[#181818] border border-[#262626] rounded-lg p-2.5 sm:p-3 flex items-center justify-between gap-2.5">
                     <div className="space-y-0.5 min-w-0">
-                      <span className="text-[10px] uppercase tracking-wider text-zinc-500 block">
+                      <span className="text-[9.5px] sm:text-[10px] uppercase tracking-wider text-zinc-500 block">
                         Serial License Key
                       </span>
                       <span className="font-mono text-xs font-semibold text-white tracking-wider select-all block truncate">
@@ -1022,17 +1025,17 @@ export function EpicLibraryClient({
 
                     <button
                       onClick={() => handleCopySerial(installProduct.serial_key!, installProduct.id)}
-                      className="bg-[#222222] hover:bg-[#2a2a2a] text-zinc-300 hover:text-white px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors flex-shrink-0 cursor-pointer"
+                      className="bg-[#222222] hover:bg-[#2a2a2a] text-zinc-300 hover:text-white px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors flex-shrink-0 cursor-pointer"
                     >
                       {copiedKeyId === installProduct.id ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-white" />
-                          <span className="text-white">Copied</span>
+                          <span className="text-white text-[11px]">Copied</span>
                         </>
                       ) : (
                         <>
                           <Copy className="w-3.5 h-3.5 text-zinc-400" />
-                          <span>Copy</span>
+                          <span className="text-[11px]">Copy</span>
                         </>
                       )}
                     </button>
@@ -1046,21 +1049,21 @@ export function EpicLibraryClient({
                     <span className="text-[11px] text-zinc-400 block">
                       Download Package
                     </span>
-                    <div className="bg-[#181818] border border-[#262626] p-3 rounded-lg flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-[#202020] flex items-center justify-center text-zinc-300">
+                    <div className="bg-[#181818] border border-[#262626] p-2.5 sm:p-3 rounded-xl flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-[#202020] flex items-center justify-center text-zinc-300 flex-shrink-0">
                           <Music className="w-4 h-4" />
                         </div>
-                        <div>
-                          <span className="text-xs font-semibold text-white block">
+                        <div className="min-w-0">
+                          <span className="text-xs font-semibold text-white block truncate">
                             Direct ZIP Archive
                           </span>
-                          <span className="text-[10px] text-zinc-500">
+                          <span className="text-[10px] text-zinc-500 block truncate">
                             Includes Loops, One-Shots &amp; Midis
                           </span>
                         </div>
                       </div>
-                      <span className="text-[10px] text-zinc-400 bg-[#222222] px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-semibold text-zinc-400 bg-[#222222] px-2 py-0.5 rounded flex-shrink-0">
                         Ready
                       </span>
                     </div>
@@ -1072,14 +1075,14 @@ export function EpicLibraryClient({
                       Select OS Platform
                     </span>
 
-                    <div className="grid grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
                       {/* Windows Option */}
                       <button
                         type="button"
                         onClick={() => setSelectedPlatform('windows')}
-                        className={`p-3 rounded-lg border flex items-center gap-2.5 transition-all cursor-pointer text-left ${
+                        className={`p-2.5 sm:p-3 rounded-xl border flex items-center gap-2 sm:gap-2.5 transition-all cursor-pointer text-left ${
                           selectedPlatform === 'windows'
-                            ? 'bg-[#202020] border-zinc-400'
+                            ? 'bg-[#202020] border-zinc-400 shadow-xs'
                             : 'bg-[#181818] border-[#262626] hover:border-zinc-600'
                         }`}
                       >
@@ -1090,7 +1093,7 @@ export function EpicLibraryClient({
                         </div>
                         <div className="min-w-0">
                           <span className="text-xs font-semibold text-white block">Windows</span>
-                          <span className="text-[10px] text-zinc-500 block truncate">VST3 / EXE</span>
+                          <span className="text-[9.5px] sm:text-[10px] text-zinc-500 block truncate">VST3 / EXE</span>
                         </div>
                       </button>
 
@@ -1098,9 +1101,9 @@ export function EpicLibraryClient({
                       <button
                         type="button"
                         onClick={() => setSelectedPlatform('mac')}
-                        className={`p-3 rounded-lg border flex items-center gap-2.5 transition-all cursor-pointer text-left ${
+                        className={`p-2.5 sm:p-3 rounded-xl border flex items-center gap-2 sm:gap-2.5 transition-all cursor-pointer text-left ${
                           selectedPlatform === 'mac'
-                            ? 'bg-[#202020] border-zinc-400'
+                            ? 'bg-[#202020] border-zinc-400 shadow-xs'
                             : 'bg-[#181818] border-[#262626] hover:border-zinc-600'
                         }`}
                       >
@@ -1111,7 +1114,7 @@ export function EpicLibraryClient({
                         </div>
                         <div className="min-w-0">
                           <span className="text-xs font-semibold text-white block">macOS</span>
-                          <span className="text-[10px] text-zinc-500 block truncate">AU / DMG</span>
+                          <span className="text-[9.5px] sm:text-[10px] text-zinc-500 block truncate">AU / DMG</span>
                         </div>
                       </button>
                     </div>
@@ -1127,14 +1130,14 @@ export function EpicLibraryClient({
                 )}
 
                 {/* Bottom Modal Actions */}
-                <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#222222]">
+                <div className="flex items-center justify-end gap-2 sm:gap-2.5 pt-3 border-t border-[#222222]">
                   <button
                     type="button"
                     onClick={() => {
                       setInstallProduct(null)
                       setDownloadError(null)
                     }}
-                    className="bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white font-medium text-xs py-2.5 px-4 rounded-lg transition-colors cursor-pointer"
+                    className="flex-1 sm:flex-none justify-center bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white font-medium text-xs py-2.5 px-3 sm:px-4 rounded-xl transition-colors cursor-pointer flex items-center"
                   >
                     Cancel
                   </button>
@@ -1148,16 +1151,16 @@ export function EpicLibraryClient({
                         selectedPlatform
                       )
                     }
-                    className="bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-6 rounded-lg uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 sm:flex-none justify-center bg-white hover:bg-zinc-200 text-black font-bold text-xs py-2.5 px-4 sm:px-6 rounded-xl uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
                   >
                     {isDownloading ? (
                       <>
                         <div className="w-3.5 h-3.5 rounded-full border-2 border-zinc-500 border-t-black animate-spin" />
-                        <span>Securing Link...</span>
+                        <span className="truncate">Securing...</span>
                       </>
                     ) : (
                       <>
-                        <Download className="w-3.5 h-3.5" />
+                        <Download className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>Download</span>
                       </>
                     )}

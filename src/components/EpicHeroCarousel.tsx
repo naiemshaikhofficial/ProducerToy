@@ -230,10 +230,10 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     <button
                       type="button"
                       onClick={(e) => handleWishlistToggle(e, product)}
-                      className={`absolute top-4 right-4 w-8 h-8 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
+                      className={`absolute top-4 right-4 w-8 h-8 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all duration-200 ${
                         isSaved
-                          ? 'bg-white text-black border-white'
-                          : 'bg-black/60 text-white/90 border-white/15 hover:bg-black/80'
+                          ? 'bg-[#FC6301] text-white border-[#FC6301] shadow-[0_0_12px_rgba(252,99,1,0.45)] hover:bg-[#e05700]'
+                          : 'bg-[#121214]/80 text-zinc-300 border-white/15 hover:border-[#FC6301]/70 hover:text-[#FC6301] hover:bg-[#1c1c20]'
                       }`}
                       title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
                     >

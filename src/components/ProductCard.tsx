@@ -199,14 +199,14 @@ export function ProductCard({ product }: { product: Product }) {
           type="button"
           onClick={handleWishlistToggle}
           aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
-          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all border border-white/20 z-10 ${
+          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
             isSaved
-              ? 'bg-white text-black opacity-100 shadow-md'
-              : 'bg-black/75 text-white/90 hover:text-white hover:bg-white hover:text-black opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-sm'
+              ? 'bg-[#FC6301] text-white border border-[#FC6301] shadow-[0_0_14px_rgba(252,99,1,0.45)] opacity-100 hover:bg-[#e05700] hover:scale-105'
+              : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#FC6301]/70 hover:text-[#FC6301] hover:bg-[#1c1c20] opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-md hover:scale-105'
           }`}
           title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
         >
-          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-current' : ''}`} />
+          <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-150 ${isSaved ? 'fill-current' : ''}`} />
         </button>
 
         {/* Audio Audition Play Button Overlay */}
