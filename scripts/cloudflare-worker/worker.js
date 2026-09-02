@@ -159,6 +159,9 @@ export default {
     const sanitizedName = decodeURIComponent(name).replace(/["\r\n]/g, '')
     responseHeaders.set('Content-Disposition', `attachment; filename="${sanitizedName}"`)
     responseHeaders.set('Cache-Control', 'private, no-transform, max-age=3600')
+    responseHeaders.set('Access-Control-Allow-Origin', '*')
+    responseHeaders.delete('x-frame-options')
+    responseHeaders.delete('content-security-policy')
     responseHeaders.delete('set-cookie')
 
     return new Response(driveResponse.body, {

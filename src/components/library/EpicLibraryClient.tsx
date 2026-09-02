@@ -165,17 +165,19 @@ export function EpicLibraryClient({
       const res = await getSecureDownloadUrlAction(productId, plat)
 
       if (res.success && res.downloadUrl) {
-        // Trigger secure download seamlessly in background without navigating or opening new tabs
-        const iframe = document.createElement('iframe')
-        iframe.style.display = 'none'
-        iframe.src = res.downloadUrl
-        document.body.appendChild(iframe)
+        // Trigger secure attachment download via native link click
+        const link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = res.downloadUrl
+        link.setAttribute('download', '')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
 
         setTimeout(() => {
-          iframe.remove()
           setIsDownloading(false)
           setInstallProduct(null)
-        }, 1500)
+        }, 1200)
       } else {
         setDownloadError(res.error || 'Failed to generate secure download link')
         setIsDownloading(false)
