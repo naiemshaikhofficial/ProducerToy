@@ -55,3 +55,16 @@ export async function checkUserStatusAction(email: string): Promise<UserStatusRe
     return { exists: false, isConfirmed: false }
   }
 }
+
+/**
+ * Validates Cloudflare Turnstile token on the server
+ */
+export async function validateTurnstileAction(token: string): Promise<{ success: boolean; error?: string }> {
+  const { verifyTurnstileToken } = await import('@/lib/turnstile')
+  const isValid = await verifyTurnstileToken(token)
+  if (!isValid) {
+    return { success: false, error: 'Security verification failed. Please try again.' }
+  }
+  return { success: true }
+}
+

@@ -7,7 +7,8 @@ import { LogoIcon } from '@/components/Logo'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { ChevronLeft, Eye, EyeOff, Mail, CheckCircle2, Lock, AlertCircle, KeyRound } from 'lucide-react'
 import Link from 'next/link'
-import { checkUserStatusAction } from '@/actions/authActions'
+import { checkUserStatusAction, validateTurnstileAction } from '@/actions/authActions'
+import { TurnstileWidget } from '@/components/TurnstileWidget'
 
 // Sleek Monochrome Google Icon SVG
 function GoogleIcon({ size = 20 }: { size?: number }) {
@@ -53,6 +54,7 @@ function AuthForm() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
 
   // UI feedback states
   const [loading, setLoading] = useState(false)
@@ -329,6 +331,16 @@ function AuthForm() {
       }
     }
 
+    // Cloudflare Turnstile bot verification check
+    if (turnstileToken) {
+      const turnstileCheck = await validateTurnstileAction(turnstileToken)
+      if (!turnstileCheck.success) {
+        setError(turnstileCheck.error || 'Security verification failed. Please try again.')
+        setLoading(false)
+        return
+      }
+    }
+
     try {
       if (mode === 'signup') {
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -599,6 +611,12 @@ function AuthForm() {
                       className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm"
                     />
                   </div>
+
+                  {/* Cloudflare Turnstile Verification Widget */}
+                  <TurnstileWidget
+                    onSuccess={(token) => setTurnstileToken(token)}
+                    onExpire={() => setTurnstileToken(null)}
+                  />
 
                   <button
                     type="submit"
@@ -1124,6 +1142,12 @@ function AuthForm() {
                     </div>
                   </div>
                 )}
+
+                {/* Cloudflare Turnstile Verification Widget */}
+                <TurnstileWidget
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken(null)}
+                />
 
                 <button
                   type="submit"
