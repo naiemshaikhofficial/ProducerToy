@@ -70,37 +70,81 @@ export async function getSecureDownloadUrlAction(
     if (!isFree) {
       let isOwner = false
       const userEmail = user.email?.trim().toLowerCase()
+      const isDev = process.env.NODE_ENV === 'development'
 
-      // Check purchases table (matching user_id OR customer_email)
-      let purchaseQuery = adminSupabase
+      // 1. Direct match: user_id + product_id (via user's client first, respecting RLS)
+      const { data: userPurchases } = await supabase
         .from('purchases')
         .select('id')
+        .eq('user_id', user.id)
         .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+        .limit(1)
 
-      if (userEmail) {
-        purchaseQuery = purchaseQuery.or(`user_id.eq.${user.id},customer_email.ilike.${userEmail}`)
-      } else {
-        purchaseQuery = purchaseQuery.eq('user_id', user.id)
-      }
-
-      const { data: purchaseRecord } = await purchaseQuery.maybeSingle()
-      if (purchaseRecord) {
+      if (userPurchases && userPurchases.length > 0) {
         isOwner = true
       }
 
-      if (!isOwner && userEmail) {
-        // Check claimed gifts table
-        const { data: giftRecord } = await adminSupabase
-          .from('gifts')
+      // 2. If not found via user client, check admin client
+      if (!isOwner) {
+        const { data: adminPurchases } = await adminSupabase
+          .from('purchases')
           .select('id')
+          .eq('user_id', user.id)
           .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
-          .eq('status', 'claimed')
-          .or(`recipient_user_id.eq.${user.id},recipient_email.ilike.${userEmail}`)
-          .maybeSingle()
+          .limit(1)
 
-        if (giftRecord) {
+        if (adminPurchases && adminPurchases.length > 0) {
           isOwner = true
         }
+      }
+
+      // 3. If still not found, check by customer_email
+      if (!isOwner && userEmail) {
+        const { data: emailPurchases } = await adminSupabase
+          .from('purchases')
+          .select('id')
+          .ilike('customer_email', userEmail)
+          .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+          .limit(1)
+
+        if (emailPurchases && emailPurchases.length > 0) {
+          isOwner = true
+        }
+      }
+
+      // 4. Check claimed gifts table
+      if (!isOwner) {
+        const { data: userGift } = await adminSupabase
+          .from('gifts')
+          .select('id')
+          .eq('recipient_user_id', user.id)
+          .eq('status', 'claimed')
+          .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+          .limit(1)
+
+        if (userGift && userGift.length > 0) {
+          isOwner = true
+        }
+
+        if (!isOwner && userEmail) {
+          const { data: emailGift } = await adminSupabase
+            .from('gifts')
+            .select('id')
+            .ilike('recipient_email', userEmail)
+            .eq('status', 'claimed')
+            .or(`product_id.eq.${activeProduct.id},product_id.eq.${activeProduct.slug}`)
+            .limit(1)
+
+          if (emailGift && emailGift.length > 0) {
+            isOwner = true
+          }
+        }
+      }
+
+      // 5. Development mode bypass
+      if (!isOwner && isDev) {
+        console.warn(`[DEV_BYPASS] Allowing download in development mode for user: ${user.id}`)
+        isOwner = true
       }
 
       if (!isOwner) {

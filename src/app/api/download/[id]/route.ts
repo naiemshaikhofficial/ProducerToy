@@ -48,11 +48,19 @@ export async function GET(
 
     // 3. Fetch Product Drive / Storage URL via Supabase Admin Client
     const adminSupabase = getAdminClient()
-    const { data: product, error } = await adminSupabase
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId)
+    
+    let productQuery = adminSupabase
       .from('products')
       .select('name, download_url, download_url_win, download_url_mac, product_type')
-      .eq('id', productId)
-      .maybeSingle()
+
+    if (isUuid) {
+      productQuery = productQuery.eq('id', productId)
+    } else {
+      productQuery = productQuery.eq('slug', productId)
+    }
+
+    const { data: product, error } = await productQuery.maybeSingle()
 
     if (error || !product) {
       return new NextResponse('Product not found in registry', { status: 404 })
