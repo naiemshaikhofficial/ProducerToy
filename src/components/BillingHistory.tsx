@@ -40,10 +40,12 @@ export function BillingHistory({
   purchases,
   userEmail,
   userName,
+  showHeader = true,
 }: {
   purchases: PurchaseItem[]
   userEmail: string
   userName?: string
+  showHeader?: boolean
 }) {
   if (!purchases || purchases.length === 0) return null
 
@@ -729,69 +731,70 @@ export function BillingHistory({
   }
 
   return (
-    <div className="space-y-4 pt-6 border-t border-[#24242e]">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#1c1c24] border border-[#2c2c3a] flex items-center justify-center">
-            <Receipt className="w-4 h-4 text-zinc-400" />
-          </div>
+    <div className="space-y-4">
+      {showHeader && (
+        <div className="flex items-center justify-between pb-2">
           <div>
-            <h2 className="text-sm font-black uppercase tracking-wider text-white">Billing & License Receipts</h2>
-            <p className="text-[10px] font-mono text-zinc-400">Download official tax invoices and EULA commercial certificates</p>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Billing &amp; License Receipts</h2>
+            <p className="text-xs text-zinc-400 mt-0.5">Download official tax invoices and EULA commercial certificates.</p>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="bg-[#141418] border border-[#24242e] rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-[#181818] border border-[#262626] rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse font-sans text-xs">
             <thead>
-              <tr className="border-b border-[#24242e] bg-[#1a1a22] text-zinc-400 font-mono text-[10px] uppercase">
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4">Product Name</th>
-                <th className="py-3 px-4">Format</th>
-                <th className="py-3 px-4 text-right">Price</th>
-                <th className="py-3 px-4 text-right">Documents</th>
+              <tr className="border-b border-[#242424] bg-[#1f1f1f] text-zinc-400 font-mono text-[10px] uppercase">
+                <th className="py-3.5 px-4 font-bold">Date</th>
+                <th className="py-3.5 px-4 font-bold">Product Name</th>
+                <th className="py-3.5 px-4 font-bold">Format</th>
+                <th className="py-3.5 px-4 font-bold text-right">Price</th>
+                <th className="py-3.5 px-4 font-bold text-right">Documents</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#24242e]">
+            <tbody className="divide-y divide-[#242424]">
               {purchases.map((item) => {
                 const product = item.products
                 if (!product) return null
-                const rawCurrency = (item.currency || '').toUpperCase()
+                const rawCurrency = (item.currency || 'INR').toUpperCase()
                 const isINR = rawCurrency === 'INR' || rawCurrency === '₹'
                 const currSymbol = isINR ? '₹' : '$'
-                const price = item.amount_paid ?? product.price_usd ?? 0
+                const price = Number(item.amount_paid ?? product.price_usd ?? 0)
 
                 return (
-                  <tr key={item.id} className="hover:bg-[#1a1a22]/60 transition-colors">
-                    <td className="py-3.5 px-4 font-mono text-zinc-400 whitespace-nowrap">
+                  <tr key={item.id} className="hover:bg-[#202020]/60 transition-colors">
+                    <td className="py-3.5 px-4 font-mono text-zinc-400 whitespace-nowrap text-[11px]">
                       {new Date(item.purchased_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </td>
-                    <td className="py-3.5 px-4 font-extrabold text-white">
-                      {product.name}
-                      <span className="block text-[10px] font-normal text-zinc-500">{product.brands?.name || product.brand || ''}</span>
+                    <td className="py-3.5 px-4">
+                      <span className="font-bold text-white text-sm block">{product.name}</span>
+                      <span className="text-[11px] text-zinc-400 block pt-0.5">{product.brands?.name || product.brand || 'Producer Toy'}</span>
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-zinc-400 uppercase">
-                      {product.product_type || 'Digital'}
+                    <td className="py-3.5 px-4 font-mono text-zinc-400 uppercase text-[11px]">
+                      {product.product_type?.replace(/_/g, ' ') || 'Audio Pack'}
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-[#fc6301] text-right whitespace-nowrap">
+                    <td className="py-3.5 px-4 font-mono font-bold text-white text-right whitespace-nowrap text-sm">
                       {currSymbol}{price.toFixed(2)}
                     </td>
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">
                         <button
+                          type="button"
                           onClick={() => handleDownloadInvoice(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#20202a] hover:bg-[#fc6301] hover:text-white text-white text-[10px] font-mono font-bold uppercase border border-[#303040] rounded-md transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white text-xs font-medium border border-[#2e2e2e] hover:border-[#FC6301]/60 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+                          title="Download GST Tax Invoice"
                         >
-                          <Receipt className="w-3.5 h-3.5" />
+                          <Receipt className="w-3.5 h-3.5 text-[#FC6301]" />
                           <span>Invoice</span>
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDownloadLicense(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#20202a] hover:bg-[#fc6301] hover:text-white text-zinc-300 text-[10px] font-mono font-bold uppercase border border-[#303040] rounded-md transition-all cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white text-xs font-medium border border-[#2e2e2e] hover:border-[#FC6301]/60 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+                          title="Download EULA Commercial License"
                         >
-                          <FileCheck className="w-3.5 h-3.5" />
+                          <FileCheck className="w-3.5 h-3.5 text-zinc-400" />
                           <span>License</span>
                         </button>
                       </div>
