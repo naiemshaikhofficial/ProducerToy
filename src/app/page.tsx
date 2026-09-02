@@ -11,6 +11,7 @@ import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
 import { FreeProducerToys } from '@/components/FreeProducerToys'
 import { ChooseYourDaw } from '@/components/ChooseYourDaw'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
+import { SamplesWalaGrid } from '@/components/SamplesWalaGrid'
 import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
 import { EpicMostPopular } from '@/components/EpicMostPopular'
@@ -68,7 +69,12 @@ export default async function HomePage() {
         {/* Centered Epic Hero Carousel (Starts immediately on mobile) */}
         <EpicHeroCarousel products={products} />
 
-        {/* 2nd Section: Producer Toy Originals Row (First) */}
+        {/* Samples Wala X Producer Toy Collaboration Row */}
+        <div className="px-4 sm:px-0">
+          <SamplesWalaGrid products={products} title="Samples Wala X Producer Toy" />
+        </div>
+
+        {/* 2nd Section: Producer Toy Originals Row */}
         <div className="px-4 sm:px-0">
           <ProducerToyGrid products={products} title="Producer Toy Originals" />
         </div>
