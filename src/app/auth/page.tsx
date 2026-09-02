@@ -982,6 +982,12 @@ function AuthForm() {
                     )}
                   </div>
 
+                  {/* Cloudflare Turnstile Verification Widget */}
+                  <TurnstileWidget
+                    onSuccess={(token) => setTurnstileToken(token)}
+                    onExpire={() => setTurnstileToken(null)}
+                  />
+
                   <button
                     type="submit"
                     className="w-full py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer"
