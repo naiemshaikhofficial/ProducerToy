@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+.font-graffiti {
+  font-family: 'Permanent Marker', cursive, system-ui, sans-serif;
+}
 
 @layer base {
   :root {
