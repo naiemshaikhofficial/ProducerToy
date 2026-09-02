@@ -404,3 +404,57 @@ export async function getToywardsDataAction(userId: string) {
   }
 }
 
+/**
+ * Fetch all verified purchases and orders for user transactions & invoices tab.
+ */
+export async function getUserTransactionsAction(userId?: string) {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    const targetUserId = userId || user?.id
+
+    if (!targetUserId) {
+      return { success: false, purchases: [], orders: [] }
+    }
+
+    const admin = getAdminClient()
+
+    // 1. Fetch from purchases table with full product details
+    const { data: purchases, error: pError } = await admin
+      .from('purchases')
+      .select('*, products(*, brands(name))')
+      .eq('user_id', targetUserId)
+      .order('purchased_at', { ascending: false })
+
+    if (pError) {
+      console.warn('Error fetching purchases for transactions:', pError)
+    }
+
+    // 2. Fetch from orders table
+    const email = user?.email
+    let ordersQuery = admin.from('orders').select('*')
+    if (email) {
+      ordersQuery = ordersQuery.or(`user_id.eq.${targetUserId},customer_email.eq.${email}`)
+    } else {
+      ordersQuery = ordersQuery.eq('user_id', targetUserId)
+    }
+
+    const { data: orders, error: oError } = await ordersQuery.order('created_at', { ascending: false })
+
+    if (oError) {
+      console.warn('Error fetching orders for transactions:', oError)
+    }
+
+    return {
+      success: true,
+      purchases: purchases || [],
+      orders: orders || [],
+    }
+  } catch (err: any) {
+    console.warn('Exception in getUserTransactionsAction:', err)
+    return { success: false, purchases: [], orders: [] }
+  }
+}
+
