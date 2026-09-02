@@ -30,6 +30,8 @@ import {
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { getUserLibraryAction } from '@/actions/libraryActions'
+import { getSecureDownloadUrlAction } from '@/actions/downloadActions'
+import { BillingHistory } from '@/components/BillingHistory'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { LogoIcon } from '@/components/Logo'
 
@@ -352,6 +354,17 @@ export function EpicLibraryClient({
     az: 'Alphabetical A-Z',
     za: 'Alphabetical Z-A',
     recent: 'Recently Added',
+  }
+
+  if (!initialUser && (authLoading || isClientFetching)) {
+    return (
+      <div className="w-full min-h-[70vh] bg-[#121212] flex flex-col items-center justify-center space-y-4">
+        <ButtonSpinner size={32} variant="light" />
+        <p className="text-xs font-mono uppercase tracking-widest text-zinc-400 animate-pulse">
+          Opening Your Producer Vault...
+        </p>
+      </div>
+    )
   }
 
   return (
