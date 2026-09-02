@@ -11,57 +11,66 @@ export const revalidate = 0
 export default async function LibraryPage() {
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/auth?next=/library')
+  let user = null
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
+    user = authUser
+  } catch (err) {
+    console.warn('SSR auth check note:', err)
   }
 
-  // Fetch all verified purchases for this user
-  const adminSupabase = getAdminClient()
-  const { data: purchases, error } = await adminSupabase
-    .from('purchases')
-    .select('*, products(*, brands(name))')
-    .eq('user_id', user.id)
-    .order('purchased_at', { ascending: false })
-
-  if (error) {
-    console.error('Error fetching library purchases:', error)
-  }
-
-  // Generate secure download tokens for each product
+  let purchases: any[] = []
   const downloadTokens: Record<string, string> = {}
-  if (purchases && purchases.length > 0) {
-    purchases.forEach((item: any) => {
-      const product = item.products
-      if (product) {
-        downloadTokens[product.id] = signDownloadToken(
-          {
-            uid: user.id,
-            pid: product.id,
-            type: product.product_type,
-            ip: '127.0.0.1',
-          },
-          3600 // 1 hour token
-        )
-      }
-    })
+
+  if (user) {
+    // Fetch all verified purchases for this user
+    const adminSupabase = getAdminClient()
+    const { data: userPurchases, error } = await adminSupabase
+      .from('purchases')
+      .select('*, products(*, brands(name))')
+      .eq('user_id', user.id)
+      .order('purchased_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching library purchases:', error)
+    }
+
+    purchases = userPurchases || []
+
+    // Generate secure download tokens for each product
+    if (purchases.length > 0) {
+      purchases.forEach((item: any) => {
+        const product = item.products
+        if (product) {
+          downloadTokens[product.id] = signDownloadToken(
+            {
+              uid: user.id,
+              pid: product.id,
+              type: product.product_type,
+              ip: '127.0.0.1',
+            },
+            3600 // 1 hour token
+          )
+        }
+      })
+    }
   }
 
   const userName =
-    user.user_metadata?.full_name ||
-    user.user_metadata?.name ||
-    user.email?.split('@')[0] ||
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email?.split('@')[0] ||
     'Producer'
 
   return (
     <EpicLibraryClient
-      purchases={(purchases as any) || []}
-      userEmail={user.email || ''}
+      purchases={purchases}
+      userEmail={user?.email || ''}
       userName={userName}
       downloadTokens={downloadTokens}
+      initialUser={user}
     />
   )
 }

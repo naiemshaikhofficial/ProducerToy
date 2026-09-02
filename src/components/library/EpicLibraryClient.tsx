@@ -27,8 +27,11 @@ import {
   Sparkles,
   AlertCircle
 } from 'lucide-react'
-import { BillingHistory } from '@/components/BillingHistory'
-import { getSecureDownloadUrlAction } from '@/actions/downloadActions'
+import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
+import { getUserLibraryAction } from '@/actions/libraryActions'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { LogoIcon } from '@/components/Logo'
 
 interface PurchaseItem {
   id: string
@@ -65,14 +68,76 @@ interface EpicLibraryClientProps {
   userEmail: string
   userName?: string
   downloadTokens: Record<string, string>
+  initialUser?: any
 }
 
 export function EpicLibraryClient({
-  purchases,
-  userEmail,
-  userName,
-  downloadTokens,
+  purchases: initialPurchases,
+  userEmail: initialUserEmail,
+  userName: initialUserName,
+  downloadTokens: initialDownloadTokens,
+  initialUser,
 }: EpicLibraryClientProps) {
+  const router = useRouter()
+  const { user: authUser, loading: authLoading } = useAuth()
+
+  const [purchases, setPurchases] = useState<PurchaseItem[]>(initialPurchases || [])
+  const [userEmail, setUserEmail] = useState<string>(initialUserEmail || '')
+  const [userName, setUserName] = useState<string>(initialUserName || '')
+  const [downloadTokens, setDownloadTokens] = useState<Record<string, string>>(initialDownloadTokens || {})
+  const [isClientFetching, setIsClientFetching] = useState(!initialUser)
+
+  // Hybrid Auth Check: Only redirect if client is genuinely NOT logged in
+  useEffect(() => {
+    if (initialUser) {
+      setIsClientFetching(false)
+      return
+    }
+
+    if (authLoading) return
+
+    if (!authUser) {
+      // User is genuinely not logged in
+      router.push('/auth?next=/library')
+      return
+    }
+
+    // User is logged in on client side -> Fetch verified purchases
+    const fetchClientLibrary = async () => {
+      try {
+        setIsClientFetching(true)
+        const res = await getUserLibraryAction()
+        if (res.success && res.user) {
+          setPurchases(res.purchases || [])
+          setUserEmail(res.user.email || authUser.email || '')
+          setUserName(res.user.name || authUser.user_metadata?.full_name || 'Producer')
+          setDownloadTokens(res.downloadTokens || {})
+        } else {
+          // Client-side direct query fallback
+          const { createClient: createBrowserClient } = await import('@/lib/supabase/client')
+          const supabase = createBrowserClient()
+          const { data: clientPurchases } = await supabase
+            .from('purchases')
+            .select('*, products(*, brands(name))')
+            .eq('user_id', authUser.id)
+            .order('purchased_at', { ascending: false })
+
+          if (clientPurchases) {
+            setPurchases(clientPurchases as any[])
+            setUserEmail(authUser.email || '')
+            setUserName(authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'Producer')
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching client library:', err)
+      } finally {
+        setIsClientFetching(false)
+      }
+    }
+
+    fetchClientLibrary()
+  }, [initialUser, authUser, authLoading, router])
+
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'all' | 'favorites' | 'plugins' | 'sounds' | 'receipts'>('all')
   const [favorites, setFavorites] = useState<string[]>([])
