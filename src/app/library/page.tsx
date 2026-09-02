@@ -23,7 +23,7 @@ export default async function LibraryPage() {
   const adminSupabase = getAdminClient()
   const { data: purchases, error } = await adminSupabase
     .from('purchases')
-    .select('*, products(*)')
+    .select('*, products(*, brands(name))')
     .eq('user_id', user.id)
     .order('purchased_at', { ascending: false })
 
