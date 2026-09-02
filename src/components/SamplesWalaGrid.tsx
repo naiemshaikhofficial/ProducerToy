@@ -10,7 +10,7 @@ interface SamplesWalaGridProps {
   title?: string
 }
 
-export function SamplesWalaGrid({ products, title = "Samples Wala X Producer Toy" }: SamplesWalaGridProps) {
+export function SamplesWalaGrid({ products, title = "Samples Wala ✕ Producer Toy" }: SamplesWalaGridProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Filter products strictly by Samples Wala brand (excluding coming soon items)
@@ -36,44 +36,50 @@ export function SamplesWalaGrid({ products, title = "Samples Wala X Producer Toy
 
   return (
     <section className="w-full my-8 sm:my-12 lg:my-16 select-none">
-      {/* Header Row with Arrow Navigation */}
+      {/* Minimalist Epic Header Row */}
       <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h2>
-          <Link 
-            href="/store?brand=samples-wala" 
-            prefetch={true}
-            className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
-          >
-            <span>{title}</span>
-            <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2>
+            <Link 
+              href="/store?brand=samples-wala" 
+              prefetch={true}
+              className="group inline-flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-white hover:text-white/80 transition-colors tracking-tight"
+            >
+              <span>{title}</span>
+              <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </h2>
 
-        {/* Scroll Control Arrows */}
-        <div className="flex items-center gap-2.5">
+          <span className="hidden sm:inline-flex items-center text-[11px] font-semibold text-zinc-400 bg-[#1e1e1e] border border-[#2a2a2a] px-2.5 py-0.5 rounded-full">
+            Sound Partner
+          </span>
+        </div>
+
+        {/* Minimal Scroll Control Arrows */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
+            className="w-9 h-9 rounded-full bg-[#1c1c1e] hover:bg-[#28282b] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm active:scale-95 cursor-pointer border border-white/10"
             aria-label="Scroll left"
             title="Previous items"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full bg-[#202020] hover:bg-[#303030] text-white/80 hover:text-white flex items-center justify-center transition-colors shadow-md active:scale-95 cursor-pointer border border-white/15"
+            className="w-9 h-9 rounded-full bg-[#1c1c1e] hover:bg-[#28282b] text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm active:scale-95 cursor-pointer border border-white/10"
             aria-label="Scroll right"
             title="Next items"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* 3:4 Poster Card Grid / Scroll Container */}
+      {/* Epic Games Store Poster Card Grid / Scroll Container */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-4 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none pb-4 snap-x snap-mandatory"
+        className="flex gap-4 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none pb-3 snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {displayProducts.map((product) => (
