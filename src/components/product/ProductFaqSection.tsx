@@ -30,7 +30,7 @@ export function generateProductFaqs(product: ProductFaqProps['product']) {
       question: `Is ${product.name} free to download?`,
       answer: isFree
         ? `Yes, ${product.name} by ${brandName} is 100% free to download on Producer Toy Store with direct instant access and zero subscription required.`
-        : `${product.name} is available for purchase on Producer Toy Store with instant digital delivery, lifetime access, and Toywards rewards.`,
+        : `${product.name} is available for purchase on Producer Toy Store with instant digital delivery and lifetime access.`,
     },
     {
       question: `Which DAWs and music software are compatible with ${product.name}?`,

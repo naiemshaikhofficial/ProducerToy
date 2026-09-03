@@ -116,6 +116,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 <span>My Achievements</span>
               </Link>
 
+              {/* TOYWARDS FEATURE (Commented out for future launch)
               <Link
                 href="/account?tab=rewards"
                 prefetch={true}
@@ -125,6 +126,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 <ToywardsIcon size={18} />
                 <span>Toywards</span>
               </Link>
+              */}
 
               {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
               <Link

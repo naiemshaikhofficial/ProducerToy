@@ -627,6 +627,7 @@ export function EpicProductDetailClient({
 
         {/* F. Metadata Specs List */}
         <div className="border-t border-b border-[#222222] py-3 space-y-3 text-xs">
+          {/* TOYWARDS FEATURE (Commented out for future launch)
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Toywards</span>
             <Link
@@ -634,10 +635,11 @@ export function EpicProductDetailClient({
               target="_blank"
               className="font-bold text-zinc-200 hover:text-white flex items-center gap-1.5 transition-colors"
             >
-              <span>Earn <strong className="text-[#FA742B]">Toywards</strong></span>
-              <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
+              <span>Earn <strong className="text-[#FC6301]">Toywards</strong></span>
+              <ToywardsSparkleIcon size={14} className="text-[#FC6301]" />
             </Link>
           </div>
+          */}
 
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Refund Type</span>
@@ -881,11 +883,11 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Highlight Promo Card: Producer Toy Club / Toywards (Positioned cleanly below description) */}
+            {/* TOYWARDS FEATURE (Commented out for future launch)
             <div className="p-5 sm:p-6 rounded-2xl border border-[#3b1706] bg-gradient-to-r from-[#260e03] via-[#1c0a02] to-[#121212] space-y-3 shadow-xl">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#FA742B]/10 border border-[#FA742B]/30 flex items-center justify-center flex-shrink-0">
-                  <ToywardsSparkleIcon size={20} className="text-[#FA742B]" />
+                <div className="w-10 h-10 rounded-xl bg-[#FC6301]/10 border border-[#FC6301]/30 flex items-center justify-center flex-shrink-0">
+                  <ToywardsSparkleIcon size={20} className="text-[#FC6301]" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white tracking-tight">
@@ -907,6 +909,7 @@ export function EpicProductDetailClient({
                 </Link>
               </div>
             </div>
+            */}
 
             {/* Add-ons Tab */}
             {activeTab === 'addons' && (
@@ -992,7 +995,7 @@ export function EpicProductDetailClient({
               </div>
             )}
 
-            {/* Toywards Rewards Pill */}
+            {/* TOYWARDS FEATURE (Commented out for future launch)
             {Number(product.price_usd) > 0 && !isOwned && !product.is_coming_soon && (
               <Link
                 href="/features/toywards"
@@ -1000,12 +1003,13 @@ export function EpicProductDetailClient({
                 className="inline-flex items-center gap-2 bg-[#26150b] hover:bg-[#321b0f] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-xs select-none shadow-xs transition-colors group cursor-pointer"
                 title="Learn more about Toywards"
               >
-                <ToywardsSparkleIcon size={14} className="text-[#FA742B]" />
+                <ToywardsSparkleIcon size={14} className="text-[#FC6301]" />
                 <span className="text-zinc-300">
-                  Earn <span className="text-[#FA742B] font-semibold">Toywards Rewards</span> on this purchase
+                  Earn <span className="text-[#FC6301] font-semibold">Toywards Rewards</span> on this purchase
                 </span>
               </Link>
             )}
+            */}
           </div>
 
           {/* Desktop CTA Action Buttons (Standardized h-12 Height & Icons) */}

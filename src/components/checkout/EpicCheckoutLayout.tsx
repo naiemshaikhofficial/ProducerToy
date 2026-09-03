@@ -287,7 +287,7 @@ export function EpicCheckoutLayout({
             </h2>
           </div>
 
-          {/* Toywards Rewards Balance Box */}
+          {/* TOYWARDS FEATURE (Commented out for future launch)
           <div className="bg-[#202020] border border-[#2c2c2c] rounded-xl p-3.5 transition-all">
             <button
               type="button"
@@ -353,6 +353,7 @@ export function EpicCheckoutLayout({
               </div>
             )}
           </div>
+          */}
 
           {/* Payment Methods Card Container */}
           {!isFree && (
@@ -624,7 +625,7 @@ export function EpicCheckoutLayout({
             </div>
           </div>
 
-          {/* Toywards Rewards Pill Badge (Minimalist Neutral Theme) */}
+          {/* TOYWARDS FEATURE (Commented out for future launch)
           {!isFree && (
             <div>
               <div className="inline-flex items-center gap-2 bg-[#1c1c1c] border border-[#2a2a2a] px-3.5 py-2 rounded-lg text-[12.5px] select-none w-fit shadow-xs">
@@ -635,6 +636,7 @@ export function EpicCheckoutLayout({
               </div>
             </div>
           )}
+          */}
 
           {/* Gift Refund Policy Agreement Checkbox */}
           {hasGiftItems && (
@@ -864,7 +866,7 @@ export function EpicCheckoutLayout({
               </div>
             </div>
 
-            {/* Toywards Rewards Pill Badge */}
+            {/* TOYWARDS FEATURE (Commented out for future launch)
             {!isFree && (
               <div className="inline-flex items-center gap-2 bg-[#1c1c1c] border border-[#2a2a2a] px-3.5 py-1.5 rounded-full text-[12.5px] select-none w-fit shadow-xs">
                 <ToywardsIcon size={15} />
@@ -873,6 +875,7 @@ export function EpicCheckoutLayout({
                 </span>
               </div>
             )}
+            */}
           </div>
         </div>
 
@@ -881,37 +884,34 @@ export function EpicCheckoutLayout({
           <div className="space-y-6">
             {/* Top User Avatar & Name / Guest Indicator */}
             {user ? (
-              <div className="flex items-center gap-2.5 text-[13px] font-normal text-zinc-300 pr-8">
-                <div className="w-6 h-6 rounded-full bg-[#242424] border border-[#333333] text-white flex items-center justify-center text-[11px] font-bold">
-                  {initialLetter}
+              <div className="flex items-center justify-between pb-3 border-b border-[#222222]">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#202024] border border-white/10 flex items-center justify-center text-xs font-bold text-white uppercase">
+                    {(user.email?.[0] || 'U')}
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white block">
+                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                    </span>
+                    <span className="text-[11px] text-zinc-500 block truncate max-w-[180px]">
+                      {user.email}
+                    </span>
+                  </div>
                 </div>
-                <span className="truncate max-w-[220px]">{displayName}</span>
               </div>
             ) : (
-              <div className="flex items-center justify-between text-[12.5px] font-normal text-zinc-400 pr-8">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-[#242424] border border-[#333333] text-zinc-400 flex items-center justify-center text-[10px] font-bold">
-                    G
-                  </div>
-                  <span>Guest Checkout</span>
-                </div>
-                <Link
-                  href="/auth?next=/checkout"
-                  className="text-zinc-300 hover:text-white text-xs font-bold underline transition-colors"
-                >
-                  Sign In
-                </Link>
+              <div className="flex items-center justify-between pb-3 border-b border-[#222222]">
+                <span className="text-xs text-zinc-400">Checkout as Guest</span>
               </div>
             )}
 
-            {/* Section Title */}
             <div>
               <h2 className="text-[23px] font-black text-white tracking-tight">
                 Payment Details
               </h2>
             </div>
 
-            {/* Toywards Box */}
+            {/* TOYWARDS FEATURE (Commented out for future launch)
             <div className="bg-[#1c1c1c] border border-[#282828] rounded-xl p-3.5 transition-all">
               <button
                 type="button"
@@ -971,6 +971,7 @@ export function EpicCheckoutLayout({
                 </div>
               )}
             </div>
+            */}
 
             {/* Payment Methods Group Box */}
             {!isFree && (

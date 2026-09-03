@@ -80,7 +80,10 @@ export const metadata: Metadata = generatePageMetadata({
   ],
 })
 
+import { redirect } from 'next/navigation'
+
 export default function ToywardsFeaturePage() {
+  redirect('/')
   return (
     <main className="min-h-screen bg-[#121212] text-white select-none pb-24 font-sans">
       <FAQPageJsonLd faqs={FAQ_ITEMS} />

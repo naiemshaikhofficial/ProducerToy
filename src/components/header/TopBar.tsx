@@ -215,6 +215,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <span>My Achievements</span>
                     </Link>
 
+                    {/* TOYWARDS FEATURE (Commented out for future launch)
                     <Link
                       href="/account?tab=rewards"
                       prefetch={true}
@@ -224,6 +225,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <ToywardsIcon size={16} />
                       <span>Toywards</span>
                     </Link>
+                    */}
 
                     {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
                     <Link

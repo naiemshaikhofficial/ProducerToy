@@ -160,6 +160,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
             <span>Subscriptions</span>
           </button>
 
+          {/* TOYWARDS FEATURE (Commented out for future launch)
           <button
             type="button"
             onClick={() => onSelectTab('rewards')}
@@ -175,6 +176,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
             />
             <span>Toywards</span>
           </button>
+          */}
 
           <button
             type="button"

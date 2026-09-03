@@ -234,10 +234,11 @@ export default function EpicAccountClient() {
             {/* TAB: TRANSACTIONS */}
             {activeTab === 'transactions' && <TransactionsTab user={user} />}
 
-            {/* TAB: EPIC REWARDS */}
+            {/* TOYWARDS FEATURE (Commented out for future launch)
             {activeTab === 'rewards' && (
               <RewardsAndWalletTab type="rewards" profile={profile} />
             )}
+            */}
 
             {/* TAB: PAYMENT SETTINGS */}
             {activeTab === 'payment' && (
