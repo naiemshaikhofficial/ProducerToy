@@ -247,7 +247,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         </div>
                       ) : isDiscount ? (
                         <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                          <span className="bg-[#FA742B] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
+                          <span className="bg-[#FC6301] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
                             {item.statusBadge}
                           </span>
                           <span className="line-through text-zinc-500 text-xs font-normal">
@@ -363,7 +363,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                           </span>
                         ) : isDiscount ? (
                           <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                            <span className="bg-[#FA742B] text-white font-black text-[10px] px-1.5 py-0.5 rounded">
+                            <span className="bg-[#FC6301] text-white font-black text-[10px] px-1.5 py-0.5 rounded">
                               {item.statusBadge}
                             </span>
                             <span className="line-through text-zinc-500 text-[11px] font-normal">

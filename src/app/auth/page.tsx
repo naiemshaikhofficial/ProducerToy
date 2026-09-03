@@ -444,10 +444,10 @@ function AuthForm() {
   return (
     /* Unified Dark Background (#121212) */
     <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center px-4 py-8 sm:py-14 select-none">
-      
+
       {/* Dark Auth Card Container (#161616 background, border #262626, rounded-2xl) */}
       <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-all">
-        
+
         {/* DEDICATED EMAIL CONFIRMATION SCREEN (SIGNUP) */}
         {isEmailSent ? (
           <div className="flex flex-col items-center text-center space-y-6 py-2 animate-in fade-in">
@@ -720,13 +720,12 @@ function AuthForm() {
                       {[1, 2, 3, 4].map((bar) => (
                         <div
                           key={bar}
-                          className={`h-1 flex-1 rounded-full transition-colors ${
-                            bar <= passwordStrength
+                          className={`h-1 flex-1 rounded-full transition-colors ${bar <= passwordStrength
                               ? passwordStrength <= 2
                                 ? 'bg-zinc-400'
                                 : 'bg-white'
                               : 'bg-[#2a2a2a]'
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
@@ -735,10 +734,10 @@ function AuthForm() {
                       {passwordStrength <= 1
                         ? 'Weak'
                         : passwordStrength === 2
-                        ? 'Medium'
-                        : passwordStrength === 3
-                        ? 'Strong'
-                        : 'Very Strong'}
+                          ? 'Medium'
+                          : passwordStrength === 3
+                            ? 'Strong'
+                            : 'Very Strong'}
                     </span>
                   </div>
                 )}
@@ -817,14 +816,14 @@ function AuthForm() {
                     ? "Create an Account"
                     : 'Set Your Details'
                   : step === 'email'
-                  ? 'Sign in to ProducerToy'
-                  : 'Enter your password'}
+                    ? 'Sign in to ProducerToy'
+                    : 'Enter your password'}
               </h1>
 
               {nextUrl.includes('checkout') && (
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#202020] border border-[#303030] text-zinc-300 text-[11.5px] font-semibold tracking-wide animate-in fade-in">
-                  <span>🔒 Sign in to complete your checkout &amp; instant download</span>
-                </div>
+                <p className="text-[13px] text-zinc-400 font-normal animate-in fade-in">
+                  to complete your checkout
+                </p>
               )}
 
               {(nextUrl.startsWith('http://') || nextUrl.startsWith('https://')) && (
@@ -1110,13 +1109,12 @@ function AuthForm() {
                         {[1, 2, 3, 4].map((bar) => (
                           <div
                             key={bar}
-                            className={`h-1 flex-1 rounded-full transition-colors ${
-                              bar <= passwordStrength
+                            className={`h-1 flex-1 rounded-full transition-colors ${bar <= passwordStrength
                                 ? passwordStrength <= 2
-                                ? 'bg-zinc-400'
-                                : 'bg-white'
+                                  ? 'bg-zinc-400'
+                                  : 'bg-white'
                                 : 'bg-[#2a2a2a]'
-                            }`}
+                              }`}
                           />
                         ))}
                       </div>
@@ -1125,10 +1123,10 @@ function AuthForm() {
                         {passwordStrength <= 1
                           ? 'Weak'
                           : passwordStrength === 2
-                          ? 'Medium'
-                          : passwordStrength === 3
-                          ? 'Strong'
-                          : 'Very Strong'}
+                            ? 'Medium'
+                            : passwordStrength === 3
+                              ? 'Strong'
+                              : 'Very Strong'}
                       </span>
                     </div>
                   )}

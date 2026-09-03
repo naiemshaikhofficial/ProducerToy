@@ -986,10 +986,10 @@ export function EpicProductDetailClient({
                   <>
                     {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
                       <>
-                        <span className="text-xs bg-[#FA742B] text-white font-bold px-2 py-1 rounded">
+                        <span className="text-xs bg-[#FC6301] text-white font-bold px-2 py-0.5 rounded">
                           -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
                         </span>
-                        <span className="text-base text-zinc-500 line-through">
+                        <span className="text-sm text-zinc-500 line-through">
                           {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
                         </span>
                       </>
@@ -1052,7 +1052,7 @@ export function EpicProductDetailClient({
                   <button
                     type="button"
                     onClick={handleFreeAction}
-                    className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FA742B] hover:bg-[#E05A18] text-white active:scale-[0.99] shadow-lg shadow-[#FA742B]/20"
+                    className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#FC6301] hover:bg-[#e05700] text-white active:scale-[0.99] shadow-md shadow-[#FC6301]/20"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download Free</span>
@@ -1061,10 +1061,10 @@ export function EpicProductDetailClient({
                   <button
                     type="button"
                     onClick={() => addItem(product, true)}
-                    className={`w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] shadow-lg ${
+                    className={`w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.99] shadow-md ${
                       added
                         ? 'bg-[#282828] hover:bg-[#303030] border border-[#383838] text-white'
-                        : 'bg-[#FA742B] hover:bg-[#E05A18] text-white shadow-[#FA742B]/20'
+                        : 'bg-[#FC6301] hover:bg-[#e05700] text-white shadow-[#FC6301]/20'
                     }`}
                   >
                     {added ? <Check className="w-4 h-4 text-white" /> : <ShoppingCart className="w-4 h-4" />}

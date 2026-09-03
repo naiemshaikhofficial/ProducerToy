@@ -89,7 +89,7 @@ export function FreeProducerToys({ products = [] }: FreeProducerToysProps) {
               </div>
 
               {/* Flush Bottom Action Bar (Static Brand Orange FREE) */}
-              <div className="bg-[#FA742B] group-hover:brightness-105 text-black font-black text-[10px] sm:text-[13px] py-1.5 sm:py-2 px-2 text-center uppercase tracking-wider rounded-b-lg sm:rounded-b-xl shadow-md transition-all duration-200">
+              <div className="bg-[#FC6301] group-hover:bg-[#e05700] text-white font-black text-[10px] sm:text-[12px] py-1.5 px-2 text-center uppercase tracking-wider rounded-b-lg sm:rounded-b-xl transition-colors">
                 FREE
               </div>
 

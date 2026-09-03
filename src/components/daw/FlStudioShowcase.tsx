@@ -545,12 +545,14 @@ export function FlStudioShowcase() {
           </div>
 
           {/* Producer Edition (Most Popular) */}
-          <div className="relative bg-[#16120e] border-2 border-[#FC6301] rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-xl shadow-[#FC6301]/10">
-            <div className="absolute -top-3 left-6 bg-[#FC6301] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">
-              Most popular
-            </div>
-            <div className="space-y-3 pt-1">
-              <h3 className="text-xl font-bold text-white">Producer Edition</h3>
+          <div className="relative bg-[#141210] border border-[#FC6301]/70 rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-md shadow-[#FC6301]/5 hover:border-[#FC6301] transition-all">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-white">Producer Edition</h3>
+                <span className="text-[10px] font-black uppercase text-[#FC6301] tracking-wider">
+                  Most popular
+                </span>
+              </div>
               <div className="text-3xl sm:text-4xl font-extrabold text-white">
                 ₹7,500
               </div>

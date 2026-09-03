@@ -236,7 +236,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                               </span>
                             ) : hasDiscount ? (
                               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                                <span className="bg-[#FA742B] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
+                                <span className="bg-[#FC6301] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
                                   -{discountPercent}%
                                 </span>
                                 <span className="line-through text-zinc-500 text-xs font-normal">
