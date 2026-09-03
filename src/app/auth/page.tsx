@@ -828,8 +828,9 @@ function AuthForm() {
               )}
 
               {(nextUrl.startsWith('http://') || nextUrl.startsWith('https://')) && (
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FC6301]/10 border border-[#FC6301]/30 text-zinc-200 text-[11.5px] font-semibold tracking-wide animate-in fade-in">
-                  <span>⚡ Create a free account or sign in to continue to official partner store</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#202020] border border-[#303030] text-[11.5px] text-white font-medium tracking-wide animate-in fade-in">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  <span>Sign in or create a free account to continue to partner store</span>
                 </div>
               )}
 
