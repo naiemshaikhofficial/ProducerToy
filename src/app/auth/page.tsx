@@ -426,6 +426,11 @@ function AuthForm() {
           throw new Error('Please confirm your email address before logging in.')
         }
 
+        if (nextUrl.startsWith('http://') || nextUrl.startsWith('https://')) {
+          window.location.href = nextUrl
+          return
+        }
+
         router.push(nextUrl)
         router.refresh()
       }
@@ -819,6 +824,12 @@ function AuthForm() {
               {nextUrl.includes('checkout') && (
                 <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#202020] border border-[#303030] text-zinc-300 text-[11.5px] font-semibold tracking-wide animate-in fade-in">
                   <span>🔒 Sign in to complete your checkout &amp; instant download</span>
+                </div>
+              )}
+
+              {(nextUrl.startsWith('http://') || nextUrl.startsWith('https://')) && (
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FC6301]/10 border border-[#FC6301]/30 text-zinc-200 text-[11.5px] font-semibold tracking-wide animate-in fade-in">
+                  <span>⚡ Create a free account or sign in to continue to official partner store</span>
                 </div>
               )}
 

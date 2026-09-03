@@ -13,6 +13,8 @@ import {
   ExternalLink,
   Infinity as InfinityIcon,
 } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 const AFFILIATE_URL = 'https://go.image-line.com/qWL015'
 
@@ -440,6 +442,18 @@ const FAQS = [
 ]
 
 export function FlStudioShowcase() {
+  const { user } = useAuth()
+  const router = useRouter()
+
+  const handleAffiliateClick = (e: React.MouseEvent, url: string = AFFILIATE_URL) => {
+    e.preventDefault()
+    if (!user) {
+      router.push(`/auth?next=${encodeURIComponent(url)}`)
+      return
+    }
+    window.open(url, '_blank')
+  }
+
   const [searchQuery, setSearchQuery] = useState('')
   const [openFaqs, setOpenFaqs] = useState<Record<number, boolean>>({})
 
@@ -520,20 +534,19 @@ export function FlStudioShowcase() {
                 Basic melody &amp; loop creation, step sequencer and pattern clips.
               </p>
             </div>
-            <a
-              href={AFFILIATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#202024] hover:bg-[#2c2c32] text-white border border-zinc-700 transition-colors flex items-center justify-center gap-1.5"
+            <button
+              type="button"
+              onClick={(e) => handleAffiliateClick(e)}
+              className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#202024] hover:bg-[#2c2c32] text-white border border-zinc-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>Buy Fruity Edition</span>
               <ExternalLink size={13} />
-            </a>
+            </button>
           </div>
 
           {/* Producer Edition (Most Popular) */}
-          <div className="relative bg-[#16120e] border-2 border-[#FA742B] rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-xl shadow-[#FA742B]/10">
-            <div className="absolute -top-3 left-6 bg-[#FA742B] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">
+          <div className="relative bg-[#16120e] border-2 border-[#FC6301] rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-xl shadow-[#FC6301]/10">
+            <div className="absolute -top-3 left-6 bg-[#FC6301] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full">
               Most popular
             </div>
             <div className="space-y-3 pt-1">
@@ -546,25 +559,23 @@ export function FlStudioShowcase() {
               </p>
               <div className="pt-1 text-xs text-zinc-400">
                 <span>Get 2 million extra sounds free for 3 months. </span>
-                <a
-                  href={AFFILIATE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#FA742B] hover:underline font-semibold inline-flex items-center gap-0.5"
+                <button
+                  type="button"
+                  onClick={(e) => handleAffiliateClick(e)}
+                  className="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-0.5 cursor-pointer"
                 >
                   Learn more
-                </a>
+                </button>
               </div>
             </div>
-            <a
-              href={AFFILIATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-[#FA742B] hover:bg-[#E05A18] text-white transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95"
+            <button
+              type="button"
+              onClick={(e) => handleAffiliateClick(e)}
+              className="w-full py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-[#FC6301] hover:bg-[#e05700] text-white transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
             >
               <span>Buy Producer Edition</span>
               <ArrowRight size={14} />
-            </a>
+            </button>
           </div>
 
           {/* Signature Bundle */}
@@ -578,15 +589,14 @@ export function FlStudioShowcase() {
                 Producer Edition + Gross Beat, Newtone pitch editor, Harmless &amp; Hardcore guitar FX.
               </p>
             </div>
-            <a
-              href={AFFILIATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#202024] hover:bg-[#2c2c32] text-white border border-zinc-700 transition-colors flex items-center justify-center gap-1.5"
+            <button
+              type="button"
+              onClick={(e) => handleAffiliateClick(e)}
+              className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#202024] hover:bg-[#2c2c32] text-white border border-zinc-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>Buy Signature Bundle</span>
               <ExternalLink size={13} />
-            </a>
+            </button>
           </div>
 
           {/* All Plugins Edition */}
@@ -600,15 +610,14 @@ export function FlStudioShowcase() {
                 The complete powerhouse with EVERY native Image-Line synthesizer and effect.
               </p>
             </div>
-            <a
-              href={AFFILIATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#202024] hover:bg-[#2c2c32] text-white border border-zinc-700 transition-colors flex items-center justify-center gap-1.5"
+            <button
+              type="button"
+              onClick={(e) => handleAffiliateClick(e)}
+              className="w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#202024] hover:bg-[#2c2c32] text-white border border-zinc-700 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>Buy All Plugins Edition</span>
               <ExternalLink size={13} />
-            </a>
+            </button>
           </div>
 
         </div>
@@ -788,15 +797,14 @@ export function FlStudioShowcase() {
         </div>
 
         <div className="pt-2">
-          <a
-            href={AFFILIATE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-sm py-4 px-8 rounded-xl transition-all shadow-xl shadow-[#FA742B]/20 active:scale-95 cursor-pointer"
+          <button
+            type="button"
+            onClick={(e) => handleAffiliateClick(e)}
+            className="inline-flex items-center gap-2 bg-[#FC6301] hover:bg-[#e05700] text-white font-extrabold text-sm py-4 px-8 rounded-xl transition-all shadow-xl shadow-[#FC6301]/20 active:scale-95 cursor-pointer"
           >
             <span>Buy FL Studio</span>
             <ArrowRight size={16} />
-          </a>
+          </button>
         </div>
 
         {/* Sleek Hardware Display Frame (Exact 1:1 match with reference) */}

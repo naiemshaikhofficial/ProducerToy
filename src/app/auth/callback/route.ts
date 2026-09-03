@@ -77,7 +77,11 @@ export async function GET(request: Request) {
         console.warn('OAuth callback profile sync note:', syncErr)
       }
 
-      return NextResponse.redirect(`${requestUrl.origin}${next}`)
+      const redirectTarget = next.startsWith('http://') || next.startsWith('https://')
+        ? next
+        : `${requestUrl.origin}${next.startsWith('/') ? next : `/${next}`}`
+
+      return NextResponse.redirect(redirectTarget)
     }
   }
 

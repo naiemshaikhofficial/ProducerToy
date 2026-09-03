@@ -118,10 +118,18 @@ export function EpicProductDetailClient({
   const isCurrentPlaying = currentTrack?.id === product.id && isPlaying
   const added = isInCart(product.id)
 
+  const handleExternalAction = (url: string) => {
+    if (!user) {
+      router.push(`/auth?next=${encodeURIComponent(url)}`)
+      return
+    }
+    window.open(url, '_blank')
+  }
+
   // Free action for 100% free toys
   const handleFreeAction = () => {
     if (product.external_url) {
-      window.open(product.external_url, '_blank')
+      handleExternalAction(product.external_url)
       return
     }
     if (product.download_url || product.download_url_win || product.download_url_mac) {
@@ -484,15 +492,14 @@ export function EpicProductDetailClient({
         {/* E. CTA Action Buttons */}
         <div className="space-y-3 pt-1">
           {product.external_url ? (
-            <a
-              href={product.external_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#FA742B] hover:bg-[#E05A18] text-white py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+            <button
+              type="button"
+              onClick={() => handleExternalAction(product.external_url!)}
+              className="bg-[#FC6301] hover:bg-[#e05700] text-white py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FC6301]/20 cursor-pointer"
             >
               <ExternalLink className="w-4 h-4" />
               <span>{product.button_text || 'Get Now'}</span>
-            </a>
+            </button>
           ) : isOwned ? (
             <Link
               href="/library"
@@ -1015,15 +1022,14 @@ export function EpicProductDetailClient({
           {/* Desktop CTA Action Buttons (Standardized h-12 Height & Icons) */}
           <div className="space-y-2.5 pt-1">
             {product.external_url ? (
-              <a
-                href={product.external_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#FA742B] hover:bg-[#E05A18] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FA742B]/20 cursor-pointer"
+              <button
+                type="button"
+                onClick={() => handleExternalAction(product.external_url!)}
+                className="bg-[#FC6301] hover:bg-[#e05700] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#FC6301]/20 cursor-pointer active:scale-[0.99]"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
-              </a>
+              </button>
             ) : isOwned ? (
               <Link
                 href="/library"
