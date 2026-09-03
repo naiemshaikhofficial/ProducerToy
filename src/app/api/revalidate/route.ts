@@ -23,13 +23,24 @@ async function handleRevalidation(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams
   let tag = searchParams.get('tag')
   let path = searchParams.get('path')
-  const secret = searchParams.get('secret')
+  const secretParam = searchParams.get('secret') || searchParams.get('token')
+  const authHeader = req.headers.get('authorization')
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+  const headerSecret =
+    req.headers.get('x-revalidation-token') ||
+    req.headers.get('x-revalidate-secret') ||
+    bearerToken
 
-  // Optional security check (if REVALIDATE_SECRET is configured in env)
-  const envSecret = process.env.REVALIDATE_SECRET
-  if (envSecret && secret && secret !== envSecret) {
+  const incomingSecret = secretParam || headerSecret
+
+  // Verify against either REVALIDATE_SECRET or REVALIDATION_TOKEN in environment
+  const configuredSecret = process.env.REVALIDATE_SECRET || process.env.REVALIDATION_TOKEN
+  if (configuredSecret && incomingSecret && incomingSecret !== configuredSecret) {
+    console.warn('[Revalidate Webhook] Unauthorized attempt with invalid secret')
     return NextResponse.json({ error: 'Unauthorized secret' }, { status: 401 })
   }
+
+  const revalidatedItems: string[] = []
 
   // Handle Supabase Webhook Body if available
   if (req.method === 'POST') {
@@ -39,40 +50,75 @@ async function handleRevalidation(req: NextRequest) {
         const body = await req.json().catch(() => null)
         if (body && body.table) {
           const table = body.table
-          const slug = body.record?.slug || body.old_record?.slug
+          const eventType = body.type || 'UNKNOWN'
+          const currentSlug = body.record?.slug
+          const previousSlug = body.old_record?.slug
+
+          console.log(`[Revalidate Webhook] Supabase ${eventType} event received for table: "${table}"`)
 
           if (table === 'products') {
             tag = 'products'
             revalidateTag('homepage_products')
+            revalidateTag('products')
             revalidatePath('/', 'page')
+            revalidatePath('/', 'layout')
             revalidatePath('/store', 'page')
+            revalidatePath('/store', 'layout')
             revalidatePath('/free-vst-plugins', 'page')
-            if (slug) {
-              revalidatePath(`/product/${slug}`, 'page')
-              revalidatePath(`/products/${slug}`, 'page')
-              revalidatePath(`/p/${slug}`, 'page')
+            revalidatePath('/product/[slug]', 'page')
+            revalidatePath('/p/[slug]', 'page')
+            revalidatePath('/products/[slug]', 'page')
+
+            revalidatedItems.push(
+              'tag:products',
+              'tag:homepage_products',
+              'path:/',
+              'path:/store',
+              'path:/product/[slug]'
+            )
+
+            // Revalidate current product slug
+            if (currentSlug) {
+              revalidatePath(`/product/${currentSlug}`)
+              revalidatePath(`/p/${currentSlug}`)
+              revalidatePath(`/products/${currentSlug}`)
+              revalidatedItems.push(`path:/product/${currentSlug}`)
+            }
+
+            // Revalidate old product slug if renamed
+            if (previousSlug && previousSlug !== currentSlug) {
+              revalidatePath(`/product/${previousSlug}`)
+              revalidatePath(`/p/${previousSlug}`)
+              revalidatePath(`/products/${previousSlug}`)
+              revalidatedItems.push(`path:/product/${previousSlug} (renamed)`)
             }
           } else if (table === 'blogs' || table === 'blog_posts') {
             tag = 'blogs'
             revalidatePath('/blog', 'page')
-            if (slug) {
-              revalidatePath(`/blog/${slug}`, 'page')
+            revalidatePath('/blog', 'layout')
+            if (currentSlug) {
+              revalidatePath(`/blog/${currentSlug}`)
+              revalidatedItems.push(`path:/blog/${currentSlug}`)
             }
           } else if (table === 'categories' || table === 'subcategories') {
             revalidatePath('/categories', 'layout')
             revalidatePath('/store', 'page')
+            revalidatePath('/store', 'layout')
+            revalidatePath('/', 'page')
+            revalidatedItems.push('path:/categories', 'path:/store', 'path:/')
           } else if (table === 'brands') {
             revalidatePath('/brands', 'layout')
             revalidatePath('/manufacturers', 'layout')
+            revalidatePath('/store', 'page')
+            revalidatePath('/', 'page')
+            revalidatedItems.push('path:/brands', 'path:/manufacturers', 'path:/store', 'path:/')
           }
         }
       }
-    } catch {
-      // JSON parse fallback
+    } catch (e: any) {
+      console.warn('[Revalidate Webhook] JSON parse error:', e.message)
     }
   }
-
-  const revalidatedItems: string[] = []
 
   try {
     // 1. Revalidate by tag (e.g., 'products', 'homepage_products', 'blogs')
