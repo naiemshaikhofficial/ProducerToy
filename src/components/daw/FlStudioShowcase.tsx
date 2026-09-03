@@ -448,7 +448,7 @@ export function FlStudioShowcase() {
   const handleAffiliateClick = (e: React.MouseEvent, url: string = AFFILIATE_URL) => {
     e.preventDefault()
     if (!user) {
-      router.push(`/auth?next=${encodeURIComponent(url)}`)
+      window.location.href = `/auth?next=${encodeURIComponent(url)}`
       return
     }
     window.open(url, '_blank')
