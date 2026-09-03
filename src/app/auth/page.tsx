@@ -828,10 +828,9 @@ function AuthForm() {
               )}
 
               {(nextUrl.startsWith('http://') || nextUrl.startsWith('https://')) && (
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#202020] border border-[#303030] text-[11.5px] text-white font-medium tracking-wide animate-in fade-in">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                  <span>Sign in or create a free account to continue to partner store</span>
-                </div>
+                <p className="text-[13px] text-zinc-400 font-normal animate-in fade-in">
+                  to continue to partner store
+                </p>
               )}
 
               {step === 'details' && (
