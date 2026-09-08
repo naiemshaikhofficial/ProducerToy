@@ -10,8 +10,10 @@ import {
   ShoppingCart,
   Bookmark,
   Gift,
+  Loader2,
 } from 'lucide-react'
 import { useGifts } from '@/context/GiftContext'
+import { liveSearchAction, SearchProductResult } from '@/actions/searchActions'
 
 interface SubBarProps {
   searchQuery: string
@@ -66,6 +68,46 @@ export const SubBar: React.FC<SubBarProps> = ({
   const mobileInputRef = useRef<HTMLInputElement>(null)
   const discoverButtonRef = useRef<HTMLDivElement>(null)
   const discoverMenuRef = useRef<HTMLDivElement>(null)
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+
+  const [suggestions, setSuggestions] = useState<SearchProductResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false)
+
+  // Live search debounced fetch
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSuggestions([])
+      setIsSuggestionsOpen(false)
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true)
+      try {
+        const results = await liveSearchAction(searchQuery)
+        setSuggestions(results)
+        setIsSuggestionsOpen(results.length > 0)
+      } catch (e) {
+        console.error('Failed to fetch search suggestions:', e)
+      } finally {
+        setIsSearching(false)
+      }
+    }, 180)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // Close search dropdown on click outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsSuggestionsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
 
   // Focus input when mobile search opens
   useEffect(() => {
@@ -274,28 +316,99 @@ export const SubBar: React.FC<SubBarProps> = ({
         {/* Left Side: Search Capsule + Navigation Links */}
         <div className="flex items-center">
           
-          {/* Search Pill */}
-          <div className="relative w-[240px] lg:w-[270px] flex-shrink-0">
-            <form onSubmit={onSearchSubmit} className="relative w-full">
+          {/* Search Pill with Live Suggestions Dropdown */}
+          <div ref={searchContainerRef} className="relative w-[240px] lg:w-[270px] flex-shrink-0">
+            <form
+              onSubmit={(e) => {
+                setIsSuggestionsOpen(false)
+                onSearchSubmit(e)
+              }}
+              className="relative w-full"
+            >
               <Search className="w-4 h-4 text-zinc-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
+                onFocus={() => {
+                  if (suggestions.length > 0) setIsSuggestionsOpen(true)
+                }}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Search store"
                 className="w-full bg-[#202020] hover:bg-[#252525] focus:bg-[#2a2a2a] text-white text-[13px] pl-10 pr-8 h-[42px] rounded-full border border-transparent focus:outline-none focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-400 transition-all font-sans"
               />
-              {searchQuery && (
+              {isSearching ? (
+                <Loader2 className="w-3.5 h-3.5 text-zinc-400 animate-spin absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              ) : searchQuery ? (
                 <button
                   type="button"
-                  onClick={() => onSearchChange('')}
+                  onClick={() => {
+                    onSearchChange('')
+                    setSuggestions([])
+                    setIsSuggestionsOpen(false)
+                  }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white p-1 rounded-full cursor-pointer"
                   title="Clear search"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
-              )}
+              ) : null}
             </form>
+
+            {/* Live Suggestions Dropdown */}
+            {isSuggestionsOpen && suggestions.length > 0 && (
+              <div className="absolute top-[48px] left-0 w-[320px] bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-2xl overflow-hidden z-[100] animate-in fade-in zoom-in-95 duration-150">
+                <div className="p-2 divide-y divide-zinc-800/60 max-h-[360px] overflow-y-auto">
+                  {suggestions.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/product/${item.slug}`}
+                      onClick={() => setIsSuggestionsOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#242424] transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-md bg-[#222] overflow-hidden flex-shrink-0 relative border border-white/5">
+                        {item.cover_image ? (
+                          <img
+                            src={item.cover_image}
+                            alt={item.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-zinc-600 text-xs font-bold">
+                            PT
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-medium text-white truncate group-hover:text-[#FA742B] transition-colors">
+                          {item.name}
+                        </p>
+                        <p className="text-[11px] text-zinc-400 truncate">
+                          {item.brand}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <span className={`text-[12px] font-semibold ${item.price_usd === 0 ? 'text-[#00FF94]' : 'text-zinc-200'}`}>
+                          {item.price_usd === 0 ? 'Free' : `$${item.price_usd.toFixed(2)}`}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <div className="bg-[#141414] px-3 py-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-400">
+                  <span>Press Enter to view all</span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      setIsSuggestionsOpen(false)
+                      onSearchSubmit(e)
+                    }}
+                    className="text-[#FA742B] hover:underline font-medium cursor-pointer"
+                  >
+                    View All &rarr;
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Desktop Sub Navigation Links */}
