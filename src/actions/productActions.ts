@@ -9,7 +9,7 @@ import { revalidateTag, revalidatePath } from 'next/cache'
  */
 export async function revalidateProductsAction(tag: string = 'products') {
   try {
-    revalidateTag(tag)
+    (revalidateTag as any)(tag, 'max')
     revalidatePath('/')
     return { success: true, revalidated: tag, timestamp: Date.now() }
   } catch (error: any) {

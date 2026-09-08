@@ -11,6 +11,18 @@ import { revalidateTag, revalidatePath } from 'next/cache'
  * GET/POST /api/revalidate?path=/
  * POST /api/revalidate (with Supabase Webhook payload: { table: "products", record: { slug: "..." } })
  */
+function safeRevalidateTag(tagName: string) {
+  try {
+    (revalidateTag as any)(tagName, 'max')
+  } catch {
+    try {
+      (revalidateTag as any)(tagName)
+    } catch (e) {
+      console.warn('[REVALIDATE_TAG_ERROR]', e)
+    }
+  }
+}
+
 export async function GET(req: NextRequest) {
   return handleRevalidation(req)
 }
@@ -58,8 +70,8 @@ async function handleRevalidation(req: NextRequest) {
 
           if (table === 'products') {
             tag = 'products'
-            revalidateTag('homepage_products')
-            revalidateTag('products')
+            safeRevalidateTag('homepage_products')
+            safeRevalidateTag('products')
             revalidatePath('/', 'page')
             revalidatePath('/', 'layout')
             revalidatePath('/store', 'page')
@@ -123,7 +135,7 @@ async function handleRevalidation(req: NextRequest) {
   try {
     // 1. Revalidate by tag (e.g., 'products', 'homepage_products', 'blogs')
     if (tag) {
-      revalidateTag(tag)
+      safeRevalidateTag(tag)
       revalidatedItems.push(`tag:${tag}`)
     }
 
@@ -135,8 +147,8 @@ async function handleRevalidation(req: NextRequest) {
 
     // If neither tag nor path was passed, default to revalidating 'products' and home '/'
     if (!tag && !path && revalidatedItems.length === 0) {
-      revalidateTag('products')
-      revalidateTag('homepage_products')
+      safeRevalidateTag('products')
+      safeRevalidateTag('homepage_products')
       revalidatePath('/')
       revalidatePath('/store')
       revalidatedItems.push('tag:products', 'tag:homepage_products', 'path:/', 'path:/store')

@@ -185,17 +185,9 @@ export async function processCheckoutAction(
       }
     }
 
-    // Fallback: If products are not in DB, populate from cart items metadata
-    if (dbProducts.length === 0) {
-      dbProducts = items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        price_usd: Number(item.price_usd || 0),
-        price_inr: Number(item.price_inr || 0),
-        product_type: item.product_type || 'plugin',
-        delivery_method: 'instant_download',
-        license_type: 'free_standard',
-      }))
+    // Security Enforcement: Reject if products are not found in official database catalog
+    if (!dbProducts || dbProducts.length === 0) {
+      return { success: false, error: 'Items could not be verified in official product catalog' }
     }
 
     // 3.1 Verify server-side total and coupons strictly against database to prevent unpaid bypass
@@ -539,7 +531,11 @@ export async function createRazorpayOrderAction(
       .select('id, name, price_inr, price_usd')
       .in('id', productIds)
 
-    const prods = dbProducts && dbProducts.length > 0 ? dbProducts : items
+    if (!dbProducts || dbProducts.length === 0) {
+      return { success: false, error: 'One or more items could not be verified in product catalog' }
+    }
+
+    const prods = dbProducts
 
     const rawSubtotalInr = prods.reduce((sum: number, p: any) => {
       const inr = Number(p.price_inr || 0)
@@ -666,7 +662,15 @@ export async function verifyRazorpayPaymentAction(params: {
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex')
 
-    if (expectedSignature !== razorpay_signature) {
+    // Constant-time cryptographic HMAC verification (Timing-Safe attack defense)
+    const isSignatureValid =
+      expectedSignature.length === razorpay_signature.length &&
+      crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, 'utf-8'),
+        Buffer.from(razorpay_signature, 'utf-8')
+      )
+
+    if (!isSignatureValid) {
       return { success: false, error: 'Invalid Razorpay payment signature' }
     }
 
@@ -688,7 +692,11 @@ export async function verifyRazorpayPaymentAction(params: {
       .select('id, name, price_inr, price_usd, product_type, delivery_method, license_type, slug')
       .in('id', productIds)
 
-    dbProducts = prodsData && prodsData.length > 0 ? prodsData : items
+    if (!prodsData || prodsData.length === 0) {
+      return { success: false, error: 'Order items could not be validated against official product catalog.' }
+    }
+
+    dbProducts = prodsData
 
     const { getUsdToInrRate } = await import('@/lib/exchangeRate')
     const liveRate = await getUsdToInrRate()
@@ -1014,7 +1022,11 @@ export async function createPayPalOrderAction(
       .select('id, name, price_usd, price_inr')
       .in('id', productIds)
 
-    const prods = dbProducts && dbProducts.length > 0 ? dbProducts : items
+    if (!dbProducts || dbProducts.length === 0) {
+      return { success: false, error: 'One or more items could not be verified in product catalog' }
+    }
+
+    const prods = dbProducts
 
     const rawSubtotalUsd = prods.reduce(
       (sum: number, p: any) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 85 : 0)),
@@ -1108,7 +1120,11 @@ export async function capturePayPalOrderAction(params: {
       .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug')
       .in('id', productIds)
 
-    const dbProducts = prodsData && prodsData.length > 0 ? prodsData : items
+    if (!prodsData || prodsData.length === 0) {
+      return { success: false, error: 'Order items could not be validated against official product catalog.' }
+    }
+
+    const dbProducts = prodsData
 
     const rawSubtotalUsd = dbProducts.reduce(
       (sum, p) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 85 : 0)),
