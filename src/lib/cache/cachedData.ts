@@ -15,7 +15,7 @@ export const getCachedBrands = unstable_cache(
     const supabase = getAdminClient()
     const { data, error } = await supabase
       .from('brands')
-      .select('id, name, slug, logo_url, description')
+      .select('id, name, slug, logo_url, description, website_url')
       .order('name')
 
     if (error) {
@@ -36,7 +36,7 @@ export const getCachedBrandBySlug = (slug: string) => {
       const supabase = getAdminClient()
       const { data, error } = await supabase
         .from('brands')
-        .select('id, name, slug, logo_url, description')
+        .select('id, name, slug, logo_url, description, website_url')
         .eq('slug', cleanSlug)
         .maybeSingle()
 
@@ -113,7 +113,7 @@ export const getCachedProductBySlug = (slug: string) => {
       const supabase = getAdminClient()
       const { data, error } = await supabase
         .from('products')
-        .select('*, categories(name, slug), subcategories!subcategory_id(name, slug), brands!brand_id(name, slug, logo_url)')
+        .select('*, categories(name, slug), subcategories!subcategory_id(name, slug), brands!brand_id(name, slug, logo_url, website_url)')
         .eq('slug', cleanSlug)
         .eq('is_active', true)
         .maybeSingle()

@@ -255,6 +255,17 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
                 <span>Filter in Store</span>
                 <ExternalLink size={14} />
               </Link>
+              {(brand as any)?.website_url && (
+                <a
+                  href={(brand as any).website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-zinc-700/80 text-xs font-bold px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all inline-flex items-center justify-center gap-2"
+                >
+                  <span>Official Website</span>
+                  <ExternalLink size={13} className="text-[#FA742B]" />
+                </a>
+              )}
             </div>
 
           </div>
