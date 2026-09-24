@@ -8,7 +8,7 @@ import { ProductCard, Product } from '@/components/ProductCard'
 import { generatePageMetadata, generateSmartKeywords } from '@/lib/seo/metadata'
 import { CollectionPageJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { LocalDataCache } from '@/components/LocalDataCache'
-import { ArrowLeft, Building2, ExternalLink, Handshake, Sparkles, CheckCircle2, SlidersHorizontal } from 'lucide-react'
+import { ArrowLeft, Building2, ExternalLink, Handshake, Sparkles, CheckCircle2, SlidersHorizontal, ShoppingBag, ArrowRight } from 'lucide-react'
 
 export const revalidate = false // 🟢 Infinite edge cache (purged on-demand via /api/revalidate)
 
@@ -252,10 +252,11 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
               <Link
                 href={`/store?brand=${brand.slug}`}
                 prefetch={true}
-                className="bg-[#FA742B] hover:bg-[#E05800] text-white text-xs font-black px-6 py-3 rounded-xl uppercase tracking-wider text-center transition-all shadow-lg inline-flex items-center justify-center gap-2"
+                className="bg-[#FA742B] hover:bg-[#E05800] text-white text-xs font-black px-6 py-3 rounded-xl uppercase tracking-wider text-center transition-all shadow-lg inline-flex items-center justify-center gap-2 group whitespace-nowrap"
               >
-                <span>Filter in Store</span>
-                <ExternalLink size={14} />
+                <ShoppingBag size={14} className="transition-transform group-hover:scale-110" />
+                <span>View Products in Store</span>
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
               {(brand as any)?.website_url && (
                 <a
