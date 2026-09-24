@@ -22,7 +22,7 @@ import { LocalDataCache } from '@/components/LocalDataCache'
 export const revalidate = false
 
 export const metadata: Metadata = generatePageMetadata({
-  title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
+  title: 'Producer Toy — Music Production VST Plugins, Samples & Presets',
   description:
     'Download world-class VST plugins, royalty-free sample packs, Serum synth presets, and DAW templates on Producer Toy. The premier marketplace for modern music creators.',
   path: '/',

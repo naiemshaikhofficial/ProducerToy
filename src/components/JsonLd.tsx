@@ -289,7 +289,7 @@ export function StoreOrganizationJsonLd() {
     '@type': ['Organization', 'OnlineStore'],
     '@id': 'https://producertoy.com/#organization',
     name: 'Producer Toy',
-    alternateName: ['ProducerToy', 'Producer Toy Store'],
+    alternateName: ['ProducerToy', 'Producer Toy Store', 'producertoy.com'],
     url: 'https://producertoy.com',
     logo: {
       '@type': 'ImageObject',
@@ -300,10 +300,11 @@ export function StoreOrganizationJsonLd() {
       caption: 'Producer Toy Logo',
     },
     image: 'https://producertoy.com/Icon.png',
-    description: 'The premier minimalist marketplace for music producers. Download VST plugins, sample packs, synth presets, and DAW templates.',
+    description: 'The premier marketplace for modern music creators. Download VST plugins, sample packs, synth presets, and DAW templates on Producer Toy.',
     sameAs: [
       'https://twitter.com/producertoy',
       'https://instagram.com/producertoy',
+      'https://youtube.com/@producertoy',
     ],
   }
 
@@ -319,9 +320,17 @@ export function WebSiteJsonLd() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': 'https://producertoy.com/#website',
     name: 'Producer Toy',
-    alternateName: ['ProducerToy', 'Producer Toy Store'],
+    alternateName: ['ProducerToy', 'Producer Toy Store', 'producertoy.com'],
     url: 'https://producertoy.com',
+    publisher: {
+      '@type': 'Organization',
+      '@id': 'https://producertoy.com/#organization',
+      name: 'Producer Toy',
+      url: 'https://producertoy.com',
+      logo: 'https://producertoy.com/Icon.png',
+    },
     potentialAction: {
       '@type': 'SearchAction',
       target: {

@@ -20,9 +20,10 @@ export const metadata: Metadata = {
       ? process.env.NEXT_PUBLIC_SITE_URL
       : 'https://producertoy.com'
   ),
+  applicationName: 'Producer Toy',
   title: {
-    default: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
-    template: '%s | Producer Toy Store',
+    default: 'Producer Toy — Music Production VST Plugins, Samples & Presets',
+    template: '%s | Producer Toy',
   },
   description:
     'The premier minimalist marketplace for music producers. Download premium and free VST plugins, sample packs, synth presets, and DAW templates.',
@@ -69,8 +70,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://producertoy.com',
-    siteName: 'Producer Toy Store',
-    title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
+    siteName: 'Producer Toy',
+    title: 'Producer Toy — Music Production VST Plugins, Samples & Presets',
     description:
       'The premier minimalist marketplace for music producers. Download premium and free VST plugins, sample packs, synth presets, and DAW templates.',
     images: [
@@ -84,7 +85,7 @@ export const metadata: Metadata = {
         url: 'https://producertoy.com/pt-banner.png',
         width: 1200,
         height: 630,
-        alt: 'Producer Toy Store',
+        alt: 'Producer Toy',
       },
     ],
   },
@@ -93,7 +94,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
+    title: 'Producer Toy — Music Production VST Plugins, Samples & Presets',
     description:
       'The premier minimalist marketplace for music producers. Download premium and free VST plugins, sample packs, synth presets, and DAW templates.',
     images: ['https://producertoy.com/pt-banner.png'],
