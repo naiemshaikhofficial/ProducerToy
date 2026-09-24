@@ -15,7 +15,11 @@ export async function updateSession(request: NextRequest) {
 
   // 🟢 PREFETCH OPTIMIZATION: Next.js aggressively prefetches pages on Link hover/view.
   // We DO NOT need to perform a costly Supabase network request (getUser) for prefetch requests.
-  const isPrefetch = request.headers.get('purpose') === 'prefetch' || request.headers.get('x-middleware-prefetch') === '1'
+  const isPrefetch =
+    request.headers.get('purpose') === 'prefetch' ||
+    request.headers.get('sec-purpose') === 'prefetch' ||
+    request.headers.get('x-middleware-prefetch') === '1' ||
+    request.headers.get('next-router-prefetch') === '1'
   if (isPrefetch) {
     return { supabaseResponse, user: null }
   }

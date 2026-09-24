@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { cache } from 'react'
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import Link from 'next/link'
@@ -20,6 +20,27 @@ interface BrandPageProps {
     sort?: string
   }>
 }
+
+// React cache wrapper: Ensures Database is queried EXACTLY ONCE per brand render
+const getCachedBrand = cache(async (slug: string) => {
+  const cleanSlug = decodeURIComponent(slug).trim().toLowerCase()
+  const supabase = getAdminClient()
+  const { data } = await supabase
+    .from('brands')
+    .select('id, name, slug, logo_url, description, website_url')
+    .eq('slug', cleanSlug)
+    .maybeSingle()
+  return data
+})
+
+const getCachedOtherBrands = cache(async () => {
+  const supabase = getAdminClient()
+  const { data } = await supabase
+    .from('brands')
+    .select('id, name, slug, logo_url')
+    .limit(10)
+  return data || []
+})
 
 export async function generateStaticParams() {
   try {
@@ -43,13 +64,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: BrandPageProps): Promise<Metadata> {
   const { slug } = await params
   const cleanSlug = decodeURIComponent(slug).trim().toLowerCase()
-  const supabase = getAdminClient()
-
-  const { data: dbBrand } = await supabase
-    .from('brands')
-    .select('id, name, slug, description, logo_url')
-    .eq('slug', cleanSlug)
-    .maybeSingle()
+  const dbBrand = await getCachedBrand(cleanSlug)
 
   const brand = dbBrand || {
     name: cleanSlug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
@@ -77,29 +92,21 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
   const cleanSlug = decodeURIComponent(slug).trim().toLowerCase()
   const supabase = getAdminClient()
 
-  // 1. Fetch Brand Info and All Active Products for this brand in parallel
-  const [brandRes, productsRes, otherBrandsRes] = await Promise.all([
-    supabase
-      .from('brands')
-      .select('id, name, slug, logo_url, description, website_url')
-      .eq('slug', cleanSlug)
-      .maybeSingle(),
+  // 1. Fetch Brand Info and All Active Products in parallel (Brand is cached via React cache)
+  const [dbBrand, productsRes, otherBrandsList] = await Promise.all([
+    getCachedBrand(cleanSlug),
     supabase
       .from('products')
       .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
       .eq('is_active', true),
-    supabase
-      .from('brands')
-      .select('id, name, slug, logo_url')
-      .neq('slug', cleanSlug)
-      .limit(8),
+    getCachedOtherBrands(),
   ])
 
   const allProducts = (productsRes.data || []) as Product[]
-  const allBrands = (otherBrandsRes.data || [])
+  const allBrands = otherBrandsList.filter((b) => b.slug !== cleanSlug).slice(0, 8)
 
   // Resolve brand from DB or construct gracefully from slug
-  let brand = brandRes.data
+  let brand = dbBrand
   if (!brand) {
     // Try to find in allProducts or otherBrands
     const matchedBrand = allBrands.find(
@@ -155,7 +162,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
     brandProducts.sort((a, b) => (b.price_usd || 0) - (a.price_usd || 0))
   }
 
-  const otherBrands = otherBrandsRes.data || []
+  const otherBrands = allBrands
   const baseUrl = `/manufacturers/${brand.slug}`
 
   return (

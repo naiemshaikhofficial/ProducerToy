@@ -2,6 +2,7 @@
 
 import { getAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { convertUsdToInr } from '@/lib/exchangeRate'
 
 export interface WishlistProduct {
   id: string
@@ -48,9 +49,7 @@ export async function getWishlistAction(userId?: string): Promise<{ success: boo
           name,
           slug,
           product_type,
-          price_inr,
           price_usd,
-          original_price_inr,
           original_price_usd,
           cover_image,
           demo_audio_url,
@@ -82,9 +81,9 @@ export async function getWishlistAction(userId?: string): Promise<{ success: boo
           slug: p.slug,
           brand: brandName,
           product_type: p.product_type,
-          price_inr: Number(p.price_inr) || 0,
+          price_inr: convertUsdToInr(Number(p.price_usd) || 0),
           price_usd: Number(p.price_usd) || 0,
-          original_price_inr: p.original_price_inr ? Number(p.original_price_inr) : undefined,
+          original_price_inr: p.original_price_usd ? convertUsdToInr(Number(p.original_price_usd)) : undefined,
           original_price_usd: p.original_price_usd ? Number(p.original_price_usd) : undefined,
           cover_image: p.cover_image,
           demo_audio_url: p.demo_audio_url,
