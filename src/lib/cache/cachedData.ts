@@ -144,3 +144,24 @@ export const getCachedActiveProductSlugs = unstable_cache(
   ['producertoy-active-product-slugs'],
   { revalidate: 86400, tags: ['products'] }
 )
+
+// 7. All Active Products for Hubs & Curated Lists (24h Cache)
+export const getCachedActiveProducts = unstable_cache(
+  async () => {
+    const supabase = getAdminClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, brands!brand_id(name, slug, logo_url), categories(name, slug), subcategories(name, slug)')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.warn('[getCachedActiveProducts] notice:', error.message)
+      return []
+    }
+    return (data || []) as any[]
+  },
+  ['producertoy-all-active-products-list'],
+  { revalidate: 86400, tags: ['products'] }
+)
+

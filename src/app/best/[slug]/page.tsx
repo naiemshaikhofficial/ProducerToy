@@ -7,6 +7,7 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import { ItemListJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { Star, Download, ExternalLink, ShieldCheck, Cpu } from 'lucide-react'
+import { getCachedActiveProducts } from '@/lib/cache/cachedData'
 
 export const revalidate = false // 🟢 Infinite edge cache
 
@@ -243,15 +244,8 @@ export default async function BestOfRoundupPage({
     notFound()
   }
 
-  const supabase = getAdminClient()
-
-  // Fetch products matching tags or category
-  const { data: rawProducts } = await supabase
-    .from('products')
-    .select('*, brands!brand_id(name, slug, logo_url), categories(name, slug), subcategories(name, slug)')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-
+  // Fetch products from persistent cache (0 DB hits)
+  const rawProducts = await getCachedActiveProducts()
   const allProducts = (rawProducts as any[]) || []
 
   // Filter products by matching slug tags

@@ -44,20 +44,14 @@ const FREE_VST_FAQS = [
   },
 ]
 
+import { getCachedActiveProducts } from '@/lib/cache/cachedData'
+
 export default async function FreeVstPluginsHubPage() {
-  const supabase = getAdminClient()
-
-  // Fetch all active products from DB (Free and Coming Soon)
-  const { data: allActiveProducts } = await supabase
-    .from('products')
-    .select('*, categories(slug, name), subcategories(slug, name), brands!brand_id(id, name, slug, logo_url)')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-
-  const allProducts: Product[] = (allActiveProducts as any[]) || []
+  // Fetch all active products from persistent cache (0 DB hits)
+  const allProducts = await getCachedActiveProducts()
   
   // Real DB Free products (price === 0)
-  const freeProducts = allProducts.filter((p) => Number(p.price_usd) === 0 && !p.is_coming_soon)
+  const freeProducts = allProducts.filter((p: any) => Number(p.price_usd) === 0 && !p.is_coming_soon)
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-20">

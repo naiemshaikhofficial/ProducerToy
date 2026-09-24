@@ -9,6 +9,7 @@ import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ProductCard, Product } from '@/components/ProductCard'
 import { FolderCheck, Cpu, HardDrive, CheckCircle2 } from 'lucide-react'
 import { FlStudioShowcase } from '@/components/daw/FlStudioShowcase'
+import { getCachedActiveProducts } from '@/lib/cache/cachedData'
 
 export const revalidate = false // 🟢 Infinite edge cache
 
@@ -246,15 +247,8 @@ export default async function DawLandingPage({
     notFound()
   }
 
-  const supabase = getAdminClient()
-
-  // Fetch active products
-  const { data: rawProducts } = await supabase
-    .from('products')
-    .select('*, brands!brand_id(name, slug, logo_url), categories(name, slug), subcategories(name, slug)')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-
+  // Fetch active products from persistent cache (0 DB hits)
+  const rawProducts = await getCachedActiveProducts()
   const products: Product[] = (rawProducts as any[]) || []
 
   const isFlStudio = slug === 'fl-studio'

@@ -41,7 +41,7 @@ export function RelatedProductsSection({
         const supabase = createClient()
         let query = supabase
           .from('products')
-          .select('id, name, slug, price_usd, price_inr, cover_image, product_type, brands!brand_id(name)')
+          .select('id, name, slug, price_usd, cover_image, product_type, brands!brand_id(name)')
           .eq('is_active', true)
           .neq('id', currentProductId)
           .limit(4)
@@ -58,7 +58,7 @@ export function RelatedProductsSection({
           // Fallback query if no exact type match
           const { data: fallbackData } = await supabase
             .from('products')
-            .select('id, name, slug, price_usd, price_inr, cover_image, product_type, brands!brand_id(name)')
+            .select('id, name, slug, price_usd, cover_image, product_type, brands!brand_id(name)')
             .eq('is_active', true)
             .neq('id', currentProductId)
             .limit(4)
