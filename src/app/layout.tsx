@@ -13,6 +13,8 @@ import { CartDrawer } from '@/components/CartDrawer'
 import { ImageProtection } from '@/components/ImageProtection'
 import { ContentProtection } from '@/components/ContentProtection'
 import { StoreOrganizationJsonLd, WebSiteJsonLd } from '@/components/JsonLd'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -166,6 +168,8 @@ export default function RootLayout({
             </CartProvider>
           </CurrencyProvider>
         </AuthProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
