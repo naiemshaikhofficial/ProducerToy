@@ -4,7 +4,9 @@ export interface ProductJsonLdProps {
   name: string
   description?: string
   image?: string
+  images?: string[]
   brandName?: string
+  brandWebsite?: string
   priceUsd: number
   priceInr?: number
   currency?: string
@@ -23,7 +25,9 @@ export function ProductJsonLd({
   name,
   description,
   image,
+  images,
   brandName = 'Producer Toy',
+  brandWebsite,
   priceUsd,
   priceInr,
   currency = 'USD',
@@ -48,7 +52,11 @@ export function ProductJsonLd({
     ...keywords,
   ]
 
-  const productImage = image || 'https://producertoy.com/Icon.png'
+  const imageList =
+    images && images.length > 0
+      ? images
+      : [image || 'https://producertoy.com/Icon.png']
+  const primaryImage = imageList[0] || 'https://producertoy.com/Icon.png'
   const finalRatingValue = Number(ratingValue) > 0 ? Number(ratingValue).toFixed(1) : '4.9'
   const finalReviewCount = Number(reviewCount) > 0 ? Number(reviewCount).toString() : '96'
   const numericPriceUsd = Number(priceUsd) || 0
@@ -69,12 +77,12 @@ export function ProductJsonLd({
     name: name,
     headline: `${name} by ${brandName}`,
     alternateName: [`${name} by ${brandName}`, `${brandName} ${name}`, `Free ${name}`],
-    description: description || `Download ${name} by ${brandName} on Producer Toy Store. Fast direct download for ${vstFormat}.`,
-    image: [productImage],
+    description: description || `Download ${name} by ${brandName} on Producer Toy. Fast direct download for ${vstFormat}.`,
+    image: imageList,
     primaryImageOfPage: {
       '@type': 'ImageObject',
-      contentUrl: productImage,
-      url: productImage,
+      contentUrl: primaryImage,
+      url: primaryImage,
       caption: `${name} by ${brandName}`,
     },
     mainEntityOfPage: {
@@ -86,6 +94,7 @@ export function ProductJsonLd({
     brand: {
       '@type': 'Brand',
       name: brandName,
+      ...(brandWebsite ? { url: brandWebsite, sameAs: [brandWebsite] } : {}),
     },
     applicationCategory: 'MultimediaApplication',
     operatingSystem: 'Windows 10/11 64-bit, macOS 10.15+ (Apple Silicon M1/M2/M3 & Intel)',

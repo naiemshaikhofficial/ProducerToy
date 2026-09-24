@@ -126,17 +126,27 @@ export default async function EpicProductDetailPage({
   const categorySlug = product.categories?.slug || (product.product_type ? product.product_type.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'plugins')
   const ytVideoId = extractYouTubeId(product.youtube_url || product.video_url)
 
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
+      ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
+      : 'https://producertoy.com'
+  const brandName = product.brands?.name || product.brand || 'Producer Toy'
+  const isFree = Number(product.price_usd) === 0
+  const productType = product.product_type || 'VST Plugin'
+  const dynamicOgImage = `${siteUrl}/api/og?title=${encodeURIComponent(product.name)}&brand=${encodeURIComponent(brandName)}&type=${encodeURIComponent(productType)}&rating=4.9&price=${encodeURIComponent(isFree ? 'FREE' : `$${Number(product.price_usd).toFixed(2)}`)}&image=${encodeURIComponent(product.cover_image || '')}`
+
   return (
     <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 text-white min-h-screen">
       {/* 🟢 Search Engine Structured Data (Product + Multi-Currency + FAQ + Video Rich Snippets) */}
       <ProductJsonLd
         name={product.name}
         description={cleanDescriptionText(product.short_description || product.description)}
-        image={product.cover_image}
-        brandName={product.brands?.name || product.brand || 'Producer Toy'}
+        images={[product.cover_image, dynamicOgImage].filter(Boolean)}
+        brandName={brandName}
+        brandWebsite={(product.brands as any)?.website_url}
         priceUsd={product.price_usd || 0}
         priceInr={product.price_inr}
-        isFree={Number(product.price_usd) === 0}
+        isFree={isFree}
         url={`https://producertoy.com/product/${product.slug}`}
         categoryName={product.product_type || 'VST Plugin'}
         vstFormat={product.vst_format || 'VST3, AU, AAX'}

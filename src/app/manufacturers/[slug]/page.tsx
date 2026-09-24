@@ -182,6 +182,23 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
         }))}
       />
 
+      {/* Brand Entity Schema for Google Knowledge Graph */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Brand',
+            '@id': `https://producertoy.com/manufacturers/${brand.slug}#brand`,
+            name: brand.name,
+            url: `https://producertoy.com/manufacturers/${brand.slug}`,
+            logo: brand.logo_url || 'https://producertoy.com/Icon.png',
+            ...(brand.website_url ? { sameAs: [brand.website_url] } : {}),
+            description: brand.description || `Official software and sound collections from ${brand.name} on Producer Toy.`,
+          }),
+        }}
+      />
+
       <div className="max-w-[1240px] mx-auto space-y-10">
         
         {/* Navigation Breadcrumb & Back Link */}
