@@ -21,34 +21,15 @@ interface BrandPageProps {
   }>
 }
 
-// React cache wrapper: Ensures Database is queried EXACTLY ONCE per brand render
-const getCachedBrand = cache(async (slug: string) => {
-  const cleanSlug = decodeURIComponent(slug).trim().toLowerCase()
-  const supabase = getAdminClient()
-  const { data } = await supabase
-    .from('brands')
-    .select('id, name, slug, logo_url, description, website_url')
-    .eq('slug', cleanSlug)
-    .maybeSingle()
-  return data
-})
+import { getCachedBrandBySlug, getCachedTopBrands, getCachedBrands } from '@/lib/cache/cachedData'
 
-const getCachedOtherBrands = cache(async () => {
-  const supabase = getAdminClient()
-  const { data } = await supabase
-    .from('brands')
-    .select('id, name, slug, logo_url')
-    .limit(10)
-  return data || []
-})
+// Use persistent server-side Next.js Data Cache (persists across requests & builds)
+const getCachedBrand = getCachedBrandBySlug
+const getCachedOtherBrands = () => getCachedTopBrands(10)
 
 export async function generateStaticParams() {
   try {
-    const supabase = getAdminClient()
-    const { data: brands } = await supabase
-      .from('brands')
-      .select('slug')
-
+    const brands = await getCachedBrands()
     if (!brands) return []
     return brands
       .filter((b) => b && b.slug)
@@ -119,7 +100,6 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
         slug: matchedBrand.slug,
         logo_url: matchedBrand.logo_url,
         description: `Explore top-rated audio plugins and sound libraries created by ${matchedBrand.name}.`,
-        website_url: null,
       }
     } else {
       // Graceful fallback brand object so no 404 is ever thrown
@@ -134,7 +114,6 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
         slug: cleanSlug,
         logo_url: null,
         description: `Discover premier VST plugins, preset banks, and sound packs by ${formattedBrandName}.`,
-        website_url: null,
       }
     }
   }
@@ -200,7 +179,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
             name: brand.name,
             url: `https://producertoy.com/manufacturers/${brand.slug}`,
             logo: brand.logo_url || 'https://producertoy.com/Icon.png',
-            ...(brand.website_url ? { sameAs: [brand.website_url] } : {}),
+            ...((brand as any)?.website_url ? { sameAs: [(brand as any).website_url] } : {}),
             description: brand.description || `Official software and sound collections from ${brand.name} on Producer Toy.`,
           }),
         }}

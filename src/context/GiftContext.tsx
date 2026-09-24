@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
 import { useAuth } from './AuthContext'
 import { getUserGiftsAction, GiftRecord } from '@/actions/giftActions'
 import { createClient } from '@/lib/supabase/client'
@@ -76,9 +77,14 @@ export function GiftProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('focus', handleFocus)
   }, [refreshGifts])
 
-  // Supabase Realtime Subscription for instant live updates when someone sends a gift
+  const pathname = usePathname()
+
+  // Supabase Realtime Subscription: Only connect WebSocket when viewing /gifts or /account
+  // This eliminates 24/7 idle WebSockets for general store visitors, staying 100% within free limits!
   useEffect(() => {
     if (!user) return
+    const isGiftActiveRoute = pathname && (pathname.startsWith('/gifts') || pathname.startsWith('/account'))
+    if (!isGiftActiveRoute) return
 
     const supabase = createClient()
     const channel = supabase
@@ -99,7 +105,7 @@ export function GiftProvider({ children }: { children: React.ReactNode }) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [user, refreshGifts])
+  }, [user, pathname, refreshGifts])
 
   const userEmail = (user?.email || '').toLowerCase()
 

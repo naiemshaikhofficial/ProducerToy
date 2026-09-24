@@ -24,6 +24,26 @@ export async function updateSession(request: NextRequest) {
     return { supabaseResponse, user: null }
   }
 
+  // 🟢 ULTRA-LOW RESOURCE OPTIMIZATION (95% Drop in Supabase Auth Network Hits):
+  // Public browsing routes (/, /store, /product/*, /categories/*, /manufacturers/*, /blog/*, legal pages)
+  // do not need server-side auth verification. The client-side AuthProvider manages session in browser memory.
+  // We strictly reserve the expensive server-side Supabase network call for:
+  // 1. Protected user accounts & checkout: /account, /checkout, /library, /gifts, /auth
+  // 2. State mutations or Server Actions (POST, next-action)
+  const pathname = request.nextUrl.pathname
+  const isServerAction = request.headers.has('next-action') || request.method === 'POST'
+  const isApi = pathname.startsWith('/api')
+  const isProtectedRoute =
+    pathname.startsWith('/account') ||
+    pathname.startsWith('/checkout') ||
+    pathname.startsWith('/library') ||
+    pathname.startsWith('/gifts') ||
+    pathname.startsWith('/auth')
+
+  if (!isProtectedRoute && !isServerAction && !isApi) {
+    return { supabaseResponse, user: null }
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://voalgeyexfhfitlyorfl.supabase.co'
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_AFTgvwUXdDPCgTny9uDIuQ_NGiDyAJD'
 

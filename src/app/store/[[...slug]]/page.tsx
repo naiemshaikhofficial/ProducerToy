@@ -1,6 +1,7 @@
 import React from 'react'
 import { Metadata } from 'next'
 import { getAdminClient } from '@/lib/supabase/admin'
+import { getCachedCategories, getCachedSubcategories, getCachedBrands } from '@/lib/cache/cachedData'
 import { ProductCard, Product } from '@/components/ProductCard'
 import { LocalDataCache } from '@/components/LocalDataCache'
 import { matchesSearchQuery } from '@/lib/search'
@@ -222,17 +223,14 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       query = query.order('created_at', { ascending: false })
     }
 
-    // 2. SINGLE PARALLEL NETWORK CALL (1 Roundtrip for ALL database queries)
-    const [dbCatRes, dbSubRes, dbBrandRes, productsRes] = await Promise.all([
-      supabase.from('categories').select('id, name, slug'),
-      supabase.from('subcategories').select('id, name, slug'),
-      supabase.from('brands').select('id, name, slug, logo_url, description').order('name'),
+    // 2. ULTRA-FAST FETCH: Categories, subcategories, and brands are read from Vercel persistent Data Cache (0 Supabase DB hits!)
+    const [dbCatData, dbSubData, dbBrandData, productsRes] = await Promise.all([
+      getCachedCategories(),
+      getCachedSubcategories(),
+      getCachedBrands(),
       query
     ])
 
-    const dbCatData = dbCatRes.data || []
-    const dbSubData = dbSubRes.data || []
-    const dbBrandData = dbBrandRes.data || []
     let fetchedProducts = (productsRes.data || []) as Product[]
 
     const combinedCategories: Array<{ id: string; name: string; slug: string }> = [

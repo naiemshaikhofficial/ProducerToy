@@ -7,7 +7,7 @@ import { Metadata } from 'next'
 import { ProductJsonLd, FAQPageJsonLd, VideoObjectJsonLd } from '@/components/JsonLd'
 import { generatePageMetadata, generateSmartKeywords, cleanDescriptionText } from '@/lib/seo/metadata'
 import { getProductRatingStatsAction } from '@/actions/ratingActions'
-import { generateProductFaqs } from '@/components/product/ProductFaqSection'
+import { generateProductFaqs } from '@/lib/seo/productFaqs'
 
 function extractYouTubeId(url?: string): string | null {
   if (!url) return null
@@ -16,44 +16,18 @@ function extractYouTubeId(url?: string): string | null {
   return match && match[2].length === 11 ? match[2] : null
 }
 
+import { getCachedProductBySlug, getCachedActiveProductSlugs } from '@/lib/cache/cachedData'
+
 // 🟢 ZERO-RESOURCE CDN CACHING: Infinite cache (purged on-demand via /api/revalidate webhook).
 export const revalidate = false
 
-// React cache wrapper: Ensures Database is queried EXACTLY ONCE per request instead of twice!
-const getCachedProduct = cache(async (slug: string) => {
-  const cleanSlug = decodeURIComponent(slug).trim()
-  const supabase = getAdminClient()
-
-  const { data: product } = await supabase
-    .from('products')
-    .select('*, categories(name, slug), subcategories!subcategory_id(name, slug), brands!brand_id(name, slug, logo_url)')
-    .eq('slug', cleanSlug.toLowerCase())
-    .eq('is_active', true)
-    .maybeSingle()
-
-  return product
-})
+// Use persistent server-side Next.js Data Cache (persists across requests & builds)
+const getCachedProduct = getCachedProductBySlug
 
 // Build-time static generation: Pre-renders ALL active products into 100% pure static HTML
 // Result: 0 Vercel Serverless Function Invocations & 0 Supabase DB queries on user visits
 export async function generateStaticParams() {
-  try {
-    const supabase = getAdminClient()
-    const { data: products } = await supabase
-      .from('products')
-      .select('slug')
-      .eq('is_active', true)
-
-    if (!products) return []
-    return products
-      .filter((p) => p && p.slug)
-      .map((p) => ({
-        slug: p.slug,
-      }))
-  } catch (e) {
-    console.error('generateStaticParams product error:', e)
-    return []
-  }
+  return getCachedActiveProductSlugs()
 }
 
 export async function generateMetadata({
