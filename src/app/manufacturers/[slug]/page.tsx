@@ -100,6 +100,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
         slug: matchedBrand.slug,
         logo_url: matchedBrand.logo_url,
         description: `Explore top-rated audio plugins and sound libraries created by ${matchedBrand.name}.`,
+        website_url: (matchedBrand as any)?.website_url || null,
       }
     } else {
       // Graceful fallback brand object so no 404 is ever thrown
@@ -114,6 +115,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
         slug: cleanSlug,
         logo_url: null,
         description: `Discover premier VST plugins, preset banks, and sound packs by ${formattedBrandName}.`,
+        website_url: null,
       }
     }
   }
