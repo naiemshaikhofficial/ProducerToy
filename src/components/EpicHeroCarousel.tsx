@@ -443,7 +443,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
         </div>
 
         {/* Right Sidebar Interactive Product Cards with Animated Progress Fill (PC Only) */}
-        <div className="col-span-3 flex flex-col justify-between gap-2.5 h-[450px]" role="tablist" aria-label="Featured slides">
+        <div className="col-span-3 flex flex-col justify-center gap-2.5 h-[450px]" role="tablist" aria-label="Featured slides">
           {featuredList.map((item, idx) => {
             const isActive = idx === selectedIndex
             return (
@@ -453,7 +453,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 aria-selected={isActive}
                 aria-current={isActive ? 'true' : undefined}
                 onClick={() => handleSelect(idx)}
-                className={`relative flex-1 flex items-center gap-3.5 p-3 rounded-xl transition-all text-left overflow-hidden border ${
+                className={`relative h-[78px] flex-shrink-0 flex items-center gap-3.5 p-3 rounded-xl transition-all text-left overflow-hidden border ${
                   isActive
                     ? 'bg-[#222222] border-[#383838] shadow-lg ring-1 ring-white/10'
                     : 'bg-[#161616] hover:bg-[#1c1c1c] border-[#262626] hover:border-[#383838] opacity-80 hover:opacity-100'
