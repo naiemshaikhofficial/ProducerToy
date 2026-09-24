@@ -9,7 +9,6 @@ import { generatePageMetadata } from '@/lib/seo/metadata'
 import { EpicHeroCarousel } from '@/components/EpicHeroCarousel'
 import { EpicSpotlightBanner } from '@/components/EpicSpotlightBanner'
 import { FreeProducerToys } from '@/components/FreeProducerToys'
-import { ChooseYourDaw } from '@/components/ChooseYourDaw'
 import { ProducerToyGrid } from '@/components/ProducerToyGrid'
 import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
@@ -96,11 +95,6 @@ export default async function HomePage() {
         {/* 7th Section: 1:1 Epic Games Trending Row (High Demand & Latest Products) */}
         <div className="px-4 sm:px-0">
           <EpicTrending products={products} />
-        </div>
-
-        {/* 8th Section: Choose Your Favourite DAW (Last Section) */}
-        <div className="px-4 sm:px-0">
-          <ChooseYourDaw />
         </div>
 
       </div>
