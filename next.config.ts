@@ -18,6 +18,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/products/:slug',
+        destination: '/product/:slug',
+        permanent: true,
+      },
+      {
+        source: '/p/:slug',
+        destination: '/product/:slug',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

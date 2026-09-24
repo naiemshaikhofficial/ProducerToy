@@ -6,6 +6,7 @@ export interface ProductJsonLdProps {
   image?: string
   brandName?: string
   priceUsd: number
+  priceInr?: number
   currency?: string
   sku?: string
   url: string
@@ -15,6 +16,7 @@ export interface ProductJsonLdProps {
   isFree?: boolean
   keywords?: string[]
   vstFormat?: string
+  youtubeUrl?: string
 }
 
 export function ProductJsonLd({
@@ -23,6 +25,7 @@ export function ProductJsonLd({
   image,
   brandName = 'Producer Toy',
   priceUsd,
+  priceInr,
   currency = 'USD',
   sku,
   url,
@@ -48,8 +51,16 @@ export function ProductJsonLd({
   const productImage = image || 'https://producertoy.com/Icon.png'
   const finalRatingValue = Number(ratingValue) > 0 ? Number(ratingValue).toFixed(1) : '4.9'
   const finalReviewCount = Number(reviewCount) > 0 ? Number(reviewCount).toString() : '96'
-  const numericPrice = Number(priceUsd) || 0
-  const formattedPrice = isFree || numericPrice === 0 ? '0.00' : numericPrice.toFixed(2)
+  const numericPriceUsd = Number(priceUsd) || 0
+  const numericPriceInr =
+    priceInr !== undefined && priceInr !== null
+      ? Number(priceInr)
+      : isFree || numericPriceUsd === 0
+      ? 0
+      : Math.round(numericPriceUsd * 85)
+
+  const formattedPriceUsd = isFree || numericPriceUsd === 0 ? '0.00' : numericPriceUsd.toFixed(2)
+  const formattedPriceInr = isFree || numericPriceInr === 0 ? '0.00' : numericPriceInr.toFixed(2)
   const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
 
   const productSchema = {
@@ -81,52 +92,109 @@ export function ProductJsonLd({
     softwareVersion: 'Latest',
     fileFormat: vstFormat,
     offers: {
-      '@type': 'Offer',
-      url,
-      priceCurrency: currency,
-      price: formattedPrice,
-      priceValidUntil: priceValidUntil,
-      itemCondition: 'https://schema.org/NewCondition',
-      availability: 'https://schema.org/InStock',
-      seller: {
-        '@type': 'Organization',
-        name: 'Producer Toy',
-        url: 'https://producertoy.com',
-        logo: 'https://producertoy.com/Icon.png',
-      },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'US',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
-        merchantReturnDays: 0,
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: '0.00',
-          currency: currency,
-        },
-        shippingDestination: {
-          '@type': 'DefinedRegion',
-          addressCountry: 'US',
-        },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 0,
-            maxValue: 0,
-            unitCode: 'DAY',
+      '@type': 'AggregateOffer',
+      priceCurrency: 'USD',
+      lowPrice: formattedPriceUsd,
+      highPrice: formattedPriceUsd,
+      offerCount: '2',
+      offers: [
+        {
+          '@type': 'Offer',
+          url,
+          priceCurrency: 'USD',
+          price: formattedPriceUsd,
+          priceValidUntil: priceValidUntil,
+          itemCondition: 'https://schema.org/NewCondition',
+          availability: 'https://schema.org/InStock',
+          seller: {
+            '@type': 'Organization',
+            name: 'Producer Toy',
+            url: 'https://producertoy.com',
+            logo: 'https://producertoy.com/Icon.png',
           },
-          transitTime: {
-            '@type': 'QuantitativeValue',
-            minValue: 0,
-            maxValue: 0,
-            unitCode: 'DAY',
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'US',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+            merchantReturnDays: 0,
+          },
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingRate: {
+              '@type': 'MonetaryAmount',
+              value: '0.00',
+              currency: 'USD',
+            },
+            shippingDestination: {
+              '@type': 'DefinedRegion',
+              addressCountry: 'US',
+            },
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: {
+                '@type': 'QuantitativeValue',
+                minValue: 0,
+                maxValue: 0,
+                unitCode: 'DAY',
+              },
+              transitTime: {
+                '@type': 'QuantitativeValue',
+                minValue: 0,
+                maxValue: 0,
+                unitCode: 'DAY',
+              },
+            },
           },
         },
-      },
+        {
+          '@type': 'Offer',
+          url,
+          priceCurrency: 'INR',
+          price: formattedPriceInr,
+          priceValidUntil: priceValidUntil,
+          itemCondition: 'https://schema.org/NewCondition',
+          availability: 'https://schema.org/InStock',
+          seller: {
+            '@type': 'Organization',
+            name: 'Producer Toy',
+            url: 'https://producertoy.com',
+            logo: 'https://producertoy.com/Icon.png',
+          },
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'IN',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+            merchantReturnDays: 0,
+          },
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingRate: {
+              '@type': 'MonetaryAmount',
+              value: '0.00',
+              currency: 'INR',
+            },
+            shippingDestination: {
+              '@type': 'DefinedRegion',
+              addressCountry: 'IN',
+            },
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: {
+                '@type': 'QuantitativeValue',
+                minValue: 0,
+                maxValue: 0,
+                unitCode: 'DAY',
+              },
+              transitTime: {
+                '@type': 'QuantitativeValue',
+                minValue: 0,
+                maxValue: 0,
+                unitCode: 'DAY',
+              },
+            },
+          },
+        },
+      ],
     },
     aggregateRating: {
       '@type': 'AggregateRating',
@@ -561,5 +629,37 @@ export function BlogListJsonLd({
     />
   )
 }
+
+export function VideoObjectJsonLd({
+  name,
+  description,
+  thumbnailUrl,
+  uploadDate,
+  embedUrl,
+}: {
+  name: string
+  description?: string
+  thumbnailUrl: string
+  uploadDate?: string
+  embedUrl: string
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: `${name} — Official Overview & Walkthrough`,
+    description: description || `Watch the official audio walkthrough, presets demo and workflow overview for ${name} on Producer Toy.`,
+    thumbnailUrl: [thumbnailUrl],
+    uploadDate: uploadDate || '2026-01-01T00:00:00+00:00',
+    embedUrl,
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
 
 

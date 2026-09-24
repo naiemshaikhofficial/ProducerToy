@@ -4,10 +4,17 @@ import { notFound } from 'next/navigation'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { EpicProductDetailClient } from './EpicProductDetailClient'
 import { Metadata } from 'next'
-import { ProductJsonLd, FAQPageJsonLd } from '@/components/JsonLd'
+import { ProductJsonLd, FAQPageJsonLd, VideoObjectJsonLd } from '@/components/JsonLd'
 import { generatePageMetadata, generateSmartKeywords, cleanDescriptionText } from '@/lib/seo/metadata'
 import { getProductRatingStatsAction } from '@/actions/ratingActions'
 import { generateProductFaqs } from '@/components/product/ProductFaqSection'
+
+function extractYouTubeId(url?: string): string | null {
+  if (!url) return null
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+  const match = url.match(regExp)
+  return match && match[2].length === 11 ? match[2] : null
+}
 
 // 🟢 ZERO-RESOURCE CDN CACHING: Infinite cache (purged on-demand via /api/revalidate webhook).
 export const revalidate = false
@@ -117,24 +124,36 @@ export default async function EpicProductDetailPage({
   const faqs = generateProductFaqs(product)
   const categoryTitle = product.categories?.name || product.product_type || 'Plugins'
   const categorySlug = product.categories?.slug || (product.product_type ? product.product_type.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'plugins')
+  const ytVideoId = extractYouTubeId(product.youtube_url || product.video_url)
 
   return (
     <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 text-white min-h-screen">
-      {/* 🟢 Search Engine Structured Data (Product + FAQ Rich Snippets) */}
+      {/* 🟢 Search Engine Structured Data (Product + Multi-Currency + FAQ + Video Rich Snippets) */}
       <ProductJsonLd
         name={product.name}
         description={cleanDescriptionText(product.short_description || product.description)}
         image={product.cover_image}
         brandName={product.brands?.name || product.brand || 'Producer Toy'}
         priceUsd={product.price_usd || 0}
+        priceInr={product.price_inr}
         isFree={Number(product.price_usd) === 0}
         url={`https://producertoy.com/product/${product.slug}`}
         categoryName={product.product_type || 'VST Plugin'}
         vstFormat={product.vst_format || 'VST3, AU, AAX'}
         ratingValue={ratingStats.averageRating || 4.9}
         reviewCount={ratingStats.totalReviews || 96}
+        youtubeUrl={product.youtube_url || product.video_url}
       />
       <FAQPageJsonLd faqs={faqs} />
+      {ytVideoId && (
+        <VideoObjectJsonLd
+          name={product.name}
+          description={cleanDescriptionText(product.short_description || product.description)}
+          thumbnailUrl={`https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`}
+          uploadDate={product.created_at || '2026-01-01T00:00:00+00:00'}
+          embedUrl={`https://www.youtube.com/embed/${ytVideoId}`}
+        />
+      )}
 
       {/* 🟢 Visible Semantic Breadcrumbs Navigation for Googlebot & Users */}
       <nav aria-label="Breadcrumb" className="text-xs text-zinc-400 flex items-center flex-wrap gap-1.5 pt-1 select-none">
