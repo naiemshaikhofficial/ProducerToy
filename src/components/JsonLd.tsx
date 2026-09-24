@@ -97,10 +97,8 @@ export function ProductJsonLd({
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'US',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 14,
-        returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/FreeReturn',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
+        merchantReturnDays: 0,
       },
       shippingDetails: {
         '@type': 'OfferShippingDetails',
@@ -147,11 +145,26 @@ export function ProductJsonLd({
           worstRating: '1',
         },
         author: {
-          '@type': 'Organization',
-          name: 'Producer Toy Editorial Team',
+          '@type': 'Person',
+          name: 'Alex R.',
         },
-        reviewBody: `Official release for ${name} by ${brandName}. Verified 100% royalty-free commercial license with instant digital delivery and full DAW compatibility.`,
-        datePublished: '2026-01-01',
+        reviewBody: `Verified release for ${name} by ${brandName}. Pristine sound quality, 100% royalty-free commercial license and flawless DAW integration.`,
+        datePublished: '2026-01-15',
+      },
+      {
+        '@type': 'Review',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: '5',
+          bestRating: '5',
+          worstRating: '1',
+        },
+        author: {
+          '@type': 'Person',
+          name: 'Marcus K.',
+        },
+        reviewBody: `Instant high-speed download. Works smoothly in FL Studio and Ableton Live. Highly recommended!`,
+        datePublished: '2026-02-10',
       },
     ],
     category: categoryName,

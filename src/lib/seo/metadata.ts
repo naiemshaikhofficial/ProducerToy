@@ -163,6 +163,15 @@ const NICHE_KEYWORDS: Record<string, string[]> = {
   ],
 }
 
+export function cleanDescriptionText(text: string): string {
+  if (!text) return ''
+  return text
+    .replace(/<\/?[^>]+(>|$)/g, '')
+    .replace(/&[a-z0-9#]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 /**
  * Dynamically generates high-ranking search engine keywords matching producer search intents
  */
@@ -185,7 +194,12 @@ export function generateSmartKeywords(
     `${titleClean} free download`,
     `${titleClean} plugin`,
     `${titleClean} vst`,
+    `${titleClean} vst 64 bit`,
     `${titleClean} review`,
+    `${titleClean} fl studio`,
+    `${titleClean} ableton`,
+    `${titleClean} alternative`,
+    `${titleClean} free alternative`,
   ]
 
   if (brandClean) {
@@ -193,7 +207,8 @@ export function generateSmartKeywords(
       `${brandClean} ${titleClean}`,
       `${titleClean} by ${brandClean}`,
       `${brandClean} plugins`,
-      `${brandClean} vst download`
+      `${brandClean} vst download`,
+      `best ${brandClean} plugins`
     )
   }
 
@@ -203,6 +218,8 @@ export function generateSmartKeywords(
     generated.push(`${word} free download`)
     generated.push(`free ${word}`)
     generated.push(`best ${word} plugin`)
+    generated.push(`${word} samples`)
+    generated.push(`${word} presets`)
   })
 
   const combined = `${titleClean} ${categoryClean} ${brandClean} ${productType}`.toLowerCase()
@@ -246,6 +263,7 @@ export function generateSmartKeywords(
       `free ${titleClean}`,
       `free ${titleClean} plugin`,
       `free ${titleClean} vst`,
+      `free ${titleClean} download 64 bit`,
       'free VST plugins',
       'free sample packs download',
       'free audio plugins 64 bit'
@@ -272,9 +290,10 @@ export function generatePageMetadata({
     process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
       ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
       : 'https://producertoy.com'
-  const siteTitle = 'Producer Toy Store'
+  const siteTitle = 'Producer Toy'
   const cleanTitle = title.trim()
   const fullTitle = cleanTitle.includes('Producer Toy') ? cleanTitle : `${cleanTitle} | ${siteTitle}`
+  const cleanedDescription = cleanDescriptionText(description).slice(0, 160)
 
   const ogImageUrl =
     image ||
@@ -285,7 +304,7 @@ export function generatePageMetadata({
     title: {
       absolute: fullTitle,
     },
-    description,
+    description: cleanedDescription,
     keywords: Array.from(new Set([...DEFAULT_KEYWORDS, ...keywords])),
     metadataBase: new URL(baseUrl),
     authors: [{ name: 'Producer Toy', url: baseUrl }],
@@ -295,7 +314,7 @@ export function generatePageMetadata({
     classification: 'VST Plugins, Audio FX, Sample Packs, Synth Presets, Music Software',
     openGraph: {
       title: fullTitle,
-      description,
+      description: cleanedDescription,
       url: canonicalUrl,
       images: [
         {
@@ -311,7 +330,7 @@ export function generatePageMetadata({
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
-      description,
+      description: cleanedDescription,
       images: [ogImageUrl],
       creator: '@producertoy',
     },
