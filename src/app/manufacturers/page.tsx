@@ -4,6 +4,8 @@ import { LocalDataCache } from '@/components/LocalDataCache'
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ItemListJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import { ENABLE_BRANDS } from '@/config/features'
 
 export const revalidate = false // 🟢 Infinite edge cache
 
@@ -26,6 +28,10 @@ export const metadata: Metadata = generatePageMetadata({
 import { getCachedBrands } from '@/lib/cache/cachedData'
 
 export default async function ManufacturersPage() {
+  if (!ENABLE_BRANDS) {
+    redirect('/store')
+  }
+
   let brands: Array<{ id: string; name: string; slug: string; logo_url: string | null }> = []
 
   try {

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { Product, ProductCard } from '@/components/ProductCard'
 import { generateStoreHeaderMeta, formatAudioTitle } from '@/lib/store/metadataEngine'
+import { ENABLE_BRANDS } from '@/config/features'
 
 export interface FilterOption {
   id: string
@@ -185,7 +186,7 @@ export function EpicStoreBrowser({
   const genresCount = selectedGenres.length
   const platformsCount = selectedPlatforms.length
   const featuresCount = selectedFeatures.length
-  const brandsCount = selectedBrands.length
+  const brandsCount = ENABLE_BRANDS ? selectedBrands.length : 0
 
   const activeFilterCount = useMemo(() => {
     let count = eventsCount + priceCount + typesCount + genresCount + platformsCount + featuresCount + brandsCount
@@ -639,53 +640,57 @@ export function EpicStoreBrowser({
           </div>
         ),
       },
-      {
-        id: 'brands',
-        title: 'Developers',
-        count: brandsCount,
-        defaultOpen: brandsCount > 0,
-        render: () => (
-          <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
-            {[...brands]
-              .sort((a, b) => {
-                const aChecked = selectedBrands.includes(a.slug) ? 1 : 0
-                const bChecked = selectedBrands.includes(b.slug) ? 1 : 0
-                return bChecked - aChecked
-              })
-              .map((brand) => {
-                const isChecked = selectedBrands.includes(brand.slug)
-                return (
-                  <label key={brand.id} className="flex items-center gap-3 cursor-pointer select-none group">
-                    <div
-                      className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
-                        isChecked
-                          ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
-                          : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
-                      }`}
-                    >
-                      {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => {
-                        setSelectedBrands((prev) =>
-                          prev.includes(brand.slug)
-                            ? prev.filter((s) => s !== brand.slug)
-                            : [...prev, brand.slug]
-                        )
-                      }}
-                      className="hidden"
-                    />
-                    <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
-                      {brand.name}
-                    </span>
-                  </label>
-                )
-              })}
-          </div>
-        ),
-      },
+      ...(ENABLE_BRANDS && brands.length > 0
+        ? [
+            {
+              id: 'brands',
+              title: 'Developers',
+              count: brandsCount,
+              defaultOpen: brandsCount > 0,
+              render: () => (
+                <div className="pt-2 pb-3 space-y-2.5 text-sm text-zinc-300 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                  {[...brands]
+                    .sort((a, b) => {
+                      const aChecked = selectedBrands.includes(a.slug) ? 1 : 0
+                      const bChecked = selectedBrands.includes(b.slug) ? 1 : 0
+                      return bChecked - aChecked
+                    })
+                    .map((brand) => {
+                      const isChecked = selectedBrands.includes(brand.slug)
+                      return (
+                        <label key={brand.id} className="flex items-center gap-3 cursor-pointer select-none group">
+                          <div
+                            className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
+                              isChecked
+                                ? 'bg-[#FA742B] border-[#FA742B] text-black shadow-sm'
+                                : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
+                            }`}
+                          >
+                            {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setSelectedBrands((prev) =>
+                                prev.includes(brand.slug)
+                                  ? prev.filter((s) => s !== brand.slug)
+                                  : [...prev, brand.slug]
+                              )
+                            }}
+                            className="hidden"
+                          />
+                          <span className={isChecked ? 'text-white font-semibold' : 'text-zinc-300 group-hover:text-white transition-colors'}>
+                            {brand.name}
+                          </span>
+                        </label>
+                      )
+                    })}
+                </div>
+              ),
+            },
+          ]
+        : []),
     ]
   }, [
     eventsCount,
@@ -904,7 +909,7 @@ export function EpicStoreBrowser({
               )
             })}
 
-            {selectedBrands.map((brandSlug) => (
+            {ENABLE_BRANDS && selectedBrands.map((brandSlug) => (
               <button
                 key={brandSlug}
                 type="button"

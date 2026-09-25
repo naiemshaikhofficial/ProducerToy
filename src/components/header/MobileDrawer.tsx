@@ -23,6 +23,7 @@ import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useGifts } from '@/context/GiftContext'
 import { categoryData, CategoryKey } from './categoryData'
+import { ENABLE_BRANDS } from '@/config/features'
 
 interface MobileDrawerProps {
   isOpen: boolean
@@ -352,15 +353,17 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
               */}
 
-              <Link
-                href="/manufacturers"
-                prefetch={true}
-                onClick={onClose}
-                className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
-              >
-                <span>All Brands</span>
-                <ChevronRight className="w-5 h-5 text-zinc-500" />
-              </Link>
+              {ENABLE_BRANDS && (
+                <Link
+                  href="/manufacturers"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
+                >
+                  <span>All Brands</span>
+                  <ChevronRight className="w-5 h-5 text-zinc-500" />
+                </Link>
+              )}
 
               <Link
                 href="/store?on_sale=true"

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { getAdminClient } from '@/lib/supabase/admin'
+import { ENABLE_BRANDS } from '@/config/features'
 
 export const revalidate = 21600 // Revalidate sitemap every 6 hours automatically
 
@@ -69,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Features & Programs
     { url: `${baseUrl}/features/toywards`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${baseUrl}/brands`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.85 },
+    ...(ENABLE_BRANDS ? [{ url: `${baseUrl}/brands`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.85 }] : []),
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
 
     // Institutional, Support & Legal Pages
@@ -133,7 +134,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ])
 
     // 5. Dynamic Brand & Manufacturer URLs (Priority: 0.8)
-    if (brandsRes.data && brandsRes.data.length > 0) {
+    if (ENABLE_BRANDS && brandsRes.data && brandsRes.data.length > 0) {
       brandEntries = brandsRes.data.flatMap((b) => [
         {
           url: `${baseUrl}/manufacturers/${encodeURIComponent(b.slug)}`,

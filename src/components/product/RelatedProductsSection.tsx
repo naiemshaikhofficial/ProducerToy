@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useCurrency } from '@/context/CurrencyContext'
+import { ENABLE_BRANDS } from '@/config/features'
 
 interface RelatedProduct {
   id: string
@@ -121,9 +122,11 @@ export function RelatedProductsSection({
               </div>
 
               <div className="space-y-1">
-                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                  {itemBrand}
-                </span>
+                {ENABLE_BRANDS && (
+                  <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                    {itemBrand}
+                  </span>
+                )}
                 <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-200 line-clamp-1">
                   {item.name}
                 </h4>

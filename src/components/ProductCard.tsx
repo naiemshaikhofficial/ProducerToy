@@ -10,6 +10,7 @@ import { useAudio } from '@/context/AudioContext'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { getCdnImageUrl } from '@/lib/cdn'
+import { ENABLE_BRANDS } from '@/config/features'
 
 export interface Product {
   id: string
@@ -228,7 +229,7 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Content Details Below Card (Exact Minimalist Epic Games Store Layout with Fixed Baseline Alignment) */}
-      <div className="flex flex-col justify-between flex-1 px-0.5 min-h-[92px]">
+      <div className={`flex flex-col justify-between flex-1 px-0.5 ${ENABLE_BRANDS ? 'min-h-[92px]' : 'min-h-[76px] sm:min-h-[80px]'}`}>
         <div className="space-y-1">
           {/* Subcategory / Tag with High Contrast */}
           <span className="text-xs font-semibold text-zinc-300 capitalize line-clamp-1 block">
@@ -241,17 +242,19 @@ export function ProductCard({ product }: { product: Product }) {
           </h3>
 
           {/* Brand Name with Accessible Hit Area */}
-          <span className="text-xs text-zinc-400 font-medium line-clamp-1 z-20 block">
-            by{' '}
-            <button
-              type="button"
-              onClick={handleBrandClick}
-              aria-label={`View brand ${brandName}`}
-              className="text-zinc-300 font-semibold hover:text-[#FC6301] transition-colors cursor-pointer inline-block py-1 -my-1"
-            >
-              {brandName}
-            </button>
-          </span>
+          {ENABLE_BRANDS && (
+            <span className="text-xs text-zinc-400 font-medium line-clamp-1 z-20 block">
+              by{' '}
+              <button
+                type="button"
+                onClick={handleBrandClick}
+                aria-label={`View brand ${brandName}`}
+                className="text-zinc-300 font-semibold hover:text-[#FC6301] transition-colors cursor-pointer inline-block py-1 -my-1"
+              >
+                {brandName}
+              </button>
+            </span>
+          )}
         </div>
 
         {/* Price Row (Pinned to Consistent Horizontal Baseline) */}

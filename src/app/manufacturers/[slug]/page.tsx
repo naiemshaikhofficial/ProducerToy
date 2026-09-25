@@ -1,6 +1,7 @@
 import React, { cache } from 'react'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { Metadata } from 'next'
+import { ENABLE_BRANDS } from '@/config/features'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getAdminClient } from '@/lib/supabase/admin'
@@ -28,6 +29,8 @@ const getCachedBrand = getCachedBrandBySlug
 const getCachedOtherBrands = () => getCachedTopBrands(10)
 
 export async function generateStaticParams() {
+  if (!ENABLE_BRANDS) return []
+
   try {
     const brands = await getCachedBrands()
     if (!brands) return []
@@ -67,6 +70,10 @@ export async function generateMetadata({ params }: BrandPageProps): Promise<Meta
 }
 
 export default async function BrandShowcasePage({ params, searchParams }: BrandPageProps) {
+  if (!ENABLE_BRANDS) {
+    redirect('/store')
+  }
+
   const { slug } = await params
   const { free: freeParam, deals: dealsParam, sort: sortParam } = await searchParams
 

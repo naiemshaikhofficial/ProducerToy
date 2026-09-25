@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Twitter, Facebook, Youtube, Instagram, ArrowRight, ChevronUp } from 'lucide-react'
+import { ENABLE_BRANDS } from '@/config/features'
 
 export function Footer() {
   const pathname = usePathname()
@@ -37,7 +38,9 @@ export function Footer() {
               <div><Link href="/free-vst-plugins" prefetch={true} className="hover:text-white transition-colors">Free VST Plugins</Link></div>
               <div><Link href="/categories/instruments" prefetch={true} className="hover:text-white transition-colors">Virtual Instruments</Link></div>
               <div><Link href="/categories/sounds" prefetch={true} className="hover:text-white transition-colors">Sample Packs</Link></div>
-              <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands & Developers</Link></div>
+              {ENABLE_BRANDS && (
+                <div><Link href="/manufacturers" prefetch={true} className="hover:text-white transition-colors">Brands & Developers</Link></div>
+              )}
               <div><Link href="/store?on_sale=true" prefetch={true} className="hover:text-white transition-colors">Deals & Discounts</Link></div>
               {/* <div><Link href="/account?tab=rewards" prefetch={true} className="hover:text-white transition-colors">Producer Toy Rewards</Link></div> */}
             </div>

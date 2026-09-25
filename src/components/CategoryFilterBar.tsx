@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { ChevronDown, ChevronUp, Check } from 'lucide-react'
+import { ENABLE_BRANDS } from '@/config/features'
 
 export interface FilterOption {
   id: string
@@ -181,73 +182,75 @@ export function CategoryFilterBar({
         </div>
 
         {/* 2. Brand Dropdown */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setOpenDropdown(openDropdown === 'brand' ? null : 'brand')}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all cursor-pointer ${
-              openDropdown === 'brand' || selectedBrands.length > 0
-                ? 'bg-[#282828] text-white font-bold'
-                : 'bg-[#1c1c1c] text-zinc-300 hover:bg-[#242424] hover:text-white'
-            }`}
-          >
-            <span>Brand {selectedBrands.length > 0 && `(${selectedBrands.length})`}</span>
-            {openDropdown === 'brand' ? <ChevronUp className="w-3.5 h-3.5 text-zinc-300" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
-          </button>
+        {ENABLE_BRANDS && (
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setOpenDropdown(openDropdown === 'brand' ? null : 'brand')}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all cursor-pointer ${
+                openDropdown === 'brand' || selectedBrands.length > 0
+                  ? 'bg-[#282828] text-white font-bold'
+                  : 'bg-[#1c1c1c] text-zinc-300 hover:bg-[#242424] hover:text-white'
+              }`}
+            >
+              <span>Brand {selectedBrands.length > 0 && `(${selectedBrands.length})`}</span>
+              {openDropdown === 'brand' ? <ChevronUp className="w-3.5 h-3.5 text-zinc-300" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />}
+            </button>
 
-          {openDropdown === 'brand' && (
-            <div className="absolute top-full left-0 mt-2 w-64 bg-[#181818] border border-zinc-800 rounded-xl shadow-2xl z-50 p-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-              <div className="max-h-56 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
-                {brands.length === 0 ? (
-                  <p className="text-xs text-zinc-500 py-2 text-center">No brands found</p>
-                ) : (
-                  brands.map((b) => {
-                    const isChecked = selectedBrands.includes(b.id) || selectedBrands.includes(b.slug || '')
-                    return (
-                      <div
-                        key={b.id}
-                        onClick={() => toggleBrand(b.slug || b.id)}
-                        className="flex items-center justify-between px-2.5 py-1.5 rounded-md text-zinc-300 hover:bg-[#252525] hover:text-white cursor-pointer transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                            isChecked ? 'bg-[#FC6301] border-[#FC6301] text-white' : 'border-zinc-600 bg-[#202020]'
-                          }`}>
-                            {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+            {openDropdown === 'brand' && (
+              <div className="absolute top-full left-0 mt-2 w-64 bg-[#181818] border border-zinc-800 rounded-xl shadow-2xl z-50 p-3 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="max-h-56 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                  {brands.length === 0 ? (
+                    <p className="text-xs text-zinc-500 py-2 text-center">No brands found</p>
+                  ) : (
+                    brands.map((b) => {
+                      const isChecked = selectedBrands.includes(b.id) || selectedBrands.includes(b.slug || '')
+                      return (
+                        <div
+                          key={b.id}
+                          onClick={() => toggleBrand(b.slug || b.id)}
+                          className="flex items-center justify-between px-2.5 py-1.5 rounded-md text-zinc-300 hover:bg-[#252525] hover:text-white cursor-pointer transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
+                              isChecked ? 'bg-[#FC6301] border-[#FC6301] text-white' : 'border-zinc-600 bg-[#202020]'
+                            }`}>
+                              {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
+                            <span className="text-xs">{b.name}</span>
                           </div>
-                          <span className="text-xs">{b.name}</span>
+                          {b.count !== undefined && b.count > 0 && (
+                            <span className="text-[11px] text-zinc-500">({b.count})</span>
+                          )}
                         </div>
-                        {b.count !== undefined && b.count > 0 && (
-                          <span className="text-[11px] text-zinc-500">({b.count})</span>
-                        )}
-                      </div>
-                    )
-                  })
-                )}
-              </div>
+                      )
+                    })
+                  )}
+                </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedBrands([])
-                    applyFilter('brand', '')
-                  }}
-                  className="px-4 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  Clear
-                </button>
-                <button
-                  type="button"
-                  onClick={() => applyFilter('brand', selectedBrands.join(','))}
-                  className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#FC6301] rounded-full transition-colors cursor-pointer shadow-md"
-                >
-                  Apply
-                </button>
+                <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedBrands([])
+                      applyFilter('brand', '')
+                    }}
+                    className="px-4 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyFilter('brand', selectedBrands.join(','))}
+                    className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#FC6301] rounded-full transition-colors cursor-pointer shadow-md"
+                  >
+                    Apply
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* 3. Price Dropdown */}
         <div className="relative">

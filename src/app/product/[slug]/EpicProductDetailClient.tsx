@@ -28,6 +28,7 @@ import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useAudio } from '@/context/AudioContext'
+import { ENABLE_BRANDS } from '@/config/features'
 import { useAuth } from '@/context/AuthContext'
 import { ToywardsSparkleIcon } from '@/components/account/RewardsAndWalletTab'
 import { ProductSpecsOverview } from '@/components/ProductTypeSpecs'
@@ -953,8 +954,8 @@ export function EpicProductDetailClient({
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image
-              src={product.brands?.logo_url || product.brand_logo || '/logo-white.png'}
-              alt={developerName}
+              src={ENABLE_BRANDS ? (product.brands?.logo_url || product.brand_logo || '/logo-white.png') : '/logo-white.png'}
+              alt={ENABLE_BRANDS ? developerName : 'Producer Toy'}
               width={360}
               height={144}
               unoptimized
@@ -1120,10 +1121,12 @@ export function EpicProductDetailClient({
 
           {/* Desktop Metadata Specs Table */}
           <div className="space-y-3 pt-4 text-xs border-t border-[#202020]">
-            <div className="flex items-center justify-between pb-1">
-              <span className="text-zinc-400">Developer</span>
-              <span className="font-semibold text-white">{developerName}</span>
-            </div>
+            {ENABLE_BRANDS && (
+              <div className="flex items-center justify-between pb-1">
+                <span className="text-zinc-400">Developer</span>
+                <span className="font-semibold text-white">{developerName}</span>
+              </div>
+            )}
             <div className="flex items-center justify-between pb-1">
               <span className="text-zinc-400">Publisher</span>
               <span className="font-semibold text-white">{publisherName}</span>

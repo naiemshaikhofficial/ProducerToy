@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useGifts } from '@/context/GiftContext'
 import { liveSearchAction, SearchProductResult } from '@/actions/searchActions'
+import { ENABLE_BRANDS } from '@/config/features'
 
 interface SubBarProps {
   searchQuery: string
@@ -32,14 +33,14 @@ interface SubBarProps {
 
 const NAV_LINKS = [
   { label: 'Deals', href: '/store?on_sale=true' },
-  { label: 'Brands', href: '/manufacturers' },
+  ...(ENABLE_BRANDS ? [{ label: 'Brands', href: '/manufacturers' }] : []),
   { label: 'Blog', href: '/blog' },
 ]
 
 const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Products', href: '/store' },
   { label: 'Deals', href: '/store?on_sale=true' },
-  { label: 'Brands', href: '/manufacturers' },
+  ...(ENABLE_BRANDS ? [{ label: 'Brands', href: '/manufacturers' }] : []),
   { label: 'Blog', href: '/blog' },
   { label: 'Free VSTs & Plugins', href: '/free-vst-plugins' },
   { label: 'Free Samples & Loops', href: '/store/sounds?price=free' },
@@ -382,9 +383,11 @@ export const SubBar: React.FC<SubBarProps> = ({
                         <p className="text-[13px] font-medium text-white truncate group-hover:text-[#FA742B] transition-colors">
                           {item.name}
                         </p>
-                        <p className="text-[11px] text-zinc-400 truncate">
-                          {item.brand}
-                        </p>
+                        {ENABLE_BRANDS && item.brand && (
+                          <p className="text-[11px] text-zinc-400 truncate">
+                            {item.brand}
+                          </p>
+                        )}
                       </div>
                       <div className="text-right flex-shrink-0">
                         <span className={`text-[12px] font-semibold ${item.price_usd === 0 ? 'text-[#00FF94]' : 'text-zinc-200'}`}>
