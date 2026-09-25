@@ -7,7 +7,7 @@ import Image from 'next/image'
 export function EpicSpotlightBanner() {
   return (
     <div
-      className="w-full relative overflow-hidden rounded-none shadow-2xl min-h-[380px] sm:min-h-[320px] lg:min-h-0 lg:aspect-[2008/783] bg-[#121212] flex flex-col justify-center select-none"
+      className="w-full relative overflow-hidden rounded-2xl min-h-[340px] sm:min-h-[320px] lg:min-h-0 lg:aspect-[2008/783] bg-[#121212] flex flex-col justify-center select-none"
       style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
     >
       {/* Responsive Background Banner Image */}

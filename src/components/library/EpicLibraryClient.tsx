@@ -371,7 +371,7 @@ export function EpicLibraryClient({
 
   return (
     <div className="w-full min-h-screen bg-[#121212] text-white py-8 select-none font-sans">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         {/* ================= TOP HEADER WITH REFRESH ================= */}
         <div className="flex items-center gap-3">

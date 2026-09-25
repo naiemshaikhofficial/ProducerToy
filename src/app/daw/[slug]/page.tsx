@@ -254,7 +254,7 @@ export default async function DawLandingPage({
   const isFlStudio = slug === 'fl-studio'
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12 sm:space-y-16 text-white min-h-screen">
+    <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12 sm:space-y-16 text-white min-h-screen">
       {/* Schema.org Structured Data */}
       <CollectionPageJsonLd
         title={config.headline}

@@ -167,7 +167,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
 
   return (
     <div className="min-h-screen bg-[#121212] text-white font-sans select-none pb-28">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
         
         {/* ========================================================================= */}
         {/* 1. TOP TITLE HEADER & TABS                                                */}

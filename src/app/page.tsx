@@ -56,44 +56,44 @@ export default async function HomePage() {
     <div className="w-full bg-[#121212] min-h-screen text-white flex flex-col items-center select-none">
       <h1 className="sr-only">Producer Toy — Music Production VST Plugins, Samples & Presets</h1>
       
-      {/* 1st Section: Epic Store Billboard Poster Banner (Desktop only - Hidden on Mobile) */}
-      <section className="hidden lg:block w-full mt-3 sm:mt-4 mb-12 sm:mb-16">
-        <EpicSpotlightBanner />
-      </section>
-
-      {/* Main Content Area */}
-      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-2 pb-20 sm:pb-28 space-y-12 sm:space-y-16 lg:space-y-24">
+      {/* Main Content Area - Exact 1:1 margin and width alignment with SubBar */}
+      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-20 sm:pb-28 space-y-12 sm:space-y-16">
         
-        {/* Centered Epic Hero Carousel (Starts immediately on mobile) */}
+        {/* 1st Section: Epic Hero Carousel (Starts immediately at top under SubBar) */}
         <EpicHeroCarousel products={products} />
 
-        {/* 2nd Section: Producer Toy Originals Row */}
-        <div className="px-4 sm:px-0">
+        {/* 2nd Section: Epic Store Billboard Spotlight Banner (Sitting flush inside 1280px container) */}
+        <section className="hidden lg:block w-full">
+          <EpicSpotlightBanner />
+        </section>
+
+        {/* 3rd Section: Producer Toy Originals Row */}
+        <div>
           <ProducerToyGrid products={products} title="Producer Toy Originals" />
         </div>
 
-        {/* 3rd Section: Free Producer Toys (Second) */}
-        <div className="px-4 sm:px-0">
+        {/* 4th Section: Free Producer Toys */}
+        <div>
           <FreeProducerToys products={products} />
         </div>
 
-        {/* 4th Section: 1:1 Epic Games New Releases (Sorted by created_at) */}
-        <div className="px-4 sm:px-0">
+        {/* 5th Section: 1:1 Epic Games New Releases */}
+        <div>
           <EpicNewReleases products={products} />
         </div>
 
-        {/* 5th Section: 1:1 Epic Games Tri-Column Lists (Top Sellers, Coming Soon, Top Deals) */}
-        <div className="px-4 sm:px-0">
+        {/* 6th Section: 1:1 Epic Games Tri-Column Lists (Top Sellers, Coming Soon, Top Deals) */}
+        <div>
           <EpicStorefrontLists products={products} />
         </div>
 
-        {/* 6th Section: 1:1 Epic Games Most Popular (Highly Purchased Products with Carousel Arrows) */}
-        <div className="px-4 sm:px-0">
+        {/* 7th Section: 1:1 Epic Games Most Popular */}
+        <div>
           <EpicMostPopular products={products} />
         </div>
 
-        {/* 7th Section: 1:1 Epic Games Trending Row (High Demand & Latest Products) */}
-        <div className="px-4 sm:px-0">
+        {/* 8th Section: 1:1 Epic Games Trending Row */}
+        <div>
           <EpicTrending products={products} />
         </div>
 

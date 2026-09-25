@@ -50,7 +50,7 @@ export default function ManufacturersClient({ initialBrands }: ManufacturersClie
     <div className="w-full min-h-screen bg-[#121212] pb-24 text-white">
       {/* Top Hero Section Header matching Epic Store Aesthetic - Unified Seamless Layout */}
       <div className="w-full bg-[#121212] pt-8 md:pt-12 pb-6">
-        <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white mb-3">
             Plugin Manufacturers & Brands
@@ -84,7 +84,7 @@ export default function ManufacturersClient({ initialBrands }: ManufacturersClie
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-[1220px] mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         
         {/* Sleek Minimalist Alphabet Bar - ALL, 0-9 & A to Z with Proper Breathing Room Circles */}
         <div className="w-full bg-[#181818] py-2 px-2 sm:px-3 rounded-full border border-[#242424] mb-8">

@@ -194,7 +194,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
         }}
       />
 
-      <div className="max-w-[1240px] mx-auto space-y-10">
+      <div className="max-w-[1280px] mx-auto space-y-10">
         
         {/* Navigation Breadcrumb & Back Link */}
         <div className="flex items-center gap-3 text-xs text-zinc-400">
