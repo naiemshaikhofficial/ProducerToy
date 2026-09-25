@@ -424,29 +424,86 @@ export function EpicProductDetailClient({
       {/* 3. MOBILE HERO & CTA SECTION (< lg ONLY - EXACT SCREENSHOT 1 & 2 MATCH)   */}
       {/* ========================================================================= */}
       <div className="block lg:hidden space-y-5">
-        {/* A. Mobile Hero Poster (16:9 aspect) */}
+        {/* A. Mobile Hero Poster & Media Showcase (16:9 aspect) */}
         <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#141414] border border-[#262626]">
-          <Image
-            src={product.cover_image}
-            alt={product.name}
-            fill
-            unoptimized
-            priority
-            className="object-cover"
-          />
+          {activeMedia.type === 'video' && activeMedia.videoId ? (
+            <div className="relative w-full h-full">
+              <iframe
+                id={`youtube-trailer-mobile-${activeMedia.videoId}`}
+                src={`https://www.youtube-nocookie.com/embed/${activeMedia.videoId}?autoplay=1&mute=${isVideoMuted ? 1 : 0}&controls=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&playsinline=1&loop=1&playlist=${activeMedia.videoId}`}
+                title={`${product.name} Video Demo`}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+              <button
+                type="button"
+                onClick={() => setIsVideoMuted(!isVideoMuted)}
+                className="absolute bottom-4 right-4 z-30 bg-black/80 hover:bg-black text-white p-2.5 rounded-full backdrop-blur-md border border-white/20 transition-all active:scale-95 shadow-xl cursor-pointer"
+                title={isVideoMuted ? 'Unmute Video' : 'Mute Video'}
+              >
+                {isVideoMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
+              </button>
+            </div>
+          ) : (
+            <Image
+              src={activeMedia.url || product.cover_image}
+              alt={product.name}
+              fill
+              unoptimized
+              priority
+              className="object-cover"
+            />
+          )}
         </div>
 
-        {/* B. Certification / License Rating Box (Exact Screenshot Match) */}
-        <div className="bg-[#181818] border border-[#262626] rounded-xl p-4 flex items-center gap-3.5 shadow-sm">
-          <div className="w-12 h-12 rounded-lg bg-[#222222] border border-[#333333] flex flex-col items-center justify-center text-center flex-shrink-0">
-            <span className="text-[10px] font-bold text-[#FA742B] uppercase leading-none">AUDIO</span>
-            <span className="text-sm font-bold text-white leading-tight">100%</span>
+        {/* Thumbnail Carousel Strip for Mobile (if multiple media items exist) */}
+        {mediaItems.length > 1 && (
+          <div className="flex items-center gap-2 pt-1 w-full">
+            <button
+              type="button"
+              onClick={handlePrevThumb}
+              className="p-2 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              aria-label="Previous media"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div className="flex-1 flex items-center gap-2 overflow-x-auto py-1 custom-scrollbar">
+              {mediaItems.map((item, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(idx)}
+                  className={`relative w-20 h-12 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
+                    selectedImageIndex === idx
+                      ? 'border-[#FA742B] shadow-md scale-105'
+                      : 'border-[#262626] opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <Image src={item.url} alt={`Media ${idx + 1}`} fill unoptimized className="object-cover" />
+                  {item.type === 'video' && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="w-5 h-5 bg-red-600 rounded flex items-center justify-center shadow">
+                        <Play className="w-3 h-3 text-white fill-white translate-x-0.5" />
+                      </div>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNextThumb}
+              className="p-2 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2a2a2a] text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              aria-label="Next media"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-white leading-tight">100% Royalty-Free</div>
-            <div className="text-xs text-zinc-400 mt-0.5">Commercial Sync & Master Clearance Included</div>
-          </div>
-        </div>
+        )}
+
 
         {/* D. Price Display */}
         <div className="space-y-1">
@@ -718,8 +775,8 @@ export function EpicProductDetailClient({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start pt-4 sm:pt-6">
         {/* ================= LEFT COLUMN (MEDIA & DETAILS) ================= */}
         <div className="lg:col-span-8 space-y-10 w-full">
-          {/* Media Showcase */}
-          <div className="space-y-3.5 w-full">
+          {/* Media Showcase (Desktop Only >= lg - Mobile Media Showcase is Rendered in Section 3) */}
+          <div className="hidden lg:block space-y-3.5 w-full">
             <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
               {activeMedia.type === 'video' && activeMedia.videoId ? (
                 <div className="relative w-full h-full">

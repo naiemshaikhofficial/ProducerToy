@@ -96,8 +96,6 @@ export default async function EpicProductDetailPage({
 
   const ratingStats = await getProductRatingStatsAction(product.id)
   const faqs = generateProductFaqs(product)
-  const categoryTitle = product.categories?.name || product.product_type || 'Plugins'
-  const categorySlug = product.categories?.slug || (product.product_type ? product.product_type.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'plugins')
   const ytVideoId = extractYouTubeId(product.youtube_url || product.video_url)
 
   const siteUrl =
@@ -139,23 +137,6 @@ export default async function EpicProductDetailPage({
         />
       )}
 
-      {/* 🟢 Visible Semantic Breadcrumbs Navigation for Googlebot & Users */}
-      <nav aria-label="Breadcrumb" className="text-xs text-zinc-400 flex items-center flex-wrap gap-1.5 pt-1 select-none">
-        <Link href="/" className="hover:text-white transition-colors">Home</Link>
-        <span className="text-zinc-600">/</span>
-        <Link href="/store" className="hover:text-white transition-colors">Store</Link>
-        <span className="text-zinc-600">/</span>
-        <Link 
-          href={`/categories/${categorySlug}`} 
-          className="hover:text-white transition-colors capitalize"
-        >
-          {categoryTitle}
-        </Link>
-        <span className="text-zinc-600">/</span>
-        <span className="text-zinc-200 font-medium truncate max-w-[220px] sm:max-w-none">
-          {product.name}
-        </span>
-      </nav>
 
       {/* Main Epic Games Product Detail Client View */}
       <EpicProductDetailClient

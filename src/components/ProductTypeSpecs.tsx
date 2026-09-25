@@ -191,7 +191,7 @@ export function ProductSpecsOverview({
   const emptyStars = Math.max(0, 5 - fullStars - (hasHalf ? 1 : 0))
 
   const dbFormat = product.vst_format || product.format
-  const dbStorage = product.file_size || (kind === 'sample_pack' ? '500 MB' : kind === 'preset' ? '100 MB' : '500 MB')
+  const dbStorage = product.file_size || product.size || product.download_size || null
   const isPlugin = kind === 'plugin'
 
   return (
@@ -370,11 +370,13 @@ export function ProductSpecsOverview({
                 </span>
               </div>
 
-              {/* 4. File Size */}
-              <div>
-                <span className="text-xs text-zinc-500 block">Download Size</span>
-                <span className="text-white font-semibold block">{dbStorage}</span>
-              </div>
+              {/* 4. File Size (Only shown if available in database) */}
+              {dbStorage && (
+                <div>
+                  <span className="text-xs text-zinc-500 block">Download Size</span>
+                  <span className="text-white font-semibold block">{dbStorage}</span>
+                </div>
+              )}
 
               {/* 5. License */}
               <div>
