@@ -30,6 +30,7 @@ import { useAuth } from '@/context/AuthContext'
 import { ToywardsSparkleIcon } from '@/components/account/RewardsAndWalletTab'
 import { ProductSpecsOverview } from '@/components/ProductTypeSpecs'
 import { SendGiftModal } from '@/components/gifts/SendGiftModal'
+import { ENABLE_BRANDS } from '@/config/features'
 
 function WindowsIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -793,12 +794,26 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image
-              src={product.brands?.logo_url || product.brand_logo || '/logo-white.png'}
-              alt={developerName}
+              src={
+                ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo)
+                  ? product.brands?.logo_url || product.brand_logo
+                  : '/logo-white.png'
+              }
+              alt={
+                ENABLE_BRANDS && (product.brands?.name || product.brand)
+                  ? product.brands?.name || product.brand
+                  : 'Producer Toy'
+              }
               width={360}
               height={144}
               unoptimized
-              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto filter brightness-200 contrast-200 drop-shadow-xl"
+              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto drop-shadow-md rounded-lg"
+              onError={(e) => {
+                const target = e.currentTarget
+                if (!target.src.endsWith('/logo-white.png')) {
+                  target.src = '/logo-white.png'
+                }
+              }}
             />
           </div>
 

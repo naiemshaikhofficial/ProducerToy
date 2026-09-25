@@ -299,7 +299,7 @@ export function EpicProductDetailClient({
     product.release_year ||
     product.release_date ||
     (product.created_at ? new Date(product.created_at).getFullYear().toString() : '2026')
-  const developerName = product.brands?.name || product.brand || 'Producer Toy'
+  const developerName = ENABLE_BRANDS ? (product.brands?.name || product.brand || 'Producer Toy') : 'Producer Toy'
 
   const licenseType = (() => {
     if (product.license_type) return product.license_type
@@ -954,12 +954,26 @@ export function EpicProductDetailClient({
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image
-              src={ENABLE_BRANDS ? (product.brands?.logo_url || product.brand_logo || '/logo-white.png') : '/logo-white.png'}
-              alt={ENABLE_BRANDS ? developerName : 'Producer Toy'}
+              src={
+                ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo)
+                  ? product.brands?.logo_url || product.brand_logo
+                  : '/logo-white.png'
+              }
+              alt={
+                ENABLE_BRANDS && (product.brands?.name || product.brand)
+                  ? product.brands?.name || product.brand
+                  : 'Producer Toy'
+              }
               width={360}
               height={144}
               unoptimized
               className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto drop-shadow-md rounded-lg"
+              onError={(e) => {
+                const target = e.currentTarget
+                if (!target.src.endsWith('/logo-white.png')) {
+                  target.src = '/logo-white.png'
+                }
+              }}
             />
           </div>
 
