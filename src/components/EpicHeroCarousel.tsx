@@ -319,12 +319,20 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
         
         {/* Main Hero Banner Container (Left 9 out of 12 columns) */}
         <div 
-          className="col-span-9 relative w-full h-[450px] rounded-none overflow-hidden border border-[#202020] shadow-2xl bg-[#121212]"
-          style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
+          className="col-span-9 relative w-full rounded-2xl lg:rounded-3xl xl:rounded-[28px] overflow-hidden border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.8)] bg-[#121212]"
+          style={{ 
+            position: 'relative', 
+            width: '100%', 
+            height: 560,
+            minHeight: 560,
+            overflow: 'hidden',
+            isolation: 'isolate',
+            transform: 'translateZ(0)'
+          }}
         >
           {/* Horizontal Sliding Viewport (Smooth 700ms Animation) */}
           <div 
-            className="flex h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            className="flex h-full w-full transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none"
             style={{ 
               display: 'flex',
               height: '100%',
@@ -333,9 +341,12 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               transition: 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1)',
             }}
           >
-            {featuredList.map((product) => {
+            {featuredList.map((product, idx) => {
               const isFree = Number(product.price_usd) === 0
               const isSaved = isWishlisted(product.id)
+              const inCart = isInCart(product.id)
+              const priceUsd = Number(product.price_usd) || 0
+              const priceInr = product.price_inr ? Number(product.price_inr) : convertUsdToInr(priceUsd)
 
               return (
                 <Link 
@@ -358,7 +369,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1600&auto=format&fit=crop', { width: 1600 })}
                     alt={product.name}
                     fill
-                    priority
+                    priority={idx === 0}
                     unoptimized
                     className="object-cover object-center pointer-events-none"
                     style={{
@@ -371,18 +382,18 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   />
 
                   {/* Epic Dark Gradients */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/45 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/40 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
 
                   {/* Top Right Wishlist Button for Desktop */}
                   <button
                     type="button"
                     onClick={(e) => handleWishlistToggle(e, product)}
                     aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
-                    className={`absolute top-4 right-4 w-10 h-10 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
+                    className={`absolute top-5 right-5 w-11 h-11 rounded-full backdrop-blur-md border flex items-center justify-center z-20 active:scale-90 transition-all ${
                       isSaved
                         ? 'bg-white text-black border-white shadow-xl'
-                        : 'bg-black/75 text-white border-white/20 hover:bg-white hover:text-black shadow-lg'
+                        : 'bg-black/70 text-white border-white/20 hover:bg-white hover:text-black shadow-lg'
                     }`}
                     title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
                   >
@@ -390,48 +401,65 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   </button>
 
                   {/* Hero Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 max-w-xl space-y-3.5 z-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 xl:p-12 max-w-2xl space-y-3.5 z-10">
                     
-                    {/* Main Product Title (H2 for clean hierarchy, Natural Title Case) */}
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight font-sans drop-shadow-xl">
+                    {/* Brand / Category Tag */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300 bg-white/[0.08] backdrop-blur-md px-2.5 py-1 rounded-md border border-white/[0.06]">
+                        {product.brand && product.brand !== 'Producer Toy' ? product.brand : (product.product_type || 'Featured Release')}
+                      </span>
+                    </div>
+
+                    {/* Main Product Title */}
+                    <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-white leading-tight font-sans drop-shadow-2xl">
                       {product.name}
                     </h2>
 
                     {/* Short Description */}
-                    <p className="text-sm text-zinc-200 font-normal leading-relaxed line-clamp-2 drop-shadow-md max-w-md">
+                    <p className="text-sm lg:text-base text-zinc-200 font-normal leading-relaxed line-clamp-2 drop-shadow-md max-w-lg">
                       {product.short_description || 'Professional audio tools and VST plugins designed for modern music producers.'}
                     </p>
 
-                    {/* CTA Action Buttons Row */}
-                    <div className="pt-1 flex items-center gap-3 flex-wrap">
-                      <span
-                        className="bg-white hover:bg-zinc-200 text-black font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-colors uppercase tracking-wider shadow-lg active:scale-95 inline-flex items-center justify-center min-w-[120px]"
-                      >
-                        {isFree ? 'Get Free' : 'Buy Now'}
-                      </span>
+                    {/* Price & Action Row (1:1 Epic Games Store Layout) */}
+                    <div className="pt-2 space-y-2.5">
+                      <p className="text-xs uppercase tracking-wider font-bold text-zinc-300">
+                        {isFree ? 'Free' : formatPrice(priceInr, priceUsd)}
+                      </p>
 
-                      <button 
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          addItem({
-                            id: product.id,
-                            name: product.name,
-                            slug: product.slug,
-                            price_inr: product.price_inr,
-                            price_usd: product.price_usd,
-                            cover_image: product.cover_image,
-                            product_type: product.product_type,
-                            brand: product.brand
-                          })
-                        }}
-                        className="bg-[#1e1e1e]/80 hover:bg-[#282828] text-white border border-white/15 p-2.5 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center"
-                        title="Add to Cart"
-                        aria-label="Add to Cart"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span
+                          className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-7 py-3 rounded-xl transition-colors uppercase tracking-wider shadow-xl active:scale-95 inline-flex items-center justify-center min-w-[130px]"
+                        >
+                          {isFree ? 'Get Free' : 'Buy Now'}
+                        </span>
+
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            addItem({
+                              id: product.id,
+                              name: product.name,
+                              slug: product.slug,
+                              price_inr: priceInr,
+                              price_usd: priceUsd,
+                              cover_image: product.cover_image,
+                              product_type: product.product_type,
+                              brand: product.brand
+                            })
+                          }}
+                          className={`p-3 rounded-xl border transition-all active:scale-95 flex items-center justify-center shadow-lg ${
+                            inCart
+                              ? 'bg-white text-black border-white'
+                              : 'bg-[#1e1e1e]/85 hover:bg-[#282828] text-white border-white/15'
+                          }`}
+                          title={inCart ? "In Cart" : "Add to Cart"}
+                          aria-label="Add to Cart"
+                        >
+                          {inCart ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
 
                   </div>
@@ -442,8 +470,13 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
         </div>
 
-        {/* Right Sidebar Interactive Product Cards with Animated Progress Fill (PC Only) */}
-        <div className="col-span-3 flex flex-col justify-center gap-2.5 h-[450px]" role="tablist" aria-label="Featured slides">
+        {/* Right Sidebar Interactive Product Cards (PC Only) - EXACT 1:1 Epic Games Store Reference */}
+        <div 
+          className="col-span-3 flex flex-col justify-start gap-2 xl:gap-2.5 py-1" 
+          role="tablist" 
+          aria-label="Featured slides"
+          style={{ height: 560, minHeight: 560 }}
+        >
           {featuredList.map((item, idx) => {
             const isActive = idx === selectedIndex
             return (
@@ -452,28 +485,36 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 role="tab"
                 aria-selected={isActive}
                 aria-current={isActive ? 'true' : undefined}
+                aria-label={item.name}
                 onClick={() => handleSelect(idx)}
-                className={`relative h-[78px] flex-shrink-0 flex items-center gap-3.5 p-3 rounded-xl transition-all text-left overflow-hidden border ${
+                style={{ height: 84, minHeight: 84 }}
+                className={`group relative w-full flex items-center gap-3.5 px-3.5 py-2 rounded-2xl transition-all duration-200 text-left overflow-hidden cursor-pointer ${
                   isActive
-                    ? 'bg-[#222222] border-[#383838] shadow-lg ring-1 ring-white/10'
-                    : 'bg-[#161616] hover:bg-[#1c1c1c] border-[#262626] hover:border-[#383838] opacity-80 hover:opacity-100'
+                    ? 'bg-[#202020] border border-white/[0.08] shadow-2xl'
+                    : 'bg-transparent border border-transparent hover:bg-white/[0.04]'
                 }`}
               >
-                {/* Active Animated Progress Fill Layer (PC Only) */}
+                {/* Active Animated Vertical Progress Bar on Left Edge (Exact 1:1 Epic Games Store) */}
                 {isActive && (
-                  <div 
-                    className="absolute inset-0 bg-white/[0.08] transition-all duration-75 ease-linear origin-left pointer-events-none"
-                    style={{ 
-                      width: `${progress}%`
-                    }}
-                  />
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-white/10 rounded-l-2xl overflow-hidden pointer-events-none">
+                    <div 
+                      className="w-full bg-white transition-all duration-75 ease-linear rounded-full motion-reduce:transition-none"
+                      style={{ 
+                        height: `${progress}%`
+                      }}
+                    />
+                  </div>
                 )}
 
-
-                {/* SQUARE Thumbnail Box */}
-                <div className="relative w-[48px] h-[48px] aspect-square rounded-xl overflow-hidden flex-shrink-0 border border-[#2a2a2a] z-10 shadow-sm">
+                {/* Poster / Thumbnail Box */}
+                <div 
+                  style={{ width: 48, height: 60, minWidth: 48, minHeight: 60 }}
+                  className={`relative rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.06] shadow-sm transition-transform duration-200 ${
+                    isActive ? 'scale-[1.02]' : 'group-hover:scale-[1.02]'
+                  }`}
+                >
                   <Image
-                    src={getCdnImageUrl(item.cover_image, { width: 100 })}
+                    src={getCdnImageUrl(item.cover_image, { width: 120 })}
                     alt={item.name}
                     fill
                     unoptimized
@@ -482,8 +523,12 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 </div>
 
                 {/* Info Text */}
-                <div className="flex-1 min-w-0 pr-1 z-10">
-                  <p className="text-xs font-bold text-white leading-tight line-clamp-2">
+                <div className="flex-1 min-w-0 pr-1">
+                  <p className={`text-[13px] xl:text-[14px] leading-snug line-clamp-2 transition-colors duration-200 ${
+                    isActive
+                      ? 'text-white font-semibold'
+                      : 'text-zinc-400 group-hover:text-white font-medium'
+                  }`}>
                     {item.name}
                   </p>
                 </div>
