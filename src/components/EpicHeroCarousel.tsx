@@ -337,8 +337,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
               display: 'flex',
               height: '100%',
               width: '100%',
-              transform: `translateX(-${selectedIndex * 100}%)`,
+              transform: `translate3d(-${selectedIndex * 100}%, 0, 0)`,
               transition: 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1)',
+              willChange: 'transform',
             }}
           >
             {featuredList.map((product, idx) => {
@@ -472,7 +473,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
         {/* Right Sidebar Interactive Product Cards (PC Only) - EXACT 1:1 Epic Games Store Reference */}
         <div 
-          className="col-span-3 flex flex-col justify-start gap-2.5 xl:gap-3 py-1" 
+          className="col-span-3 flex flex-col justify-center gap-2.5 xl:gap-3 py-1" 
           role="tablist" 
           aria-label="Featured slides"
           style={{ height: 620, minHeight: 620 }}
@@ -488,18 +489,19 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 aria-label={item.name}
                 onClick={() => handleSelect(idx)}
                 style={{ height: 96, minHeight: 96 }}
-                className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 text-left overflow-hidden cursor-pointer ${
+                className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-2xl border transition-colors duration-200 text-left overflow-hidden cursor-pointer select-none outline-none focus:outline-none focus-visible:outline-none ${
                   isActive
-                    ? 'bg-[#202020] border border-white/[0.08] shadow-md'
-                    : 'bg-transparent hover:bg-white/[0.05]'
+                    ? 'bg-[#202020] border-white/10 shadow-md'
+                    : 'bg-transparent border-transparent hover:bg-white/[0.05]'
                 }`}
               >
                 {/* Active Animated Progress Fill Layer (PC Only - sweeps horizontally to the side) */}
                 {isActive && (
                   <div 
-                    className="absolute inset-0 bg-white/[0.08] transition-all duration-75 ease-linear origin-left pointer-events-none"
+                    className="absolute inset-0 bg-white/[0.06] origin-left pointer-events-none"
                     style={{ 
-                      width: `${progress}%`
+                      width: `${progress}%`,
+                      transition: progress === 0 ? 'none' : 'width 50ms linear',
                     }}
                   />
                 )}
