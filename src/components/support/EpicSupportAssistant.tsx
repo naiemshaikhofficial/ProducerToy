@@ -195,7 +195,10 @@ export function EpicSupportAssistant({
 
       // Query Groq AI with fallback to local knowledge
       try {
-        const groqRes = await askGroqSupportAction(query, [])
+        const [groqRes] = await Promise.all([
+          askGroqSupportAction(query, []),
+          new Promise((r) => setTimeout(r, 650)),
+        ])
 
         if (groqRes && groqRes.success && groqRes.answer) {
           setMessages((prev) =>
@@ -287,7 +290,10 @@ export function EpicSupportAssistant({
       }))
 
     try {
-      const groqRes = await askGroqSupportAction(text, history)
+      const [groqRes] = await Promise.all([
+        askGroqSupportAction(text, history),
+        new Promise((r) => setTimeout(r, 650)),
+      ])
       setIsTyping(false)
 
       if (groqRes && groqRes.success && groqRes.answer) {
@@ -598,11 +604,11 @@ export function EpicSupportAssistant({
                     <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
                   </div>
 
-                  {/* Thinking Spinner Card (Exact Screenshot 3: ○ Thinking...) */}
+                  {/* Thinking Spinner Card (Exact Match with Epic Games Screenshot) */}
                   {msg.isThinking ? (
-                    <div className="bg-[#14100d] border border-[#2c1d15] text-zinc-200 rounded-2xl rounded-tl-xs px-5 py-3.5 text-xs sm:text-sm flex items-center gap-2.5 shadow-xl animate-pulse">
-                      <Loader2 size={14} className="animate-spin text-[#FC6301]" />
-                      <span className="text-zinc-300 font-medium">Thinking...</span>
+                    <div className="inline-flex items-center gap-3 bg-[#15110e] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-sm px-5 py-3.5 shadow-xl w-fit">
+                      <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
+                      <span className="text-zinc-300 text-sm font-normal">Thinking...</span>
                     </div>
                   ) : (
                     /* Full Assistant Response Card (Exact Match with Circled Screenshot) */

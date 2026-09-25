@@ -30,8 +30,8 @@ export function SupportClient() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#0e071c] flex items-center justify-center text-purple-400 text-xs uppercase tracking-widest font-bold">
-          Loading Support Center...
+        <div className="w-full min-h-[calc(100vh-76px)] bg-[#070605] flex items-center justify-center">
+          <div className="w-6 h-6 rounded-full border-2 border-[#FC6301]/20 border-t-[#FC6301] animate-spin" />
         </div>
       }
     >
