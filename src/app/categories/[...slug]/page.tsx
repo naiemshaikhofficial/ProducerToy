@@ -490,7 +490,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   return (
     <div className="min-h-screen bg-[#121212] text-white py-8 px-4 sm:px-6 lg:px-8 font-sans select-none">
-      <div className="max-w-[1280px] mx-auto space-y-8">
+      <div className="max-w-[1440px] mx-auto space-y-8">
         
         {/* Category Header Title (Plugin Boutique Style) */}
         <div className="space-y-2 pt-2">

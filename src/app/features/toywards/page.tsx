@@ -89,7 +89,7 @@ export default function ToywardsFeaturePage() {
       <FAQPageJsonLd faqs={FAQ_ITEMS} />
       
       {/* Container wrapper */}
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 space-y-16 sm:space-y-24">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 space-y-16 sm:space-y-24">
         
         {/* HERO SECTION */}
         <section className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-[#141414] shadow-2xl min-h-[440px] sm:min-h-[480px] lg:h-[500px] flex items-center">

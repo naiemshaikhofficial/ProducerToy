@@ -754,7 +754,7 @@ export function EpicStoreBrowser({
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-28">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
         
         {/* ========================================================================= */}
         {/* PAGE HEADER: TITLE & DESCRIPTION (Exact Free Page Hero Layout)             */}

@@ -57,7 +57,7 @@ export default async function HomePage() {
       <h1 className="sr-only">Producer Toy — Music Production VST Plugins, Samples & Presets</h1>
       
       {/* Main Content Area - Exact 1:1 margin and width alignment with SubBar */}
-      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-20 sm:pb-28 space-y-12 sm:space-y-16">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-20 sm:pb-28 space-y-12 sm:space-y-16">
         
         {/* 1st Section: Epic Hero Carousel (Starts immediately at top under SubBar) */}
         <EpicHeroCarousel products={products} />

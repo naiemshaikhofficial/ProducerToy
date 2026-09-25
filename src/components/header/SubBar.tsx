@@ -312,7 +312,7 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* ========================================================================= */}
       {/* 2. DESKTOP SUBBAR (>= 768px): Products ˅, Deals, Brands, Blog, Free ˅      */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
+      <div className="hidden md:flex w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
         
         {/* Left Side: Search Capsule + Navigation Links */}
         <div className="flex items-center">

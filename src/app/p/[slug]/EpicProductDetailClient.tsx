@@ -235,7 +235,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         : ['Sound Kits']
 
   return (
-    <div className="space-y-8 sm:space-y-10 text-white max-w-[1280px] mx-auto font-sans select-none pb-28">
+    <div className="space-y-8 sm:space-y-10 text-white max-w-[1440px] mx-auto font-sans select-none pb-28">
       
       {/* ========================================================================= */}
       {/* 1. TOP TITLE HEADER (Exact 1:1 Match)                                     */}

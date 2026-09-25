@@ -107,7 +107,7 @@ export default function WishlistPage() {
 
   return (
     <div className="w-full min-h-screen bg-[#121212] text-white select-none pb-28 font-sans">
-      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         
         {/* ========================================================================= */}
         {/* 1. TOP HEADER: My Wishlist + Producer Rewards Balance                      */}
