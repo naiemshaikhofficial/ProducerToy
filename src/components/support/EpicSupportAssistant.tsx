@@ -11,19 +11,15 @@ import {
   Bot,
   Send,
   Loader2,
-  Copy,
-  Check,
   MoreHorizontal,
   ExternalLink,
   ThumbsUp,
   ThumbsDown,
-  ShoppingBag,
-  User,
+  AlertTriangle,
   ArrowLeft,
 } from 'lucide-react'
 import {
   KNOWLEDGE_BASE,
-  KNOWLEDGE_CATEGORIES,
   KnowledgeArticle,
 } from './supportKnowledgeData'
 import { createSupportTicketAction } from '@/actions/supportActions'
@@ -38,6 +34,7 @@ interface ChatMessage {
   feedback?: 'yes' | 'no'
   needsTicket?: boolean
   ticketNumber?: string
+  isThinking?: boolean
 }
 
 interface EpicSupportAssistantProps {
@@ -47,22 +44,21 @@ interface EpicSupportAssistantProps {
 }
 
 export function EpicSupportAssistant({
+  initialTab,
   initialTicketNumber = '',
   initialEmail = '',
 }: EpicSupportAssistantProps) {
-  // Screen state: false = Hero Search (Screen 1), true = Interactive Chat Feed (Screen 2)
+  // Screen state: false = Hero Search (Screen 1), true = Chat Assistant (Screen 2)
   const [isChatStarted, setIsChatStarted] = useState(false)
 
   // Search input on Screen 1
   const [heroInput, setHeroInput] = useState('')
+  const [inputError, setInputError] = useState('')
+  const [isHeroLoading, setIsHeroLoading] = useState(false)
 
   // Chat message input on Screen 2
   const [chatInput, setChatInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-
-  // Navigation dropdowns
-  const [isExploreOpen, setIsExploreOpen] = useState(false)
-  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
 
   // Ticket creation inline state
   const [ticketName, setTicketName] = useState('')
@@ -85,17 +81,6 @@ export function EpicSupportAssistant({
 
   // Chat history for Screen 2
   const [messages, setMessages] = useState<ChatMessage[]>([])
-
-  // Suggested prompt chips on Screen 1
-  const SUGGESTED_QUESTIONS = [
-    { label: 'Are they free?', query: 'are they free' },
-    { label: 'Where is my serial key?', query: 'where is my serial key' },
-    { label: 'FL Studio plugin missing', query: 'fl studio plugin missing' },
-    { label: 'Ableton Live rescan', query: 'ableton rescan' },
-    { label: 'Download tax invoice', query: 'download invoice' },
-    { label: 'Refund policy', query: 'refund policy' },
-    { label: 'Apple Silicon M1-M4', query: 'apple silicon' },
-  ]
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -141,77 +126,109 @@ export function EpicSupportAssistant({
     return highestScore >= 15 ? bestArticle : null
   }
 
-  // Triggered when user submits their problem from Hero Landing (Screen 1)
-  const handleHeroSubmit = (queryToSubmit?: string) => {
-    const query = (queryToSubmit || heroInput).trim()
-    if (!query) return
+  // Validation & Submit from Screen 1 (Hero Landing)
+  const handleHeroSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
+    const query = heroInput.trim()
+
+    // Validation: Exactly as in user screenshot 2 (e.g. if too short like "sd")
+    if (!query || query.length < 5 || query.split(/\s+/).length < 2) {
+      setInputError('Describe the problem in more detail.')
+      return
+    }
+
+    setInputError('')
+    setIsHeroLoading(true)
 
     const time = formatCurrentTime()
 
-    // Switch to Screen 2
-    setIsChatStarted(true)
-    setIsTyping(true)
-
-    // User message (Screen 2 right bubble)
-    const userMsg: ChatMessage = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
-      timestamp: time,
-      content: query,
-    }
-
-    // Initial greeting message (matches Epic Games screenshot)
-    const introMsg: ChatMessage = {
-      id: `intro-${Date.now()}`,
-      sender: 'assistant',
-      timestamp: time,
-      content:
-        "Hey 👋 I'm the Producer Toy Support Assistant. I'm AI-powered and here to help you with your Producer Toy questions and issues.",
-    }
-
-    setMessages([userMsg, introMsg])
-
-    // Generate AI resolution
+    // Spinner spins for 700ms then smoothly transitions to Screen 2
     setTimeout(() => {
-      const match = findBestAnswer(query)
-      setIsTyping(false)
+      setIsHeroLoading(false)
+      setIsChatStarted(true)
 
-      if (match) {
-        const answerMsg: ChatMessage = {
-          id: `asst-${Date.now()}`,
-          sender: 'assistant',
-          timestamp: formatCurrentTime(),
-          article: match,
-          isSourcesOpen: false,
-        }
-        setMessages((prev) => [...prev, answerMsg])
-      } else {
-        const fallbackMsg: ChatMessage = {
-          id: `asst-${Date.now()}`,
-          sender: 'assistant',
-          timestamp: formatCurrentTime(),
-          content: `I couldn't find an exact automated solution for "${query}". Would you like me to connect you with our senior audio engineers?`,
-          needsTicket: true,
-        }
-        setMessages((prev) => [...prev, fallbackMsg])
+      const userMsg: ChatMessage = {
+        id: `user-${Date.now()}`,
+        sender: 'user',
+        timestamp: time,
+        content: query,
       }
-    }, 600)
+
+      const introMsg: ChatMessage = {
+        id: `intro-${Date.now()}`,
+        sender: 'assistant',
+        timestamp: time,
+        content:
+          "Hey 👋 I'm the Producer Toy Support Assistant. I'm AI-powered and here to help you with your Producer Toy questions and issues.",
+      }
+
+      // Thinking placeholder message (as shown in user screenshot 3)
+      const thinkingMsgId = `thinking-${Date.now()}`
+      const thinkingMsg: ChatMessage = {
+        id: thinkingMsgId,
+        sender: 'assistant',
+        timestamp: time,
+        isThinking: true,
+      }
+
+      setMessages([userMsg, introMsg, thinkingMsg])
+
+      // After thinking completes, replace with actual answer (Screenshot 4)
+      setTimeout(() => {
+        const match = findBestAnswer(query)
+
+        setMessages((prev) =>
+          prev.map((m) => {
+            if (m.id === thinkingMsgId) {
+              if (match) {
+                return {
+                  id: `asst-${Date.now()}`,
+                  sender: 'assistant',
+                  timestamp: formatCurrentTime(),
+                  article: match,
+                  isSourcesOpen: false,
+                  isThinking: false,
+                }
+              }
+              return {
+                id: `asst-${Date.now()}`,
+                sender: 'assistant',
+                timestamp: formatCurrentTime(),
+                content: `I couldn't find an exact automated solution for "${query}". Would you like me to connect you with our senior audio engineers?`,
+                needsTicket: true,
+                isThinking: false,
+              }
+            }
+            return m
+          })
+        )
+      }, 1000)
+    }, 700)
   }
 
-  // Triggered from bottom input bar inside Screen 2
+  // Submit from bottom input bar on Screen 2 (Chat)
   const handleChatSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     const text = chatInput.trim()
     if (!text || isTyping) return
 
+    const time = formatCurrentTime()
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
       sender: 'user',
-      timestamp: formatCurrentTime(),
+      timestamp: time,
       content: text,
     }
 
-    setMessages((prev) => [...prev, userMsg])
+    const thinkingMsgId = `thinking-${Date.now()}`
+    const thinkingMsg: ChatMessage = {
+      id: thinkingMsgId,
+      sender: 'assistant',
+      timestamp: time,
+      isThinking: true,
+    }
+
+    setMessages((prev) => [...prev, userMsg, thinkingMsg])
     setChatInput('')
     setIsTyping(true)
 
@@ -219,26 +236,32 @@ export function EpicSupportAssistant({
       const match = findBestAnswer(text)
       setIsTyping(false)
 
-      if (match) {
-        const answerMsg: ChatMessage = {
-          id: `asst-${Date.now()}`,
-          sender: 'assistant',
-          timestamp: formatCurrentTime(),
-          article: match,
-          isSourcesOpen: false,
-        }
-        setMessages((prev) => [...prev, answerMsg])
-      } else {
-        const fallbackMsg: ChatMessage = {
-          id: `asst-${Date.now()}`,
-          sender: 'assistant',
-          timestamp: formatCurrentTime(),
-          content: `I couldn't find an automated solution for "${text}". Would you like to raise a support ticket with our audio technicians?`,
-          needsTicket: true,
-        }
-        setMessages((prev) => [...prev, fallbackMsg])
-      }
-    }, 600)
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m.id === thinkingMsgId) {
+            if (match) {
+              return {
+                id: `asst-${Date.now()}`,
+                sender: 'assistant',
+                timestamp: formatCurrentTime(),
+                article: match,
+                isSourcesOpen: false,
+                isThinking: false,
+              }
+            }
+            return {
+              id: `asst-${Date.now()}`,
+              sender: 'assistant',
+              timestamp: formatCurrentTime(),
+              content: `I couldn't find an automated solution for "${text}". Would you like to raise a support ticket with our audio technicians?`,
+              needsTicket: true,
+              isThinking: false,
+            }
+          }
+          return m
+        })
+      )
+    }, 1000)
   }
 
   const toggleSources = (msgId: string) => {
@@ -304,29 +327,48 @@ export function EpicSupportAssistant({
   const handleResetToHero = () => {
     setIsChatStarted(false)
     setHeroInput('')
+    setInputError('')
     setChatInput('')
     setMessages([])
     setIsTyping(false)
+    setIsHeroLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-[#080706] text-white font-sans selection:bg-[#FC6301] selection:text-white flex flex-col justify-between relative overflow-hidden">
+    <div className="min-h-[calc(100vh-80px)] bg-[#070605] text-white font-sans selection:bg-[#FC6301] selection:text-white flex flex-col justify-between relative overflow-hidden">
       
-      {/* Background Ambient Glow (Orangish glow matching Epic Games lighting) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[520px] bg-[radial-gradient(ellipse_75%_55%_at_50%_0%,_rgba(252,99,1,0.28),_rgba(234,88,12,0.12)_45%,_rgba(8,7,6,0)_80%)] blur-3xl pointer-events-none -z-0" />
-      <div className="absolute top-1/4 left-1/4 w-[360px] h-[360px] bg-[#FC6301]/10 rounded-full blur-[130px] pointer-events-none -z-0" />
+      {/* Background Ambience: Cinematic Orangish Glowing Lights & Geometric Elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[550px] bg-[radial-gradient(ellipse_75%_55%_at_50%_0%,_rgba(252,99,1,0.25),_rgba(234,88,12,0.10)_45%,_rgba(7,6,5,0)_80%)] blur-3xl pointer-events-none -z-0" />
+      <div className="absolute top-1/4 left-1/4 w-[380px] h-[380px] bg-[#FC6301]/10 rounded-full blur-[140px] pointer-events-none -z-0" />
+      <div className="absolute top-1/3 right-1/4 w-[420px] h-[420px] bg-amber-600/8 rounded-full blur-[150px] pointer-events-none -z-0" />
 
-
+      {/* Abstract Glowing Angular Lines / Geometric Objects in Background (As requested by user in audio) */}
+      <svg
+        className="absolute inset-0 w-full h-[600px] pointer-events-none opacity-20 -z-0 overflow-hidden"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="ptGlowLine" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FC6301" stopOpacity="0.4" />
+            <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M -100 200 L 400 50 L 900 350 L 1600 100" fill="none" stroke="url(#ptGlowLine)" strokeWidth="1.5" />
+        <path d="M 100 450 L 600 180 L 1100 380 L 1700 250" fill="none" stroke="url(#ptGlowLine)" strokeWidth="1" strokeDasharray="4 6" />
+        <circle cx="350" cy="180" r="120" fill="none" stroke="rgba(252,99,1,0.15)" strokeWidth="1" />
+        <circle cx="1100" cy="220" r="160" fill="none" stroke="rgba(252,99,1,0.12)" strokeWidth="1" strokeDasharray="8 8" />
+      </svg>
 
       {/* ========================================================================= */}
-      {/* SCREEN 1: HERO LANDING STATE (Matching Image 1 Screenshot)               */}
+      {/* SCREEN 1: HERO LANDING STATE (Exact Match with Screenshot 1 & 2)          */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 w-full py-12 sm:py-20 flex-grow flex flex-col justify-center">
+        <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 w-full py-16 sm:py-24 flex-grow flex flex-col justify-center">
           
-          {/* Floating Server Status Pill (Top Right, matching Screenshot 1) */}
-          <div className="w-full flex justify-end mb-4 sm:mb-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#120e0b]/90 border border-white/[0.08] text-xs text-zinc-300 shadow-sm backdrop-blur-sm">
+          {/* Floating Server Status Pill (Top Right, matching Screenshot 1 & 2) */}
+          <div className="w-full flex justify-end mb-6 sm:mb-10">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#110d0a]/90 border border-white/[0.08] text-xs text-zinc-300 shadow-sm backdrop-blur-sm">
               <span className="text-zinc-400">Server status:</span>
               <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px] sm:text-xs">
                 <span className="relative flex h-2 w-2">
@@ -341,7 +383,7 @@ export function EpicSupportAssistant({
           {/* Center Hero Heading */}
           <div className="text-center space-y-6 sm:space-y-8">
             <div className="space-y-2">
-              <p className="text-xs sm:text-sm font-semibold tracking-wider text-[#FC6301]/90 uppercase">
+              <p className="text-xs sm:text-sm font-semibold tracking-wider text-zinc-400 uppercase">
                 Producer Toy Support
               </p>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight">
@@ -349,31 +391,46 @@ export function EpicSupportAssistant({
               </h1>
             </div>
 
-            {/* Problem Input Pill + Circle Arrow Button */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                handleHeroSubmit()
-              }}
-              className="max-w-xl mx-auto w-full"
-            >
+            {/* Problem Input Pill + Circle Arrow Button (Exact Screenshot Layout) */}
+            <form onSubmit={handleHeroSubmit} className="max-w-xl mx-auto w-full">
               <div className="flex items-center justify-center gap-3 w-full">
                 <input
                   type="text"
                   value={heroInput}
-                  onChange={(e) => setHeroInput(e.target.value)}
+                  onChange={(e) => {
+                    setHeroInput(e.target.value)
+                    if (inputError) setInputError('')
+                  }}
                   placeholder="Describe your problem here"
-                  className="w-full bg-[#140f0c]/90 hover:bg-[#1a130f] focus:bg-[#1a130f] border border-[#2b1c14] focus:border-[#FC6301]/70 rounded-full px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl shadow-black/40 backdrop-blur-md"
+                  className={`w-full bg-[#130f0c]/90 hover:bg-[#181310] focus:bg-[#181310] border rounded-full px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl shadow-black/40 backdrop-blur-md ${
+                    inputError
+                      ? 'border-rose-500 focus:border-rose-500'
+                      : 'border-[#291c14] focus:border-[#FC6301]/70'
+                  }`}
                 />
 
                 <button
                   type="submit"
+                  disabled={isHeroLoading}
                   aria-label="Submit problem"
-                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#1a130f] hover:bg-[#FC6301] border border-[#2b1c14] hover:border-[#FC6301] text-zinc-400 hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer flex-shrink-0"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#18120e] hover:bg-[#FC6301] border border-[#2b1c14] hover:border-[#FC6301] text-zinc-300 hover:text-white flex items-center justify-center transition-all shadow-md active:scale-95 cursor-pointer flex-shrink-0"
                 >
-                  <ArrowRight className="w-4 h-4" />
+                  {isHeroLoading ? (
+                    /* Spinning Loader when user clicks submit, as requested in audio */
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : (
+                    <ArrowRight className="w-4 h-4" />
+                  )}
                 </button>
               </div>
+
+              {/* Exact Validation Error (Screenshot 2: ▲ Describe the problem in more detail.) */}
+              {inputError && (
+                <div className="text-left pt-2.5 px-4 flex items-center gap-1.5 text-xs text-rose-400 font-medium animate-in fade-in">
+                  <AlertTriangle size={13} className="text-rose-500 flex-shrink-0" />
+                  <span>{inputError}</span>
+                </div>
+              )}
             </form>
 
             {/* Disclaimer Note */}
@@ -388,28 +445,15 @@ export function EpicSupportAssistant({
               </Link>
               .
             </p>
-
-            {/* Quick Suggestion Chips */}
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 max-w-2xl mx-auto">
-              {SUGGESTED_QUESTIONS.map((q) => (
-                <button
-                  key={q.label}
-                  onClick={() => handleHeroSubmit(q.query)}
-                  className="text-xs px-3.5 py-1.5 rounded-full bg-[#140f0c]/80 hover:bg-[#FC6301]/20 border border-[#261810] hover:border-[#FC6301]/50 text-zinc-300 hover:text-white transition-all cursor-pointer shadow-sm"
-                >
-                  {q.label}
-                </button>
-              ))}
-            </div>
           </div>
         </main>
       ) : (
         /* ========================================================================= */
-        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Exact Match with Screenshot 2)     */
+        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Exact Match with Screenshot 3 & 4) */
         /* ========================================================================= */
         <div className="flex-1 flex flex-col justify-between overflow-hidden">
           
-          {/* Header Title: YOUR CHAT WITH / Epic Support Assistant (Exact Screenshot 2) */}
+          {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant (Exact Screenshot 3) */}
           <div className="text-center pt-8 pb-4 relative">
             <button
               onClick={handleResetToHero}
@@ -428,9 +472,9 @@ export function EpicSupportAssistant({
               </h2>
             </div>
 
-            {/* Date Pill (Sep 25, 2026, matching screenshot 2) */}
+            {/* Date Pill (Sep 25, 2026, matching screenshot 3) */}
             <div className="pt-4">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-[#1a1512] border border-[#2a1d15] text-[11px] text-zinc-400 font-medium">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#181310] border border-[#2b1d15] text-[11px] text-zinc-400 font-medium">
                 {formatCurrentDate()}
               </span>
             </div>
@@ -442,25 +486,25 @@ export function EpicSupportAssistant({
             {messages.map((msg) => {
               if (msg.sender === 'user') {
                 return (
-                  /* User Bubble (Right-aligned, with "You 10:18 PM" metadata & gradient pill from screenshot) */
+                  /* User Bubble (Right-aligned, with "You 10:03 PM" & warm gradient from screenshot 3 & 4) */
                   <div key={msg.id} className="flex flex-col items-end space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200">
                     <div className="text-xs text-zinc-400 pr-1 flex items-center gap-1.5">
                       <span className="font-semibold text-zinc-200">You</span>
                       <span className="text-[11px] text-zinc-400">{msg.timestamp}</span>
                     </div>
 
-                    <div className="bg-gradient-to-r from-amber-300 via-orange-400 to-[#FC6301] text-zinc-950 font-semibold px-5 py-3 rounded-2xl rounded-tr-sm max-w-lg shadow-lg text-sm sm:text-[15px] leading-relaxed">
+                    <div className="bg-gradient-to-r from-amber-300 via-orange-400 to-[#FC6301] text-zinc-950 font-medium px-5 py-3 rounded-2xl rounded-tr-sm max-w-lg shadow-lg text-sm sm:text-[15px] leading-relaxed">
                       {msg.content}
                     </div>
                   </div>
                 )
               }
 
-              /* Assistant Bubble (Left-aligned, exact card style from screenshot 2) */
+              /* Assistant Bubble (Left-aligned, exact card style from screenshot 3 & 4) */
               return (
                 <div key={msg.id} className="flex flex-col items-start space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200 max-w-2xl">
                   
-                  {/* Assistant Header: Icon + Name + Timestamp */}
+                  {/* Assistant Header: Bot Icon + Name + Timestamp */}
                   <div className="flex items-center gap-2 text-xs text-zinc-400 px-1">
                     <div className="w-5 h-5 rounded-md bg-[#251811] border border-[#3d251a] flex items-center justify-center text-[#FC6301]">
                       <Bot size={13} />
@@ -469,183 +513,182 @@ export function EpicSupportAssistant({
                     <span className="text-[11px] text-zinc-400">{msg.timestamp}</span>
                   </div>
 
-                  {/* Message Content Card */}
-                  <div className="bg-[#181412] border border-[#2d1e16] text-zinc-200 rounded-2xl rounded-tl-sm p-4 sm:p-5 text-xs sm:text-sm leading-relaxed space-y-3.5 shadow-xl w-full">
-                    
-                    {/* Text / Greeting */}
-                    {msg.content && (
-                      <p className="text-zinc-200">{msg.content}</p>
-                    )}
+                  {/* Case 1: Thinking Spinner Card (Exact Screenshot 3: ○ Thinking...) */}
+                  {msg.isThinking ? (
+                    <div className="bg-[#181412] border border-[#2d1e16] text-zinc-200 rounded-2xl rounded-tl-sm px-5 py-3 text-xs sm:text-sm flex items-center gap-2.5 shadow-xl animate-pulse">
+                      <Loader2 size={14} className="animate-spin text-[#FC6301]" />
+                      <span className="text-zinc-300 font-medium">Thinking...</span>
+                    </div>
+                  ) : (
+                    /* Case 2: Full Assistant Card (Exact Screenshot 4) */
+                    <div className="bg-[#181412] border border-[#2d1e16] text-zinc-200 rounded-2xl rounded-tl-sm p-4 sm:p-5 text-xs sm:text-sm leading-relaxed space-y-3.5 shadow-xl w-full">
+                      
+                      {/* Introductory greeting or fallback text */}
+                      {msg.content && (
+                        <p className="text-zinc-200">{msg.content}</p>
+                      )}
 
-                    {/* Structured Knowledge Article Resolution (Exact layout from screenshot 2) */}
-                    {msg.article && (
-                      <div className="space-y-3.5">
-                        <p className="font-semibold text-white">
-                          To {msg.article.question.toLowerCase().replace('how do i ', '').replace('how to ', '')}:
-                        </p>
+                      {/* Structured Resolution Steps (Exact Screenshot 4 Layout) */}
+                      {msg.article && (
+                        <div className="space-y-3.5">
+                          <p className="font-semibold text-white">
+                            To {msg.article.question.toLowerCase().replace('how do i ', '').replace('how to ', '')}:
+                          </p>
 
-                        <ol className="space-y-2 list-decimal list-inside text-zinc-300 text-xs sm:text-[13px] leading-relaxed">
-                          {msg.article.detailedSteps.map((step, sIdx) => (
-                            <li key={sIdx} className="pl-1">
-                              <span className="text-zinc-200">{step}</span>
-                            </li>
-                          ))}
-                        </ol>
+                          <ol className="space-y-2 list-decimal list-inside text-zinc-300 text-xs sm:text-[13px] leading-relaxed">
+                            {msg.article.detailedSteps.map((step, sIdx) => (
+                              <li key={sIdx} className="pl-1">
+                                <span className="text-zinc-200">{step}</span>
+                              </li>
+                            ))}
+                          </ol>
 
-                        <p className="text-xs text-zinc-400 pt-1">
-                          Are you downloading on a PC, macOS Apple Silicon, or need help with a DAW (FL Studio, Ableton, Logic)?
-                        </p>
+                          <p className="text-xs text-zinc-400 pt-1">
+                            Are you downloading on a PC or Mac, or need help with a DAW (FL Studio, Ableton, Logic)?
+                          </p>
 
-                        {/* Answer Sources Dropdown (Exact accordion pill from screenshot 2) */}
-                        <div className="pt-2">
-                          <button
-                            onClick={() => toggleSources(msg.id)}
-                            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#201814] hover:bg-[#281d18] border border-[#33221a] text-xs text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                          >
-                            <span className="font-medium">Answer sources</span>
-                            {msg.isSourcesOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                          </button>
+                          {/* Answer Sources Dropdown (Exact accordion pill from screenshot 4) */}
+                          <div className="pt-2">
+                            <button
+                              onClick={() => toggleSources(msg.id)}
+                              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#201814] hover:bg-[#281d18] border border-[#33221a] text-xs text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                            >
+                              <span className="font-medium">Answer sources</span>
+                              {msg.isSourcesOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                            </button>
 
-                          {msg.isSourcesOpen && (
-                            <div className="mt-2 p-3 rounded-xl bg-[#140e0b] border border-[#2b1b13] space-y-2 text-xs animate-in fade-in">
-                              <div className="flex items-center justify-between text-zinc-300">
-                                <span>Producer Toy Knowledge Base: {msg.article.categoryLabel}</span>
-                                {msg.article.actionCta && (
-                                  <Link
-                                    href={msg.article.actionCta.href}
-                                    className="inline-flex items-center gap-1 text-[#FC6301] hover:underline"
-                                  >
-                                    <span>{msg.article.actionCta.label}</span>
-                                    <ExternalLink size={11} />
-                                  </Link>
-                                )}
+                            {msg.isSourcesOpen && (
+                              <div className="mt-2 p-3 rounded-xl bg-[#140e0b] border border-[#2b1b13] space-y-2 text-xs animate-in fade-in">
+                                <div className="flex items-center justify-between text-zinc-300">
+                                  <span>Producer Toy Knowledge Base: {msg.article.categoryLabel}</span>
+                                  {msg.article.actionCta && (
+                                    <Link
+                                      href={msg.article.actionCta.href}
+                                      className="inline-flex items-center gap-1 text-[#FC6301] hover:underline"
+                                    >
+                                      <span>{msg.article.actionCta.label}</span>
+                                      <ExternalLink size={11} />
+                                    </Link>
+                                  )}
+                                </div>
                               </div>
+                            )}
+                          </div>
+
+                          {/* Helpful feedback toggle */}
+                          <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-zinc-400">
+                            <span>Did this solve your problem?</span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleFeedback(msg.id, true)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
+                                  msg.feedback === 'yes'
+                                    ? 'bg-emerald-600 text-white border-emerald-500'
+                                    : 'bg-[#221812] text-zinc-300 hover:text-white border-[#332218]'
+                                }`}
+                              >
+                                <ThumbsUp size={12} />
+                                <span>Yes</span>
+                              </button>
+                              <button
+                                onClick={() => handleFeedback(msg.id, false)}
+                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
+                                  msg.feedback === 'no'
+                                    ? 'bg-rose-900/80 text-white border-rose-600'
+                                    : 'bg-[#221812] text-zinc-300 hover:text-white border-[#332218]'
+                                }`}
+                              >
+                                <ThumbsDown size={12} />
+                                <span>No</span>
+                              </button>
                             </div>
+                          </div>
+
+                          {msg.feedback === 'yes' && (
+                            <p className="text-xs text-emerald-400 flex items-center gap-1 pt-1">
+                              <CheckCircle2 size={13} />
+                              Glad that helped! Happy producing!
+                            </p>
                           )}
                         </div>
+                      )}
 
-                        {/* Feedback query */}
-                        <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-zinc-400">
-                          <span>Did this solve your problem?</span>
-                          <div className="flex items-center gap-2">
+                      {/* Inline Ticket Escalation Form (If answer didn't help or no match found) */}
+                      {msg.needsTicket && (
+                        <div className="mt-3 p-4 rounded-xl bg-[#140e0b] border border-[#3b2318] space-y-3 animate-in fade-in">
+                          <p className="text-xs text-zinc-200 font-medium">
+                            Submit this request directly to our senior audio engineering desk:
+                          </p>
+
+                          {ticketError && (
+                            <p className="text-xs text-rose-400">{ticketError}</p>
+                          )}
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <input
+                              type="text"
+                              value={ticketName}
+                              onChange={(e) => setTicketName(e.target.value)}
+                              placeholder="Your Name (Optional)"
+                              className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
+                            />
+                            <input
+                              type="email"
+                              required
+                              value={ticketEmail}
+                              onChange={(e) => setTicketEmail(e.target.value)}
+                              placeholder="Your Email *"
+                              className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
+                            />
+                          </div>
+
+                          <div className="flex justify-end pt-1">
                             <button
-                              onClick={() => handleFeedback(msg.id, true)}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
-                                msg.feedback === 'yes'
-                                  ? 'bg-emerald-600 text-white border-emerald-500'
-                                  : 'bg-[#221812] text-zinc-300 hover:text-white border-[#332218]'
-                              }`}
+                              onClick={() => handleCreateTicket(msg.id, msg.article?.question || 'General Inquiry')}
+                              disabled={isSubmittingTicket}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
                             >
-                              <ThumbsUp size={12} />
-                              <span>Yes</span>
-                            </button>
-                            <button
-                              onClick={() => handleFeedback(msg.id, false)}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
-                                msg.feedback === 'no'
-                                  ? 'bg-rose-900/80 text-white border-rose-600'
-                                  : 'bg-[#221812] text-zinc-300 hover:text-white border-[#332218]'
-                              }`}
-                            >
-                              <ThumbsDown size={12} />
-                              <span>No</span>
+                              {isSubmittingTicket ? (
+                                <>
+                                  <Loader2 size={13} className="animate-spin" />
+                                  <span>Submitting...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Send size={13} />
+                                  <span>Submit to Audio Desk</span>
+                                </>
+                              )}
                             </button>
                           </div>
                         </div>
+                      )}
 
-                        {msg.feedback === 'yes' && (
-                          <p className="text-xs text-emerald-400 flex items-center gap-1 pt-1">
-                            <CheckCircle2 size={13} />
-                            Glad that helped! Happy producing!
+                      {/* Ticket Confirmation */}
+                      {msg.ticketNumber && (
+                        <div className="p-3.5 rounded-xl bg-[#0f1f14] border border-emerald-500/40 space-y-2 text-xs text-emerald-300 animate-in fade-in">
+                          <p className="font-semibold flex items-center gap-1.5 text-emerald-400">
+                            <CheckCircle2 size={14} />
+                            Ticket #{msg.ticketNumber} created!
                           </p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Inline Ticket Escalation Form (If answer didn't help or no match found) */}
-                    {msg.needsTicket && (
-                      <div className="mt-3 p-4 rounded-xl bg-[#140e0b] border border-[#3b2318] space-y-3 animate-in fade-in">
-                        <p className="text-xs text-zinc-200 font-medium">
-                          Submit this request directly to our senior audio engineering desk:
-                        </p>
-
-                        {ticketError && (
-                          <p className="text-xs text-rose-400">{ticketError}</p>
-                        )}
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                          <input
-                            type="text"
-                            value={ticketName}
-                            onChange={(e) => setTicketName(e.target.value)}
-                            placeholder="Your Name (Optional)"
-                            className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
-                          />
-                          <input
-                            type="email"
-                            required
-                            value={ticketEmail}
-                            onChange={(e) => setTicketEmail(e.target.value)}
-                            placeholder="Your Email *"
-                            className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
-                          />
+                          <p className="text-zinc-300">
+                            Our audio engineers have received your inquiry. A confirmation was sent to {ticketEmail}.
+                          </p>
                         </div>
+                      )}
 
-                        <div className="flex justify-end pt-1">
-                          <button
-                            onClick={() => handleCreateTicket(msg.id, msg.article?.question || 'General Inquiry')}
-                            disabled={isSubmittingTicket}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-                          >
-                            {isSubmittingTicket ? (
-                              <>
-                                <Loader2 size={13} className="animate-spin" />
-                                <span>Submitting...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Send size={13} />
-                                <span>Submit to Audio Desk</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    </div>
+                  )}
 
-                    {/* Ticket Confirmation */}
-                    {msg.ticketNumber && (
-                      <div className="p-3.5 rounded-xl bg-[#0f1f14] border border-emerald-500/40 space-y-2 text-xs text-emerald-300 animate-in fade-in">
-                        <p className="font-semibold flex items-center gap-1.5 text-emerald-400">
-                          <CheckCircle2 size={14} />
-                          Ticket #{msg.ticketNumber} created!
-                        </p>
-                        <p className="text-zinc-300">
-                          Our audio engineers have received your inquiry. A confirmation was sent to {ticketEmail}.
-                        </p>
-                      </div>
-                    )}
-
-                  </div>
                 </div>
               )
             })}
 
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex items-center gap-2 text-xs text-zinc-400 px-1 animate-pulse">
-                <div className="w-5 h-5 rounded-md bg-[#251811] border border-[#3d251a] flex items-center justify-center text-[#FC6301]">
-                  <Bot size={13} />
-                </div>
-                <span>Producer Toy Support Assistant is typing...</span>
-              </div>
-            )}
-
             <div ref={messagesEndRef} />
           </main>
 
-          {/* Bottom Fixed Chat Bar (Exact match with Screenshot 2) */}
-          <footer className="relative z-20 w-full border-t border-white/[0.06] bg-[#080706]/95 backdrop-blur-md px-4 sm:px-6 py-3.5">
+          {/* Bottom Fixed Chat Bar (Exact Match with Screenshot 3 & 4) */}
+          <footer className="relative z-20 w-full border-t border-white/[0.06] bg-[#070605]/95 backdrop-blur-md px-4 sm:px-6 py-3.5">
             <form
               onSubmit={handleChatSubmit}
               className="max-w-3xl mx-auto flex items-center gap-3"
@@ -655,7 +698,7 @@ export function EpicSupportAssistant({
                 type="button"
                 onClick={() => handleChatSubmit()}
                 title="Options"
-                className="w-10 h-10 rounded-full bg-[#16110e] hover:bg-[#201813] border border-[#2b1d15] text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                className="w-10 h-10 rounded-full bg-[#140f0c] hover:bg-[#1e1510] border border-[#2b1d15] text-zinc-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
               >
                 <MoreHorizontal size={18} />
               </button>
@@ -668,7 +711,7 @@ export function EpicSupportAssistant({
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Write a message..."
-                  className="w-full bg-[#140f0c] hover:bg-[#1a1410] focus:bg-[#1a1410] border border-[#2b1d15] focus:border-[#FC6301]/70 rounded-full pl-5 pr-12 py-3 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  className="w-full bg-[#120e0b] hover:bg-[#18120e] focus:bg-[#18120e] border border-[#2b1d15] focus:border-[#FC6301]/70 rounded-full pl-5 pr-12 py-3 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
                 {/* Circle Arrow Submit Button */}
@@ -676,7 +719,7 @@ export function EpicSupportAssistant({
                   type="submit"
                   disabled={!chatInput.trim() || isTyping}
                   aria-label="Send message"
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#201712] hover:bg-[#FC6301] disabled:opacity-30 disabled:hover:bg-[#201712] text-zinc-400 hover:text-white disabled:text-zinc-600 flex items-center justify-center transition-all cursor-pointer flex-shrink-0"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[#1e1510] hover:bg-[#FC6301] disabled:opacity-30 disabled:hover:bg-[#1e1510] text-zinc-400 hover:text-white disabled:text-zinc-600 flex items-center justify-center transition-all cursor-pointer flex-shrink-0"
                 >
                   <ArrowRight size={14} />
                 </button>
