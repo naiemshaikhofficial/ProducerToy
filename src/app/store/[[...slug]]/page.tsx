@@ -165,7 +165,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
   const categorySlug = slug?.[0] || ''
   const subTypeSlug = slug?.[1] || ''
 
-  const isFree = categorySlug.toLowerCase() === 'free' || freeParam === 'true'
+  const isFree = categorySlug.toLowerCase() === 'free' || freeParam === 'true' || priceParam === 'free'
   const isDeals = dealsParam === 'true'
   const isBundles = bundlesParam === 'true' || categorySlug.toLowerCase() === 'bundles'
   const isRentToOwn = rentParam === 'true'
@@ -257,11 +257,13 @@ export default async function StorePage({ params, searchParams }: StorePageProps
     categoriesOptions = combinedCategories
     brandsOptions = dbBrandData
 
-    // Fast in-memory lookup & filter for selected brand
-    const brandSearchTerm = brandParam || (categorySlug.toLowerCase() === 'brand' ? subTypeSlug : categorySlug)
+    // Fast in-memory lookup & filter for selected brand (avoid false positives on category words like 'sounds')
+    const isBrandRoute = categorySlug.toLowerCase() === 'brand'
+    const isKnownCategory = Boolean(CATEGORY_TYPE_MAP[categorySlug.toLowerCase()] || combinedCategories.some(c => c.slug.toLowerCase() === categorySlug.toLowerCase()))
+    const brandSearchTerm = brandParam || (isBrandRoute ? subTypeSlug : !isKnownCategory ? categorySlug : '')
     if (brandSearchTerm && brandSearchTerm.toLowerCase() !== 'free') {
-      const cleanTerm = brandSearchTerm.toLowerCase()
-      selectedBrand = dbBrandData.find(b => b.slug.toLowerCase() === cleanTerm || b.name.toLowerCase().includes(cleanTerm)) || null
+      const cleanTerm = brandSearchTerm.toLowerCase().trim()
+      selectedBrand = dbBrandData.find(b => b.slug.toLowerCase() === cleanTerm || b.name.toLowerCase() === cleanTerm) || null
 
       if (selectedBrand) {
         fetchedProducts = fetchedProducts.filter(p => p.brand_id === selectedBrand?.id || p.brands?.slug === selectedBrand?.slug)
@@ -316,7 +318,7 @@ export default async function StorePage({ params, searchParams }: StorePageProps
         categories={categoriesOptions}
         brands={brandsOptions}
         activeCategorySlug={categorySlug}
-        activeSubTypeSlug={subTypeSlug}
+        activeSubTypeSlug={subTypeSlug || catParam || ''}
         activeBrandSlug={brandParam}
         activeQuery={queryText}
         activeSort={sortOption}

@@ -165,3 +165,32 @@ export const getCachedActiveProducts = unstable_cache(
   { revalidate: 86400, tags: ['products'] }
 )
 
+// 8. Free Categories & Subcategories with Active Free Products (24h Cache)
+export const getCachedFreeCategories = unstable_cache(
+  async () => {
+    const supabase = getAdminClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        id,
+        name,
+        price_usd,
+        category_id,
+        subcategory_id,
+        categories:category_id (id, name, slug, sort_order),
+        subcategories:subcategory_id (id, name, slug, sort_order)
+      `)
+      .eq('is_active', true)
+      .lte('price_usd', 0)
+
+    if (error) {
+      console.warn('[getCachedFreeCategories] notice:', error.message)
+      return []
+    }
+    return data || []
+  },
+  ['producertoy-free-categories-list'],
+  { revalidate: 86400, tags: ['products', 'categories', 'subcategories'] }
+)
+
+

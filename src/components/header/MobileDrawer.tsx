@@ -23,6 +23,7 @@ import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useGifts } from '@/context/GiftContext'
 import { categoryData, CategoryKey } from './categoryData'
+import { useFreeCategories } from './freeCategoryData'
 import { ENABLE_BRANDS } from '@/config/features'
 
 interface MobileDrawerProps {
@@ -49,6 +50,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const [isMobileRegionOpen, setIsMobileRegionOpen] = useState(false)
   const [isMobileFreeOpen, setIsMobileFreeOpen] = useState(false)
   const [mobileExpandedCat, setMobileExpandedCat] = useState<CategoryKey | null>(null)
+  const { categories: freeCategories } = useFreeCategories()
 
   if (!isOpen) return null
 
@@ -399,36 +401,41 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileFreeOpen ? 'rotate-180 text-white' : ''}`} />
                 </button>
                 {isMobileFreeOpen && (
-                  <div className="pl-3 py-2 flex flex-col gap-2 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
+                  <div className="pl-3 py-2 flex flex-col gap-2.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
+                    {freeCategories.length === 0 ? (
+                      <span className="text-xs text-zinc-500 py-1">No free downloads available.</span>
+                    ) : (
+                      freeCategories.map((cat) => (
+                        <div key={cat.id} className="flex flex-col gap-1 pb-1">
+                          <Link
+                            href={cat.exploreUrl}
+                            prefetch={true}
+                            onClick={onClose}
+                            className="text-xs font-bold text-white hover:text-[#FA742B] py-1 block"
+                          >
+                            {cat.name}
+                          </Link>
+                          {cat.subcategories
+                            .filter((s) => !s.name.startsWith('Show All'))
+                            .map((sub, sIdx) => (
+                              <Link
+                                key={sub.id || sIdx}
+                                href={sub.href}
+                                prefetch={true}
+                                onClick={onClose}
+                                className="text-[12px] font-normal text-zinc-400 hover:text-white pl-2.5 py-0.5 block"
+                              >
+                                • {sub.name}
+                              </Link>
+                            ))}
+                        </div>
+                      ))
+                    )}
                     <Link
-                      href="/free-vst-plugins"
+                      href="/store?price=free"
                       prefetch={true}
                       onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1 block"
-                    >
-                      Free VSTs &amp; Plugins
-                    </Link>
-                    <Link
-                      href="/store/sounds?price=free"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1 block"
-                    >
-                      Free Samples &amp; Loops
-                    </Link>
-                    <Link
-                      href="/store/presets?price=free"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1 block"
-                    >
-                      Free Presets &amp; Soundbanks
-                    </Link>
-                    <Link
-                      href="/free-vst-plugins"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-bold text-[#FA742B] hover:underline py-1 block"
+                      className="text-xs font-bold text-[#FA742B] hover:underline pt-1 block"
                     >
                       Explore All Free Tools →
                     </Link>
