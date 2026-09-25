@@ -26,6 +26,7 @@ export const CATALOG_PRODUCT_SELECT = `
   release_date,
   is_active,
   created_at,
+  file_size,
   brands ( id, name, slug, logo_url ),
   subcategories ( id, name, slug )
 `

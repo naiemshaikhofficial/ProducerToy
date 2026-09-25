@@ -56,6 +56,7 @@ export interface Product {
   is_coming_soon?: boolean
   release_date?: string | null
   created_at?: string | null
+  file_size?: string | null
 }
 
 export function ProductCard({ product }: { product: Product }) {
