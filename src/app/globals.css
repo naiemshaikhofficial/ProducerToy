@@ -36,6 +36,22 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Support Page Fullscreen Clean Lock (No footer, no layout padding, seamless theme background) */
+  body:has(.support-page-container) {
+    background-color: #070605 !important;
+  }
+
+  body:has(.support-page-container) main {
+    padding-bottom: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  body:has(.support-page-container) footer {
+    display: none !important;
+  }
+
   /* Disable Image Drag & Drop and Selection Across Entire Site */
   img, svg, picture {
     -webkit-user-drag: none !important;

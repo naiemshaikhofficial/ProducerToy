@@ -9,12 +9,14 @@ import { ENABLE_BRANDS } from '@/config/features'
 export function Footer() {
   const pathname = usePathname()
 
-  // Hide footer completely on Auth and Checkout pages (exact Epic Games screen lock)
+  // Hide footer completely on Auth, Checkout, and Support pages (no footer on support)
   if (
     pathname === '/auth' ||
     pathname?.startsWith('/auth') ||
     pathname === '/checkout' ||
-    pathname?.startsWith('/checkout')
+    pathname?.startsWith('/checkout') ||
+    pathname === '/support' ||
+    pathname?.startsWith('/support')
   ) {
     return null
   }
@@ -24,7 +26,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="w-full bg-[#141414] text-white border-none mt-28 sm:mt-36 select-none font-sans">
+    <footer className={`w-full bg-[#141414] text-white border-none select-none font-sans ${pathname === '/support' ? 'mt-0' : 'mt-28 sm:mt-36'}`}>
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 sm:pt-20 sm:pb-28">
         
         {/* Main Grid with Consistent Vertical Dividers */}

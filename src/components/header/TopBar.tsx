@@ -147,27 +147,26 @@ export const TopBar: React.FC<TopBarProps> = ({
   // Derive initial and display name only when user is present
   const displayName = user
     ? user.user_metadata?.full_name ||
-      user.user_metadata?.name ||
-      (user.email ? user.email.split('@')[0] : 'Producer')
+    user.user_metadata?.name ||
+    (user.email ? user.email.split('@')[0] : 'Producer')
     : ''
   const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
     <div className="w-full bg-[#121212] border-none">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
-        
+
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
         <div className="flex items-center relative">
           {/* Logo with Ecosystem Dropdown - Smoothly collapses on mobile when menu opens */}
-          <div 
+          <div
             ref={ecosystemMenuRef}
             onMouseEnter={handleMouseEnterEcosystem}
             onMouseLeave={handleMouseLeaveEcosystem}
-            className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              isMobileMenuOpen
-                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
-                : 'opacity-100 translate-x-0 overflow-visible mr-6 sm:mr-7 md:mr-8'
-            }`}
+            className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isMobileMenuOpen
+              ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
+              : 'opacity-100 translate-x-0 overflow-visible mr-6 sm:mr-7 md:mr-8'
+              }`}
           >
             <button
               type="button"
@@ -184,7 +183,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
             {/* Ecosystem Mega Dropdown */}
             {isEcosystemOpen && (
-              <div 
+              <div
                 className="absolute left-0 top-full mt-2.5 w-[570px] max-w-[calc(100vw-32px)] bg-[#141416]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.03)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-[220px_1fr] gap-6 text-left select-none pointer-events-auto"
               >
                 {/* Column 1: Play & Discover */}
@@ -337,16 +336,16 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
 
           {/* STORE Brand Title - Smoothly slides to corner on mobile */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             prefetch={true}
             className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none flex-shrink-0 ml-2 sm:ml-0"
           >
             STORE
           </Link>
 
-          <Link 
-            href="/contact" 
+          <Link
+            href="/support"
             prefetch={true}
             className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors ml-6 lg:ml-8"
           >
@@ -354,8 +353,8 @@ export const TopBar: React.FC<TopBarProps> = ({
           </Link>
 
           {/* Distribute Dropdown with Hover */}
-          <div 
-            className="relative hidden lg:block ml-6 lg:ml-8" 
+          <div
+            className="relative hidden lg:block ml-6 lg:ml-8"
             ref={distributeMenuRef}
             onMouseEnter={handleMouseEnterDistribute}
             onMouseLeave={handleMouseLeaveDistribute}
@@ -366,11 +365,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                 setIsDistributeOpen(!isDistributeOpen)
                 setIsEcosystemOpen(false)
               }}
-              className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${
-                isDistributeOpen 
-                  ? 'bg-white/[0.08] text-white border border-white/20' 
-                  : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
-              }`}
+              className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${isDistributeOpen
+                ? 'bg-white/[0.08] text-white border border-white/20'
+                : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                }`}
               aria-label="Distribute Menu"
             >
               <span>Distribute</span>
@@ -425,9 +423,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             <button
               type="button"
               onClick={() => setIsGlobeMenuOpen(!isGlobeMenuOpen)}
-              className={`p-2 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${
-                isGlobeMenuOpen ? 'text-white bg-[#222222]' : 'text-zinc-400 hover:text-white hover:bg-[#1a1a1a]'
-              }`}
+              className={`p-2 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${isGlobeMenuOpen ? 'text-white bg-[#222222]' : 'text-zinc-400 hover:text-white hover:bg-[#1a1a1a]'
+                }`}
               title={`Select Region & Currency (Current: ${region?.name || 'India'} - ${currency})`}
               aria-label="Select Region and Currency"
             >
@@ -454,11 +451,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                           setRegion(r.id)
                           setIsGlobeMenuOpen(false)
                         }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-colors text-left cursor-pointer ${
-                          isSelected
-                            ? 'bg-[#242424] text-white font-semibold'
-                            : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                        }`}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-colors text-left cursor-pointer ${isSelected
+                          ? 'bg-[#242424] text-white font-semibold'
+                          : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                          }`}
                       >
                         <div className="flex items-center gap-3">
                           <span className="text-[17px] leading-none">{r.flag}</span>
