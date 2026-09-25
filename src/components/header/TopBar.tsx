@@ -154,7 +154,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <div className="w-full bg-[#121212] border-none">
-      <div className="w-full px-5 sm:px-8 lg:px-10 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
         <div className="flex items-center relative">
@@ -165,8 +165,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             onMouseLeave={handleMouseLeaveEcosystem}
             className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isMobileMenuOpen
-                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-6'
-                : 'w-[44px] sm:w-[48px] opacity-100 translate-x-0 overflow-visible mr-3 sm:mr-4 md:mr-6'
+                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-5'
+                : 'opacity-100 translate-x-0 overflow-visible mr-2 sm:mr-3 md:mr-5'
             }`}
           >
             <button
