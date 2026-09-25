@@ -340,7 +340,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link 
             href="/" 
             prefetch={true}
-            className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none"
+            className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none flex-shrink-0 ml-2 sm:ml-0"
           >
             STORE
           </Link>
@@ -619,24 +619,15 @@ export const TopBar: React.FC<TopBarProps> = ({
                 </div>
               )}
             </div>
-          ) : (
-            <Link
-              href="/auth"
-              prefetch={true}
-              className="flex items-center gap-2 py-1.5 px-3 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-[#1a1a1a] rounded-lg transition-colors cursor-pointer"
-            >
-              <User className="w-4 h-4 text-zinc-400" />
-              <span>Sign In</span>
-            </Link>
-          )}
+          ) : null}
 
-          {/* Library Button (Balanced Minimalist Style) */}
+          {/* Primary Action Button: Library (when logged in) or Sign In (when not logged in) */}
           <Link
-            href="/library"
+            href={user ? "/library" : "/auth"}
             prefetch={true}
             className="bg-[#202020] hover:bg-[#2a2a2a] text-white hover:text-white border border-[#303030] hover:border-zinc-400 font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
           >
-            Library
+            {user ? 'Library' : 'Sign In'}
           </Link>
 
         </div>
@@ -654,11 +645,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           ) : (
             <div className="flex items-center gap-2.5">
               <Link
-                href="/library"
+                href={user ? "/library" : "/auth"}
                 prefetch={true}
                 className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
               >
-                Library
+                {user ? 'Library' : 'Sign In'}
               </Link>
 
               <button

@@ -240,7 +240,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     onClick={onClose}
                     className="flex items-center gap-3.5 text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"
                   >
-                    <LogOut className="w-5 h-5 text-zinc-400" />
+                    <User className="w-5 h-5 text-zinc-400" />
                     <span>Sign In</span>
                   </Link>
                 )}
@@ -506,15 +506,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               )}
             </div>
 
-            {/* Bottom Orange Library Button (Exact Screenshot 1 & 4 Match in Producer Toy Orange) */}
+            {/* Bottom Orange Action Button: Sign In (if not logged in) or Library (if logged in) */}
             <div className="mt-auto pt-6 border-t border-[#202020]">
               <Link
-                href="/library"
+                href={user ? "/library" : "/auth"}
                 prefetch={true}
                 onClick={onClose}
                 className="bg-[#FC6301] hover:bg-[#e05700] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
               >
-                Library
+                {user ? 'Library' : 'Sign In'}
               </Link>
             </div>
           </>
