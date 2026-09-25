@@ -575,42 +575,78 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         </div>
 
-        {/* Mobile Right Controls: Exact Epic Games Screenshot Match */}
-        <div className="flex md:hidden items-center gap-3">
-          {!isMobileMenuOpen && (
-            <Link
-              href="/library"
-              prefetch={true}
-              className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-wide"
-            >
-              Library
-            </Link>
-          )}
+        {/* Mobile Right Controls: Exact Epic Games Screenshot 1 & 4 */}
+        <div className="flex md:hidden items-center gap-2">
+          {isMobileMenuOpen ? (
+            // When Mobile Menu is Open:
+            user ? (
+              // Logged in (Screenshot 4): Orange Library button + X close button
+              <>
+                <Link
+                  href="/library"
+                  prefetch={true}
+                  className="bg-[#FC6301] hover:bg-[#e05700] text-white font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center uppercase tracking-wide"
+                >
+                  Library
+                </Link>
 
-          <button
-            type="button"
-            onClick={onToggleMobileMenu}
-            className="w-10 h-10 -mr-2 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer active:scale-90"
-            aria-label={isMobileMenuOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
-          >
-            <div className="relative w-6 h-[18px] flex flex-col justify-between items-center">
-              <span
-                className={`h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] origin-center ${
-                  isMobileMenuOpen ? 'rotate-45 translate-y-[8px]' : 'translate-y-0'
-                }`}
-              />
-              <span
-                className={`h-0.5 w-6 bg-white rounded-full transition-all duration-200 ease-out ${
-                  isMobileMenuOpen ? 'opacity-0 scale-x-0' : 'opacity-100 scale-x-100'
-                }`}
-              />
-              <span
-                className={`h-0.5 w-6 bg-white rounded-full transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] origin-center ${
-                  isMobileMenuOpen ? '-rotate-45 -translate-y-[8px]' : 'translate-y-0'
-                }`}
-              />
-            </div>
-          </button>
+                <button
+                  onClick={onToggleMobileMenu}
+                  className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                  aria-label="Close Navigation Menu"
+                >
+                  <X className="w-6 h-6 stroke-[2.2]" />
+                </button>
+              </>
+            ) : (
+              // Logged out (Screenshot 1): Globe icon + Sign In button + X close button
+              <>
+                <button
+                  type="button"
+                  onClick={onToggleCurrency}
+                  className="p-1.5 text-zinc-300 hover:text-white transition-colors"
+                  aria-label="Toggle Currency"
+                >
+                  <Globe className="w-4 h-4" />
+                </button>
+
+                <Link
+                  href="/auth"
+                  prefetch={true}
+                  className="bg-[#202020] hover:bg-[#282828] text-white border border-white/10 font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-sm flex items-center justify-center"
+                >
+                  Sign in
+                </Link>
+
+                <button
+                  onClick={onToggleMobileMenu}
+                  className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                  aria-label="Close Navigation Menu"
+                >
+                  <X className="w-6 h-6 stroke-[2.2]" />
+                </button>
+              </>
+            )
+          ) : (
+            // When Mobile Menu is Closed: Normal Library button + Hamburger icon
+            <>
+              <Link
+                href="/library"
+                prefetch={true}
+                className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
+              >
+                Library
+              </Link>
+
+              <button
+                onClick={onToggleMobileMenu}
+                className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                aria-label="Open Navigation Menu"
+              >
+                <Menu className="w-7 h-7 stroke-[2.2]" />
+              </button>
+            </>
+          )}
         </div>
 
       </div>
