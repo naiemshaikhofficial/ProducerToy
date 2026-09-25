@@ -25,7 +25,9 @@ import {
   Upload,
   Radio,
   Users,
-  ShieldCheck
+  ShieldCheck,
+  BookOpen,
+  MessageSquare
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
@@ -59,9 +61,11 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
   const [isGlobeMenuOpen, setIsGlobeMenuOpen] = useState(false)
   const [isEcosystemOpen, setIsEcosystemOpen] = useState(false)
+  const [isDistributeOpen, setIsDistributeOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
   const globeMenuRef = useRef<HTMLDivElement>(null)
   const ecosystemMenuRef = useRef<HTMLDivElement>(null)
+  const distributeMenuRef = useRef<HTMLDivElement>(null)
 
   // Click outside to close desktop menus
   useEffect(() => {
@@ -75,14 +79,17 @@ export const TopBar: React.FC<TopBarProps> = ({
       if (ecosystemMenuRef.current && !ecosystemMenuRef.current.contains(event.target as Node)) {
         setIsEcosystemOpen(false)
       }
+      if (distributeMenuRef.current && !distributeMenuRef.current.contains(event.target as Node)) {
+        setIsDistributeOpen(false)
+      }
     }
-    if (isAccountMenuOpen || isGlobeMenuOpen || isEcosystemOpen) {
+    if (isAccountMenuOpen || isGlobeMenuOpen || isEcosystemOpen || isDistributeOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isAccountMenuOpen, isGlobeMenuOpen, isEcosystemOpen])
+  }, [isAccountMenuOpen, isGlobeMenuOpen, isEcosystemOpen, isDistributeOpen])
 
   // Derive initial and display name only when user is present
   const displayName = user
@@ -98,18 +105,176 @@ export const TopBar: React.FC<TopBarProps> = ({
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
         <div className="flex items-center gap-5 sm:gap-7 lg:gap-8 relative">
-          {/* Logo with Dropdown Chevron - On mobile, if mobile menu is open, transition/hide logo */}
-          <button
-            type="button"
-            onClick={() => setIsEcosystemOpen(!isEcosystemOpen)}
-            className={`items-center gap-1.5 hover:opacity-90 transition-all cursor-pointer ${
-              isMobileMenuOpen ? 'hidden md:flex' : 'flex'
-            }`}
-            aria-label="Producer Toy Ecosystem Menu"
-          >
-            <LogoIcon size={38} />
-            <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
-          </button>
+          {/* Logo with Ecosystem Dropdown (Exact Screenshot 1 Match) */}
+          <div className="relative" ref={ecosystemMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsEcosystemOpen(!isEcosystemOpen)
+                setIsDistributeOpen(false)
+              }}
+              className={`items-center gap-1.5 hover:opacity-90 transition-all cursor-pointer ${
+                isMobileMenuOpen ? 'hidden md:flex' : 'flex'
+              }`}
+              aria-label="Producer Toy Ecosystem Menu"
+            >
+              <LogoIcon size={38} />
+              <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
+            </button>
+
+            {/* Ecosystem Mega Dropdown (Exact Screenshot 1 Match) */}
+            {isEcosystemOpen && (
+              <div 
+                className="absolute left-0 top-[60px] sm:top-[68px] lg:top-[74px] w-[calc(100vw-32px)] sm:w-[500px] lg:w-[540px] bg-[#18181c] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-5 sm:p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-6 sm:gap-8 text-left select-none"
+              >
+                {/* Column 1: Play & Discover */}
+                <div className="space-y-6">
+                  {/* Section: Play */}
+                  <div className="space-y-2.5">
+                    <h4 className="text-[15px] font-bold text-white tracking-tight">Play</h4>
+                    <div className="space-y-1">
+                      <Link
+                        href="/store/sounds"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      >
+                        <Music2 className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                        <span>Sample Packs</span>
+                      </Link>
+
+                      <Link
+                        href="/store/vst-plugins"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      >
+                        <Cpu className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                        <span>VST Plugins</span>
+                      </Link>
+
+                      <Link
+                        href="/store/presets"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      >
+                        <Sparkles className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                        <span>Synth Presets</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Section: Discover */}
+                  <div className="space-y-2.5 pt-2 border-t border-white/[0.06]">
+                    <h4 className="text-[15px] font-bold text-white tracking-tight">Discover</h4>
+                    <div className="space-y-1">
+                      <Link
+                        href="/store"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-semibold bg-[#2a2a30] text-white shadow-sm transition-colors"
+                      >
+                        <ShoppingBag className="w-4 h-4 text-white flex-shrink-0" />
+                        <span>Producer Toy Store</span>
+                      </Link>
+
+                      <Link
+                        href="/store?price=free"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="group flex items-center justify-between px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Gift className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
+                          <span>Free Producer Toys</span>
+                        </div>
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FC6301]/20 text-[#FC6301]">
+                          Free
+                        </span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2: Create */}
+                <div className="space-y-2.5 sm:border-l sm:border-white/[0.06] sm:pl-6">
+                  <h4 className="text-[15px] font-bold text-white tracking-tight">Create</h4>
+                  <div className="space-y-1">
+                    <Link
+                      href="/distribute"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <Upload className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
+                      <span>Distribute on Producer Toy</span>
+                    </Link>
+
+                    <Link
+                      href="/account"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <Users className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Creator Dashboard</span>
+                    </Link>
+
+                    <Link
+                      href="/distribute"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <Radio className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Publish Your Music Packs</span>
+                    </Link>
+
+                    <Link
+                      href="/contact?topic=creator"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <MessageSquare className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Developer & Creator Forums</span>
+                    </Link>
+
+                    <Link
+                      href="/licensing"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Licensing & Terms</span>
+                    </Link>
+
+                    <Link
+                      href="/blog"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Creator Academy & Guides</span>
+                    </Link>
+
+                    <Link
+                      href="/contact"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Help & Support Assistant</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           <Link 
             href="/" 
@@ -127,197 +292,63 @@ export const TopBar: React.FC<TopBarProps> = ({
             Support
           </Link>
 
-          <div 
-            onClick={() => setIsEcosystemOpen(!isEcosystemOpen)}
-            className="hidden lg:flex items-center gap-1.5 text-zinc-300 hover:text-white text-[15px] font-medium cursor-pointer transition-colors"
-          >
-            <Link href="/distribute" prefetch={true} onClick={(e) => e.stopPropagation()}>
-              Distribute
-            </Link>
-            <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
-          </div>
-
-          {/* Epic Ecosystem Mega Dropdown (Exact Screenshot 1 Match) */}
-          {isEcosystemOpen && (
-            <div 
-              ref={ecosystemMenuRef}
-              className="absolute left-0 top-[60px] sm:top-[68px] w-[540px] bg-[#181818] border border-white/10 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-2 gap-8 text-left select-none"
+          {/* Distribute Dropdown (Exact Screenshot 2 Match) */}
+          <div className="relative hidden lg:block" ref={distributeMenuRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setIsDistributeOpen(!isDistributeOpen)
+                setIsEcosystemOpen(false)
+              }}
+              className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${
+                isDistributeOpen 
+                  ? 'bg-white/[0.08] text-white border border-white/20' 
+                  : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+              }`}
+              aria-label="Distribute Menu"
             >
-              {/* Column 1: Play & Discover */}
-              <div className="space-y-6">
-                {/* Section: Play */}
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Play & Produce</h4>
-                  <div className="space-y-1">
-                    <Link
-                      href="/store/sounds"
-                      prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
-                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                        <Music2 className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold leading-tight">Sample Packs & Loops</p>
-                        <p className="text-[11px] text-zinc-500 leading-tight">808s, Drums & Melodies</p>
-                      </div>
-                    </Link>
+              <span>Distribute</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDistributeOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
+            </button>
 
-                    <Link
-                      href="/store/vst-plugins"
-                      prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
-                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                        <Cpu className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold leading-tight">VST & Audio Plugins</p>
-                        <p className="text-[11px] text-zinc-500 leading-tight">Instruments & FX Tools</p>
-                      </div>
-                    </Link>
-
-                    <Link
-                      href="/store/presets"
-                      prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
-                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                        <Sparkles className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold leading-tight">Synth Presets</p>
-                        <p className="text-[11px] text-zinc-500 leading-tight">Serum, Vital, Phase Plant</p>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Section: Discover */}
-                <div className="space-y-3 pt-3 border-t border-white/[0.06]">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Discover</h4>
-                  <div className="space-y-1">
-                    <Link
-                      href="/store"
-                      prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
-                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                        <ShoppingBag className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold leading-tight">Producer Toy Store</p>
-                        <p className="text-[11px] text-zinc-500 leading-tight">Explore Full Catalog</p>
-                      </div>
-                    </Link>
-
-                    <Link
-                      href="/store?price=free"
-                      prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
-                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                        <Gift className="w-4 h-4 text-[#FC6301]" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold leading-tight text-white flex items-center gap-1.5">
-                          <span>Free Producer Toys</span>
-                          <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FC6301]/20 text-[#FC6301]">Free</span>
-                        </p>
-                        <p className="text-[11px] text-zinc-500 leading-tight">100% Free Downloads</p>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
+            {/* Distribute Dropdown Menu (Screenshot 2 1:1 Match) */}
+            {isDistributeOpen && (
+              <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
+                <Link
+                  href="/distribute"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                >
+                  Distribute on Producer Toy
+                </Link>
+                <Link
+                  href="/contact?topic=creator"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                >
+                  Developer Forums
+                </Link>
+                <Link
+                  href="/licensing"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                >
+                  Documentation
+                </Link>
+                <Link
+                  href="/blog"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                >
+                  Learning
+                </Link>
               </div>
-
-              {/* Column 2: Create & Distribute */}
-              <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Create & Distribute</h4>
-                <div className="space-y-1">
-                  <Link
-                    href="/distribute"
-                    prefetch={true}
-                    onClick={() => setIsEcosystemOpen(false)}
-                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-[#FC6301]">
-                      <Upload className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold leading-tight text-white">Distribute on Producer Toy</p>
-                      <p className="text-[11px] text-zinc-500 leading-tight">88/12 Revenue Split</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/contact?topic=creator"
-                    prefetch={true}
-                    onClick={() => setIsEcosystemOpen(false)}
-                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                      <Radio className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold leading-tight">Publish Your Music Packs</p>
-                      <p className="text-[11px] text-zinc-500 leading-tight">Global CDN Distribution</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/account"
-                    prefetch={true}
-                    onClick={() => setIsEcosystemOpen(false)}
-                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                      <Users className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold leading-tight">Creator Dashboard</p>
-                      <p className="text-[11px] text-zinc-500 leading-tight">Analytics & Earnings</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/contact"
-                    prefetch={true}
-                    onClick={() => setIsEcosystemOpen(false)}
-                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                      <HelpCircle className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold leading-tight">Help & Support</p>
-                      <p className="text-[11px] text-zinc-500 leading-tight">Tickets & Live Assistance</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    href="/licensing"
-                    prefetch={true}
-                    onClick={() => setIsEcosystemOpen(false)}
-                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold leading-tight">Licensing Agreement</p>
-                      <p className="text-[11px] text-zinc-500 leading-tight">Royalty-Free Terms</p>
-                    </div>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}

@@ -49,6 +49,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [isMobileRegionOpen, setIsMobileRegionOpen] = useState(false)
   const [isMobileFreeOpen, setIsMobileFreeOpen] = useState(false)
+  const [isMobileDistributeOpen, setIsMobileDistributeOpen] = useState(false)
   const [mobileExpandedCat, setMobileExpandedCat] = useState<CategoryKey | null>(null)
   const { categories: freeCategories } = useFreeCategories()
 
@@ -333,15 +334,53 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 Support
               </Link>
 
-              <Link
-                href="/distribute"
-                prefetch={true}
-                onClick={onClose}
-                className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
-              >
-                <span>Distribute</span>
-                <ChevronRight className="w-5 h-5 text-zinc-500" />
-              </Link>
+              {/* Distribute Accordion */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileDistributeOpen(!isMobileDistributeOpen)}
+                  className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
+                >
+                  <span>Distribute</span>
+                  <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileDistributeOpen ? 'rotate-180 text-white' : ''}`} />
+                </button>
+                {isMobileDistributeOpen && (
+                  <div className="pl-3 py-2 flex flex-col gap-1.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
+                    <Link
+                      href="/distribute"
+                      prefetch={true}
+                      onClick={onClose}
+                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                    >
+                      Distribute on Producer Toy
+                    </Link>
+                    <Link
+                      href="/contact?topic=creator"
+                      prefetch={true}
+                      onClick={onClose}
+                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                    >
+                      Developer Forums
+                    </Link>
+                    <Link
+                      href="/licensing"
+                      prefetch={true}
+                      onClick={onClose}
+                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                    >
+                      Documentation
+                    </Link>
+                    <Link
+                      href="/blog"
+                      prefetch={true}
+                      onClick={onClose}
+                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                    >
+                      Learning
+                    </Link>
+                  </div>
+                )}
+              </div>
 
               <Link
                 href="/store?on_sale=true"
