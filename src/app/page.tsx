@@ -62,7 +62,7 @@ export default async function HomePage() {
       </section>
 
       {/* Main Content Area */}
-      <div className="w-full max-w-[1280px] mx-auto px-0 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-2 pb-20 sm:pb-28 space-y-12 sm:space-y-16 lg:space-y-24">
+      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-2 pb-20 sm:pb-28 space-y-12 sm:space-y-16 lg:space-y-24">
         
         {/* Centered Epic Hero Carousel (Starts immediately on mobile) */}
         <EpicHeroCarousel products={products} />

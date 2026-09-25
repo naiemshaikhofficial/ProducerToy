@@ -317,9 +317,9 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       {/* ========================================================================= */}
       <div className="hidden lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-stretch">
         
-        {/* Main Hero Banner Container (Left 9 out of 12 columns) */}
+        {/* Main Hero Banner Container (Left 9 out of 12 columns - Flush against page, no shadow) */}
         <div 
-          className="col-span-9 relative w-full rounded-2xl lg:rounded-3xl xl:rounded-[28px] overflow-hidden border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.8)] bg-[#121212]"
+          className="col-span-9 relative w-full rounded-2xl overflow-hidden bg-[#121212]"
           style={{ 
             position: 'relative', 
             width: '100%', 
@@ -490,8 +490,8 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 style={{ height: 84, minHeight: 84 }}
                 className={`group relative w-full flex items-center gap-3.5 px-3.5 py-2 rounded-2xl transition-all duration-200 text-left overflow-hidden cursor-pointer ${
                   isActive
-                    ? 'bg-[#202020] border border-white/[0.08] shadow-2xl'
-                    : 'bg-transparent border border-transparent hover:bg-white/[0.04]'
+                    ? 'bg-[#202020]'
+                    : 'bg-transparent hover:bg-white/[0.04]'
                 }`}
               >
                 {/* Active Animated Progress Fill Layer (PC Only - sweeps horizontally to the side) */}
@@ -506,13 +506,13 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
                 {/* Poster / Thumbnail Box */}
                 <div 
-                  style={{ width: 48, height: 60, minWidth: 48, minHeight: 60 }}
+                  style={{ width: 52, height: 68, minWidth: 52, minHeight: 68 }}
                   className={`relative z-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.06] shadow-sm transition-transform duration-200 ${
                     isActive ? 'scale-[1.02]' : 'group-hover:scale-[1.02]'
                   }`}
                 >
                   <Image
-                    src={getCdnImageUrl(item.cover_image, { width: 120 })}
+                    src={getCdnImageUrl(item.cover_image, { width: 140 })}
                     alt={item.name}
                     fill
                     unoptimized
