@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { Metadata } from 'next'
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { ContactClient } from './ContactClient'
@@ -19,5 +19,9 @@ export const metadata: Metadata = generatePageMetadata({
 })
 
 export default function ContactPage() {
-  return <ContactClient />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#121212]" />}>
+      <ContactClient />
+    </Suspense>
+  )
 }

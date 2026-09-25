@@ -15,6 +15,7 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 import { createSupportTicketAction } from '@/actions/supportActions'
+import { FORMS_CONFIG } from '@/config/forms'
 
 interface RaiseTicketFormProps {
   initialEmail?: string
@@ -83,18 +84,68 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
     setErrorMessage('')
 
     try {
+      // 1. Create ticket in Supabase database & get ticket number
       const res = await createSupportTicketAction(formData)
       if (res.success && res.ticketNumber) {
+        const ticketNum = res.ticketNumber
         setCreatedTicket({
-          ticketNumber: res.ticketNumber,
+          ticketNumber: ticketNum,
           email: formData.email.trim(),
         })
+
+        if (onTicketCreated) {
+          onTicketCreated(ticketNum, formData.email.trim())
+        }
+
+        // 2. Programmatically dispatch to FormSubmit endpoint to deliver email to support@producertoy.com and autoresponse copy to customer
+        try {
+          const origin = typeof window !== 'undefined' ? window.location.origin : FORMS_CONFIG.SITE_URL
+          const nextUrl = `${origin}/support?tab=track&ticket=${encodeURIComponent(ticketNum)}&email=${encodeURIComponent(formData.email.trim())}`
+
+          const fsForm = document.createElement('form')
+          fsForm.action = `https://formsubmit.co/${FORMS_CONFIG.SUPPORT_EMAIL}`
+          fsForm.method = 'POST'
+          fsForm.style.display = 'none'
+
+          const fields: Record<string, string> = {
+            'Ticket Number': ticketNum,
+            'Customer Name': formData.name.trim(),
+            'email': formData.email.trim(),
+            '_replyto': formData.email.trim(),
+            'Category': formData.category,
+            'Priority': formData.priority,
+            'Order ID': formData.orderId?.trim() || 'N/A',
+            'OS Platform': formData.osPlatform,
+            'DAW': formData.daw,
+            'Subject': formData.subject.trim(),
+            'Description': formData.description.trim(),
+            '_subject': `[Producer Toy Support] Ticket ${ticketNum}: ${formData.subject.trim()}`,
+            '_template': 'table',
+            '_captcha': 'false',
+            '_autoresponse': `Hello ${formData.name.trim()},\n\nYour support ticket has been received!\n\nTicket Code: ${ticketNum}\nSubject: ${formData.subject.trim()}\nCategory: ${formData.category}\n\nOur audio engineering team is reviewing your ticket and will respond within 2–4 hours.\nYou can track real-time ticket progress at:\n${nextUrl}\n\nProducer Toy Support Desk\nhttps://producertoy.com/support`,
+            '_next': nextUrl,
+          }
+
+          Object.entries(fields).forEach(([key, val]) => {
+            const input = document.createElement('input')
+            input.type = 'hidden'
+            input.name = key
+            input.value = val
+            fsForm.appendChild(input)
+          })
+
+          document.body.appendChild(fsForm)
+          fsForm.submit()
+          return
+        } catch (fsErr) {
+          console.warn('[RaiseTicketForm] FormSubmit submission notice:', fsErr)
+        }
       } else {
         setErrorMessage(res.error || 'Failed to submit ticket. Please check your details.')
+        setLoading(false)
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected network error occurred.')
-    } finally {
       setLoading(false)
     }
   }
@@ -205,6 +256,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
           </label>
           <input
             type="text"
+            name="name"
             required
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -219,6 +271,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
           </label>
           <input
             type="email"
+            name="email"
             required
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -236,6 +289,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
             <span>Category</span>
           </label>
           <select
+            name="category"
             value={formData.category}
             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
@@ -254,6 +308,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
             <span>Priority</span>
           </label>
           <select
+            name="priority"
             value={formData.priority}
             onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
             className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
@@ -274,6 +329,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
             <span>Operating System</span>
           </label>
           <select
+            name="os_platform"
             value={formData.osPlatform}
             onChange={(e) => setFormData({ ...formData, osPlatform: e.target.value })}
             className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
@@ -292,6 +348,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
             <span>DAW</span>
           </label>
           <select
+            name="daw"
             value={formData.daw}
             onChange={(e) => setFormData({ ...formData, daw: e.target.value })}
             className="w-full bg-[#111113] border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-zinc-600 transition-colors cursor-pointer"
@@ -313,6 +370,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
           </label>
           <input
             type="text"
+            name="order_id"
             value={formData.orderId}
             onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
             placeholder="PT-ORD-XXXXX"
@@ -326,6 +384,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
           </label>
           <input
             type="text"
+            name="subject"
             required
             value={formData.subject}
             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -341,6 +400,7 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
           Details &amp; Error Description
         </label>
         <textarea
+          name="description"
           required
           rows={4}
           value={formData.description}

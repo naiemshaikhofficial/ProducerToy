@@ -1,13 +1,20 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Send, CheckCircle2, ArrowLeft, Building2, ShieldCheck, Mail, Clock, MapPin, Headphones, ArrowRight, Search } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Send, CheckCircle2, ArrowLeft, Building2, ShieldCheck, Mail, Clock, MapPin, Headphones, ArrowRight, Search, Loader2 } from 'lucide-react'
 import { submitContactFormAction } from '@/actions/contactActions'
+import { FORMS_CONFIG } from '@/config/forms'
 
 export function ContactClient() {
-  const [submitted, setSubmitted] = useState(false)
-  const [serverMsg, setServerMsg] = useState('')
+  const searchParams = useSearchParams()
+  const isSubmittedFromUrl = searchParams?.get('submitted') === 'true'
+
+  const [submitted, setSubmitted] = useState(isSubmittedFromUrl)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [nextUrl, setNextUrl] = useState(`${FORMS_CONFIG.SITE_URL}/contact?submitted=true`)
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,19 +23,32 @@ export function ContactClient() {
     message: '',
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const payload = new FormData()
-    payload.append('name', formData.name)
-    payload.append('email', formData.email)
-    payload.append('subject', formData.subject)
-    payload.append('message', formData.message)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setNextUrl(`${window.location.origin}/contact?submitted=true`)
+    }
+  }, [])
 
-    const res = await submitContactFormAction(payload)
-    if (res.success) {
-      setServerMsg(res.message)
+  useEffect(() => {
+    if (searchParams?.get('submitted') === 'true') {
       setSubmitted(true)
     }
+  }, [searchParams])
+
+  const handleSubmit = (e: React.FormEvent) => {
+    setIsSubmitting(true)
+    // Non-blocking server action logging for internal audit
+    try {
+      const payload = new FormData()
+      payload.append('name', formData.name)
+      payload.append('email', formData.email)
+      payload.append('subject', formData.subject)
+      payload.append('message', formData.message)
+      submitContactFormAction(payload).catch(() => {})
+    } catch {
+      // Ignored
+    }
+    // FormSubmit native POST proceeds to https://formsubmit.co/contact@producertoy.com
   }
 
   return (
@@ -92,15 +112,22 @@ export function ContactClient() {
         </div>
 
         {submitted ? (
-          <div className="bg-[#181818] border border-zinc-800 rounded-2xl p-8 sm:p-12 text-center space-y-4 shadow-2xl">
+          <div className="bg-[#181818] border border-zinc-800 rounded-2xl p-8 sm:p-12 text-center space-y-4 shadow-2xl animate-in fade-in duration-200">
             <div className="w-16 h-16 bg-[#251b14] border border-[#fa742b]/30 rounded-full flex items-center justify-center mx-auto text-[#fa742b]">
               <CheckCircle2 size={32} />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-white">Message Received</h2>
             <p className="text-sm text-zinc-300 max-w-md mx-auto leading-relaxed">
-              {serverMsg || 'Thank you for reaching out! Our support team typically responds within 2–6 hours.'}
+              Thank you for reaching out! A confirmation has been sent to your email. Our support team typically responds within 2–6 hours.
             </p>
-            <div className="pt-4">
+            <div className="pt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setSubmitted(false)}
+                className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs py-3 px-5 rounded-full uppercase transition-all"
+              >
+                Send Another Message
+              </button>
               <Link
                 href="/store"
                 prefetch={true}
@@ -111,7 +138,28 @@ export function ContactClient() {
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-[#181818] border border-zinc-800 rounded-2xl p-6 sm:p-10 space-y-6 shadow-2xl">
+          <form
+            action={`https://formsubmit.co/${FORMS_CONFIG.CONTACT_EMAIL}`}
+            method="POST"
+            onSubmit={handleSubmit}
+            className="bg-[#181818] border border-zinc-800 rounded-2xl p-6 sm:p-10 space-y-6 shadow-2xl"
+          >
+            {/* FormSubmit Configuration Directives */}
+            <input
+              type="hidden"
+              name="_subject"
+              value={`[Producer Toy Contact] ${formData.subject} - ${formData.name || 'Inquiry'}`}
+            />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_replyto" value={formData.email} />
+            <input
+              type="hidden"
+              name="_autoresponse"
+              value={`Thank you for contacting Producer Toy!\n\nWe have received your message regarding "${formData.subject}". A member of our support team will review your inquiry and reply to you directly within 2–6 hours.\n\nWarm regards,\nProducer Toy Support Team\nhttps://producertoy.com`}
+            />
+            <input type="hidden" name="_next" value={nextUrl} />
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
@@ -119,6 +167,7 @@ export function ContactClient() {
                 </label>
                 <input
                   type="text"
+                  name="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -133,6 +182,7 @@ export function ContactClient() {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -149,6 +199,7 @@ export function ContactClient() {
                 </label>
                 <input
                   type="text"
+                  name="order_id"
                   value={formData.orderId}
                   onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
                   placeholder="e.g. PT-M82..."
@@ -161,6 +212,7 @@ export function ContactClient() {
                   Subject Category <span className="text-[#fa742b]">*</span>
                 </label>
                 <select
+                  name="subject"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#fa742b] transition-colors cursor-pointer"
@@ -180,6 +232,7 @@ export function ContactClient() {
                 Message & Details <span className="text-[#fa742b]">*</span>
               </label>
               <textarea
+                name="message"
                 required
                 rows={5}
                 value={formData.message}
@@ -191,10 +244,11 @@ export function ContactClient() {
 
             <button
               type="submit"
-              className="w-full sm:w-auto bg-[#fa742b] hover:bg-[#e05800] text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto bg-[#fa742b] hover:bg-[#e05800] disabled:opacity-60 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Send size={16} />
-              <span>Send Message</span>
+              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
             </button>
           </form>
         )}
