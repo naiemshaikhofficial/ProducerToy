@@ -165,8 +165,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             onMouseLeave={handleMouseLeaveEcosystem}
             className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isMobileMenuOpen
-                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-6'
-                : 'opacity-100 translate-x-0 overflow-visible mr-3.5 sm:mr-4.5 md:mr-6'
+                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
+                : 'opacity-100 translate-x-0 overflow-visible mr-6 sm:mr-7 md:mr-8'
             }`}
           >
             <button
@@ -175,7 +175,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 setIsEcosystemOpen(!isEcosystemOpen)
                 setIsDistributeOpen(false)
               }}
-              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0 pr-0.5"
+              className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
               aria-label="Producer Toy Ecosystem Menu"
             >
               <LogoIcon size={34} />
