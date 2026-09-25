@@ -494,22 +494,20 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     : 'bg-transparent border border-transparent hover:bg-white/[0.04]'
                 }`}
               >
-                {/* Active Animated Vertical Progress Bar on Left Edge (Exact 1:1 Epic Games Store) */}
+                {/* Active Animated Progress Fill Layer (PC Only - sweeps horizontally to the side) */}
                 {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-white/10 rounded-l-2xl overflow-hidden pointer-events-none">
-                    <div 
-                      className="w-full bg-white transition-all duration-75 ease-linear rounded-full motion-reduce:transition-none"
-                      style={{ 
-                        height: `${progress}%`
-                      }}
-                    />
-                  </div>
+                  <div 
+                    className="absolute inset-0 bg-white/[0.08] transition-all duration-75 ease-linear origin-left pointer-events-none"
+                    style={{ 
+                      width: `${progress}%`
+                    }}
+                  />
                 )}
 
                 {/* Poster / Thumbnail Box */}
                 <div 
                   style={{ width: 48, height: 60, minWidth: 48, minHeight: 60 }}
-                  className={`relative rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.06] shadow-sm transition-transform duration-200 ${
+                  className={`relative z-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.06] shadow-sm transition-transform duration-200 ${
                     isActive ? 'scale-[1.02]' : 'group-hover:scale-[1.02]'
                   }`}
                 >
@@ -523,7 +521,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 </div>
 
                 {/* Info Text */}
-                <div className="flex-1 min-w-0 pr-1">
+                <div className="flex-1 min-w-0 pr-1 relative z-10">
                   <p className={`text-[13px] xl:text-[14px] leading-snug line-clamp-2 transition-colors duration-200 ${
                     isActive
                       ? 'text-white font-semibold'

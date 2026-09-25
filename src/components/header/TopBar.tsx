@@ -66,6 +66,59 @@ export const TopBar: React.FC<TopBarProps> = ({
   const globeMenuRef = useRef<HTMLDivElement>(null)
   const ecosystemMenuRef = useRef<HTMLDivElement>(null)
   const distributeMenuRef = useRef<HTMLDivElement>(null)
+  const ecosystemTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const distributeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleMouseEnterEcosystem = () => {
+    if (ecosystemTimeoutRef.current) {
+      clearTimeout(ecosystemTimeoutRef.current)
+      ecosystemTimeoutRef.current = null
+    }
+    if (distributeTimeoutRef.current) {
+      clearTimeout(distributeTimeoutRef.current)
+      distributeTimeoutRef.current = null
+    }
+    setIsDistributeOpen(false)
+    setIsEcosystemOpen(true)
+  }
+
+  const handleMouseLeaveEcosystem = () => {
+    if (ecosystemTimeoutRef.current) {
+      clearTimeout(ecosystemTimeoutRef.current)
+    }
+    ecosystemTimeoutRef.current = setTimeout(() => {
+      setIsEcosystemOpen(false)
+    }, 180)
+  }
+
+  const handleMouseEnterDistribute = () => {
+    if (distributeTimeoutRef.current) {
+      clearTimeout(distributeTimeoutRef.current)
+      distributeTimeoutRef.current = null
+    }
+    if (ecosystemTimeoutRef.current) {
+      clearTimeout(ecosystemTimeoutRef.current)
+      ecosystemTimeoutRef.current = null
+    }
+    setIsEcosystemOpen(false)
+    setIsDistributeOpen(true)
+  }
+
+  const handleMouseLeaveDistribute = () => {
+    if (distributeTimeoutRef.current) {
+      clearTimeout(distributeTimeoutRef.current)
+    }
+    distributeTimeoutRef.current = setTimeout(() => {
+      setIsDistributeOpen(false)
+    }, 180)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (ecosystemTimeoutRef.current) clearTimeout(ecosystemTimeoutRef.current)
+      if (distributeTimeoutRef.current) clearTimeout(distributeTimeoutRef.current)
+    }
+  }, [])
 
   // Click outside to close desktop menus
   useEffect(() => {
@@ -104,28 +157,35 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="w-full px-5 sm:px-8 lg:px-10 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
-        <div className="flex items-center gap-5 sm:gap-7 lg:gap-8 relative">
-          {/* Logo with Ecosystem Dropdown (Exact Screenshot 1 Match) */}
-          <div className="relative" ref={ecosystemMenuRef}>
+        <div className="flex items-center relative">
+          {/* Logo with Ecosystem Dropdown - Smoothly collapses on mobile when menu opens */}
+          <div 
+            ref={ecosystemMenuRef}
+            onMouseEnter={handleMouseEnterEcosystem}
+            onMouseLeave={handleMouseLeaveEcosystem}
+            className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isMobileMenuOpen
+                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-6'
+                : 'w-[44px] sm:w-[48px] opacity-100 translate-x-0 overflow-visible mr-3 sm:mr-4 md:mr-6'
+            }`}
+          >
             <button
               type="button"
               onClick={() => {
                 setIsEcosystemOpen(!isEcosystemOpen)
                 setIsDistributeOpen(false)
               }}
-              className={`items-center gap-1.5 hover:opacity-90 transition-all cursor-pointer ${
-                isMobileMenuOpen ? 'hidden md:flex' : 'flex'
-              }`}
+              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
               aria-label="Producer Toy Ecosystem Menu"
             >
-              <LogoIcon size={38} />
-              <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
+              <LogoIcon size={36} />
+              <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
             </button>
 
             {/* Ecosystem Mega Dropdown (Exact Screenshot 1 Match) */}
             {isEcosystemOpen && (
               <div 
-                className="absolute left-0 top-[60px] sm:top-[68px] lg:top-[74px] w-[calc(100vw-32px)] sm:w-[500px] lg:w-[540px] bg-[#18181c] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-5 sm:p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-6 sm:gap-8 text-left select-none"
+                className="absolute left-0 top-full mt-2 w-[520px] max-w-[calc(100vw-32px)] bg-[#18181c] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-2 gap-6 text-left select-none pointer-events-auto"
               >
                 {/* Column 1: Play & Discover */}
                 <div className="space-y-6">
@@ -137,7 +197,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store/sounds"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                       >
                         <Music2 className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                         <span>Sample Packs</span>
@@ -147,7 +207,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store/vst-plugins"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                       >
                         <Cpu className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                         <span>VST Plugins</span>
@@ -157,7 +217,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store/presets"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                       >
                         <Sparkles className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                         <span>Synth Presets</span>
@@ -173,7 +233,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-semibold bg-[#2a2a30] text-white shadow-sm transition-colors"
+                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-semibold bg-[#2a2a30] text-white shadow-sm transition-colors whitespace-nowrap"
                       >
                         <ShoppingBag className="w-4 h-4 text-white flex-shrink-0" />
                         <span>Producer Toy Store</span>
@@ -183,7 +243,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store?price=free"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center justify-between px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        className="group flex items-center justify-between px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                       >
                         <div className="flex items-center gap-2.5">
                           <Gift className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
@@ -205,7 +265,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/distribute"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <Upload className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
                       <span>Distribute on Producer Toy</span>
@@ -215,7 +275,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/account"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <Users className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Creator Dashboard</span>
@@ -225,7 +285,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/distribute"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <Radio className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Publish Your Music Packs</span>
@@ -235,17 +295,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/contact?topic=creator"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <MessageSquare className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Developer & Creator Forums</span>
+                      <span>Developer Forums</span>
                     </Link>
 
                     <Link
                       href="/licensing"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <ShieldCheck className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Licensing & Terms</span>
@@ -255,7 +315,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/blog"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Creator Academy & Guides</span>
@@ -265,7 +325,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/contact"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
                     >
                       <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Help & Support Assistant</span>
@@ -276,10 +336,11 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </div>
 
+          {/* STORE Brand Title - Smoothly slides to corner on mobile */}
           <Link 
             href="/" 
             prefetch={true}
-            className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-colors leading-none"
+            className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none"
           >
             STORE
           </Link>
@@ -287,13 +348,18 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link 
             href="/contact" 
             prefetch={true}
-            className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors"
+            className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors ml-6 lg:ml-8"
           >
             Support
           </Link>
 
-          {/* Distribute Dropdown (Exact Screenshot 2 Match) */}
-          <div className="relative hidden lg:block" ref={distributeMenuRef}>
+          {/* Distribute Dropdown with Hover */}
+          <div 
+            className="relative hidden lg:block ml-6 lg:ml-8" 
+            ref={distributeMenuRef}
+            onMouseEnter={handleMouseEnterDistribute}
+            onMouseLeave={handleMouseLeaveDistribute}
+          >
             <button
               type="button"
               onClick={() => {
@@ -311,14 +377,14 @@ export const TopBar: React.FC<TopBarProps> = ({
               <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDistributeOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
             </button>
 
-            {/* Distribute Dropdown Menu (Screenshot 2 1:1 Match) */}
+            {/* Distribute Dropdown Menu */}
             {isDistributeOpen && (
               <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
                 <Link
                   href="/distribute"
                   prefetch={true}
                   onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                 >
                   Distribute on Producer Toy
                 </Link>
@@ -326,7 +392,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   href="/contact?topic=creator"
                   prefetch={true}
                   onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                 >
                   Developer Forums
                 </Link>
@@ -334,7 +400,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   href="/licensing"
                   prefetch={true}
                   onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                 >
                   Documentation
                 </Link>
@@ -342,7 +408,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   href="/blog"
                   prefetch={true}
                   onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                 >
                   Learning
                 </Link>
@@ -575,61 +641,18 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         </div>
 
-        {/* Mobile Right Controls: Exact Epic Games Screenshot 1 & 4 */}
+        {/* Mobile Right Controls: Exact Epic Games Screenshot Match */}
         <div className="flex md:hidden items-center gap-2">
           {isMobileMenuOpen ? (
-            // When Mobile Menu is Open:
-            user ? (
-              // Logged in (Screenshot 4): Orange Library button + X close button
-              <>
-                <Link
-                  href="/library"
-                  prefetch={true}
-                  className="bg-[#FC6301] hover:bg-[#e05700] text-white font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center uppercase tracking-wide"
-                >
-                  Library
-                </Link>
-
-                <button
-                  onClick={onToggleMobileMenu}
-                  className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
-                  aria-label="Close Navigation Menu"
-                >
-                  <X className="w-6 h-6 stroke-[2.2]" />
-                </button>
-              </>
-            ) : (
-              // Logged out (Screenshot 1): Globe icon + Sign In button + X close button
-              <>
-                <button
-                  type="button"
-                  onClick={onToggleCurrency}
-                  className="p-1.5 text-zinc-300 hover:text-white transition-colors"
-                  aria-label="Toggle Currency"
-                >
-                  <Globe className="w-4 h-4" />
-                </button>
-
-                <Link
-                  href="/auth"
-                  prefetch={true}
-                  className="bg-[#202020] hover:bg-[#282828] text-white border border-white/10 font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-sm flex items-center justify-center"
-                >
-                  Sign in
-                </Link>
-
-                <button
-                  onClick={onToggleMobileMenu}
-                  className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
-                  aria-label="Close Navigation Menu"
-                >
-                  <X className="w-6 h-6 stroke-[2.2]" />
-                </button>
-              </>
-            )
+            <button
+              onClick={onToggleMobileMenu}
+              className="w-10 h-10 flex items-center justify-center text-white hover:text-zinc-300 transition-colors focus:outline-none cursor-pointer"
+              aria-label="Close Navigation Menu"
+            >
+              <X className="w-6 h-6 stroke-[2.2] animate-in zoom-in-75 duration-200" />
+            </button>
           ) : (
-            // When Mobile Menu is Closed: Normal Library button + Hamburger icon
-            <>
+            <div className="flex items-center gap-2.5">
               <Link
                 href="/library"
                 prefetch={true}
@@ -640,12 +663,12 @@ export const TopBar: React.FC<TopBarProps> = ({
 
               <button
                 onClick={onToggleMobileMenu}
-                className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center text-white hover:text-zinc-300 transition-colors focus:outline-none cursor-pointer"
                 aria-label="Open Navigation Menu"
               >
-                <Menu className="w-7 h-7 stroke-[2.2]" />
+                <Menu className="w-7 h-7 stroke-[2.2] animate-in zoom-in-75 duration-200" />
               </button>
-            </>
+            </div>
           )}
         </div>
 
