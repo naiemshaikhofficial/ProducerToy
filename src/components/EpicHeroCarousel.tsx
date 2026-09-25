@@ -323,8 +323,8 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
           style={{ 
             position: 'relative', 
             width: '100%', 
-            height: 560,
-            minHeight: 560,
+            height: 620,
+            minHeight: 620,
             overflow: 'hidden',
             isolation: 'isolate',
             transform: 'translateZ(0)'
@@ -472,10 +472,10 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
         {/* Right Sidebar Interactive Product Cards (PC Only) - EXACT 1:1 Epic Games Store Reference */}
         <div 
-          className="col-span-3 flex flex-col justify-start gap-2 xl:gap-2.5 py-1" 
+          className="col-span-3 flex flex-col justify-start gap-2.5 xl:gap-3 py-1" 
           role="tablist" 
           aria-label="Featured slides"
-          style={{ height: 560, minHeight: 560 }}
+          style={{ height: 620, minHeight: 620 }}
         >
           {featuredList.map((item, idx) => {
             const isActive = idx === selectedIndex
@@ -487,11 +487,11 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 aria-current={isActive ? 'true' : undefined}
                 aria-label={item.name}
                 onClick={() => handleSelect(idx)}
-                style={{ height: 84, minHeight: 84 }}
-                className={`group relative w-full flex items-center gap-3.5 px-3.5 py-2 rounded-2xl transition-all duration-200 text-left overflow-hidden cursor-pointer ${
+                style={{ height: 96, minHeight: 96 }}
+                className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 text-left overflow-hidden cursor-pointer ${
                   isActive
-                    ? 'bg-[#202020]'
-                    : 'bg-transparent hover:bg-white/[0.04]'
+                    ? 'bg-[#202020] border border-white/[0.08] shadow-md'
+                    : 'bg-transparent hover:bg-white/[0.05]'
                 }`}
               >
                 {/* Active Animated Progress Fill Layer (PC Only - sweeps horizontally to the side) */}
@@ -504,15 +504,15 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   />
                 )}
 
-                {/* Poster / Thumbnail Box */}
+                {/* Poster / Thumbnail Box (Exact 3:4 Epic Games Store Portrait Ratio) */}
                 <div 
-                  style={{ width: 52, height: 68, minWidth: 52, minHeight: 68 }}
-                  className={`relative z-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.06] shadow-sm transition-transform duration-200 ${
+                  style={{ width: 62, height: 82, minWidth: 62, minHeight: 82 }}
+                  className={`relative z-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.08] shadow-sm transition-transform duration-200 ${
                     isActive ? 'scale-[1.02]' : 'group-hover:scale-[1.02]'
                   }`}
                 >
                   <Image
-                    src={getCdnImageUrl(item.cover_image, { width: 140 })}
+                    src={getCdnImageUrl(item.cover_image, { width: 160 })}
                     alt={item.name}
                     fill
                     unoptimized
@@ -522,7 +522,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
                 {/* Info Text */}
                 <div className="flex-1 min-w-0 pr-1 relative z-10">
-                  <p className={`text-[13px] xl:text-[14px] leading-snug line-clamp-2 transition-colors duration-200 ${
+                  <p className={`text-[14px] xl:text-[15.5px] leading-snug line-clamp-2 transition-colors duration-200 ${
                     isActive
                       ? 'text-white font-semibold'
                       : 'text-zinc-400 group-hover:text-white font-medium'
