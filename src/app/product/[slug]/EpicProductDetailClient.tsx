@@ -17,7 +17,6 @@ import {
   ShoppingBag,
   Download,
   Gift,
-  Info,
   ChevronDown,
   ChevronUp,
   Volume2,
@@ -706,13 +705,6 @@ export function EpicProductDetailClient({
           </div>
           */}
 
-          <div className="flex items-center justify-between">
-            <span className="text-zinc-400">Refund Type</span>
-            <div className="flex items-center gap-1 font-semibold text-zinc-200">
-              <span>Instant Cloud Delivery</span>
-              <Info className="w-3.5 h-3.5 text-zinc-500" />
-            </div>
-          </div>
 
           <div className="flex items-center justify-between">
             <span className="text-zinc-400">Developer</span>
