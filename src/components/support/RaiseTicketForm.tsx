@@ -20,6 +20,8 @@ import { FORMS_CONFIG } from '@/config/forms'
 interface RaiseTicketFormProps {
   initialEmail?: string
   initialName?: string
+  initialSubject?: string
+  initialDescription?: string
   onTicketCreated?: (ticketNumber: string, email: string) => void
 }
 
@@ -60,7 +62,13 @@ const DAW_OPTIONS = [
   'Other / Standalone VST',
 ]
 
-export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketCreated }: RaiseTicketFormProps) {
+export function RaiseTicketForm({
+  initialEmail = '',
+  initialName = '',
+  initialSubject = '',
+  initialDescription = '',
+  onTicketCreated,
+}: RaiseTicketFormProps) {
   const [formData, setFormData] = useState({
     name: initialName,
     email: initialEmail,
@@ -69,8 +77,8 @@ export function RaiseTicketForm({ initialEmail = '', initialName = '', onTicketC
     orderId: '',
     osPlatform: 'Windows 11 (64-bit)',
     daw: 'FL Studio 21 / 24',
-    subject: '',
-    description: '',
+    subject: initialSubject,
+    description: initialDescription,
   })
 
   const [loading, setLoading] = useState(false)

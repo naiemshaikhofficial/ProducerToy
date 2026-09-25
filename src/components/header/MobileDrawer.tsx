@@ -209,7 +209,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
               <div className="pt-2 border-t border-[#202020] flex flex-col space-y-3.5">
                 <Link
-                  href="/store"
+                  href="/support"
                   prefetch={true}
                   onClick={onClose}
                   className="flex items-center justify-between text-[15px] text-zinc-200 hover:text-white py-1.5 transition-colors"

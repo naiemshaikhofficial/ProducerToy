@@ -322,7 +322,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/contact"
+                      href="/support"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
@@ -579,7 +579,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/contact"
+                      href="/support"
                       prefetch={true}
                       onClick={() => setIsAccountMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
