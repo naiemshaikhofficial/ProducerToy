@@ -251,90 +251,79 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           /* VIEW 2: MAIN MENU VIEW (Exact Screenshot 2 Match with Corner Initial)     */
           /* ========================================================================= */
           <>
-            {/* Top Controls Row: Globe Currency Toggle + Corner Profile Initial Icon */}
-            <div className="flex items-center justify-end gap-3.5">
-              {/* Globe Currency Toggle with Dropdown */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
-                  className="px-2.5 py-1 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer bg-[#1c1c1c] border border-[#2c2c2c] rounded-lg"
-                  title="Select Region & Currency"
-                >
-                  <span className="text-[14px]">{region?.flag || '🇮🇳'}</span>
-                  <Globe className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>{currency}</span>
-                  <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isMobileRegionOpen ? 'rotate-180 text-white' : ''}`} />
-                </button>
+            {/* Top Controls Row (Only when logged in): Globe Currency Toggle + Profile Initial Icon */}
+            {user && (
+              <div className="flex items-center justify-end gap-3.5">
+                {/* Globe Currency Toggle with Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
+                    className="px-2.5 py-1 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer bg-[#1c1c1c] border border-[#2c2c2c] rounded-lg"
+                    title="Select Region & Currency"
+                  >
+                    <span className="text-[14px]">{region?.flag || '🇮🇳'}</span>
+                    <Globe className="w-3.5 h-3.5 text-zinc-400" />
+                    <span>{currency}</span>
+                    <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isMobileRegionOpen ? 'rotate-180 text-white' : ''}`} />
+                  </button>
 
-                {isMobileRegionOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
-                    <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                      Select Region
+                  {isMobileRegionOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
+                      <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Select Region
+                      </div>
+                      <div className="max-h-[220px] overflow-y-auto">
+                        {regions.map((r) => {
+                          const isSelected = region?.id === r.id
+                          return (
+                            <button
+                              key={r.id}
+                              type="button"
+                              onClick={() => {
+                                setRegion(r.id)
+                                setIsMobileRegionOpen(false)
+                              }}
+                              className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#262626] text-white font-bold'
+                                  : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span>{r.flag}</span>
+                                <span className="truncate">{r.name}</span>
+                              </div>
+                              <span className="text-[10px] text-zinc-400 font-mono">
+                                {r.currency} ({r.symbol})
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
                     </div>
-                    <div className="max-h-[220px] overflow-y-auto">
-                      {regions.map((r) => {
-                        const isSelected = region?.id === r.id
-                        return (
-                          <button
-                            key={r.id}
-                            type="button"
-                            onClick={() => {
-                              setRegion(r.id)
-                              setIsMobileRegionOpen(false)
-                            }}
-                            className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${
-                              isSelected
-                                ? 'bg-[#262626] text-white font-bold'
-                                : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{r.flag}</span>
-                              <span className="truncate">{r.name}</span>
-                            </div>
-                            <span className="text-[10px] text-zinc-400 font-mono">
-                              {r.currency} ({r.symbol})
-                            </span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Corner Profile Button (If logged in, show Initial Circle. If logged out, show Sign In link) */}
-              {user ? (
+                {/* Corner Profile Button (Tapping opens Account View, Screenshot 5) */}
                 <button
                   type="button"
                   onClick={() => setActiveView('account')}
-                  className="w-8 h-8 rounded-full bg-[#2a2a2a] hover:bg-[#383838] text-white text-xs font-bold flex items-center justify-center border border-zinc-700/60 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-[#2a2a2a] hover:bg-[#383838] text-white text-xs font-bold flex items-center justify-center border border-zinc-700 shadow-sm active:scale-95 transition-all cursor-pointer"
                   title={`Open Account (${displayName})`}
                 >
                   {initialLetter}
                 </button>
-              ) : (
-                <Link
-                  href="/auth"
-                  prefetch={true}
-                  onClick={onClose}
-                  className="flex items-center gap-1.5 py-1.5 px-3 text-xs font-bold text-zinc-300 hover:text-white bg-[#202020] hover:bg-[#282828] border border-[#2e2e2e] rounded-lg transition-colors cursor-pointer"
-                >
-                  <User className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Sign In</span>
-                </Link>
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Big Bold "Menu" Header (Exact Image 2 Match) */}
+            {/* Big Bold "Menu" Header (Exact Epic Games Screenshot Match) */}
             <h2 className="text-3xl font-black text-white tracking-tight -mt-1">
               Menu
             </h2>
 
-            {/* Primary Menu Links */}
+            {/* Primary Menu Links: Support + Distribute + Clean Routes */}
             <div className="flex flex-col space-y-4">
-              {/* 
               <Link
                 href="/contact"
                 prefetch={true}
@@ -345,7 +334,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </Link>
 
               <Link
-                href="/manufacturers"
+                href="/distribute"
                 prefetch={true}
                 onClick={onClose}
                 className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
@@ -353,19 +342,6 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 <span>Distribute</span>
                 <ChevronRight className="w-5 h-5 text-zinc-500" />
               </Link>
-              */}
-
-              {ENABLE_BRANDS && (
-                <Link
-                  href="/manufacturers"
-                  prefetch={true}
-                  onClick={onClose}
-                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
-                >
-                  <span>All Brands</span>
-                  <ChevronRight className="w-5 h-5 text-zinc-500" />
-                </Link>
-              )}
 
               <Link
                 href="/store?on_sale=true"
@@ -396,7 +372,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 >
                   <span className="flex items-center gap-2">
                     <span>Free Downloads</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FA742B]/20 text-[#FA742B] uppercase">100% Free</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FC6301]/20 text-[#FC6301] uppercase">100% Free</span>
                   </span>
                   <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileFreeOpen ? 'rotate-180 text-white' : ''}`} />
                 </button>
@@ -411,7 +387,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                             href={cat.exploreUrl}
                             prefetch={true}
                             onClick={onClose}
-                            className="text-xs font-bold text-white hover:text-[#FA742B] py-1 block"
+                            className="text-xs font-bold text-white hover:text-[#FC6301] py-1 block"
                           >
                             {cat.name}
                           </Link>
@@ -435,7 +411,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                       href="/store?price=free"
                       prefetch={true}
                       onClick={onClose}
-                      className="text-xs font-bold text-[#FA742B] hover:underline pt-1 block"
+                      className="text-xs font-bold text-[#FC6301] hover:underline pt-1 block"
                     >
                       Explore All Free Tools →
                     </Link>
@@ -491,15 +467,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               )}
             </div>
 
-            {/* Bottom Library / Account Button */}
+            {/* Bottom Orange Library Button (Exact Screenshot 1 & 4 Match in Producer Toy Orange) */}
             <div className="mt-auto pt-6 border-t border-[#202020]">
               <Link
-                href={user ? "/library" : "/auth"}
+                href="/library"
                 prefetch={true}
                 onClick={onClose}
-                className="bg-[#202020] hover:bg-[#282828] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-md"
+                className="bg-[#FC6301] hover:bg-[#e05700] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
               >
-                {user ? "Go to My Library" : "Sign In to ProducerToy"}
+                Library
               </Link>
             </div>
           </>

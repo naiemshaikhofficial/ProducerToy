@@ -18,7 +18,14 @@ import {
   Key,
   Bookmark,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  Music2,
+  Cpu,
+  ShoppingBag,
+  Upload,
+  Radio,
+  Users,
+  ShieldCheck
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
@@ -51,8 +58,10 @@ export const TopBar: React.FC<TopBarProps> = ({
   const { unopenedCount } = useGifts()
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
   const [isGlobeMenuOpen, setIsGlobeMenuOpen] = useState(false)
+  const [isEcosystemOpen, setIsEcosystemOpen] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
   const globeMenuRef = useRef<HTMLDivElement>(null)
+  const ecosystemMenuRef = useRef<HTMLDivElement>(null)
 
   // Click outside to close desktop menus
   useEffect(() => {
@@ -63,14 +72,17 @@ export const TopBar: React.FC<TopBarProps> = ({
       if (globeMenuRef.current && !globeMenuRef.current.contains(event.target as Node)) {
         setIsGlobeMenuOpen(false)
       }
+      if (ecosystemMenuRef.current && !ecosystemMenuRef.current.contains(event.target as Node)) {
+        setIsEcosystemOpen(false)
+      }
     }
-    if (isAccountMenuOpen || isGlobeMenuOpen) {
+    if (isAccountMenuOpen || isGlobeMenuOpen || isEcosystemOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isAccountMenuOpen, isGlobeMenuOpen])
+  }, [isAccountMenuOpen, isGlobeMenuOpen, isEcosystemOpen])
 
   // Derive initial and display name only when user is present
   const displayName = user
@@ -85,11 +97,19 @@ export const TopBar: React.FC<TopBarProps> = ({
       <div className="w-full px-5 sm:px-8 lg:px-10 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
         
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
-        <div className="flex items-center gap-5 sm:gap-8 lg:gap-10">
-          <Link href="/" prefetch={true} className="flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+        <div className="flex items-center gap-5 sm:gap-7 lg:gap-8 relative">
+          {/* Logo with Dropdown Chevron - On mobile, if mobile menu is open, transition/hide logo */}
+          <button
+            type="button"
+            onClick={() => setIsEcosystemOpen(!isEcosystemOpen)}
+            className={`items-center gap-1.5 hover:opacity-90 transition-all cursor-pointer ${
+              isMobileMenuOpen ? 'hidden md:flex' : 'flex'
+            }`}
+            aria-label="Producer Toy Ecosystem Menu"
+          >
             <LogoIcon size={38} />
-            <ChevronDown className="w-4 h-4 text-zinc-400" />
-          </Link>
+            <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
+          </button>
 
           <Link 
             href="/" 
@@ -99,7 +119,6 @@ export const TopBar: React.FC<TopBarProps> = ({
             STORE
           </Link>
 
-          {/* Placeholder links commented out
           <Link 
             href="/contact" 
             prefetch={true}
@@ -108,11 +127,197 @@ export const TopBar: React.FC<TopBarProps> = ({
             Support
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1.5 text-zinc-300 hover:text-white text-[15px] font-medium cursor-pointer transition-colors">
-            <span>Distribute</span>
-            <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
+          <div 
+            onClick={() => setIsEcosystemOpen(!isEcosystemOpen)}
+            className="hidden lg:flex items-center gap-1.5 text-zinc-300 hover:text-white text-[15px] font-medium cursor-pointer transition-colors"
+          >
+            <Link href="/distribute" prefetch={true} onClick={(e) => e.stopPropagation()}>
+              Distribute
+            </Link>
+            <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
           </div>
-          */}
+
+          {/* Epic Ecosystem Mega Dropdown (Exact Screenshot 1 Match) */}
+          {isEcosystemOpen && (
+            <div 
+              ref={ecosystemMenuRef}
+              className="absolute left-0 top-[60px] sm:top-[68px] w-[540px] bg-[#181818] border border-white/10 rounded-3xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-2 gap-8 text-left select-none"
+            >
+              {/* Column 1: Play & Discover */}
+              <div className="space-y-6">
+                {/* Section: Play */}
+                <div className="space-y-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Play & Produce</h4>
+                  <div className="space-y-1">
+                    <Link
+                      href="/store/sounds"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                        <Music2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold leading-tight">Sample Packs & Loops</p>
+                        <p className="text-[11px] text-zinc-500 leading-tight">808s, Drums & Melodies</p>
+                      </div>
+                    </Link>
+
+                    <Link
+                      href="/store/vst-plugins"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                        <Cpu className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold leading-tight">VST & Audio Plugins</p>
+                        <p className="text-[11px] text-zinc-500 leading-tight">Instruments & FX Tools</p>
+                      </div>
+                    </Link>
+
+                    <Link
+                      href="/store/presets"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold leading-tight">Synth Presets</p>
+                        <p className="text-[11px] text-zinc-500 leading-tight">Serum, Vital, Phase Plant</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Section: Discover */}
+                <div className="space-y-3 pt-3 border-t border-white/[0.06]">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Discover</h4>
+                  <div className="space-y-1">
+                    <Link
+                      href="/store"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                        <ShoppingBag className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold leading-tight">Producer Toy Store</p>
+                        <p className="text-[11px] text-zinc-500 leading-tight">Explore Full Catalog</p>
+                      </div>
+                    </Link>
+
+                    <Link
+                      href="/store?price=free"
+                      prefetch={true}
+                      onClick={() => setIsEcosystemOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                        <Gift className="w-4 h-4 text-[#FC6301]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold leading-tight text-white flex items-center gap-1.5">
+                          <span>Free Producer Toys</span>
+                          <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FC6301]/20 text-[#FC6301]">Free</span>
+                        </p>
+                        <p className="text-[11px] text-zinc-500 leading-tight">100% Free Downloads</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2: Create & Distribute */}
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Create & Distribute</h4>
+                <div className="space-y-1">
+                  <Link
+                    href="/distribute"
+                    prefetch={true}
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-[#FC6301]">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold leading-tight text-white">Distribute on Producer Toy</p>
+                      <p className="text-[11px] text-zinc-500 leading-tight">88/12 Revenue Split</p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/contact?topic=creator"
+                    prefetch={true}
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                      <Radio className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold leading-tight">Publish Your Music Packs</p>
+                      <p className="text-[11px] text-zinc-500 leading-tight">Global CDN Distribution</p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/account"
+                    prefetch={true}
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                      <Users className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold leading-tight">Creator Dashboard</p>
+                      <p className="text-[11px] text-zinc-500 leading-tight">Analytics & Earnings</p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/contact"
+                    prefetch={true}
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                      <HelpCircle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold leading-tight">Help & Support</p>
+                      <p className="text-[11px] text-zinc-500 leading-tight">Tickets & Live Assistance</p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    href="/licensing"
+                    prefetch={true}
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="flex items-center gap-3 p-2 rounded-xl text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-zinc-300">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold leading-tight">Licensing Agreement</p>
+                      <p className="text-[11px] text-zinc-500 leading-tight">Royalty-Free Terms</p>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}
@@ -339,23 +544,78 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         </div>
 
-        {/* Mobile Right Controls: Library Button + Menu Hamburger */}
-        <div className="flex md:hidden items-center gap-2.5">
-          <Link
-            href="/library"
-            prefetch={true}
-            className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
-          >
-            Library
-          </Link>
+        {/* Mobile Right Controls: Exact Epic Games Screenshot 1 & 4 */}
+        <div className="flex md:hidden items-center gap-2">
+          {isMobileMenuOpen ? (
+            // When Mobile Menu is Open:
+            user ? (
+              // Logged in (Screenshot 4): Orange Library button + X close button
+              <>
+                <Link
+                  href="/library"
+                  prefetch={true}
+                  className="bg-[#FC6301] hover:bg-[#e05700] text-white font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center uppercase tracking-wide"
+                >
+                  Library
+                </Link>
 
-          <button
-            onClick={onToggleMobileMenu}
-            className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
-            aria-label="Toggle Navigation Menu"
-          >
-            {isMobileMenuOpen ? <X className="w-7 h-7 stroke-[2.2]" /> : <Menu className="w-7 h-7 stroke-[2.2]" />}
-          </button>
+                <button
+                  onClick={onToggleMobileMenu}
+                  className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                  aria-label="Close Navigation Menu"
+                >
+                  <X className="w-6 h-6 stroke-[2.2]" />
+                </button>
+              </>
+            ) : (
+              // Logged out (Screenshot 1): Globe icon + Sign In button + X close button
+              <>
+                <button
+                  type="button"
+                  onClick={onToggleCurrency}
+                  className="p-1.5 text-zinc-300 hover:text-white transition-colors"
+                  aria-label="Toggle Currency"
+                >
+                  <Globe className="w-4 h-4" />
+                </button>
+
+                <Link
+                  href="/auth"
+                  prefetch={true}
+                  className="bg-[#202020] hover:bg-[#282828] text-white border border-white/10 font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-sm flex items-center justify-center"
+                >
+                  Sign in
+                </Link>
+
+                <button
+                  onClick={onToggleMobileMenu}
+                  className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                  aria-label="Close Navigation Menu"
+                >
+                  <X className="w-6 h-6 stroke-[2.2]" />
+                </button>
+              </>
+            )
+          ) : (
+            // When Mobile Menu is Closed: Normal Library button + Hamburger icon
+            <>
+              <Link
+                href="/library"
+                prefetch={true}
+                className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
+              >
+                Library
+              </Link>
+
+              <button
+                onClick={onToggleMobileMenu}
+                className="p-1 text-white hover:text-zinc-300 transition-colors focus:outline-none flex items-center justify-center cursor-pointer"
+                aria-label="Open Navigation Menu"
+              >
+                <Menu className="w-7 h-7 stroke-[2.2]" />
+              </button>
+            </>
+          )}
         </div>
 
       </div>

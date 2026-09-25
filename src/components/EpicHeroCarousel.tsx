@@ -35,10 +35,10 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   // Priority to featured products (is_featured === true), backfilling with top products
   const featuredOnly = products.filter((p) => p.is_featured === true)
   const nonFeatured = products.filter((p) => !p.is_featured)
-  const featuredList = (featuredOnly.length >= 4 
+  const featuredList = (featuredOnly.length >= 6 
     ? featuredOnly 
     : [...featuredOnly, ...nonFeatured]
-  ).slice(0, 5)
+  ).slice(0, 6)
 
   // Detect Desktop Viewport for PC-only animation
   useEffect(() => {
