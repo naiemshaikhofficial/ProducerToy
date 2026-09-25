@@ -165,8 +165,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             onMouseLeave={handleMouseLeaveEcosystem}
             className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isMobileMenuOpen
-                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-5'
-                : 'opacity-100 translate-x-0 overflow-visible mr-2 sm:mr-3 md:mr-5'
+                ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-6'
+                : 'opacity-100 translate-x-0 overflow-visible mr-3.5 sm:mr-4.5 md:mr-6'
             }`}
           >
             <button
@@ -175,29 +175,29 @@ export const TopBar: React.FC<TopBarProps> = ({
                 setIsEcosystemOpen(!isEcosystemOpen)
                 setIsDistributeOpen(false)
               }}
-              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
+              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0 pr-0.5"
               aria-label="Producer Toy Ecosystem Menu"
             >
-              <LogoIcon size={36} />
+              <LogoIcon size={34} />
               <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
             </button>
 
-            {/* Ecosystem Mega Dropdown (Exact Screenshot 1 Match) */}
+            {/* Ecosystem Mega Dropdown */}
             {isEcosystemOpen && (
               <div 
-                className="absolute left-0 top-full mt-2 w-[520px] max-w-[calc(100vw-32px)] bg-[#18181c] border border-white/10 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-2 gap-6 text-left select-none pointer-events-auto"
+                className="absolute left-0 top-full mt-2.5 w-[570px] max-w-[calc(100vw-32px)] bg-[#141416]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.03)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-[220px_1fr] gap-6 text-left select-none pointer-events-auto"
               >
                 {/* Column 1: Play & Discover */}
                 <div className="space-y-6">
                   {/* Section: Play */}
                   <div className="space-y-2.5">
-                    <h4 className="text-[15px] font-bold text-white tracking-tight">Play</h4>
+                    <h4 className="text-[13px] font-bold uppercase tracking-wider text-zinc-400">Play</h4>
                     <div className="space-y-1">
                       <Link
                         href="/store/sounds"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                        className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <Music2 className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                         <span>Sample Packs</span>
@@ -207,7 +207,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store/vst-plugins"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                        className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <Cpu className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                         <span>VST Plugins</span>
@@ -217,7 +217,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store/presets"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                        className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <Sparkles className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                         <span>Synth Presets</span>
@@ -227,13 +227,13 @@ export const TopBar: React.FC<TopBarProps> = ({
 
                   {/* Section: Discover */}
                   <div className="space-y-2.5 pt-2 border-t border-white/[0.06]">
-                    <h4 className="text-[15px] font-bold text-white tracking-tight">Discover</h4>
+                    <h4 className="text-[13px] font-bold uppercase tracking-wider text-zinc-400">Discover</h4>
                     <div className="space-y-1">
                       <Link
                         href="/store"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-semibold bg-[#2a2a30] text-white shadow-sm transition-colors whitespace-nowrap"
+                        className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.08] text-white shadow-sm transition-all whitespace-nowrap w-full"
                       >
                         <ShoppingBag className="w-4 h-4 text-white flex-shrink-0" />
                         <span>Producer Toy Store</span>
@@ -243,7 +243,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="/store?price=free"
                         prefetch={true}
                         onClick={() => setIsEcosystemOpen(false)}
-                        className="group flex items-center justify-between px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                        className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <div className="flex items-center gap-2.5">
                           <Gift className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
@@ -259,13 +259,13 @@ export const TopBar: React.FC<TopBarProps> = ({
 
                 {/* Column 2: Create */}
                 <div className="space-y-2.5 sm:border-l sm:border-white/[0.06] sm:pl-6">
-                  <h4 className="text-[15px] font-bold text-white tracking-tight">Create</h4>
+                  <h4 className="text-[13px] font-bold uppercase tracking-wider text-zinc-400">Create</h4>
                   <div className="space-y-1">
                     <Link
                       href="/distribute"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Upload className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
                       <span>Distribute on Producer Toy</span>
@@ -275,7 +275,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/account"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Users className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Creator Dashboard</span>
@@ -285,7 +285,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/distribute"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Radio className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Publish Your Music Packs</span>
@@ -295,7 +295,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/contact?topic=creator"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <MessageSquare className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Developer Forums</span>
@@ -305,7 +305,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/licensing"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <ShieldCheck className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Licensing & Terms</span>
@@ -315,7 +315,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/blog"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Creator Academy & Guides</span>
@@ -325,7 +325,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="/contact"
                       prefetch={true}
                       onClick={() => setIsEcosystemOpen(false)}
-                      className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Help & Support Assistant</span>
