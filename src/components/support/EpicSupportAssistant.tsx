@@ -425,22 +425,22 @@ export function EpicSupportAssistant({
       {/* SCREEN 1: HERO LANDING STATE (Exact Match with Screenshot 1 & 2)          */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#0c0a1a] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
+        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background Lights */}
-          <div className="absolute inset-0 bg-[#0c0a1a] pointer-events-none -z-0" />
+          {/* Ambient Glowing Background Lights (Producer Toy Sunset Orange & Amber) */}
+          <div className="absolute inset-0 bg-[#080706] pointer-events-none -z-0" />
           
-          {/* Angled neon violet/magenta light beam on left */}
-          <div className="absolute -top-20 -left-20 w-[650px] h-[350px] -rotate-45 bg-gradient-to-r from-purple-600/30 via-fuchsia-600/20 to-transparent blur-3xl pointer-events-none -z-0" />
-          <div className="absolute top-1/4 left-1/10 w-[420px] h-[420px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none -z-0" />
+          {/* Angled neon orange/amber light beam on left */}
+          <div className="absolute -top-20 -left-20 w-[650px] h-[350px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/20 to-transparent blur-3xl pointer-events-none -z-0" />
+          <div className="absolute top-1/4 left-1/10 w-[420px] h-[420px] bg-[#FC6301]/12 rounded-full blur-[140px] pointer-events-none -z-0" />
 
-          {/* Deep ambient violet bloom in center & warm orange ambient bloom */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] h-[650px] bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,_rgba(147,51,234,0.14),_rgba(88,28,135,0.06)_50%,_transparent_80%)] blur-3xl pointer-events-none -z-0" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-[#FC6301]/10 rounded-full blur-[150px] pointer-events-none -z-0" />
+          {/* Deep ambient orange bloom in center & warm amber glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] h-[650px] bg-[radial-gradient(ellipse_75%_55%_at_50%_50%,_rgba(252,99,1,0.16),_rgba(234,88,12,0.06)_50%,_transparent_80%)] blur-3xl pointer-events-none -z-0" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-amber-600/12 rounded-full blur-[150px] pointer-events-none -z-0" />
 
           {/* Server Status Pill (Top Right Corner, as circled in screenshot) */}
           <div className="absolute top-4 right-4 sm:top-6 sm:right-8 z-20">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#141026]/90 border border-white/10 text-xs sm:text-[13px] text-zinc-300 shadow-xl backdrop-blur-md">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#14100c]/90 border border-white/10 text-xs sm:text-[13px] text-zinc-300 shadow-xl backdrop-blur-md">
               <span className="text-zinc-400">Server status:</span>
               <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-medium text-xs sm:text-[13px]">
                 <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center">
@@ -475,7 +475,7 @@ export function EpicSupportAssistant({
                     if (inputError) setInputError('')
                   }}
                   placeholder="Describe your problem here"
-                  className={`flex-1 bg-[#141026]/90 hover:bg-[#191430] focus:bg-[#191430] border rounded-xl px-5 py-3.5 sm:py-4 text-sm sm:text-[15px] text-white placeholder-zinc-400 focus:outline-none transition-all shadow-2xl backdrop-blur-md ${
+                  className={`flex-1 bg-[#14100c]/90 hover:bg-[#1a140f] focus:bg-[#1a140f] border rounded-xl px-5 py-3.5 sm:py-4 text-sm sm:text-[15px] text-white placeholder-zinc-400 focus:outline-none transition-all shadow-2xl backdrop-blur-md ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
                       : 'border-white/15 focus:border-[#FC6301]'
@@ -523,13 +523,13 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         /* SCREEN 2: CHAT ASSISTANT INTERACTION (Full Website Scroll, Exact Theme)   */
         /* ========================================================================= */
-        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#0c0a1a] text-white font-sans flex flex-col justify-between relative">
+        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
           
           {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant */}
-          <div className="text-center pt-8 pb-3 relative bg-[#0c0a1a]">
+          <div className="text-center pt-8 pb-3 relative bg-[#080706]">
             <button
               onClick={handleResetToHero}
-              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#141026] border border-white/10"
+              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c] border border-white/10"
             >
               <ArrowLeft size={13} />
               <span className="hidden sm:inline">Start over</span>
@@ -546,7 +546,7 @@ export function EpicSupportAssistant({
 
             {/* Date Pill */}
             <div className="pt-3">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16122a] border border-white/10 text-[11px] text-zinc-400 font-medium">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e] border border-white/10 text-[11px] text-zinc-400 font-medium">
                 {formatCurrentDate()}
               </span>
             </div>
@@ -811,7 +811,7 @@ export function EpicSupportAssistant({
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Write a message..."
                   disabled={isTyping}
-                  className="flex-1 bg-[#141026] hover:bg-[#18132e] focus:bg-[#18132e] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
                 {/* Circle Arrow Button (Producer Toy Orange) */}
