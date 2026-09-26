@@ -425,130 +425,111 @@ export function EpicSupportAssistant({
       {/* SCREEN 1: HERO LANDING STATE (Exact Match with Screenshot 1 & 2)          */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#070605] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col justify-between pt-4 pb-8 sm:pt-6 sm:pb-12">
+        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#0c0a1a] text-white font-sans selection:bg-[#0074e4] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background Lights - Top & Bottom to fill full page */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[750px] bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,_rgba(252,99,1,0.24),_rgba(234,88,12,0.08)_50%,_rgba(7,6,5,0)_85%)] blur-3xl pointer-events-none -z-0" />
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] h-[550px] bg-[radial-gradient(ellipse_75%_55%_at_50%_100%,_rgba(252,99,1,0.18),_rgba(234,88,12,0.06)_55%,_rgba(7,6,5,0)_90%)] blur-3xl pointer-events-none -z-0" />
-          <div className="absolute top-1/3 left-1/5 w-[420px] h-[420px] bg-[#FC6301]/10 rounded-full blur-[140px] pointer-events-none -z-0" />
-          <div className="absolute bottom-1/4 right-1/5 w-[460px] h-[460px] bg-amber-600/8 rounded-full blur-[160px] pointer-events-none -z-0" />
+          {/* Ambient Glowing Background Lights matching Epic Games screenshot */}
+          <div className="absolute inset-0 bg-[#0c0a1a] pointer-events-none -z-0" />
+          
+          {/* Angled neon violet/magenta light beam on left */}
+          <div className="absolute -top-20 -left-20 w-[650px] h-[350px] -rotate-45 bg-gradient-to-r from-purple-600/30 via-fuchsia-600/20 to-transparent blur-3xl pointer-events-none -z-0" />
+          <div className="absolute top-1/4 left-1/10 w-[420px] h-[420px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none -z-0" />
 
-          {/* Abstract Glowing Lines & Geometric Bokeh in Background covering full page height */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none opacity-25 -z-0 overflow-hidden"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient id="ptGlowLine" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.4" />
-                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.2" />
-                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d="M -100 200 L 400 50 L 900 350 L 1600 100" fill="none" stroke="url(#ptGlowLine)" strokeWidth="1.5" />
-            <path d="M 100 450 L 600 180 L 1100 380 L 1700 250" fill="none" stroke="url(#ptGlowLine)" strokeWidth="1" strokeDasharray="4 6" />
-            <path d="M -50 750 L 500 550 L 1050 820 L 1800 600" fill="none" stroke="url(#ptGlowLine)" strokeWidth="1" strokeDasharray="6 8" />
-            <circle cx="350" cy="180" r="120" fill="none" stroke="rgba(252,99,1,0.15)" strokeWidth="1" />
-            <circle cx="1100" cy="220" r="160" fill="none" stroke="rgba(252,99,1,0.12)" strokeWidth="1" strokeDasharray="8 8" />
-            <circle cx="280" cy="680" r="140" fill="none" stroke="rgba(252,99,1,0.10)" strokeWidth="1" strokeDasharray="4 6" />
-            <circle cx="1250" cy="620" r="180" fill="none" stroke="rgba(252,99,1,0.08)" strokeWidth="1" />
-          </svg>
+          {/* Deep ambient violet bloom in center & bottom */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] h-[650px] bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,_rgba(147,51,234,0.14),_rgba(88,28,135,0.06)_50%,_transparent_80%)] blur-3xl pointer-events-none -z-0" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none -z-0" />
 
-          {/* Server Status Pill (Top Right Corner, as requested in Audio 1) */}
-          <div className="w-full flex justify-end px-4 sm:px-8 pt-2 sm:pt-4 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#110d0a]/90 border border-white/[0.08] text-xs text-zinc-300 shadow-sm backdrop-blur-sm">
+          {/* Server Status Pill (Top Right Corner, as circled in screenshot) */}
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-8 z-20">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#141026]/90 border border-white/10 text-xs sm:text-[13px] text-zinc-300 shadow-xl backdrop-blur-md">
               <span className="text-zinc-400">Server status:</span>
-              <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px] sm:text-xs">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-medium text-xs sm:text-[13px]">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center">
+                  <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                 </span>
                 All systems operational
               </span>
             </div>
           </div>
 
-          {/* Center Hero Heading & Input */}
-          <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 w-full py-16 sm:py-24 flex flex-col justify-center flex-grow">
-            <div className="text-center space-y-6 sm:space-y-8">
-              
-              <div className="space-y-2">
-                <p className="text-xs sm:text-sm font-semibold tracking-wider text-zinc-400 uppercase">
-                  Producer Toy Support
-                </p>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight">
-                  How can we help?
-                </h1>
+          {/* Center Hero Heading & Input (Strictly centered vertically & horizontally) */}
+          <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
+            <div className="space-y-2.5 mb-6 sm:mb-8">
+              <p className="text-sm sm:text-base font-normal text-zinc-300 tracking-normal">
+                Producer Toy Support
+              </p>
+              <h1 className="text-4xl sm:text-5xl md:text-[54px] font-bold text-white tracking-tight leading-tight">
+                How can we help?
+              </h1>
+            </div>
+
+            {/* Problem Input Box + Blue Circle Arrow Button */}
+            <form onSubmit={handleHeroSubmit} className="w-full max-w-[580px] mx-auto">
+              <div className="flex items-center gap-3 w-full">
+                <input
+                  type="text"
+                  value={heroInput}
+                  onChange={(e) => {
+                    setHeroInput(e.target.value)
+                    if (inputError) setInputError('')
+                  }}
+                  placeholder="Describe your problem here"
+                  className={`flex-1 bg-[#141026]/90 hover:bg-[#191430] focus:bg-[#191430] border rounded-xl px-5 py-3.5 sm:py-4 text-sm sm:text-[15px] text-white placeholder-zinc-400 focus:outline-none transition-all shadow-2xl backdrop-blur-md ${
+                    inputError
+                      ? 'border-rose-500 focus:border-rose-500'
+                      : 'border-white/15 focus:border-[#0074e4]'
+                  }`}
+                />
+
+                <button
+                  type="submit"
+                  disabled={isHeroLoading}
+                  aria-label="Submit problem"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#0074e4] hover:bg-[#0062c4] active:scale-95 text-white flex items-center justify-center transition-all shadow-lg shadow-[#0074e4]/30 cursor-pointer flex-shrink-0"
+                >
+                  {isHeroLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : (
+                    <ArrowRight className="w-5 h-5 stroke-[2.5]" />
+                  )}
+                </button>
               </div>
 
-              {/* Problem Input Pill + Vibrant Orange Circle Arrow Button (Exact Screenshot) */}
-              <form onSubmit={handleHeroSubmit} className="max-w-xl mx-auto w-full">
-                <div className="flex items-center justify-center gap-3 w-full">
-                  <input
-                    type="text"
-                    value={heroInput}
-                    onChange={(e) => {
-                      setHeroInput(e.target.value)
-                      if (inputError) setInputError('')
-                    }}
-                    placeholder="Describe your problem here"
-                    className={`w-full bg-[#130f0c]/90 hover:bg-[#181310] focus:bg-[#181310] border rounded-full px-6 py-3.5 sm:py-4 text-xs sm:text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl shadow-black/40 backdrop-blur-md ${
-                      inputError
-                        ? 'border-rose-500 focus:border-rose-500'
-                        : 'border-[#291c14] focus:border-[#FC6301]/70'
-                    }`}
-                  />
-
-                  {/* Solid Orange Circle Button (matching cropped image in Orange tone) */}
-                  <button
-                    type="submit"
-                    disabled={isHeroLoading}
-                    aria-label="Submit problem"
-                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#FC6301] hover:bg-[#ff751a] text-white flex items-center justify-center transition-all shadow-lg shadow-[#FC6301]/30 active:scale-95 cursor-pointer flex-shrink-0"
-                  >
-                    {isHeroLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-white" />
-                    ) : (
-                      <ArrowRight className="w-5 h-5" />
-                    )}
-                  </button>
+              {/* Validation Error: ▲ Describe the problem in more detail. */}
+              {inputError && (
+                <div className="text-left pt-2.5 px-3 flex items-center gap-1.5 text-xs text-rose-400 font-medium animate-in fade-in">
+                  <AlertTriangle size={13} className="text-rose-500 flex-shrink-0" />
+                  <span>{inputError}</span>
                 </div>
+              )}
+            </form>
 
-                {/* Validation Error: ▲ Describe the problem in more detail. */}
-                {inputError && (
-                  <div className="text-left pt-2.5 px-4 flex items-center gap-1.5 text-xs text-rose-400 font-medium animate-in fade-in">
-                    <AlertTriangle size={13} className="text-rose-500 flex-shrink-0" />
-                    <span>{inputError}</span>
-                  </div>
-                )}
-              </form>
-
-              {/* Disclaimer Note */}
-              <p className="text-[11px] text-zinc-400/80">
-                By continuing, you agree to our{' '}
-                <Link href="/terms" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
-                  Terms
-                </Link>{' '}
-                and acknowledge our{' '}
-                <Link href="/privacy" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
-                  Privacy Policy
-                </Link>
-                .
-              </p>
-            </div>
+            {/* Disclaimer Note */}
+            <p className="text-xs sm:text-[13px] text-zinc-400/90 mt-5 sm:mt-6">
+              By continuing, you agree to our{' '}
+              <Link href="/terms" className="text-zinc-300 hover:text-white underline underline-offset-2">
+                Terms
+              </Link>{' '}
+              and acknowledge our{' '}
+              <Link href="/privacy" className="text-zinc-300 hover:text-white underline underline-offset-2">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </main>
         </div>
       ) : (
         /* ========================================================================= */
         /* SCREEN 2: CHAT ASSISTANT INTERACTION (Full Website Scroll, Exact Theme)   */
         /* ========================================================================= */
-        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#070605] text-white font-sans flex flex-col justify-between relative">
+        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#0c0a1a] text-white font-sans flex flex-col justify-between relative">
           
-          {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant (Exact Screenshot 3) */}
-          <div className="text-center pt-8 pb-3 relative bg-[#070605]">
+          {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant */}
+          <div className="text-center pt-8 pb-3 relative bg-[#0c0a1a]">
             <button
               onClick={handleResetToHero}
-              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#140e0b] border border-[#2b1c14]"
+              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#141026] border border-white/10"
             >
               <ArrowLeft size={13} />
               <span className="hidden sm:inline">Start over</span>
@@ -563,9 +544,9 @@ export function EpicSupportAssistant({
               </h2>
             </div>
 
-            {/* Date Pill (Sep 25, 2026) */}
+            {/* Date Pill */}
             <div className="pt-3">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120f] border border-[#2a1d15] text-[11px] text-zinc-400 font-medium">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16122a] border border-white/10 text-[11px] text-zinc-400 font-medium">
                 {formatCurrentDate()}
               </span>
             </div>
@@ -822,7 +803,7 @@ export function EpicSupportAssistant({
                   </button>
                 </div>
 
-                {/* Writing Box Input (Exact Epic Games rounded box with subtle border) */}
+                {/* Writing Box Input */}
                 <input
                   ref={chatInputRef}
                   type="text"
@@ -830,15 +811,15 @@ export function EpicSupportAssistant({
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Write a message..."
                   disabled={isTyping}
-                  className="flex-1 bg-[#140f0c] hover:bg-[#18120e] focus:bg-[#18120e] border border-white/[0.08] focus:border-[#FC6301]/70 rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  className="flex-1 bg-[#141026] hover:bg-[#18132e] focus:bg-[#18132e] border border-white/10 focus:border-[#0074e4] rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
-                {/* Circle Arrow Button (Exact Epic Games side circle button) */}
+                {/* Circle Arrow Button (Epic blue) */}
                 <button
                   type="submit"
                   disabled={!chatInput.trim() || isTyping}
                   aria-label="Send message"
-                  className="w-11 h-11 rounded-full bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-30 disabled:hover:bg-[#FC6301] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#FC6301]/25 active:scale-95"
+                  className="w-11 h-11 rounded-full bg-[#0074e4] hover:bg-[#0062c4] disabled:opacity-30 disabled:hover:bg-[#0074e4] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#0074e4]/25 active:scale-95"
                 >
                   <ArrowRight size={16} />
                 </button>

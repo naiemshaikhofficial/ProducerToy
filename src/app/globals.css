@@ -38,7 +38,7 @@
 
   /* Support Page Fullscreen Clean Lock (No footer, no layout padding, seamless theme background) */
   body:has(.support-page-container) {
-    background-color: #070605 !important;
+    background-color: #0c0a1a !important;
   }
 
   body:has(.support-page-container) main {
