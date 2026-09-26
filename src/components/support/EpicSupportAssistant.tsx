@@ -111,12 +111,95 @@ export function EpicSupportAssistant({
     }
   }, [messages, isTyping, isChatStarted])
 
+  // Parses markdown links [Text](/url) and bold **text** into clickable React elements
+  const renderBoldText = (text: string, keyPrefix: string): React.ReactNode => {
+    const boldRegex = /\*\*([^*]+)\*\*/g
+    const parts = text.split(boldRegex)
+    if (parts.length === 1) return text
+
+    return parts.map((part, pIdx) => {
+      if (pIdx % 2 === 1) {
+        return (
+          <strong key={`${keyPrefix}-bold-${pIdx}`} className="font-semibold text-white">
+            {part}
+          </strong>
+        )
+      }
+      return part
+    })
+  }
+
+  const renderFormattedAnswer = (text: string) => {
+    if (!text) return null
+
+    const lines = text.split('\n')
+
+    return lines.map((line, lIdx) => {
+      const elements: React.ReactNode[] = []
+      let lastIndex = 0
+      let match: RegExpExecArray | null
+
+      const lineRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+      while ((match = lineRegex.exec(line)) !== null) {
+        const [fullMatch, linkText, url] = match
+        const matchIndex = match.index
+
+        if (matchIndex > lastIndex) {
+          const before = line.substring(lastIndex, matchIndex)
+          elements.push(renderBoldText(before, `l-${lIdx}-b-${lastIndex}`))
+        }
+
+        const isExternal = url.startsWith('http://') || url.startsWith('https://')
+        if (isExternal) {
+          elements.push(
+            <a
+              key={`link-${lIdx}-${matchIndex}`}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#FC6301] hover:text-[#ff751a] font-semibold underline underline-offset-2 decoration-[#FC6301]/60 hover:decoration-[#ff751a] inline-flex items-center gap-0.5 transition-colors cursor-pointer"
+            >
+              <span>{linkText}</span>
+              <ExternalLink size={12} className="inline ml-0.5" />
+            </a>
+          )
+        } else {
+          elements.push(
+            <Link
+              key={`link-${lIdx}-${matchIndex}`}
+              href={url}
+              className="text-[#FC6301] hover:text-[#ff751a] font-semibold underline underline-offset-2 decoration-[#FC6301]/60 hover:decoration-[#ff751a] transition-colors cursor-pointer"
+            >
+              {linkText}
+            </Link>
+          )
+        }
+
+        lastIndex = matchIndex + fullMatch.length
+      }
+
+      if (lastIndex < line.length) {
+        elements.push(renderBoldText(line.substring(lastIndex), `l-${lIdx}-a-${lastIndex}`))
+      }
+
+      return (
+        <React.Fragment key={lIdx}>
+          {elements.length > 0 ? elements : <span className="block h-2" />}
+          {lIdx < lines.length - 1 && <br />}
+        </React.Fragment>
+      )
+    })
+  }
+
   // Fallback local matching
   const findLocalAnswer = (query: string): KnowledgeArticle | null => {
     const raw = query.trim().toLowerCase()
     if (!raw) return null
 
-    const tokens = raw.split(/\s+/).filter(Boolean)
+    const stopWords = new Set(['what', 'is', 'a', 'the', 'to', 'in', 'on', 'for', 'how', 'do', 'i', 'can', 'from', 'where', 'me', 'my', 'of'])
+    const tokens = raw.split(/\s+/).filter((t) => t.length > 2 && !stopWords.has(t))
+    if (tokens.length === 0) return null
+
     let bestArticle: KnowledgeArticle | null = null
     let highestScore = 0
 
@@ -128,11 +211,10 @@ export function EpicSupportAssistant({
 
       if (qLower.includes(raw)) score += 100
       if (tagString.includes(raw)) score += 80
-      if (aLower.includes(raw)) score += 40
 
       tokens.forEach((token) => {
-        if (qLower.includes(token)) score += 20
-        if (tagString.includes(token)) score += 15
+        if (qLower.includes(token)) score += 25
+        if (tagString.includes(token)) score += 20
         if (aLower.includes(token)) score += 5
       })
 
@@ -142,7 +224,7 @@ export function EpicSupportAssistant({
       }
     }
 
-    return highestScore >= 15 ? bestArticle : null
+    return highestScore >= 50 ? bestArticle : null
   }
 
   // Submit from Screen 1 (Hero Landing)
@@ -643,10 +725,10 @@ export function EpicSupportAssistant({
                   ) : (
                     <div className="bg-[#15110e] border border-white/[0.08] text-zinc-200 rounded-2xl rounded-tl-sm px-5 py-4 text-sm sm:text-[14.5px] leading-relaxed space-y-3.5 shadow-xl w-full">
                       
-                      {/* AI Content */}
+                      {/* AI Content with Clickable Direct Redirect Links */}
                       {msg.content && (
-                        <div className="whitespace-pre-line text-zinc-200">
-                          {msg.content}
+                        <div className="text-zinc-200 leading-relaxed">
+                          {renderFormattedAnswer(msg.content)}
                         </div>
                       )}
 
