@@ -1256,17 +1256,28 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
           
-          {/* Epic Games Sticky Sub-Header: Seamless extension of site header with centered title (Solid, Zero Glassmorphism) */}
+          {/* Epic Games Sticky Sub-Header with Smooth Opacity Gradient Dissolve */}
           <div
-            className={`fixed top-[60px] sm:top-[72px] lg:top-[76px] left-0 right-0 z-40 h-13 sm:h-14 bg-[#121212] border-b border-[#252525] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center px-4 ${
+            className={`fixed top-[60px] sm:top-[72px] lg:top-[76px] left-0 right-0 z-40 pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isSubHeaderVisible
-                ? 'translate-y-0 opacity-100 shadow-md shadow-black/50 pointer-events-auto'
-                : '-translate-y-full opacity-0 pointer-events-none'
+                ? 'translate-y-0 opacity-100'
+                : '-translate-y-full opacity-0'
             }`}
           >
-            <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-200 select-none font-sans">
-              Producer Toy Support Assistant
-            </span>
+            {/* Centered Title Bar on pure dark background matching page (#080706) */}
+            <div className="w-full bg-[#080706] h-12 sm:h-14 flex items-center justify-center px-4 pointer-events-auto">
+              <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans">
+                Producer Toy Support Assistant
+              </span>
+            </div>
+
+            {/* Smooth Epic Games Gradient Fade (Messages fade in opacity as they scroll underneath) */}
+            <div 
+              className="w-full h-20 sm:h-28 pointer-events-none"
+              style={{
+                background: 'linear-gradient(to bottom, #080706 0%, #080706 15%, rgba(8, 7, 6, 0.85) 45%, rgba(8, 7, 6, 0.4) 75%, transparent 100%)',
+              }}
+            />
           </div>
 
           {/* Header Title with Seamlessly Dissolved Musical Bokeh Atmosphere */}
