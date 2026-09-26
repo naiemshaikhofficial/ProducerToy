@@ -427,23 +427,41 @@ export function EpicSupportAssistant({
       {!isChatStarted ? (
         <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background Lights (Producer Toy Sunset Orange & Amber) */}
+          {/* Ambient Glowing Background Lights with Studio Elements Circled in Screenshot */}
           <div className="absolute inset-0 bg-[#080706] pointer-events-none -z-0" />
           
-          {/* Angled neon orange/amber light beam on left */}
-          <div className="absolute -top-20 -left-20 w-[650px] h-[350px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/20 to-transparent blur-3xl pointer-events-none -z-0" />
-          <div className="absolute top-1/4 left-1/10 w-[420px] h-[420px] bg-[#FC6301]/12 rounded-full blur-[140px] pointer-events-none -z-0" />
+          {/* 1. Angled Studio Light Rig / Beams on Left (Circled in screenshot) */}
+          <div className="absolute -top-16 -left-20 w-[620px] h-[340px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/18 to-transparent blur-3xl pointer-events-none -z-0" />
+          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20 -z-0 overflow-hidden">
+            <defs>
+              <linearGradient id="ptStudioBeam" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.5" />
+                <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d="M -80 180 L 400 520" stroke="url(#ptStudioBeam)" strokeWidth="2" fill="none" />
+            <path d="M 60 40 L 480 480" stroke="url(#ptStudioBeam)" strokeWidth="1.5" strokeDasharray="6 8" fill="none" />
+          </svg>
 
-          {/* Deep ambient orange bloom in center & warm amber glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] h-[650px] bg-[radial-gradient(ellipse_75%_55%_at_50%_50%,_rgba(252,99,1,0.16),_rgba(234,88,12,0.06)_50%,_transparent_80%)] blur-3xl pointer-events-none -z-0" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-amber-600/12 rounded-full blur-[150px] pointer-events-none -z-0" />
+          {/* 2. Vertical Studio Light Pillar on Bottom Left (Circled in screenshot) */}
+          <div className="absolute bottom-0 left-[16%] w-[130px] h-[360px] bg-gradient-to-t from-[#FC6301]/18 via-amber-600/08 to-transparent blur-2xl rounded-full pointer-events-none -z-0" />
 
-          {/* Server Status Pill (Top Right Corner, as circled in screenshot) */}
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-8 z-20">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#14100c]/90 border border-white/10 text-xs sm:text-[13px] text-zinc-300 shadow-xl backdrop-blur-md">
+          {/* 3. Soft Lens Flare / Bokeh Orb at Bottom Center (Circled in screenshot) */}
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[220px] h-[180px] bg-[radial-gradient(circle_at_50%_50%,_rgba(252,99,1,0.14),_rgba(245,158,11,0.05)_50%,_transparent_75%)] blur-2xl pointer-events-none -z-0" />
+
+          {/* 4. Vertical Ambient Beam on Right (Circled in screenshot) */}
+          <div className="absolute top-1/4 right-[7%] w-[140px] h-[440px] bg-gradient-to-b from-amber-500/15 via-[#FC6301]/10 to-transparent blur-2xl rounded-full pointer-events-none -z-0" />
+
+          {/* Center ambient glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1100px] h-[550px] bg-[radial-gradient(ellipse_75%_55%_at_50%_45%,_rgba(252,99,1,0.12),_transparent_70%)] blur-3xl pointer-events-none -z-0" />
+
+          {/* Server Status: Square/rectangular with slightly rounded sides and subtle border (Exact Match with Screenshot) */}
+          <div className="absolute top-4 right-4 sm:top-5 sm:right-8 z-20">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#110d0a]/95 border border-white/15 text-xs text-zinc-300 shadow-lg backdrop-blur-md">
               <span className="text-zinc-400">Server status:</span>
-              <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-medium text-xs sm:text-[13px]">
-                <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center">
+              <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-semibold text-xs">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center flex-shrink-0">
                   <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
@@ -454,19 +472,19 @@ export function EpicSupportAssistant({
           </div>
 
           {/* Center Hero Heading & Input (Strictly centered vertically & horizontally) */}
-          <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
-            <div className="space-y-2.5 mb-6 sm:mb-8">
-              <p className="text-sm sm:text-base font-normal text-zinc-300 tracking-normal">
+          <main className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
+            <div className="space-y-2 mb-6 sm:mb-7">
+              <p className="text-sm font-normal text-zinc-300 tracking-normal">
                 Producer Toy Support
               </p>
-              <h1 className="text-4xl sm:text-5xl md:text-[54px] font-bold text-white tracking-tight leading-tight">
+              <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
                 How can we help?
               </h1>
             </div>
 
-            {/* Problem Input Box + Vibrant Orange Circle Arrow Button */}
-            <form onSubmit={handleHeroSubmit} className="w-full max-w-[580px] mx-auto">
-              <div className="flex items-center gap-3 w-full">
+            {/* Problem Input Box: Square-ish with slightly rounded sides (rounded-lg) and matched width */}
+            <form onSubmit={handleHeroSubmit} className="w-full max-w-[490px] mx-auto">
+              <div className="flex items-center gap-2.5 w-full">
                 <input
                   type="text"
                   value={heroInput}
@@ -475,10 +493,10 @@ export function EpicSupportAssistant({
                     if (inputError) setInputError('')
                   }}
                   placeholder="Describe your problem here"
-                  className={`flex-1 bg-[#14100c]/90 hover:bg-[#1a140f] focus:bg-[#1a140f] border rounded-xl px-5 py-3.5 sm:py-4 text-sm sm:text-[15px] text-white placeholder-zinc-400 focus:outline-none transition-all shadow-2xl backdrop-blur-md ${
+                  className={`flex-1 bg-[#130f0c]/90 hover:bg-[#18130f] focus:bg-[#18130f] border rounded-lg px-4.5 py-2.5 sm:py-3 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl backdrop-blur-md ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
-                      : 'border-white/15 focus:border-[#FC6301]'
+                      : 'border-white/20 hover:border-white/30 focus:border-[#FC6301]'
                   }`}
                 />
 
@@ -486,19 +504,23 @@ export function EpicSupportAssistant({
                   type="submit"
                   disabled={isHeroLoading}
                   aria-label="Submit problem"
-                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#FC6301] hover:bg-[#ff751a] active:scale-95 text-white flex items-center justify-center transition-all shadow-lg shadow-[#FC6301]/30 cursor-pointer flex-shrink-0"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer flex-shrink-0 ${
+                    heroInput.trim()
+                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/30 active:scale-95'
+                      : 'bg-[#1b1511] hover:bg-[#241c16] border border-white/10 text-zinc-500 hover:text-zinc-300'
+                  }`}
                 >
                   {isHeroLoading ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                   ) : (
-                    <ArrowRight className="w-5 h-5 stroke-[2.5]" />
+                    <ArrowRight className="w-4 h-4 stroke-[2.5]" />
                   )}
                 </button>
               </div>
 
               {/* Validation Error: ▲ Describe the problem in more detail. */}
               {inputError && (
-                <div className="text-left pt-2.5 px-3 flex items-center gap-1.5 text-xs text-rose-400 font-medium animate-in fade-in">
+                <div className="text-left pt-2 px-2 flex items-center gap-1.5 text-xs text-rose-400 font-medium animate-in fade-in">
                   <AlertTriangle size={13} className="text-rose-500 flex-shrink-0" />
                   <span>{inputError}</span>
                 </div>
@@ -506,7 +528,7 @@ export function EpicSupportAssistant({
             </form>
 
             {/* Disclaimer Note */}
-            <p className="text-xs sm:text-[13px] text-zinc-400/90 mt-5 sm:mt-6">
+            <p className="text-xs text-zinc-400/90 mt-5">
               By continuing, you agree to our{' '}
               <Link href="/terms" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
                 Terms
