@@ -739,7 +739,25 @@ export function EpicSupportAssistant({
 
     try {
       const customerName = ticketName.trim() || user?.user_metadata?.full_name || 'Producer'
-      const queryText = subjectQuery || 'Technical Support Inquiry'
+      
+      // Look up target message to extract the exact user question
+      const targetMsg = messages.find((m) => m.id === msgId)
+      const lastUserMsg = [...messages].reverse().find((m) => m.sender === 'user')
+      const exactUserQuestion = 
+        targetMsg?.userQuery?.trim() || 
+        subjectQuery?.trim() || 
+        lastUserMsg?.content?.trim() || 
+        'Technical Support Inquiry'
+
+      // Construct formatted full conversation transcript
+      const conversationHistory = messages
+        .filter((m) => !m.isThinking && (m.content || m.userQuery))
+        .map((m) => {
+          const role = m.sender === 'user' ? 'Customer' : 'Producer Toy Support Assistant'
+          const text = m.content || m.userQuery || ''
+          return `[${m.timestamp}] ${role}:\n${text}`
+        })
+        .join('\n\n--------------------\n\n')
 
       // 1. Create ticket in Supabase database with user association
       const res = await createSupportTicketAction({
@@ -747,8 +765,8 @@ export function EpicSupportAssistant({
         email: emailToSend,
         category: 'Senior Audio Engineering Desk',
         priority: 'NORMAL',
-        subject: queryText,
-        description: `Customer submitted via Producer Toy Support Assistant.\nInquiry: "${queryText}".\nDirect senior audio engineer assistance requested.`,
+        subject: exactUserQuestion.slice(0, 150),
+        description: `User Inquiry: "${exactUserQuestion}"\n\n=== FULL CONVERSATION TRANSCRIPT ===\n${conversationHistory}`,
       })
 
       if (res && res.success && res.ticketNumber) {
@@ -761,13 +779,15 @@ export function EpicSupportAssistant({
               Accept: 'application/json',
             },
             body: JSON.stringify({
-              _subject: `[Senior Audio Desk] New Support Ticket #${res.ticketNumber} from ${customerName}`,
+              _subject: `[Senior Audio Desk] New Support Ticket #${res.ticketNumber}: "${exactUserQuestion}" from ${customerName}`,
               ticket_number: res.ticketNumber,
               customer_name: customerName,
               customer_email: emailToSend,
               account_type: user?.id ? `Registered Member (${user.email})` : 'Guest Account',
-              inquiry_details: queryText,
-              message: `New ticket #${res.ticketNumber} submitted to Senior Audio Engineering Desk.\n\nCustomer: ${customerName} (${emailToSend})\nInquiry Details: "${queryText}"\nCreated At: ${new Date().toLocaleString()}`,
+              user_question: exactUserQuestion,
+              inquiry_details: exactUserQuestion,
+              full_conversation: conversationHistory,
+              message: `New ticket #${res.ticketNumber} submitted to Senior Audio Engineering Desk.\n\nCustomer: ${customerName} (${emailToSend})\nUser Question: "${exactUserQuestion}"\n\n=== FULL CONVERSATION TRANSCRIPT ===\n${conversationHistory}\n\nCreated At: ${new Date().toLocaleString()}`,
               _replyto: emailToSend,
               _template: 'table',
               _captcha: 'false',
@@ -1482,7 +1502,7 @@ export function EpicSupportAssistant({
 
                               <div className="flex justify-end pt-1">
                                 <button
-                                  onClick={() => handleCreateTicket(msg.id, msg.content || 'Technical Assistance')}
+                                  onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
                                   disabled={isSubmittingTicket}
                                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
                                 >
