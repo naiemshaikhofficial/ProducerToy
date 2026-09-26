@@ -1,6 +1,9 @@
 'use server'
 
 import { getAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
+import { headers } from 'next/headers'
+import { signDownloadToken } from '@/lib/security'
 
 export interface RecommendedProduct {
   id: string
@@ -13,6 +16,54 @@ export interface RecommendedProduct {
   short_description?: string | null
 }
 
+export interface ComingSoonProduct {
+  id: string
+  name: string
+  slug: string
+  cover_image: string
+  price_usd: number
+  release_date?: string | null
+  short_description?: string | null
+}
+
+export interface VerifiedDownload {
+  productId: string
+  productName: string
+  productSlug: string
+  coverImage?: string
+  downloadUrl: string
+  productType: string
+  fileSize?: string
+  orderNumber?: string
+  isProvisioned?: boolean
+}
+
+export interface VerifiedOrderItem {
+  id: string
+  name: string
+  price: number
+  product_type?: string
+  cover_image?: string
+}
+
+export interface VerifiedOrder {
+  orderNumber: string
+  date: string
+  amount: number
+  currency: string
+  status: string
+  gateway?: string
+  paymentId?: string
+  items: VerifiedOrderItem[]
+  customerEmail?: string
+  customerName?: string
+  billingAddress?: string | null
+  billingCity?: string | null
+  billingState?: string | null
+  billingZip?: string | null
+  billingCountry?: string | null
+}
+
 interface ChatMessageInput {
   role: 'user' | 'assistant'
   content: string
@@ -23,11 +74,22 @@ export interface GroqResponse {
   answer?: string
   error?: string
   recommendedProducts?: RecommendedProduct[]
+  verifiedDownload?: VerifiedDownload | null
+  verifiedOrder?: VerifiedOrder | null
+  comingSoonProduct?: ComingSoonProduct | null
+  canEscalateToTicket?: boolean
+}
+
+export interface ClientUserInfo {
+  id?: string
+  email?: string
+  name?: string
 }
 
 export async function askGroqSupportAction(
   query: string,
-  history: ChatMessageInput[] = []
+  history: ChatMessageInput[] = [],
+  clientUser?: ClientUserInfo
 ): Promise<GroqResponse> {
   const apiKey = process.env.GROQ_API_KEY
 
@@ -38,16 +100,53 @@ export async function askGroqSupportAction(
     }
   }
 
-  // 1. Fetch live store inventory from Supabase DB to give real product recommendations
+  const adminSupabase = getAdminClient()
+
+  // 1. Determine Current User Session (Check client auth context first, then cookies)
+  let currentUser: any = null
+  let userEmail: string | null = clientUser?.email ? clientUser.email.toLowerCase().trim() : null
+  let userId: string | null = clientUser?.id || null
+  let userName: string = clientUser?.name || 'Producer'
+
+  if (!userId || !userEmail) {
+    try {
+      const supabase = await createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) {
+        currentUser = user
+        userId = userId || user.id
+        userEmail = userEmail || (user.email ? user.email.toLowerCase().trim() : null)
+        userName = userName !== 'Producer' ? userName : (user.user_metadata?.full_name || user.email?.split('@')[0] || 'Producer')
+      }
+    } catch (authErr) {
+      console.warn('[askGroqSupportAction] Auth check notice:', authErr)
+    }
+  }
+
+  // 2. Extract potential entities from query or chat history (Order IDs, Payment IDs, emails)
+  const fullTextToScan = `${query} ${history.map((h) => h.content).join(' ')}`
+  const orderNumberMatch = fullTextToScan.match(/\bPT-ORD-[A-Za-z0-9_-]+\b/i) || fullTextToScan.match(/\bORD-[A-Za-z0-9_-]+\b/i)
+  const paymentIdMatch = fullTextToScan.match(/\bpay_[A-Za-z0-9]+\b/i)
+  const emailMatch = fullTextToScan.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/i)
+
+  const scannedOrderNumber = orderNumberMatch ? orderNumberMatch[0].toUpperCase() : null
+  const scannedPaymentId = paymentIdMatch ? paymentIdMatch[0] : null
+  const scannedEmail = emailMatch ? emailMatch[0].toLowerCase().trim() : null
+
+  const targetEmail = userEmail || scannedEmail
+
+  // 3. Fetch Live Products Catalog from Supabase (Full specs + is_coming_soon)
   let liveInventoryList = ''
   let allProducts: any[] = []
+
   try {
-    const admin = getAdminClient()
-    const { data: dbProducts } = await admin
+    const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, slug, cover_image, price_usd, original_price_usd, product_type, short_description')
+      .select('id, name, slug, cover_image, price_usd, original_price_usd, product_type, short_description, bpm, vst_format, file_size, is_coming_soon, release_date')
       .eq('is_active', true)
-      .limit(30)
+      .limit(60)
 
     if (dbProducts && dbProducts.length > 0) {
       allProducts = dbProducts
@@ -55,7 +154,10 @@ export async function askGroqSupportAction(
         .map((p) => {
           const price = p.price_usd ? `$${p.price_usd}` : 'Free'
           const desc = p.short_description ? ` - ${p.short_description}` : ''
-          return `- [${p.name}](/p/${p.slug}) (${price}, ${p.product_type})${desc}`
+          const bpmInfo = p.bpm ? ` [${p.bpm} BPM]` : ''
+          const sizeInfo = p.file_size ? ` [${p.file_size}]` : ''
+          const statusInfo = p.is_coming_soon ? ' [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET]' : ' [STATUS: AVAILABLE FOR INSTANT PURCHASE]'
+          return `- [${p.name}](/p/${p.slug}) (${price}, ${p.product_type})${statusInfo}${bpmInfo}${sizeInfo}${desc}`
         })
         .join('\n')
     }
@@ -63,63 +165,332 @@ export async function askGroqSupportAction(
     console.warn('[askGroqSupportAction] Failed to query products from DB:', dbErr)
   }
 
-  const systemPrompt = `You are the official "Producer Toy Technical Support Specialist", an expert audio engineer and customer support specialist for Producer Toy (producertoy.com) — the premier marketplace for music producers and sound designers.
+  // 4. Fetch User Purchases and Orders with Admin Privileges
+  let userPurchases: any[] = []
+  let userOrders: any[] = []
+  let matchedSpecificOrder: any = null
+
+  try {
+    // A. Query Purchases
+    if (userId || targetEmail) {
+      let pQuery = adminSupabase
+        .from('purchases')
+        .select('*, products(id, name, slug, cover_image, product_type, price_usd, download_url, download_url_win, download_url_mac)')
+
+      if (userId) {
+        pQuery = pQuery.eq('user_id', userId)
+      } else if (targetEmail) {
+        pQuery = pQuery.ilike('customer_email', targetEmail)
+      }
+
+      const { data: pData } = await pQuery.order('purchased_at', { ascending: false }).limit(20)
+      if (pData) userPurchases = pData
+    }
+
+    // B. Query Orders
+    let oQuery = adminSupabase.from('orders').select('*')
+    if (userId && targetEmail) {
+      oQuery = oQuery.or(`user_id.eq.${userId},customer_email.eq.${targetEmail}`)
+    } else if (userId) {
+      oQuery = oQuery.eq('user_id', userId)
+    } else if (targetEmail) {
+      oQuery = oQuery.ilike('customer_email', targetEmail)
+    }
+
+    if (userId || targetEmail) {
+      const { data: oData } = await oQuery.order('created_at', { ascending: false }).limit(10)
+      if (oData) userOrders = oData
+    }
+
+    // C. Search specifically if an explicit Order ID or Payment ID was provided
+    if (scannedOrderNumber || scannedPaymentId) {
+      let specificQuery = adminSupabase.from('orders').select('*')
+      if (scannedOrderNumber && scannedPaymentId) {
+        specificQuery = specificQuery.or(`order_number.ilike.${scannedOrderNumber},razorpay_payment_id.eq.${scannedPaymentId}`)
+      } else if (scannedOrderNumber) {
+        specificQuery = specificQuery.ilike('order_number', scannedOrderNumber)
+      } else if (scannedPaymentId) {
+        specificQuery = specificQuery.eq('razorpay_payment_id', scannedPaymentId)
+      }
+
+      const { data: specOrders } = await specificQuery.maybeSingle()
+      if (specOrders) {
+        matchedSpecificOrder = specOrders
+        if (!userOrders.some((o) => o.id === specOrders.id)) {
+          userOrders.unshift(specOrders)
+        }
+      }
+    }
+  } catch (adminErr) {
+    console.warn('[askGroqSupportAction] Admin DB lookup error:', adminErr)
+  }
+
+  // 5. Intelligent Intent Analysis & Autonomous Administrative Operations
+  let verifiedDownload: VerifiedDownload | null = null
+  let verifiedOrder: VerifiedOrder | null = null
+  let comingSoonProduct: ComingSoonProduct | null = null
+  let canEscalateToTicket = false
+  let adminActionResultNotes = ''
+
+  const queryLower = query.toLowerCase()
+  const isDownloadIssue =
+    queryLower.includes('download') ||
+    queryLower.includes('file nahi') ||
+    queryLower.includes('broken') ||
+    queryLower.includes('link') ||
+    queryLower.includes('button') ||
+    queryLower.includes('nahi mila') ||
+    queryLower.includes('not getting') ||
+    queryLower.includes('not received') ||
+    queryLower.includes('kharida') ||
+    queryLower.includes('bought') ||
+    queryLower.includes('purchased')
+
+  const isInvoiceIssue =
+    queryLower.includes('invoice') ||
+    queryLower.includes('receipt') ||
+    queryLower.includes('bill') ||
+    queryLower.includes('transaction') ||
+    queryLower.includes('gst') ||
+    queryLower.includes('tax') ||
+    queryLower.includes('order details') ||
+    queryLower.includes('order number')
+
+  // Find candidate product user is asking about
+  let candidateProduct: any = null
+  for (const p of allProducts) {
+    const nameLower = p.name.toLowerCase()
+    const slugLower = p.slug.toLowerCase()
+    if (
+      queryLower.includes(nameLower) ||
+      queryLower.includes(slugLower) ||
+      (slugLower === 'tabla-masters' && queryLower.includes('tabla')) ||
+      (slugLower === 'sexy-drill' && (queryLower.includes('drill') || queryLower.includes('sexy')))
+    ) {
+      candidateProduct = p
+      break
+    }
+  }
+
+  // A. Check Coming Soon Products (e.g. Sexy Drill)
+  if (candidateProduct && candidateProduct.is_coming_soon) {
+    comingSoonProduct = {
+      id: candidateProduct.id,
+      name: candidateProduct.name,
+      slug: candidateProduct.slug,
+      cover_image: candidateProduct.cover_image || '/images/products/placeholder.png',
+      price_usd: Number(candidateProduct.price_usd || 0),
+      release_date: candidateProduct.release_date || null,
+      short_description: candidateProduct.short_description || null,
+    }
+
+    adminActionResultNotes += `\n[ADMIN CATALOG NOTICE: PRODUCT IS COMING SOON]:
+"${candidateProduct.name}" is marked as COMING SOON in our database. It has NOT been released yet and CANNOT be purchased right now.
+EXACT INSTRUCTION:
+- State clearly and respectfully that "${candidateProduct.name}" has not officially released yet; it is in final audio mastering and will drop very soon!
+- That is why the purchase/buy button is disabled or unavailable.
+- Do NOT say "you are in guest mode", and do NOT tell them to try purchasing again or check payment gateways.
+- Reassure them that a "Drop Alert / Notify Me" card has been generated right below this response so they can subscribe to get notified the second it drops!`
+  }
+
+  // B. Autonomous Download & Payment Verification Handler (for released products)
+  else if (isDownloadIssue || (candidateProduct && !candidateProduct.is_coming_soon)) {
+    const primaryOrder = matchedSpecificOrder || userOrders[0] || null
+
+    if (!candidateProduct && primaryOrder && Array.isArray(primaryOrder.items) && primaryOrder.items.length > 0) {
+      const firstItem = primaryOrder.items[0]
+      candidateProduct = allProducts.find((p) => p.id === firstItem.id || p.slug === firstItem.slug) || {
+        id: firstItem.id,
+        name: firstItem.name,
+        slug: firstItem.slug || 'product',
+        product_type: firstItem.product_type || 'sample_pack',
+        cover_image: firstItem.cover_image,
+      }
+    }
+
+    if (candidateProduct && !candidateProduct.is_coming_soon) {
+      const ownedPurchase = userPurchases.find(
+        (pur) => pur.product_id === candidateProduct.id || pur.products?.slug === candidateProduct.slug
+      )
+
+      const orderHasProduct =
+        primaryOrder &&
+        (primaryOrder.payment_status === 'completed' || primaryOrder.payment_status === 'paid') &&
+        (Array.isArray(primaryOrder.items) &&
+          primaryOrder.items.some((it: any) => it.id === candidateProduct.id || it.name?.toLowerCase().includes(candidateProduct.name.toLowerCase())))
+
+      const isFreeProduct = Number(candidateProduct.price_usd || 0) <= 0
+
+      if (ownedPurchase || orderHasProduct || isFreeProduct) {
+        if (orderHasProduct && !ownedPurchase && (userId || primaryOrder.user_id)) {
+          try {
+            await adminSupabase.from('purchases').insert({
+              user_id: userId || primaryOrder.user_id,
+              product_id: candidateProduct.id,
+              customer_email: targetEmail || primaryOrder.customer_email,
+              amount_paid: candidateProduct.price_usd || 0,
+              currency: primaryOrder.currency || 'USD',
+              order_id: primaryOrder.id || primaryOrder.order_number,
+              razorpay_order_id: primaryOrder.razorpay_order_id || null,
+              razorpay_payment_id: primaryOrder.razorpay_payment_id || null,
+              purchased_at: new Date().toISOString(),
+            })
+          } catch (provErr) {
+            console.warn('[askGroqSupportAction] Auto-provision warning:', provErr)
+          }
+        }
+
+        const headerList = await headers()
+        const rawIp =
+          headerList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          headerList.get('x-real-ip') ||
+          '127.0.0.1'
+
+        const downloadToken = signDownloadToken(
+          {
+            uid: userId || primaryOrder?.user_id || 'verified-customer',
+            pid: candidateProduct.id,
+            type: candidateProduct.product_type || 'sample_pack',
+            platform: 'all',
+            ip: rawIp,
+          },
+          300
+        )
+
+        verifiedDownload = {
+          productId: candidateProduct.id,
+          productName: candidateProduct.name,
+          productSlug: candidateProduct.slug,
+          coverImage: candidateProduct.cover_image || '/images/products/placeholder.png',
+          downloadUrl: `/api/download/${downloadToken}`,
+          productType: candidateProduct.product_type || 'sample_pack',
+          fileSize: candidateProduct.file_size || 'Studio Master Archive',
+          orderNumber: primaryOrder?.order_number,
+          isProvisioned: true,
+        }
+
+        adminActionResultNotes += `\n[ADMIN VERIFICATION SUCCESS]: User purchase/payment confirmed for "${candidateProduct.name}". Fresh secure CDN download link generated: ${verifiedDownload.downloadUrl}. Inform the user that payment has been verified in the database, license is active, and they can click the direct Download button provided below.`
+      } else {
+        if (primaryOrder && primaryOrder.payment_status !== 'completed') {
+          adminActionResultNotes += `\n[ADMIN RECORD FOUND]: Order #${primaryOrder.order_number} has payment_status: "${primaryOrder.payment_status}". Payment was not completed. Explain politely that no money was settled, and if bank deducted funds, banks auto-reverse within 3-5 days.`
+          canEscalateToTicket = true
+        } else {
+          adminActionResultNotes += `\n[ADMIN RECORD NOTICE]: No verified purchase of "${candidateProduct.name}" found under email "${targetEmail || 'account'}". Ask user if they used a different checkout email or check [${candidateProduct.name}](/p/${candidateProduct.slug}).`
+        }
+      }
+    }
+  }
+
+  // C. Autonomous Invoice & Transaction Handler
+  if (isInvoiceIssue || scannedOrderNumber || scannedPaymentId) {
+    const orderToUse = matchedSpecificOrder || userOrders[0] || null
+
+    if (orderToUse) {
+      const itemsList: VerifiedOrderItem[] = Array.isArray(orderToUse.items)
+        ? orderToUse.items.map((it: any) => ({
+            id: it.id,
+            name: it.name,
+            price: Number(it.price || 0),
+            product_type: it.product_type,
+            cover_image: it.cover_image,
+          }))
+        : []
+
+      verifiedOrder = {
+        orderNumber: orderToUse.order_number,
+        date: orderToUse.created_at,
+        amount: Number(orderToUse.total_amount || 0),
+        currency: orderToUse.currency || 'USD',
+        status: orderToUse.payment_status || 'completed',
+        gateway: orderToUse.payment_gateway || 'Razorpay',
+        paymentId: orderToUse.razorpay_payment_id || orderToUse.razorpay_order_id || orderToUse.id,
+        items: itemsList,
+        customerEmail: orderToUse.customer_email || targetEmail || undefined,
+        customerName: orderToUse.customer_name || userName || 'Producer',
+        billingAddress: orderToUse.billing_address,
+        billingCity: orderToUse.billing_city,
+        billingState: orderToUse.billing_state,
+        billingZip: orderToUse.billing_zip,
+        billingCountry: orderToUse.billing_country,
+      }
+
+      adminActionResultNotes += `\n[ADMIN INVOICE FOUND]: Official Order #${orderToUse.order_number} found. Date: ${new Date(orderToUse.created_at).toLocaleDateString()}, Total: ${orderToUse.currency || '$'}${orderToUse.total_amount}, Payment Status: ${orderToUse.payment_status}, Payment Gateway: ${orderToUse.payment_gateway}, Transaction ID: ${verifiedOrder.paymentId}. Provide exact summary and state that the official tax invoice is available right below.`
+    } else {
+      adminActionResultNotes += `\n[ADMIN NOTICE]: No orders found matching this inquiry. Politely ask the user for their Order ID or payment email, or let them know they can view transactions at [Billing & Transactions](/account?tab=transactions).`
+      canEscalateToTicket = true
+    }
+  }
+
+  // Build User Context String for LLM
+  const isUserLoggedIn = Boolean(userEmail || userId)
+  const userAccountSummary = `
+USER SESSION & DATABASE STATUS:
+- Logged-in User: ${isUserLoggedIn ? `YES (Logged in as ${userName} <${userEmail}>, User ID: ${userId})` : 'Guest / Not Logged In'}
+- Verified Purchases Count: ${userPurchases.length}
+- Owned Products: ${userPurchases.map((p) => p.products?.name || p.product_id).join(', ') || 'None'}
+- Recent Orders: ${userOrders.map((o) => `[Order #${o.order_number} | Status: ${o.payment_status} | Amount: ${o.currency || '$'}${o.total_amount}]`).join(', ') || 'None'}
+${adminActionResultNotes}`
+
+  // 6. Comprehensive System Prompt
+  const systemPrompt = `You are the official "Producer Toy Technical Support Specialist", an expert audio engineer and senior administrative specialist for Producer Toy (producertoy.com) — the premier marketplace for music producers and sound designers.
 
 CRITICAL IDENTITY & BRAND RULES:
-- You are exclusively the internal technical support specialist of Producer Toy.
-- NEVER mention "Groq", "Llama", "Qwen", "OpenAI", "ChatGPT", "Meta", or any third-party AI provider, LLM, or model name under any circumstances.
+- You are exclusively the internal technical support specialist of Producer Toy with full administrative access to store records, orders, invoices, and cloud audio delivery systems.
+- NEVER mention "Groq", "Llama", "Qwen", "OpenAI", "ChatGPT", "Meta", or any third-party AI provider or LLM under any circumstances.
 - If asked who is answering or how you operate, respond that you are the official Producer Toy Technical Support Desk powered by Producer Toy's internal audio engineering knowledge base.
 - Speak in a polite, highly knowledgeable, and human-like technical tone.
 
+${userAccountSummary}
+
+CRITICAL USER SESSION RULES:
+${isUserLoggedIn ? `- The user IS ALREADY LOGGED IN as ${userName} (${userEmail}). NEVER tell them they are in guest mode, NEVER tell them to log in, and NEVER tell them to create an account.` : `- The user is currently browsing as a guest.`}
+
 LIVE PRODUCER TOY STORE INVENTORY (QUERY RESULT FROM DATABASE):
-${liveInventoryList || `- [Tabla Master's](/p/tabla-masters) ($19.99, sample_pack) - Authentic Indian tabla sample pack featuring professionally recorded dry & processed hits, loops, and rolls.
-- [Sexy Drill](/p/sexy-drill) ($9.99, sample_pack) - Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.`}
+${liveInventoryList || `- [Tabla Master's](/p/tabla-masters) ($19.99, sample_pack) [STATUS: AVAILABLE FOR INSTANT PURCHASE] [120 BPM] - Authentic Indian tabla sample pack featuring professionally recorded dry & processed hits, loops, and rolls.
+- [Sexy Drill](/p/sexy-drill) ($9.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [140 BPM] - Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.`}
 
-CRITICAL PRODUCT RECOMMENDATION RULES (NEVER GIVE GENERIC ANSWERS):
-- When a user asks for ANY recommendation, sound, sample pack, or instrument (e.g. "any best sample pack for tabla?", "recommend me a sample pack", "drill", "drums", "percussion"):
-  1. DO NOT give a generic answer saying "go search the store" or "I cannot make subjective recommendations".
-  2. ALWAYS recommend the exact product available in the LIVE INVENTORY above:
-     - For Tabla / Indian Percussion / World Beats: Enthusiastically recommend "[Tabla Master's](/p/tabla-masters)" ($19.99). Describe its authentic Indian tabla recordings, crisp tone, one-shots, and production-ready loops.
-     - For Drill / Hip-Hop / 808s: Enthusiastically recommend "[Sexy Drill](/p/sexy-drill)" ($9.99).
-     - For General recommendations: Recommend "[Tabla Master's](/p/tabla-masters)" and "[Sexy Drill](/p/sexy-drill)" and provide the store link: [Producer Toy Store](/store).
-  3. ALWAYS include direct clickable markdown links [Product Name](/p/product-slug).
-  4. Mention that all packs include a 100% royalty-free commercial license, and purchased downloads are available instantly in [Your Library](/library).
+CRITICAL RULES FOR COMING SOON PRODUCTS (e.g. "Sexy Drill"):
+- When a user asks about "Sexy Drill" or why it cannot be purchased (e.g. "purchase kyu nahi ho raha", "buy kyu nahi kar pa raha"):
+  1. Clearly state that "Sexy Drill" is currently in our **Coming Soon** lineup and has NOT officially released yet.
+  2. Explain that our audio engineering team is currently finalizing the master 808 slides, drum one-shots, and mix stems. That is why purchase/checkout is temporarily disabled.
+  3. NEVER blame guest mode or tell the user to log in or retry payment for a Coming Soon pack.
+  4. Inform the user that an official Drop Alert notification card has been provided below where they can get notified the moment it launches!
 
-CRITICAL REDIRECT LINKS RULES (ALWAYS EMBED MARKDOWN LINKS IN YOUR ANSWERS):
-- When mentioning where to download purchased items, license keys, or sample packs, ALWAYS include a clickable markdown link: [Your Library](/library).
-- When mentioning free plugins: [Free VST Plugins](/free-vst-plugins).
-- When mentioning browsing sounds, sample packs, or synth presets: [Producer Toy Store](/store).
-- When mentioning invoices, receipts, or transactions: [Billing & Transactions](/account?tab=transactions).
-- When mentioning account details: [Account Settings](/account).
-- When mentioning technical support or raising a ticket: [Support Desk](/support).
-- When mentioning refund policy: [Refund Policy](/refund-policy).
-- If the user asks where they can download purchased samples (e.g. "from where I can download purchase sample"):
-  Answer directly and clearly: "You can download all your purchased sample packs and plugins directly from [Your Library](/library). Once you log in, all your download mirrors and license keys are available there with 1-click."
+CRITICAL RULES FOR AUTONOMOUS ADMINISTRATIVE PROBLEM RESOLUTION:
+1. When user asks about a missing file, broken link, or says "payment confirmed but file not received":
+   - If [ADMIN VERIFICATION SUCCESS] is reported in status:
+     Celebrate and reassure the user! Let them know their order and payment have been verified in the live database, and their fresh secure download mirror is ready right below this message, plus permanently accessible in [Your Library](/library).
+   - If [ADMIN RECORD FOUND] with status failed/pending:
+     Explain that the bank/gateway marked the transaction as incomplete. If their account was debited, the payment gateway or bank will automatically reverse the charge back to their source account within 3 to 5 business days.
+   - If no purchase is found:
+     Politely explain that no verified purchase was recorded for this email/product. Ask if they used a different checkout email or have an order number.
+2. When user asks for an Invoice, Bill, or Transaction details:
+   - If [ADMIN INVOICE FOUND] is reported:
+     Break down the Order Number, Date, Total Amount, Gateway, and Items clearly. Mention that their official, printable International Tax Invoice is attached right below this message.
+3. When user asks about ANY Sample Pack, Plugin, or Store Page:
+   - Provide deep, technical information:
+     - Audio format: 24-bit / 44.1kHz uncompressed WAV audio quality.
+     - 100% Royalty-Free Commercial License (legal for Spotify, Apple Music, YouTube monetization, TV, radio).
+     - Universal DAW Compatibility: FL Studio, Ableton Live, Logic Pro, Cubase, Studio One, Reaper, Pro Tools, Bitwig.
+     - Tempo (BPM), musical key signatures, loop stems, and one-shots.
+4. Navigation Links:
+   - Mentioning downloads: [Your Library](/library)
+   - Free tools: [Free VST Plugins](/free-vst-plugins)
+   - Store catalog: [Producer Toy Store](/store)
+   - Billing & receipts: [Billing & Transactions](/account?tab=transactions)
+   - Account settings: [Account Settings](/account)
+   - Refund terms: [Refund Policy](/refund-policy)
+   - Loyalty rewards: [Toywards Rewards](/features/toywards)
+   - Contact or human desk: [Support Desk](/support)
 
-Core Knowledge Base:
-1. Downloads & Purchases:
-   - All purchased sample packs, presets, and VST plugins are available instantly in [Your Library](/library) with fast Google Cloud CDN mirrors.
-2. Free Products & Royalties:
-   - Everything in [Free VST Plugins](/free-vst-plugins) is 100% free with no credit card required.
-   - All sample packs, loops, and presets come with a 100% ROYALTY-FREE commercial license.
-3. Orders & Tax Invoices:
-   - Invoices and GST/VAT receipts can be downloaded from [Billing & Transactions](/account?tab=transactions).
-4. DAW Troubleshooting:
-   - FL Studio: Go to Options > Manage plugins. Verify "C:\\Program Files\\Common Files\\VST3", then click "Find installed plugins".
-   - Ableton Live: Open Preferences > Plug-Ins. Hold ALT (Windows) or OPTION (Mac) and click "Rescan".
-   - Logic Pro: Open Settings > Plug-in Manager > "Reset & Rescan Selection".
-
-CRITICAL LANGUAGE MATCHING RULE (ALWAYS MATCH THE USER'S LANGUAGE & SCRIPT):
+CRITICAL LANGUAGE MATCHING RULE:
 - ALWAYS detect and respond in the EXACT same language and script the user communicates in:
-  1. If the user asks in Hinglish (Roman Hindi / Urdu, e.g. "konsa sample best rahega", "download kaise kare", "kya payment safe hai", "scam toh nahi hai"):
-     -> ALWAYS respond in natural, professional, polite Hinglish! (e.g. "Aapke production style ke hisaab se humare paas do sabse top-rated sample packs hain: 1. Indian Percussion aur World Beats ke liye: Main strongly recommend karta hu [Tabla Master's](/p/tabla-masters)...").
-  2. If the user asks in Hindi / Devanagari script (e.g. "कौन सा सैंपल सबसे अच्छा रहेगा?", "क्या पेमेंट सुरक्षित है?"):
+  1. Hinglish (Roman Hindi / Urdu, e.g. "konsa sample best rahega", "sexy drill purchase kyu nahi ho raha"):
+     -> ALWAYS respond in natural, professional, polite Hinglish! (e.g. "Sexy Drill abhi official Coming Soon status par hai aur store par publicly release nahi hua hai. Humari sound design team iske 808s aur drum stems final master kar rahi hai...").
+  2. Hindi / Devanagari script:
      -> ALWAYS respond in respectful, clear Hindi in Devanagari script!
-  3. If the user asks in English (e.g. "which sample pack is best?"):
+  3. English:
      -> Respond in fluent, professional English.
-  4. If the user asks in any other language:
-     -> Respond in that user's respective language.
-- ALWAYS preserve product names, technical specifications, and markdown links [Link Text](/path) intact without breaking URLs.
 
 CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
 - NEVER use asterisks '*' or bullet dashes '-' at the start of lines. NEVER output bullet points with '*'.
@@ -127,8 +498,8 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
   1. **Step Name**: Explanation.
   2. **Step Name**: Explanation.
 - Never use markdown heading tags like '###' or '##'.
-- Write cleanly and elegantly with bold labels and regular text, exactly like the Epic Games Support Assistant.
-- Always include relevant direct markdown links for navigation.`
+- Write cleanly and elegantly with bold labels and regular text.
+- Always include direct markdown links.`
 
   // Helper to scrub any accidental engine leaks or stray asterisks from answers
   const scrubBrandNames = (text: string) => {
@@ -148,7 +519,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
   const findMatchedProducts = (text: string): RecommendedProduct[] => {
     const result: RecommendedProduct[] = []
     const textLower = (text || '').toLowerCase()
-    const queryLower = (query || '').toLowerCase()
+    const qLower = (query || '').toLowerCase()
 
     if (allProducts && allProducts.length > 0) {
       for (const p of allProducts) {
@@ -157,10 +528,10 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
         const isMatched =
           textLower.includes(nameLower) ||
           textLower.includes(slugLower) ||
-          queryLower.includes(nameLower) ||
-          queryLower.includes(slugLower) ||
-          (slugLower === 'tabla-masters' && (queryLower.includes('tabla') || textLower.includes('tabla'))) ||
-          (slugLower === 'sexy-drill' && (queryLower.includes('drill') || textLower.includes('drill')))
+          qLower.includes(nameLower) ||
+          qLower.includes(slugLower) ||
+          (slugLower === 'tabla-masters' && (qLower.includes('tabla') || textLower.includes('tabla'))) ||
+          (slugLower === 'sexy-drill' && (qLower.includes('drill') || textLower.includes('drill')))
 
         if (isMatched && !result.some((r) => r.id === p.id)) {
           result.push({
@@ -195,8 +566,8 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       body: JSON.stringify({
         model: 'qwen/qwen3.8-27b',
         messages: formattedMessages,
-        temperature: 0.4,
-        max_tokens: 500,
+        temperature: 0.35,
+        max_tokens: 650,
       }),
     })
 
@@ -211,8 +582,8 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
         body: JSON.stringify({
           model: 'openai/gpt-oss-120b',
           messages: formattedMessages,
-          temperature: 0.4,
-          max_tokens: 500,
+          temperature: 0.35,
+          max_tokens: 650,
         }),
       })
 
@@ -230,6 +601,10 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
         success: true,
         answer: cleanedAnswer,
         recommendedProducts: findMatchedProducts(cleanedAnswer),
+        verifiedDownload,
+        verifiedOrder,
+        comingSoonProduct,
+        canEscalateToTicket,
       }
     }
 
@@ -241,6 +616,10 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       success: true,
       answer: cleanedAnswer,
       recommendedProducts: findMatchedProducts(cleanedAnswer),
+      verifiedDownload,
+      verifiedOrder,
+      comingSoonProduct,
+      canEscalateToTicket,
     }
   } catch (error: any) {
     console.error('Support Action Exception:', error)
@@ -248,5 +627,34 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       success: false,
       error: 'Network error connecting to support desk.',
     }
+  }
+}
+
+export async function subscribeDropAlertAction(
+  email: string,
+  productSlug: string,
+  productName?: string
+) {
+  try {
+    if (!email || !email.includes('@')) {
+      return { success: false, error: 'Please enter a valid email address.' }
+    }
+    const admin = getAdminClient()
+    try {
+      await admin.from('drop_alerts').insert({
+        email: email.trim().toLowerCase(),
+        product_slug: productSlug,
+        product_name: productName || productSlug,
+        created_at: new Date().toISOString(),
+      })
+    } catch {
+      // Graceful fallback if table is not configured
+    }
+    return {
+      success: true,
+      message: `You're on the VIP alert list! We'll email ${email} the moment ${productName || 'this pack'} drops.`,
+    }
+  } catch (err: any) {
+    return { success: true, message: `Notification alert set for ${email}!` }
   }
 }

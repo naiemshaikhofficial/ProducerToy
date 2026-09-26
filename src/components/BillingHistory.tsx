@@ -36,63 +36,49 @@ export interface PurchaseItem {
   }
 }
 
-export function BillingHistory({
-  purchases,
-  userEmail,
-  userName,
-  showHeader = true,
-}: {
-  purchases: PurchaseItem[]
-  userEmail: string
-  userName?: string
-  showHeader?: boolean
-}) {
-  if (!purchases || purchases.length === 0) return null
+export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, userName?: string) {
+  const invoiceWindow = window.open('', '_blank')
+  if (!invoiceWindow) return
 
-  // 1. Generate printable International Tax Invoice PDF / Window
-  const handleDownloadInvoice = (item: PurchaseItem) => {
-    const invoiceWindow = window.open('', '_blank')
-    if (!invoiceWindow) return
+  const product = item.products
+  const dateStr = new Date(item.purchased_at).toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+  const timeStr = new Date(item.purchased_at).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  const rawCurrency = (item.currency || '').toUpperCase()
+  const isINR = rawCurrency === 'INR' || rawCurrency === '₹'
+  const currency = isINR ? '₹' : '$'
+  const currencyCode = isINR ? 'INR' : 'USD'
+  const price = Number(item.amount_paid ?? product.price_usd ?? 0)
+  const discount = Number(item.discount_amount || 0)
+  const subtotal = price + discount
 
-    const product = item.products
-    const dateStr = new Date(item.purchased_at).toLocaleDateString('en-US', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    })
-    const timeStr = new Date(item.purchased_at).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    const rawCurrency = (item.currency || '').toUpperCase()
-    const isINR = rawCurrency === 'INR' || rawCurrency === '₹'
-    const currency = isINR ? '₹' : '$'
-    const currencyCode = isINR ? 'INR' : 'USD'
-    const price = Number(item.amount_paid ?? product.price_usd ?? 0)
-    const discount = Number(item.discount_amount || 0)
-    const subtotal = price + discount
+  const invoiceRef = (item.razorpay_payment_id || item.payment_id || item.id).replace(/[^a-zA-Z0-9]/g, '').slice(-10).toUpperCase()
+  const orderRef = item.razorpay_order_id || item.order_id || `ORD-${item.id.slice(0, 10).toUpperCase()}`
+  const paymentTxnId = item.razorpay_payment_id || item.payment_id || item.id
+  const brandName = product.brands?.name || product.brand || ''
+  const customerFullName = item.customer_name || userName || 'Producer'
+  const customerEmailAddress = item.customer_email || userEmail || 'Customer'
+  
+  const hasBillingAddress = !!(item.billing_address || item.billing_city || item.billing_country)
+  const formattedAddress = hasBillingAddress
+    ? [item.billing_address, item.billing_city, item.billing_state, item.billing_zip, item.billing_country].filter(Boolean).join(', ')
+    : 'Digital Fulfillment (Global License Vault)'
 
-    const invoiceRef = (item.razorpay_payment_id || item.payment_id || item.id).replace(/[^a-zA-Z0-9]/g, '').slice(-10).toUpperCase()
-    const orderRef = item.razorpay_order_id || item.order_id || `ORD-${item.id.slice(0, 10).toUpperCase()}`
-    const paymentTxnId = item.razorpay_payment_id || item.payment_id || item.id
-    const brandName = product.brands?.name || product.brand || ''
-    const customerFullName = item.customer_name || userName || 'Producer'
-    const customerEmailAddress = item.customer_email || userEmail
-    
-    const hasBillingAddress = !!(item.billing_address || item.billing_city || item.billing_country)
-    const formattedAddress = hasBillingAddress
-      ? [item.billing_address, item.billing_city, item.billing_state, item.billing_zip, item.billing_country].filter(Boolean).join(', ')
-      : 'Digital Fulfillment (Global License Vault)'
-
-    const formatType = (type?: string) => {
-      if (!type) return 'Digital Audio Asset'
-      if (type === 'sample_pack') return 'Audio Sample Pack (WAV 24-Bit / 44.1kHz)'
-      if (type === 'sound' || type === 'one_shot') return 'Drum & Sound Kit (WAV / One-Shots)'
-      if (type === 'plugin' || type === 'vst') return 'Audio Software Plugin / VST Instrument'
-      if (type === 'preset') return 'Synthesizer Preset Bank'
-      if (type === 'bundle') return 'Complete Producer Sound & Tool Bundle'
-      return type.replace(/_/g, ' ').toUpperCase()
-    }
+  const formatType = (type?: string) => {
+    if (!type) return 'Digital Audio Asset'
+    if (type === 'sample_pack') return 'Audio Sample Pack (WAV 24-Bit / 44.1kHz)'
+    if (type === 'sound' || type === 'one_shot') return 'Drum & Sound Kit (WAV / One-Shots)'
+    if (type === 'plugin' || type === 'vst') return 'Audio Software Plugin / VST Instrument'
+    if (type === 'preset') return 'Synthesizer Preset Bank'
+    if (type === 'bundle') return 'Complete Producer Sound & Tool Bundle'
+    return type.replace(/_/g, ' ').toUpperCase()
+  }
 
     invoiceWindow.document.write(`
       <!DOCTYPE html>
@@ -589,6 +575,23 @@ export function BillingHistory({
       </html>
     `)
     invoiceWindow.document.close()
+  }
+
+export function BillingHistory({
+  purchases,
+  userEmail,
+  userName,
+  showHeader = true,
+}: {
+  purchases: PurchaseItem[]
+  userEmail: string
+  userName?: string
+  showHeader?: boolean
+}) {
+  if (!purchases || purchases.length === 0) return null
+
+  const handleDownloadInvoice = (item: PurchaseItem) => {
+    openPrintableInvoice(item, userEmail, userName)
   }
 
   // 2. Generate printable EULA License Certificate PDF / Window

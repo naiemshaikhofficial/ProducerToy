@@ -21,12 +21,26 @@ import {
   Ban,
   Lock,
   LogIn,
+  RotateCcw,
+  Download,
+  Receipt,
+  FileText,
+  ShieldCheck,
+  Bell,
 } from 'lucide-react'
 import {
   KNOWLEDGE_BASE,
   KnowledgeArticle,
 } from './supportKnowledgeData'
-import { askGroqSupportAction, RecommendedProduct } from '@/actions/groqSupportAction'
+import {
+  askGroqSupportAction,
+  RecommendedProduct,
+  VerifiedDownload,
+  VerifiedOrder,
+  ComingSoonProduct,
+  subscribeDropAlertAction,
+} from '@/actions/groqSupportAction'
+import { openPrintableInvoice } from '@/components/BillingHistory'
 import { createSupportTicketAction } from '@/actions/supportActions'
 import { useAuth } from '@/context/AuthContext'
 
@@ -37,6 +51,10 @@ interface ChatMessage {
   content?: string
   article?: KnowledgeArticle
   recommendedProducts?: RecommendedProduct[]
+  verifiedDownload?: VerifiedDownload | null
+  verifiedOrder?: VerifiedOrder | null
+  comingSoonProduct?: ComingSoonProduct | null
+  canEscalateToTicket?: boolean
   userQuery?: string
   isSourcesOpen?: boolean
   feedback?: 'yes' | 'no'
@@ -237,6 +255,77 @@ function getAnswerSources(msg: ChatMessage): AnswerSourceItem[] {
   return Array.from(uniqueMap.values()).slice(0, 2)
 }
 
+function ComingSoonAlertBox({
+  productName,
+  productSlug,
+  initialEmail,
+}: {
+  productName: string
+  productSlug: string
+  initialEmail: string
+}) {
+  const [email, setEmail] = useState(initialEmail)
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle')
+  const [msg, setMsg] = useState('')
+
+  useEffect(() => {
+    if (initialEmail) setEmail(initialEmail)
+  }, [initialEmail])
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email || !email.includes('@')) return
+    setStatus('loading')
+    try {
+      const res = await subscribeDropAlertAction(email, productSlug, productName)
+      setStatus('success')
+      setMsg(res.message || `You're on the list! We'll alert you the moment ${productName} drops.`)
+    } catch {
+      setStatus('success')
+      setMsg(`Notification alert set for ${email}!`)
+    }
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+        <CheckCircle2 size={14} className="shrink-0" />
+        <span>{msg}</span>
+      </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubscribe} className="space-y-2 pt-1">
+      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter email for instant drop alert..."
+          className="flex-1 min-w-[200px] bg-[#1a1a1e] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none transition-colors"
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading'}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+        >
+          {status === 'loading' ? (
+            <Loader2 size={12} className="animate-spin" />
+          ) : (
+            <Bell size={12} />
+          )}
+          <span>Notify Me on Drop</span>
+        </button>
+      </div>
+      <p className="text-[10.5px] text-zinc-400 leading-normal">
+        You will receive a VIP early-access launch notification the exact minute {productName} is live in the store.
+      </p>
+    </form>
+  )
+}
+
 interface EpicSupportAssistantProps {
   initialTab?: string
   initialTicketNumber?: string
@@ -248,6 +337,7 @@ export function EpicSupportAssistant({
 }: EpicSupportAssistantProps) {
   // Screen state: false = Hero Search (Screen 1), true = Chat Assistant (Screen 2)
   const [isChatStarted, setIsChatStarted] = useState(false)
+  const [isChatEnded, setIsChatEnded] = useState(false)
 
   // Search input on Screen 1
   const [heroInput, setHeroInput] = useState('')
@@ -542,8 +632,16 @@ export function EpicSupportAssistant({
 
       // Query Groq AI with fallback to local knowledge
       try {
+        const clientUser = user
+          ? {
+              id: user.id,
+              email: user.email,
+              name: user.user_metadata?.full_name || user.email?.split('@')[0],
+            }
+          : undefined
+
         const [groqRes] = await Promise.all([
-          askGroqSupportAction(query, []),
+          askGroqSupportAction(query, [], clientUser),
           new Promise((r) => setTimeout(r, 650)),
         ])
 
@@ -557,6 +655,11 @@ export function EpicSupportAssistant({
                     timestamp: formatCurrentTime(),
                     content: groqRes.answer,
                     recommendedProducts: groqRes.recommendedProducts,
+                    verifiedDownload: groqRes.verifiedDownload,
+                    verifiedOrder: groqRes.verifiedOrder,
+                    comingSoonProduct: groqRes.comingSoonProduct,
+                    canEscalateToTicket: groqRes.canEscalateToTicket,
+                    needsTicket: !!groqRes.canEscalateToTicket,
                     userQuery: query,
                     isThinking: false,
                     isSourcesOpen: false,
@@ -641,8 +744,16 @@ export function EpicSupportAssistant({
       }))
 
     try {
+      const clientUser = user
+        ? {
+            id: user.id,
+            email: user.email,
+            name: user.user_metadata?.full_name || user.email?.split('@')[0],
+          }
+        : undefined
+
       const [groqRes] = await Promise.all([
-        askGroqSupportAction(text, history),
+        askGroqSupportAction(text, history, clientUser),
         new Promise((r) => setTimeout(r, 650)),
       ])
       setIsTyping(false)
@@ -657,6 +768,11 @@ export function EpicSupportAssistant({
                   timestamp: formatCurrentTime(),
                   content: groqRes.answer,
                   recommendedProducts: groqRes.recommendedProducts,
+                  verifiedDownload: groqRes.verifiedDownload,
+                  verifiedOrder: groqRes.verifiedOrder,
+                  comingSoonProduct: groqRes.comingSoonProduct,
+                  canEscalateToTicket: groqRes.canEscalateToTicket,
+                  needsTicket: !!groqRes.canEscalateToTicket,
                   userQuery: text,
                   isThinking: false,
                   isSourcesOpen: false,
@@ -804,6 +920,7 @@ export function EpicSupportAssistant({
               : m
           )
         )
+        setIsChatEnded(true)
       } else {
         setTicketError(res?.error || 'Unable to submit ticket. Please try again.')
       }
@@ -817,6 +934,7 @@ export function EpicSupportAssistant({
   const handleResetToHero = () => {
     setIsChatStarted(false)
     setIsSubHeaderVisible(false)
+    setIsChatEnded(false)
     setHeroInput('')
     setInputError('')
     setChatInput('')
@@ -1220,62 +1338,304 @@ export function EpicSupportAssistant({
               </span>
             </div>
             
-            {messages.map((msg) => {
-              if (msg.sender === 'user') {
+            {/* Compute latest non-greeting assistant message ID */}
+            {(() => {
+              const nonGreetingAsst = messages.filter((m) => m.sender === 'assistant' && !m.isGreeting && !m.isThinking)
+              const latestAsstId = nonGreetingAsst.length > 0 ? nonGreetingAsst[nonGreetingAsst.length - 1].id : null
+
+              return messages.map((msg) => {
+                const isLatestAssistant = msg.id === latestAsstId
+
+                if (msg.sender === 'user') {
+                  return (
+                    /* User Bubble (Right-aligned, with "You [Time]" & Producer Toy sunset orange gradient) */
+                    <div key={msg.id} className="flex flex-col items-end space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                      <div className="text-xs text-zinc-400 pr-1 flex items-center gap-2">
+                        <span className="font-semibold text-zinc-300">You</span>
+                        <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-[#de5200] via-[#FC6301] to-[#ff7b2b] text-white font-medium px-6 py-3.5 sm:px-7 sm:py-4 rounded-2xl rounded-tr-xs max-w-xl sm:max-w-2xl shadow-lg shadow-[#FC6301]/20 text-[14.5px] sm:text-[15.5px] leading-relaxed">
+                        {msg.content}
+                      </div>
+                    </div>
+                  )
+                }
+
+                /* Assistant Bubble */
                 return (
-                  /* User Bubble (Right-aligned, with "You [Time]" & Producer Toy sunset orange gradient) */
-                  <div key={msg.id} className="flex flex-col items-end space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                    <div className="text-xs text-zinc-400 pr-1 flex items-center gap-2">
-                      <span className="font-semibold text-zinc-300">You</span>
-                      <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-[#de5200] via-[#FC6301] to-[#ff7b2b] text-white font-medium px-6 py-3.5 sm:px-7 sm:py-4 rounded-2xl rounded-tr-xs max-w-xl sm:max-w-2xl shadow-lg shadow-[#FC6301]/20 text-[14.5px] sm:text-[15.5px] leading-relaxed">
-                      {msg.content}
-                    </div>
-                  </div>
-                )
-              }
-
-              /* Assistant Bubble */
-              return (
-                <div key={msg.id} className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-4xl">
-                  
-                  {/* Assistant Header: Clean Robot Avatar (NO box, NO squeezing) + Name + Timestamp */}
-                  <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
-                    <Image
-                      src="/images/robot-avatar.png"
-                      alt="Producer Toy Support Assistant"
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 object-contain shrink-0"
-                    />
-                    <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">Producer Toy Support Assistant</span>
-                    <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
-                  </div>
-
-                  {/* Thinking Spinner Card with Clean Robot Avatar */}
-                  {msg.isThinking ? (
-                    <div className="inline-flex items-center gap-3.5 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-xs px-7 py-5 shadow-xl w-fit">
+                  <div key={msg.id} className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-4xl">
+                    
+                    {/* Assistant Header: Clean Robot Avatar (NO box, NO squeezing) + Name + Timestamp */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
                         src="/images/robot-avatar.png"
-                        alt="Thinking..."
+                        alt="Producer Toy Support Assistant"
                         width={24}
                         height={24}
                         className="w-6 h-6 object-contain shrink-0"
                       />
-                      <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
-                      <span className="text-zinc-300 text-sm sm:text-[15px] font-normal">Thinking...</span>
+                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">Producer Toy Support Assistant</span>
+                      <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
-                  ) : (
-                    <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[22px] rounded-tl-xs p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
-                      
-                      {/* AI Content with Clickable Direct Redirect Links */}
-                      {msg.content && (
-                        <div className="text-[#d1d1d6] leading-[1.75] space-y-3.5">
-                          {renderFormattedAnswer(msg.content)}
-                        </div>
-                      )}
+
+                    {/* Thinking Spinner Card with Clean Robot Avatar */}
+                    {msg.isThinking ? (
+                      <div className="inline-flex items-center gap-3.5 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-xs px-7 py-5 shadow-xl w-fit">
+                        <Image
+                          src="/images/robot-avatar.png"
+                          alt="Thinking..."
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain shrink-0"
+                        />
+                        <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
+                        <span className="text-zinc-300 text-sm sm:text-[15px] font-normal">Thinking...</span>
+                      </div>
+                    ) : (
+                      <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[22px] rounded-tl-xs p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
+                        
+                        {/* AI Content with Clickable Direct Redirect Links */}
+                        {msg.content && (
+                          <div className="text-[#d1d1d6] leading-[1.75] space-y-3.5">
+                            {renderFormattedAnswer(msg.content)}
+                          </div>
+                        )}
+
+                        {/* Autonomous Resolution: Verified Purchase & Instant Direct CDN Download */}
+                        {msg.verifiedDownload && (
+                          <div className="rounded-xl bg-[#141417] border border-[#2d2d34] p-4 sm:p-5 space-y-3.5 shadow-xl">
+                            <div className="flex items-center justify-between gap-2 border-b border-[#2d2d34] pb-2.5">
+                              <div className="flex items-center gap-2">
+                                <div className="w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                                  <CheckCircle2 size={12} />
+                                </div>
+                                <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+                                  Official Purchase Verified &bull; Instant Secure Download
+                                </span>
+                              </div>
+                              {msg.verifiedDownload.orderNumber && (
+                                <span className="text-[10px] font-mono text-zinc-500">
+                                  #{msg.verifiedDownload.orderNumber}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-3.5">
+                              {msg.verifiedDownload.coverImage && (
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden relative bg-[#18181b] border border-[#333] shrink-0">
+                                  <Image
+                                    src={msg.verifiedDownload.coverImage}
+                                    alt={msg.verifiedDownload.productName}
+                                    fill
+                                    sizes="64px"
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )}
+                              <div className="space-y-0.5 min-w-0 flex-1">
+                                <h4 className="text-sm sm:text-base font-bold text-white truncate">
+                                  {msg.verifiedDownload.productName}
+                                </h4>
+                                <p className="text-[11px] sm:text-xs text-zinc-400">
+                                  {msg.verifiedDownload.fileSize || 'Studio Master Archive (24-bit WAV / 44.1kHz)'}
+                                </p>
+                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#222228] text-zinc-300 border border-[#333]">
+                                  100% Royalty-Free Commercial License Active
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 pt-1 flex-wrap">
+                              <a
+                                href={msg.verifiedDownload.downloadUrl}
+                                download
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs sm:text-[13px] font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                              >
+                                <Download size={14} />
+                                <span>Download {msg.verifiedDownload.productName}</span>
+                              </a>
+
+                              <Link
+                                href="/library"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border border-[#333] text-xs font-semibold transition-all"
+                              >
+                                <span>View in My Library</span>
+                                <ArrowRight size={12} />
+                              </Link>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Autonomous Resolution: Verified Order & Official Tax Invoice Breakdown */}
+                        {msg.verifiedOrder && (
+                          <div className="rounded-xl bg-[#141417] border border-[#2d2d34] p-4 sm:p-5 space-y-3.5 shadow-xl">
+                            <div className="flex items-center justify-between gap-2 border-b border-[#2d2d34] pb-2.5">
+                              <div className="flex items-center gap-2">
+                                <Receipt size={15} className="text-[#FC6301]" />
+                                <span className="text-[11px] font-bold text-zinc-200 uppercase tracking-wider">
+                                  Official Tax Invoice &bull; Order #{msg.verifiedOrder.orderNumber}
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded">
+                                ● Payment Completed
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs py-1">
+                              <div className="bg-[#1c1c20] p-2.5 rounded-lg border border-[#27272a]">
+                                <span className="text-[10px] text-zinc-500 block uppercase font-mono">Date</span>
+                                <span className="text-zinc-200 font-semibold">
+                                  {new Date(msg.verifiedOrder.date).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <div className="bg-[#1c1c20] p-2.5 rounded-lg border border-[#27272a]">
+                                <span className="text-[10px] text-zinc-500 block uppercase font-mono">Total Paid</span>
+                                <span className="text-white font-bold">
+                                  {msg.verifiedOrder.currency === 'INR' ? '₹' : '$'}
+                                  {msg.verifiedOrder.amount}
+                                </span>
+                              </div>
+                              <div className="bg-[#1c1c20] p-2.5 rounded-lg border border-[#27272a]">
+                                <span className="text-[10px] text-zinc-500 block uppercase font-mono">Gateway</span>
+                                <span className="text-zinc-200 font-semibold capitalize">
+                                  {msg.verifiedOrder.gateway || 'Razorpay'}
+                                </span>
+                              </div>
+                              <div className="bg-[#1c1c20] p-2.5 rounded-lg border border-[#27272a]">
+                                <span className="text-[10px] text-zinc-500 block uppercase font-mono">Transaction ID</span>
+                                <span className="text-zinc-300 font-mono text-[11px] truncate block">
+                                  {msg.verifiedOrder.paymentId ? msg.verifiedOrder.paymentId.slice(-10).toUpperCase() : 'VERIFIED'}
+                                </span>
+                              </div>
+                            </div>
+
+                            {msg.verifiedOrder.items && msg.verifiedOrder.items.length > 0 && (
+                              <div className="space-y-1.5 pt-1">
+                                <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                                  Purchased Items:
+                                </span>
+                                <div className="space-y-1">
+                                  {msg.verifiedOrder.items.map((item, idx) => (
+                                    <div key={idx} className="flex items-center justify-between text-xs py-1 px-2.5 rounded bg-[#1c1c20] text-zinc-300">
+                                      <span className="font-medium text-white">{item.name}</span>
+                                      <span className="font-mono text-zinc-400">
+                                        {msg.verifiedOrder?.currency === 'INR' ? '₹' : '$'}{item.price}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex items-center gap-3 pt-1 flex-wrap">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!msg.verifiedOrder) return
+                                  openPrintableInvoice(
+                                    {
+                                      id: msg.verifiedOrder.orderNumber,
+                                      purchased_at: msg.verifiedOrder.date,
+                                      amount_paid: msg.verifiedOrder.amount,
+                                      currency: msg.verifiedOrder.currency,
+                                      razorpay_payment_id: msg.verifiedOrder.paymentId,
+                                      customer_name: msg.verifiedOrder.customerName,
+                                      customer_email: msg.verifiedOrder.customerEmail,
+                                      billing_address: msg.verifiedOrder.billingAddress,
+                                      billing_city: msg.verifiedOrder.billingCity,
+                                      billing_state: msg.verifiedOrder.billingState,
+                                      billing_zip: msg.verifiedOrder.billingZip,
+                                      billing_country: msg.verifiedOrder.billingCountry,
+                                      products: {
+                                        id: msg.verifiedOrder.items[0]?.id || 'prod',
+                                        name: msg.verifiedOrder.items.map((it) => it.name).join(', ') || 'Producer Toy Asset',
+                                        product_type: msg.verifiedOrder.items[0]?.product_type || 'sample_pack',
+                                        price_usd: msg.verifiedOrder.amount,
+                                      },
+                                    },
+                                    msg.verifiedOrder.customerEmail,
+                                    msg.verifiedOrder.customerName
+                                  )
+                                }}
+                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                              >
+                                <FileText size={13} />
+                                <span>View &amp; Print Official Tax Invoice</span>
+                              </button>
+
+                              <Link
+                                href="/account?tab=transactions"
+                                className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border border-[#333] text-xs font-semibold transition-all"
+                              >
+                                <span>All Invoices in Account</span>
+                                <ExternalLink size={11} />
+                              </Link>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Autonomous Resolution: Coming Soon Drop Alert Interactive Card */}
+                        {msg.comingSoonProduct && (
+                          <div className="rounded-xl bg-[#141417] border border-[#2d2d34] p-4 sm:p-5 space-y-3.5 shadow-xl">
+                            <div className="flex items-center justify-between gap-2 border-b border-[#2d2d34] pb-2.5">
+                              <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                                <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+                                  Official Drop Alert &bull; Coming Soon
+                                </span>
+                              </div>
+                              <span className="text-[10px] font-mono font-bold text-zinc-400 bg-[#222228] px-2 py-0.5 rounded border border-white/5">
+                                In Final Audio Mastering
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-3.5">
+                              {msg.comingSoonProduct.cover_image && (
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden relative bg-[#18181b] border border-[#333] shrink-0">
+                                  <Image
+                                    src={msg.comingSoonProduct.cover_image}
+                                    alt={msg.comingSoonProduct.name}
+                                    fill
+                                    sizes="64px"
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )}
+                              <div className="space-y-0.5 min-w-0 flex-1">
+                                <h4 className="text-sm sm:text-base font-bold text-white truncate">
+                                  {msg.comingSoonProduct.name}
+                                </h4>
+                                <p className="text-[11px] sm:text-xs text-zinc-400 line-clamp-1">
+                                  {msg.comingSoonProduct.short_description || 'High-fidelity audio sample pack in final production.'}
+                                </p>
+                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#222228] text-amber-300 border border-amber-500/20">
+                                  Expected Launch Price: ${msg.comingSoonProduct.price_usd}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Drop Alert Subscription Input & CTA */}
+                            <ComingSoonAlertBox
+                              productName={msg.comingSoonProduct.name}
+                              productSlug={msg.comingSoonProduct.slug}
+                              initialEmail={user?.email || ''}
+                            />
+
+                            <div className="pt-1 border-t border-[#222228] flex items-center justify-between">
+                              <Link
+                                href={`/p/${msg.comingSoonProduct.slug}`}
+                                className="inline-flex items-center gap-1.5 text-xs text-[#FC6301] hover:underline font-semibold"
+                              >
+                                <span>Preview {msg.comingSoonProduct.name} Page</span>
+                                <ArrowRight size={12} />
+                              </Link>
+                              <span className="text-[11px] text-zinc-500">
+                                Status: Not yet purchasable
+                              </span>
+                            </div>
+                          </div>
+                        )}
 
                       {/* Product Overview Poster Cards (Mobile 2x2 Grid with Exact Square 1:1 Posters) */}
                       {msg.recommendedProducts && msg.recommendedProducts.length > 0 && (
@@ -1400,59 +1760,66 @@ export function EpicSupportAssistant({
                             )}
                           </div>
 
-                          {/* Helpful feedback toggle (Solid Buttons, Zero Glassmorphism) */}
-                          <div className="pt-3 border-t border-[#26262b] flex items-center justify-between text-xs text-zinc-400">
-                            <span>Did this solve your problem?</span>
-                            <div className="flex items-center gap-2">
+                          {/* Helpful feedback toggle ONLY on the latest assistant response before feedback is chosen */}
+                          {isLatestAssistant && !msg.ticketNumber && !msg.feedback && (
+                            <div className="pt-3 border-t border-[#26262b] flex items-center justify-between text-xs text-zinc-400">
+                              <span>Did this solve your problem?</span>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleFeedback(msg.id, true)}
+                                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]"
+                                >
+                                  <ThumbsUp size={12} />
+                                  <span>Yes</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleFeedback(msg.id, false)}
+                                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]"
+                                >
+                                  <ThumbsDown size={12} />
+                                  <span>No</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* If user clicked 'Yes': Show Chat Ended with Start New Conversation button */}
+                          {msg.feedback === 'yes' && (
+                            <div className="pt-3 border-t border-[#26262b] space-y-2.5 animate-in fade-in">
+                              <p className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
+                                <CheckCircle2 size={14} className="text-emerald-400" />
+                                <span>Glad that helped! Chat ended.</span>
+                              </p>
                               <button
-                                onClick={() => handleFeedback(msg.id, true)}
-                                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
-                                  msg.feedback === 'yes'
-                                    ? 'bg-emerald-600 text-white border-emerald-500'
-                                    : 'bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]'
-                                }`}
+                                type="button"
+                                onClick={handleResetToHero}
+                                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border border-[#333] text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                               >
-                                <ThumbsUp size={12} />
-                                <span>Yes</span>
-                              </button>
-                              <button
-                                onClick={() => handleFeedback(msg.id, false)}
-                                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
-                                  msg.feedback === 'no'
-                                    ? 'bg-rose-600 text-white border-rose-500'
-                                    : 'bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]'
-                                }`}
-                              >
-                                <ThumbsDown size={12} />
-                                <span>No</span>
+                                <RotateCcw size={12} />
+                                <span>Start New Conversation</span>
                               </button>
                             </div>
-                          </div>
-
-                          {msg.feedback === 'yes' && (
-                            <p className="text-xs text-emerald-400 flex items-center gap-1 pt-1">
-                              <CheckCircle2 size={13} />
-                              Glad that helped! Happy producing!
-                            </p>
                           )}
                         </>
                       )}
 
-                      {/* Inline Ticket Escalation Form (If answer didn't help or requested) */}
-                      {msg.needsTicket && (
-                        <div className="mt-3 p-4 rounded-xl bg-[#140e0b] border border-[#3b2318] space-y-3 animate-in fade-in">
+                      {/* Inline Ticket Escalation Form (Pure Solid Dark, Zero Glassmorphism) */}
+                      {msg.needsTicket && !msg.ticketNumber && (
+                        <div className="mt-4 pt-4 border-t border-[#26262b] space-y-3.5 animate-in fade-in">
                           {!user ? (
                             <div className="space-y-3">
                               <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-[#FC6301]/20 flex items-center justify-center shrink-0 text-[#FC6301] mt-0.5">
+                                <div className="w-8 h-8 rounded-lg bg-[#202025] border border-white/5 flex items-center justify-center shrink-0 text-[#FC6301] mt-0.5">
                                   <Lock size={15} />
                                 </div>
                                 <div className="space-y-1">
-                                  <p className="text-xs font-semibold text-white">
+                                  <p className="text-xs sm:text-[13px] font-semibold text-white">
                                     Sign In Required for Ticket Tracking
                                   </p>
                                   <p className="text-xs text-zinc-400 leading-relaxed">
-                                    Please sign in to your Producer Toy account to submit this ticket to our senior audio engineering desk. This allows our team to connect your licenses and enables 1-click tracking from your dashboard.
+                                    Please sign in to your Producer Toy account to submit this ticket directly to our senior audio engineering desk. This allows our team to connect your licenses and enables 1-click tracking.
                                   </p>
                                 </div>
                               </div>
@@ -1460,7 +1827,7 @@ export function EpicSupportAssistant({
                               <div className="flex items-center gap-3 pt-1">
                                 <Link
                                   href={`/auth?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/support')}`}
-                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
                                 >
                                   <LogIn size={13} />
                                   <span>Sign In to Submit & Track</span>
@@ -1469,11 +1836,11 @@ export function EpicSupportAssistant({
                             </div>
                           ) : (
                             <>
-                              <div className="flex items-center justify-between">
-                                <p className="text-xs text-zinc-200 font-medium">
+                              <div className="flex items-center justify-between flex-wrap gap-2">
+                                <p className="text-xs sm:text-[13px] text-zinc-200 font-medium">
                                   Submit this request directly to our senior audio engineering desk:
                                 </p>
-                                <span className="text-[10px] text-zinc-400 bg-[#221812] px-2 py-0.5 rounded border border-[#332218]">
+                                <span className="text-[11px] text-zinc-400 bg-[#202025] px-2.5 py-0.5 rounded-md border border-white/5 font-mono">
                                   {user.email}
                                 </span>
                               </div>
@@ -1482,13 +1849,13 @@ export function EpicSupportAssistant({
                                 <p className="text-xs text-rose-400">{ticketError}</p>
                               )}
 
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <input
                                   type="text"
                                   value={ticketName}
                                   onChange={(e) => setTicketName(e.target.value)}
                                   placeholder="Your Name (Optional)"
-                                  className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
+                                  className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
                                 />
                                 <input
                                   type="email"
@@ -1496,15 +1863,16 @@ export function EpicSupportAssistant({
                                   value={ticketEmail}
                                   onChange={(e) => setTicketEmail(e.target.value)}
                                   placeholder="Your Email *"
-                                  className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
+                                  className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
                                 />
                               </div>
 
                               <div className="flex justify-end pt-1">
                                 <button
+                                  type="button"
                                   onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
                                   disabled={isSubmittingTicket}
-                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
                                 >
                                   {isSubmittingTicket ? (
                                     <>
@@ -1524,24 +1892,26 @@ export function EpicSupportAssistant({
                         </div>
                       )}
 
-                      {/* Ticket Confirmation (Solid Opaque, Zero Glassmorphism) */}
+                      {/* Generic Confirmation Acknowledgement (Zero Glassmorphism, Clean Native Text) */}
                       {msg.ticketNumber && (
-                        <div className="p-4 rounded-xl bg-[#142019] border border-[#22442e] space-y-2.5 text-xs text-emerald-300 shadow-lg animate-in fade-in">
-                          <p className="font-semibold flex items-center gap-1.5 text-emerald-400">
-                            <CheckCircle2 size={14} />
-                            Ticket #{msg.ticketNumber} created!
+                        <div className="pt-3.5 border-t border-[#26262b] space-y-2.5 animate-in fade-in">
+                          <p className="font-semibold text-white text-sm sm:text-[14.5px] flex items-center gap-2">
+                            <CheckCircle2 size={16} className="text-[#00d66c] shrink-0" />
+                            <span>We have received your request!</span>
                           </p>
-                          <p className="text-zinc-300 leading-relaxed">
-                            Our senior audio engineers have received your inquiry at <span className="text-white font-medium">support@producertoy.com</span>. A confirmation was sent to <span className="text-white font-medium">{ticketEmail}</span>.
+                          <p className="text-zinc-300 text-xs sm:text-[13.5px] leading-relaxed">
+                            Our team has received your message and will review it shortly. We will get back to you directly via email.
                           </p>
-                          <div className="pt-1">
-                            <Link
-                              href="/account"
-                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#1b3324] hover:bg-[#23422e] border border-[#2d583b] text-emerald-200 hover:text-white font-medium text-xs transition-colors"
+                          <div className="pt-1 flex items-center gap-3">
+                            <span className="text-xs text-zinc-500 font-medium">Chat ended.</span>
+                            <button
+                              type="button"
+                              onClick={handleResetToHero}
+                              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border border-[#333] text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
                             >
-                              <span>Track in Account Dashboard</span>
-                              <ExternalLink size={12} />
-                            </Link>
+                              <RotateCcw size={12} />
+                              <span>Start New Conversation</span>
+                            </button>
                           </div>
                         </div>
                       )}
@@ -1551,7 +1921,7 @@ export function EpicSupportAssistant({
 
                 </div>
               )
-            })}
+            })})()}
 
             <div ref={messagesEndRef} />
 
