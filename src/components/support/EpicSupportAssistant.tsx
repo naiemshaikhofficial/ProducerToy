@@ -577,49 +577,208 @@ export function EpicSupportAssistant({
       {!isChatStarted ? (
         <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#070503] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background: Exact Epic Games angled geometry in rich orange shade */}
-          <div className="absolute inset-0 bg-[#070503] pointer-events-none -z-10" />
+          {/* Ambient Glowing Background: Exact Epic Games 3D angled geometry & elements in rich orange shade */}
+          {/* Deep Volumetric Atmospheric Orange Glow & Light Cones */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_12%_15%,_rgba(252,99,1,0.40)_0%,_rgba(255,115,25,0.22)_32%,_rgba(245,158,11,0.08)_60%,_transparent_80%)] pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_90%_25%,_rgba(252,99,1,0.20)_0%,_rgba(245,158,11,0.06)_40%,_transparent_70%)] pointer-events-none z-0" />
+
+          {/* Large Angled Volumetric Light Shaft slicing from top-left across screen */}
+          <div className="absolute -top-36 -left-32 w-[900px] h-[650px] -rotate-[38deg] bg-gradient-to-r from-[#FC6301]/40 via-amber-500/22 to-transparent blur-3xl pointer-events-none z-0" />
+          <div className="absolute top-1/4 right-[2%] w-[260px] h-[600px] bg-gradient-to-b from-[#FC6301]/25 via-amber-600/12 to-transparent blur-3xl rounded-full pointer-events-none z-0" />
           
-          {/* 1. Large Angled Studio Light Rig / Beams on Left (Matching Epic Games Trusses) */}
-          <div className="absolute -top-24 -left-28 w-[720px] h-[480px] -rotate-45 bg-gradient-to-r from-[#FC6301]/35 via-amber-500/20 to-transparent blur-3xl pointer-events-none -z-10" />
-          
-          {/* Angled 3D Truss & Light Vector Lines */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30 -z-10 overflow-hidden">
+          {/* Rich 3D Perspective Trusses, Architectural Frames & Hexagonal Bokeh Elements */}
+          <svg
+            className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden"
+            viewBox="0 0 1440 900"
+            preserveAspectRatio="xMidYMid slice"
+          >
             <defs>
-              <linearGradient id="ptEpicBeamOrange" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.8" />
-                <stop offset="40%" stopColor="#ff7824" stopOpacity="0.4" />
-                <stop offset="85%" stopColor="#f59e0b" stopOpacity="0.1" />
+              {/* Linear Gradients for Structural Neon Lines */}
+              <linearGradient id="ptNeonOrangeStrong" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffb366" stopOpacity="1" />
+                <stop offset="45%" stopColor="#FC6301" stopOpacity="0.95" />
+                <stop offset="85%" stopColor="#ff7a1a" stopOpacity="0.6" />
+                <stop offset="100%" stopColor="#FC6301" stopOpacity="0.15" />
+              </linearGradient>
+
+              <linearGradient id="ptNeonOrangeMuted" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ff9a42" stopOpacity="0.8" />
+                <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.5" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
-              <linearGradient id="ptTrussLine" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+
+              <linearGradient id="ptTrussFaceFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.15" />
+                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.06" />
+                <stop offset="100%" stopColor="#1a0c04" stopOpacity="0.5" />
               </linearGradient>
+
+              <linearGradient id="ptHexBokehGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+                <stop offset="0%" stopColor="#ffaa40" stopOpacity="0.45" />
+                <stop offset="45%" stopColor="#FC6301" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#d9480f" stopOpacity="0.08" />
+              </linearGradient>
+
+              {/* Glow & Blur Filters for Realistic Camera Depth of Field */}
+              <filter id="ptSoftBokehBlur" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="8" />
+              </filter>
+              <filter id="ptHeavyBokehBlur" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="18" />
+              </filter>
+              <filter id="ptNeonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
-            {/* Strong angled perspective light beams */}
-            <path d="M -120 120 L 520 620" stroke="url(#ptEpicBeamOrange)" strokeWidth="3" fill="none" />
-            <path d="M -60 40 L 680 640" stroke="url(#ptEpicBeamOrange)" strokeWidth="1.5" strokeDasharray="8 10" fill="none" />
-            <path d="M 40 -80 L 820 540" stroke="url(#ptEpicBeamOrange)" strokeWidth="1" fill="none" />
-            {/* Geometric angled trusses like Epic Games 3D background */}
-            <path d="M 80 80 L 260 220 L 180 340 L 40 200 Z" stroke="url(#ptTrussLine)" strokeWidth="1.5" fill="none" opacity="0.6" />
-            <path d="M 260 220 L 440 360 L 360 480 L 180 340 Z" stroke="url(#ptTrussLine)" strokeWidth="1" strokeDasharray="4 6" fill="none" opacity="0.4" />
-            {/* Right side subtle diagonal beam */}
-            <path d="M 900 -50 L 1700 580" stroke="url(#ptEpicBeamOrange)" strokeWidth="1.5" fill="none" opacity="0.5" />
+
+            {/* --- STAGE RIGGING / TRUSS 1: Main Left 3D Perspective Scaffolding --- */}
+            {/* 3D Tilted Top Extrusion Face */}
+            <polygon
+              points="40,150 140,60 440,140 350,230"
+              fill="url(#ptTrussFaceFill)"
+              stroke="url(#ptNeonOrangeStrong)"
+              strokeWidth="2.2"
+              filter="url(#ptNeonGlow)"
+              opacity="0.95"
+            />
+            {/* Top face cross-brace */}
+            <line x1="40" y1="150" x2="440" y2="140" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="6 6" opacity="0.75" />
+
+            {/* 3D Tilted Front Face Panel */}
+            <polygon
+              points="40,150 350,230 270,680 -20,570"
+              fill="url(#ptTrussFaceFill)"
+              stroke="url(#ptNeonOrangeStrong)"
+              strokeWidth="2.5"
+              filter="url(#ptNeonGlow)"
+              opacity="1"
+            />
+
+            {/* Front Face Modular Section Dividers & Diagonal 'X' Bracing (Matching Stage Scaffolding) */}
+            <line x1="40" y1="150" x2="270" y2="680" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2" opacity="0.8" />
+            <line x1="350" y1="230" x2="-20" y2="570" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2" opacity="0.8" />
+            <line x1="10" y1="360" x2="310" y2="455" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2.2" opacity="0.9" />
+            <line x1="10" y1="360" x2="350" y2="230" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.5" strokeDasharray="6 8" opacity="0.7" />
+            <line x1="10" y1="360" x2="270" y2="680" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.5" strokeDasharray="6 8" opacity="0.7" />
+
+            {/* 3D Perspective Right Edge Depth Plane */}
+            <polygon
+              points="350,230 440,140 370,590 270,680"
+              fill="url(#ptTrussFaceFill)"
+              stroke="url(#ptNeonOrangeStrong)"
+              strokeWidth="2"
+              opacity="0.85"
+            />
+            <line x1="350" y1="230" x2="370" y2="590" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="5 7" opacity="0.65" />
+
+            {/* Junction Nodes / Truss Joint Rivets */}
+            <circle cx="40" cy="150" r="4" fill="#ffca80" filter="url(#ptNeonGlow)" />
+            <circle cx="350" cy="230" r="5" fill="#ffca80" filter="url(#ptNeonGlow)" />
+            <circle cx="270" cy="680" r="4.5" fill="#FC6301" />
+            <circle cx="-20" cy="570" r="4" fill="#FC6301" />
+            <circle cx="140" cy="60" r="3.5" fill="#ffca80" />
+            <circle cx="440" cy="140" r="4" fill="#ffca80" filter="url(#ptNeonGlow)" />
+            <circle cx="10" cy="360" r="4" fill="#ffca80" />
+            <circle cx="310" cy="455" r="4" fill="#ffca80" />
+
+            {/* --- SECONDARY BACKGROUND TRUSS (Deeper in 3D Space) --- */}
+            <polygon
+              points="-80,280 160,350 110,750 -120,650"
+              fill="none"
+              stroke="url(#ptNeonOrangeMuted)"
+              strokeWidth="1.8"
+              strokeDasharray="5 6"
+              opacity="0.5"
+            />
+            <line x1="-80" y1="280" x2="110" y2="750" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="4 6" opacity="0.4" />
+
+            {/* Long Overhead Stage Rigging Rail (Spanning Across Top Left to Center) */}
+            <line x1="-100" y1="50" x2="620" y2="560" stroke="url(#ptNeonOrangeStrong)" strokeWidth="3" filter="url(#ptNeonGlow)" opacity="0.9" />
+            <line x1="-60" y1="10" x2="660" y2="520" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.8" strokeDasharray="8 10" opacity="0.6" />
+            {/* Ladder Rungs connecting the two rails */}
+            <line x1="30" y1="155" x2="70" y2="115" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
+            <line x1="170" y1="265" x2="210" y2="225" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
+            <line x1="310" y1="375" x2="350" y2="335" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
+            <line x1="450" y1="485" x2="490" y2="445" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
+
+            {/* --- RIGHT SIDE BALANCED ARCHITECTURAL PERSPECTIVE ELEMENTS --- */}
+            <line x1="960" y1="-30" x2="1620" y2="510" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2.4" opacity="0.75" />
+            <line x1="1000" y1="-50" x2="1660" y2="490" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.5" strokeDasharray="6 8" opacity="0.5" />
+            {/* Receding geometric frame in right midground */}
+            <polygon
+              points="1160,510 1440,610 1400,820 1130,720"
+              fill="url(#ptTrussFaceFill)"
+              stroke="url(#ptNeonOrangeMuted)"
+              strokeWidth="1.6"
+              opacity="0.55"
+            />
+            <line x1="1160" y1="510" x2="1400" y2="820" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="5 7" opacity="0.4" />
+
+            {/* --- ICONIC FLOATING HEXAGONAL BOKEH ELEMENTS (Epic Games Signature) --- */}
+            {/* Hexagon 1: Large soft-blurred bokeh in mid-left field */}
+            <polygon
+              points="350,290 395,316 395,368 350,394 305,368 305,316"
+              fill="url(#ptHexBokehGrad)"
+              stroke="#ffb366"
+              strokeWidth="2.2"
+              filter="url(#ptSoftBokehBlur)"
+              opacity="0.9"
+            />
+            {/* Hexagon 1 Crisp Core */}
+            <polygon
+              points="350,298 388,320 388,364 350,386 312,364 312,320"
+              fill="none"
+              stroke="#ffaa40"
+              strokeWidth="1.5"
+              opacity="0.8"
+            />
+
+            {/* Hexagon 2: Smaller crisp floating hexagon near center */}
+            <polygon
+              points="480,410 500,422 500,444 480,456 460,444 460,422"
+              fill="url(#ptHexBokehGrad)"
+              stroke="#ffca80"
+              strokeWidth="2"
+              filter="url(#ptNeonGlow)"
+              opacity="0.95"
+            />
+
+            {/* Hexagon 3: Subtle floating hexagon on right side */}
+            <polygon
+              points="1080,380 1110,397 1110,431 1080,448 1050,431 1050,397"
+              fill="url(#ptHexBokehGrad)"
+              stroke="#ffaa40"
+              strokeWidth="1.5"
+              filter="url(#ptSoftBokehBlur)"
+              opacity="0.65"
+            />
+
+            {/* Hexagon 4: Heavy foreground blurred orb near bottom-left */}
+            <polygon
+              points="170,580 215,606 215,658 170,684 125,658 125,606"
+              fill="url(#ptHexBokehGrad)"
+              stroke="#FC6301"
+              strokeWidth="2.5"
+              filter="url(#ptHeavyBokehBlur)"
+              opacity="0.75"
+            />
           </svg>
 
-          {/* 2. Floating Bokeh / Glowing Dust Particles (Exact Match with Epic Games) */}
-          <div className="absolute top-1/4 left-[22%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-70 pointer-events-none -z-10 animate-pulse" />
-          <div className="absolute top-1/3 left-[28%] w-1.5 h-1.5 rounded-full bg-amber-400 opacity-80 pointer-events-none -z-10" />
-          <div className="absolute bottom-1/3 left-[18%] w-4 h-4 rounded-full bg-[#ff7824] blur-[2px] opacity-60 pointer-events-none -z-10" />
-          <div className="absolute top-1/5 right-[24%] w-2 h-2 rounded-full bg-amber-400 opacity-60 pointer-events-none -z-10" />
-          <div className="absolute bottom-1/4 right-[20%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-70 pointer-events-none -z-10 animate-pulse" />
+          {/* Floating Glowing Bokeh Dust Particles (Subtle Animation) */}
+          <div className="absolute top-1/4 left-[24%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
+          <div className="absolute top-[32%] left-[28%] w-1.5 h-1.5 rounded-full bg-amber-400 opacity-95 pointer-events-none z-0 shadow-[0_0_10px_#f59e0b]" />
+          <div className="absolute bottom-1/3 left-[17%] w-4 h-4 rounded-full bg-[#ff7824] blur-[2px] opacity-75 pointer-events-none z-0" />
+          <div className="absolute top-[22%] right-[23%] w-2 h-2 rounded-full bg-amber-400 opacity-75 pointer-events-none z-0 shadow-[0_0_8px_#f59e0b]" />
+          <div className="absolute bottom-1/4 right-[21%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
+          <div className="absolute top-[48%] left-[14%] w-2 h-2 rounded-full bg-amber-300 opacity-85 pointer-events-none z-0 shadow-[0_0_6px_#fcd34d]" />
+          <div className="absolute top-[60%] right-[32%] w-1.5 h-1.5 rounded-full bg-[#ff9a42] opacity-75 pointer-events-none z-0" />
 
-          {/* 3. Warm Ambient Beam on Right */}
-          <div className="absolute top-1/4 right-[5%] w-[180px] h-[520px] bg-gradient-to-b from-[#FC6301]/20 via-amber-600/10 to-transparent blur-3xl rounded-full pointer-events-none -z-10" />
-
-          {/* 4. Center ambient warm aura behind heading */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(252,99,1,0.14),_transparent_70%)] blur-3xl pointer-events-none -z-10" />
+          {/* Center ambient warm aura behind heading */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(252,99,1,0.18),_transparent_70%)] blur-3xl pointer-events-none z-0" />
 
           {/* Server Status: Exact Epic Games style with green dot & checkmark */}
           <div className="absolute top-5 right-6 sm:top-6 sm:right-10 z-20">
