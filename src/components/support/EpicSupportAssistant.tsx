@@ -268,8 +268,8 @@ export function EpicSupportAssistant({
     if (e) e.preventDefault()
     const query = heroInput.trim()
 
-    // Validation: Require descriptive query (e.g. not short like "sd")
-    if (!query || query.length < 4 || query.split(/\s+/).length < 2) {
+    // Validation: Require descriptive query (at least 3 chars)
+    if (!query || query.length < 3) {
       setInputError('Describe the problem in more detail.')
       return
     }
@@ -826,9 +826,13 @@ export function EpicSupportAssistant({
 
                 <button
                   type="submit"
-                  disabled={isHeroLoading}
+                  disabled={isHeroLoading || heroInput.trim().length < 3}
                   aria-label="Submit problem"
-                  className="w-11 h-11 rounded-full bg-[#FC6301] hover:bg-[#ff751a] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#FC6301]/30 active:scale-95"
+                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                    heroInput.trim().length >= 3
+                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer active:scale-95'
+                      : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
+                  }`}
                 >
                   {isHeroLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin text-white" />
