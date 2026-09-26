@@ -37,12 +37,204 @@ interface ChatMessage {
   content?: string
   article?: KnowledgeArticle
   recommendedProducts?: RecommendedProduct[]
+  userQuery?: string
   isSourcesOpen?: boolean
   feedback?: 'yes' | 'no'
   needsTicket?: boolean
   ticketNumber?: string
   isThinking?: boolean
   isGreeting?: boolean
+}
+
+interface AnswerSourceItem {
+  title: string
+  label: string
+  href: string
+}
+
+function getAnswerSources(msg: ChatMessage): AnswerSourceItem[] {
+  const sources: AnswerSourceItem[] = []
+  const textCombined = `${msg.userQuery || ''} ${msg.content || ''}`.toLowerCase()
+
+  // 1. If message specifically recommended products (e.g. Tabla Master's, Sexy Drill)
+  if (msg.recommendedProducts && msg.recommendedProducts.length > 0) {
+    for (const prod of msg.recommendedProducts) {
+      sources.push({
+        title: `Producer Toy Catalog • ${prod.name}`,
+        label: `View ${prod.name}`,
+        href: `/p/${prod.slug}`,
+      })
+    }
+  }
+
+  // 2. If message matched a local knowledge article
+  if (msg.article) {
+    if (msg.article.actionCta) {
+      sources.push({
+        title: `Producer Toy Knowledge Base • ${msg.article.categoryLabel}`,
+        label: msg.article.actionCta.label,
+        href: msg.article.actionCta.href,
+      })
+    } else {
+      switch (msg.article.category) {
+        case 'downloads':
+        case 'serial_keys':
+          sources.push({
+            title: 'Producer Toy Official Cloud CDN • My Library',
+            label: 'Go to Library',
+            href: '/library',
+          })
+          break
+        case 'free_and_licensing':
+          sources.push({
+            title: 'Producer Toy Official Licensing & Free Audio Tier',
+            label: 'Browse Free VSTs',
+            href: '/free-vst-plugins',
+          })
+          break
+        case 'billing_invoices':
+          sources.push({
+            title: 'Producer Toy Orders, Invoices & Tax Desk',
+            label: 'View Invoices',
+            href: '/account?tab=transactions',
+          })
+          break
+        case 'refunds':
+          sources.push({
+            title: 'Producer Toy Customer Guarantee & Refund Terms',
+            label: 'Refund Policy',
+            href: '/refund-policy',
+          })
+          break
+        case 'account':
+          sources.push({
+            title: 'Producer Toy Account & Security Portal',
+            label: 'Account Settings',
+            href: '/account',
+          })
+          break
+        default:
+          sources.push({
+            title: `Producer Toy Knowledge Base • ${msg.article.categoryLabel}`,
+            label: 'Support Desk',
+            href: '/support',
+          })
+          break
+      }
+    }
+  }
+
+  // 3. Extract markdown links from msg.content
+  if (msg.content) {
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+    let match: RegExpExecArray | null
+    while ((match = linkRegex.exec(msg.content)) !== null) {
+      const linkText = match[1].trim()
+      const linkHref = match[2].trim()
+
+      if (!sources.some((s) => s.href === linkHref)) {
+        let title = 'Producer Toy Official Knowledge Base'
+        let label = linkText
+
+        if (linkHref.startsWith('/p/')) {
+          title = `Producer Toy Catalog • ${linkText}`
+          label = `View ${linkText}`
+        } else if (linkHref === '/store') {
+          title = 'Producer Toy Store • Sound Catalog'
+          label = 'Browse Store'
+        } else if (linkHref === '/free-vst-plugins') {
+          title = 'Producer Toy Free Audio Tier • 100% Free Tools'
+          label = 'Browse Free VSTs'
+        } else if (linkHref.startsWith('/account')) {
+          title = 'Producer Toy Account & Transactions'
+          label = 'Account Dashboard'
+        } else if (linkHref === '/library') {
+          title = 'Producer Toy Cloud Downloads • My Library'
+          label = 'Go to Library'
+        } else if (linkHref === '/refund-policy') {
+          title = 'Producer Toy Customer Guarantee & Terms'
+          label = 'Refund Policy'
+        } else if (linkHref === '/support') {
+          title = 'Producer Toy Technical Support Desk'
+          label = 'Support Desk'
+        }
+
+        sources.push({ title, label, href: linkHref })
+      }
+    }
+  }
+
+  // 4. Keyword-based matching if no sources discovered yet
+  if (sources.length === 0) {
+    if (textCombined.includes('tabla') || textCombined.includes('indian')) {
+      sources.push({
+        title: "Producer Toy Catalog • Tabla Master's",
+        label: "View Tabla Master's",
+        href: '/p/tabla-masters',
+      })
+    } else if (textCombined.includes('drill') || textCombined.includes('808')) {
+      sources.push({
+        title: 'Producer Toy Catalog • Sexy Drill',
+        label: 'View Sexy Drill',
+        href: '/p/sexy-drill',
+      })
+    } else if (textCombined.includes('free') || textCombined.includes('vst') || textCombined.includes('plugin')) {
+      sources.push({
+        title: 'Producer Toy Free Audio Tier • Royalty-Free VSTs',
+        label: 'Browse Free VSTs',
+        href: '/free-vst-plugins',
+      })
+    } else if (textCombined.includes('sample') || textCombined.includes('pack') || textCombined.includes('loop') || textCombined.includes('sound') || textCombined.includes('store')) {
+      sources.push({
+        title: 'Producer Toy Store • Sample Packs & Audio Tools',
+        label: 'Browse Store',
+        href: '/store',
+      })
+    } else if (textCombined.includes('download') || textCombined.includes('purchase') || textCombined.includes('library') || textCombined.includes('serial')) {
+      sources.push({
+        title: 'Producer Toy Cloud Downloads • User Library',
+        label: 'Go to Library',
+        href: '/library',
+      })
+    } else if (textCombined.includes('invoice') || textCombined.includes('receipt') || textCombined.includes('billing') || textCombined.includes('transaction')) {
+      sources.push({
+        title: 'Producer Toy Orders & Tax Receipts',
+        label: 'View Invoices',
+        href: '/account?tab=transactions',
+      })
+    } else if (textCombined.includes('refund') || textCombined.includes('money back')) {
+      sources.push({
+        title: 'Producer Toy Customer Guarantee & Refund Terms',
+        label: 'Refund Policy',
+        href: '/refund-policy',
+      })
+    } else if (textCombined.includes('fl studio') || textCombined.includes('ableton') || textCombined.includes('logic') || textCombined.includes('daw') || textCombined.includes('install')) {
+      sources.push({
+        title: 'Producer Toy Technical Audio & DAW Integration Guide',
+        label: 'Support Desk',
+        href: '/support',
+      })
+    }
+  }
+
+  // 5. Final fallback
+  if (sources.length === 0) {
+    sources.push({
+      title: 'Producer Toy Official Knowledge Base • Technical Support Desk',
+      label: 'Support Desk',
+      href: '/support',
+    })
+  }
+
+  // Deduplicate by href
+  const uniqueMap = new Map<string, AnswerSourceItem>()
+  for (const s of sources) {
+    if (!uniqueMap.has(s.href)) {
+      uniqueMap.set(s.href, s)
+    }
+  }
+
+  return Array.from(uniqueMap.values()).slice(0, 2)
 }
 
 interface EpicSupportAssistantProps {
@@ -365,6 +557,7 @@ export function EpicSupportAssistant({
                     timestamp: formatCurrentTime(),
                     content: groqRes.answer,
                     recommendedProducts: groqRes.recommendedProducts,
+                    userQuery: query,
                     isThinking: false,
                     isSourcesOpen: false,
                   }
@@ -382,6 +575,7 @@ export function EpicSupportAssistant({
                     sender: 'assistant',
                     timestamp: formatCurrentTime(),
                     article: localMatch || undefined,
+                    userQuery: query,
                     content: localMatch ? undefined : `I couldn't find an exact solution for "${query}". Would you like to connect with our audio engineers?`,
                     needsTicket: !localMatch,
                     isThinking: false,
@@ -400,6 +594,7 @@ export function EpicSupportAssistant({
                   sender: 'assistant',
                   timestamp: formatCurrentTime(),
                   article: localMatch || undefined,
+                  userQuery: query,
                   needsTicket: !localMatch,
                   isThinking: false,
                 }
@@ -462,6 +657,7 @@ export function EpicSupportAssistant({
                   timestamp: formatCurrentTime(),
                   content: groqRes.answer,
                   recommendedProducts: groqRes.recommendedProducts,
+                  userQuery: text,
                   isThinking: false,
                   isSourcesOpen: false,
                 }
@@ -478,6 +674,7 @@ export function EpicSupportAssistant({
                   sender: 'assistant',
                   timestamp: formatCurrentTime(),
                   article: localMatch || undefined,
+                  userQuery: text,
                   content: localMatch ? undefined : `I couldn't find an automated solution for "${text}". Would you like to raise a support ticket?`,
                   needsTicket: !localMatch,
                   isThinking: false,
@@ -497,6 +694,7 @@ export function EpicSupportAssistant({
                 sender: 'assistant',
                 timestamp: formatCurrentTime(),
                 article: localMatch || undefined,
+                userQuery: text,
                 needsTicket: !localMatch,
                 isThinking: false,
               }
@@ -1122,17 +1320,19 @@ export function EpicSupportAssistant({
                             </button>
 
                             {msg.isSourcesOpen && (
-                              <div className="mt-2 p-3 rounded-xl bg-[#140e0b] border border-[#2b1b13] space-y-2 text-xs animate-in fade-in">
-                                <div className="flex items-center justify-between text-zinc-300">
-                                  <span>Producer Toy Official Knowledge Base &bull; Technical Support Desk</span>
-                                  <Link
-                                    href="/library"
-                                    className="inline-flex items-center gap-1 text-[#FC6301] hover:underline"
-                                  >
-                                    <span>Go to Library</span>
-                                    <ExternalLink size={11} />
-                                  </Link>
-                                </div>
+                              <div className="mt-2 p-3 rounded-xl bg-[#18181c] border border-[#2b2b32] space-y-2.5 text-xs animate-in fade-in">
+                                {getAnswerSources(msg).map((source, sIdx) => (
+                                  <div key={sIdx} className="flex items-center justify-between text-zinc-300 gap-3">
+                                    <span className="truncate text-zinc-300 font-normal">{source.title}</span>
+                                    <Link
+                                      href={source.href}
+                                      className="inline-flex items-center gap-1 text-[#FC6301] hover:underline font-medium shrink-0"
+                                    >
+                                      <span>{source.label}</span>
+                                      <ExternalLink size={11} />
+                                    </Link>
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>
