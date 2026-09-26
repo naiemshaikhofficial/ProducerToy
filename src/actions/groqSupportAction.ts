@@ -2,15 +2,27 @@
 
 import { getAdminClient } from '@/lib/supabase/admin'
 
+export interface RecommendedProduct {
+  id: string
+  name: string
+  slug: string
+  cover_image: string
+  price_usd: number
+  original_price_usd?: number | null
+  product_type: string
+  short_description?: string | null
+}
+
 interface ChatMessageInput {
   role: 'user' | 'assistant'
   content: string
 }
 
-interface GroqResponse {
+export interface GroqResponse {
   success: boolean
   answer?: string
   error?: string
+  recommendedProducts?: RecommendedProduct[]
 }
 
 export async function askGroqSupportAction(
@@ -28,15 +40,17 @@ export async function askGroqSupportAction(
 
   // 1. Fetch live store inventory from Supabase DB to give real product recommendations
   let liveInventoryList = ''
+  let allProducts: any[] = []
   try {
     const admin = getAdminClient()
     const { data: dbProducts } = await admin
       .from('products')
-      .select('name, slug, price_usd, original_price_usd, product_type, short_description')
+      .select('id, name, slug, cover_image, price_usd, original_price_usd, product_type, short_description')
       .eq('is_active', true)
       .limit(30)
 
     if (dbProducts && dbProducts.length > 0) {
+      allProducts = dbProducts
       liveInventoryList = dbProducts
         .map((p) => {
           const price = p.price_usd ? `$${p.price_usd}` : 'Free'
@@ -117,6 +131,41 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
   }
 
+  // Helper to extract recommended products from AI response and user query
+  const findMatchedProducts = (text: string): RecommendedProduct[] => {
+    const result: RecommendedProduct[] = []
+    const textLower = (text || '').toLowerCase()
+    const queryLower = (query || '').toLowerCase()
+
+    if (allProducts && allProducts.length > 0) {
+      for (const p of allProducts) {
+        const nameLower = p.name.toLowerCase()
+        const slugLower = p.slug.toLowerCase()
+        const isMatched =
+          textLower.includes(nameLower) ||
+          textLower.includes(slugLower) ||
+          queryLower.includes(nameLower) ||
+          queryLower.includes(slugLower) ||
+          (slugLower === 'tabla-masters' && (queryLower.includes('tabla') || textLower.includes('tabla'))) ||
+          (slugLower === 'sexy-drill' && (queryLower.includes('drill') || textLower.includes('drill')))
+
+        if (isMatched && !result.some((r) => r.id === p.id)) {
+          result.push({
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            cover_image: p.cover_image || '/images/products/placeholder.png',
+            price_usd: Number(p.price_usd || 0),
+            original_price_usd: p.original_price_usd ? Number(p.original_price_usd) : null,
+            product_type: p.product_type || 'sample_pack',
+            short_description: p.short_description || null,
+          })
+        }
+      }
+    }
+    return result
+  }
+
   try {
     const formattedMessages = [
       { role: 'system', content: systemPrompt },
@@ -162,13 +211,24 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
 
       const fallbackData = await fallbackResponse.json()
       const rawAnswer = fallbackData.choices?.[0]?.message?.content || ''
-      return { success: true, answer: scrubBrandNames(rawAnswer) }
+      const cleanedAnswer = scrubBrandNames(rawAnswer)
+
+      return {
+        success: true,
+        answer: cleanedAnswer,
+        recommendedProducts: findMatchedProducts(cleanedAnswer),
+      }
     }
 
     const data = await response.json()
     const rawAnswer = data.choices?.[0]?.message?.content || ''
+    const cleanedAnswer = scrubBrandNames(rawAnswer)
 
-    return { success: true, answer: scrubBrandNames(rawAnswer) }
+    return {
+      success: true,
+      answer: cleanedAnswer,
+      recommendedProducts: findMatchedProducts(cleanedAnswer),
+    }
   } catch (error: any) {
     console.error('Support Action Exception:', error)
     return {

@@ -26,7 +26,7 @@ import {
   KNOWLEDGE_BASE,
   KnowledgeArticle,
 } from './supportKnowledgeData'
-import { askGroqSupportAction } from '@/actions/groqSupportAction'
+import { askGroqSupportAction, RecommendedProduct } from '@/actions/groqSupportAction'
 import { createSupportTicketAction } from '@/actions/supportActions'
 import { useAuth } from '@/context/AuthContext'
 
@@ -36,6 +36,7 @@ interface ChatMessage {
   timestamp: string
   content?: string
   article?: KnowledgeArticle
+  recommendedProducts?: RecommendedProduct[]
   isSourcesOpen?: boolean
   feedback?: 'yes' | 'no'
   needsTicket?: boolean
@@ -326,6 +327,7 @@ export function EpicSupportAssistant({
                     sender: 'assistant',
                     timestamp: formatCurrentTime(),
                     content: groqRes.answer,
+                    recommendedProducts: groqRes.recommendedProducts,
                     isThinking: false,
                     isSourcesOpen: false,
                   }
@@ -422,6 +424,7 @@ export function EpicSupportAssistant({
                   sender: 'assistant',
                   timestamp: formatCurrentTime(),
                   content: groqRes.answer,
+                  recommendedProducts: groqRes.recommendedProducts,
                   isThinking: false,
                   isSourcesOpen: false,
                 }
@@ -796,6 +799,80 @@ export function EpicSupportAssistant({
                       {msg.content && (
                         <div className="text-[#d1d1d6] leading-relaxed space-y-2">
                           {renderFormattedAnswer(msg.content)}
+                        </div>
+                      )}
+
+                      {/* Product Overview Poster Cards (Rendered with high-res poster, details, and direct button) */}
+                      {msg.recommendedProducts && msg.recommendedProducts.length > 0 && (
+                        <div className="pt-2 pb-1 space-y-3">
+                          {msg.recommendedProducts.map((prod) => (
+                            <div
+                              key={prod.id}
+                              className="rounded-2xl bg-[#130f0c] border border-white/10 hover:border-[#FC6301]/50 p-4 transition-all duration-200 shadow-xl group"
+                            >
+                              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                                {/* Poster Image with Zoom on hover */}
+                                <Link
+                                  href={`/p/${prod.slug}`}
+                                  className="w-full sm:w-32 h-36 sm:h-32 rounded-xl overflow-hidden shrink-0 relative bg-black/50 border border-white/10 shadow-md group-hover:border-[#FC6301]/40 transition-colors block"
+                                >
+                                  <Image
+                                    src={prod.cover_image}
+                                    alt={prod.name}
+                                    fill
+                                    sizes="(max-width: 640px) 100vw, 128px"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                </Link>
+
+                                {/* Product Details & Overview */}
+                                <div className="flex-1 space-y-2 text-left w-full">
+                                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FC6301]/15 text-[#FC6301] border border-[#FC6301]/30">
+                                      {prod.product_type === 'sample_pack' ? 'Sample Pack' : 'Audio Plugin'} &bull; Royalty-Free
+                                    </span>
+                                    <div className="flex items-baseline gap-1.5">
+                                      {prod.original_price_usd && (
+                                        <span className="text-xs text-zinc-500 line-through">
+                                          ${prod.original_price_usd}
+                                        </span>
+                                      )}
+                                      <span className="text-base font-extrabold text-white">
+                                        ${prod.price_usd}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <Link href={`/p/${prod.slug}`}>
+                                    <h4 className="text-base sm:text-lg font-bold text-white group-hover:text-[#FC6301] transition-colors flex items-center gap-1.5">
+                                      <span>{prod.name}</span>
+                                      <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-[#FC6301]" />
+                                    </h4>
+                                  </Link>
+
+                                  <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed">
+                                    {prod.short_description ||
+                                      'High-fidelity, professionally recorded sounds crafted specifically for music producers and beatmakers.'}
+                                  </p>
+
+                                  <div className="pt-2 flex items-center justify-between gap-3 flex-wrap">
+                                    <span className="text-[11px] text-zinc-400 font-medium flex items-center gap-1">
+                                      <CheckCircle2 size={13} className="text-emerald-400" />
+                                      <span>Instant Download in Your Library</span>
+                                    </span>
+
+                                    <Link
+                                      href={`/p/${prod.slug}`}
+                                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-xs shadow-md transition-all shrink-0 active:scale-95"
+                                    >
+                                      <span>View Product</span>
+                                      <ArrowRight size={13} strokeWidth={2.5} />
+                                    </Link>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
 
