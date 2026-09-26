@@ -872,141 +872,121 @@ export function EpicSupportAssistant({
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
-              {/* Hexagonal Camera Aperture Radial Gradients */}
-              <radialGradient id="epicHexBokeh1" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#ffe4c4" stopOpacity="0.5" />
-                <stop offset="40%" stopColor="#ffaa40" stopOpacity="0.3" />
-                <stop offset="85%" stopColor="#FC6301" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#FC6301" stopOpacity="0.02" />
-              </radialGradient>
+              {/* Music Notation Gradient */}
+              <linearGradient id="musicNoteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffe4c4" stopOpacity="0.9" />
+                <stop offset="40%" stopColor="#ffaa40" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#FC6301" stopOpacity="0.4" />
+              </linearGradient>
 
-              <radialGradient id="epicHexBokeh2" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#ffca80" stopOpacity="0.4" />
-                <stop offset="60%" stopColor="#FC6301" stopOpacity="0.2" />
+              {/* Music Wave Gradient */}
+              <linearGradient id="musicWaveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ffaa40" stopOpacity="0.1" />
+                <stop offset="25%" stopColor="#FC6301" stopOpacity="0.7" />
+                <stop offset="50%" stopColor="#ffc078" stopOpacity="0.9" />
+                <stop offset="75%" stopColor="#FC6301" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#d9480f" stopOpacity="0.1" />
+              </linearGradient>
+
+              {/* Circular Camera Aperture Bokeh Disc */}
+              <radialGradient id="musicBokehCircle" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#fff0db" stopOpacity="0.55" />
+                <stop offset="45%" stopColor="#ffaa40" stopOpacity="0.32" />
+                <stop offset="85%" stopColor="#FC6301" stopOpacity="0.14" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </radialGradient>
             </defs>
 
-            {/* --- 1. OUT-OF-FOCUS 3D ARCHITECTURAL STAGE SCAFFOLDING BEAMS (LEFT FIELD) --- */}
-            {/* Deep background receding structural rail (softly melted into darkness) */}
-            <line
-              x1="-80" y1="40" x2="680" y2="580"
-              stroke="url(#epicOrangeBeam)"
-              strokeWidth="4"
-              filter="url(#epicBokehHeavy)"
+            {/* --- 1. FLOWING ANALOG AUDIO WAVEFORMS (CINEMATIC SOUNDSCAPES) --- */}
+            {/* Primary Undulating Analog Audio Wave across midground */}
+            <path
+              d="M -60 380 C 140 240, 320 540, 540 360 S 840 200, 1080 430 S 1320 270, 1500 380"
+              fill="none"
+              stroke="url(#musicWaveGradient)"
+              strokeWidth="4.5"
+              filter="url(#epicBokehMedium)"
               opacity="0.85"
             />
-            <line
-              x1="-40" y1="5" x2="720" y2="540"
+
+            {/* High-Frequency Audio Ripple / Transient Wave */}
+            <path
+              d="M -40 440 Q 60 390, 160 440 T 360 440 T 560 440 T 760 440 T 960 440 T 1160 440 T 1360 440 T 1480 440"
+              fill="none"
               stroke="url(#epicMutedBeam)"
               strokeWidth="2.5"
               filter="url(#epicBokehHeavy)"
-              opacity="0.6"
+              opacity="0.5"
             />
 
-            {/* Stage Scaffolding Cross-bracing Ladder Rungs (Out of Focus) */}
-            <line x1="50" y1="140" x2="90" y2="105" stroke="url(#epicMutedBeam)" strokeWidth="2.2" filter="url(#epicBokehHeavy)" opacity="0.5" />
-            <line x1="190" y1="250" x2="230" y2="215" stroke="url(#epicMutedBeam)" strokeWidth="2.2" filter="url(#epicBokehHeavy)" opacity="0.5" />
-            <line x1="330" y1="360" x2="370" y2="325" stroke="url(#epicMutedBeam)" strokeWidth="2.2" filter="url(#epicBokehHeavy)" opacity="0.5" />
-            <line x1="470" y1="470" x2="510" y2="435" stroke="url(#epicMutedBeam)" strokeWidth="2.2" filter="url(#epicBokehHeavy)" opacity="0.5" />
-
-            {/* 3D Angled Frame Depth Panel (Blurred Foreground Depth) */}
-            <polygon
-              points="40,160 360,240 280,690 -30,580"
-              fill="url(#epicTrussFill)"
+            {/* Deep Sub-Bass Ambient Wave (lower field depth) */}
+            <path
+              d="M -80 620 C 220 480, 500 740, 820 590 S 1220 470, 1520 640"
+              fill="none"
               stroke="url(#epicOrangeBeam)"
-              strokeWidth="3"
-              filter="url(#epicBokehHeavy)"
-              opacity="0.75"
-            />
-            {/* Diagonal Truss X-Bracing */}
-            <line x1="40" y1="160" x2="280" y2="690" stroke="url(#epicOrangeBeam)" strokeWidth="2" filter="url(#epicBokehHeavy)" opacity="0.6" />
-            <line x1="360" y1="240" x2="-30" y2="580" stroke="url(#epicOrangeBeam)" strokeWidth="2" filter="url(#epicBokehHeavy)" opacity="0.6" />
-
-            {/* Right Side Subtle Atmospheric Beams */}
-            <line
-              x1="940" y1="-20" x2="1640" y2="520"
-              stroke="url(#epicOrangeBeam)"
-              strokeWidth="3"
-              filter="url(#epicBokehHeavy)"
-              opacity="0.6"
-            />
-            <line
-              x1="980" y1="-40" x2="1680" y2="500"
-              stroke="url(#epicMutedBeam)"
-              strokeWidth="2"
-              filter="url(#epicBokehHeavy)"
-              opacity="0.4"
+              strokeWidth="6"
+              filter="url(#epicBokehExtreme)"
+              opacity="0.35"
             />
 
-            {/* --- 2. SIGNATURE CAMERA APERTURE HEXAGONAL BOKEH DISCS (EXACT EPIC MATCH) --- */}
-            {/* Hexagon Bokeh 1: Iconic Large Soft Bokeh Disc in Mid-Left (Matches Epic Screenshot exactly) */}
-            <g transform="translate(360, 390)">
-              {/* Outer Blurred Aperture Halo */}
-              <polygon
-                points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30"
-                fill="url(#epicHexBokeh1)"
-                stroke="#ffaa40"
-                strokeWidth="2.5"
-                filter="url(#epicBokehMedium)"
-                opacity="0.85"
-              />
-              {/* Inner Crisp-Soft Aperture Ring */}
-              <polygon
-                points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"
-                fill="none"
-                stroke="#ffe4c4"
-                strokeWidth="1.6"
-                filter="url(#epicBokehSoft)"
-                opacity="0.7"
-              />
+            {/* --- 2. GLOWING MUSICAL NOTATION WITH CAMERA DEPTH-OF-FIELD BOKEH --- */}
+            {/* Beamed Eighth Note Pair ♫ (Mid-Left Floating Bokeh Disc) */}
+            <g transform="translate(320, 350) rotate(-14) scale(1.15)" filter="url(#epicBokehMedium)">
+              <ellipse cx="0" cy="40" rx="18" ry="12" transform="rotate(-25 0 40)" fill="url(#musicNoteGradient)" />
+              <ellipse cx="62" cy="25" rx="18" ry="12" transform="rotate(-25 62 25)" fill="url(#musicNoteGradient)" />
+              <rect x="14" y="-22" width="4.5" height="62" rx="2" fill="url(#musicNoteGradient)" />
+              <rect x="76" y="-37" width="4.5" height="62" rx="2" fill="url(#musicNoteGradient)" />
+              <polygon points="14,-22 80.5,-37 80.5,-24 14,-9" fill="url(#musicNoteGradient)" />
             </g>
 
-            {/* Hexagon Bokeh 2: Medium Soft Floating Bokeh near Center-Bottom */}
-            <g transform="translate(710, 680)">
-              <polygon
-                points="0,-45 39,-22.5 39,22.5 0,45 -39,22.5 -39,-22.5"
-                fill="url(#epicHexBokeh2)"
-                stroke="#ff9a42"
-                strokeWidth="2"
-                filter="url(#epicBokehHeavy)"
-                opacity="0.55"
-              />
+            {/* Eighth Note with Curved Flag ♪ (Top-Right Atmospheric Bokeh) */}
+            <g transform="translate(1120, 310) rotate(12) scale(1.05)" filter="url(#epicBokehMedium)">
+              <ellipse cx="0" cy="30" rx="17" ry="11.5" transform="rotate(-25 0 30)" fill="url(#musicNoteGradient)" />
+              <rect x="13" y="-32" width="4.2" height="62" rx="2" fill="url(#musicNoteGradient)" />
+              <path d="M 17 -32 C 38 -25, 45 -5, 32 16 C 41 0, 37 -19, 17 -26 Z" fill="url(#musicNoteGradient)" />
             </g>
 
-            {/* Hexagon Bokeh 3: Delicate Blurred Aperture Disc on Right Side */}
-            <g transform="translate(1080, 380)">
-              <polygon
-                points="0,-48 41.5,-24 41.5,24 0,48 -41.5,24 -41.5,-24"
-                fill="url(#epicHexBokeh1)"
-                stroke="#ffaa40"
-                strokeWidth="2"
-                filter="url(#epicBokehMedium)"
-                opacity="0.65"
-              />
+            {/* Foreground Deep-Blur Beamed Notes ♫ (Bottom-Left Depth) */}
+            <g transform="translate(140, 630) rotate(-20) scale(1.5)" filter="url(#epicBokehExtreme)" opacity="0.38">
+              <ellipse cx="0" cy="40" rx="24" ry="16" transform="rotate(-25 0 40)" fill="#FC6301" />
+              <ellipse cx="78" cy="20" rx="24" ry="16" transform="rotate(-25 78 20)" fill="#FC6301" />
+              <rect x="18" y="-32" width="6" height="72" rx="3" fill="#FC6301" />
+              <rect x="96" y="-52" width="6" height="72" rx="3" fill="#FC6301" />
+              <polygon points="18,-32 102,-52 102,-36 18,-16" fill="#FC6301" />
             </g>
 
-            {/* Hexagon Bokeh 4: Heavy Foreground Melted Bokeh Orb (Bottom Left) */}
-            <g transform="translate(150, 640)">
-              <polygon
-                points="0,-80 69,-40 69,40 0,80 -69,40 -69,-40"
-                fill="url(#epicHexBokeh2)"
-                stroke="#FC6301"
-                strokeWidth="3"
-                filter="url(#epicBokehExtreme)"
-                opacity="0.5"
-              />
+            {/* Single Quarter Note ♩ (Lower-Right) */}
+            <g transform="translate(900, 580) rotate(-10) scale(0.9)" filter="url(#epicBokehSoft)" opacity="0.55">
+              <ellipse cx="0" cy="26" rx="15" ry="10" transform="rotate(-25 0 26)" fill="url(#musicNoteGradient)" />
+              <rect x="12" y="-32" width="3.8" height="58" rx="1.8" fill="url(#musicNoteGradient)" />
             </g>
 
-            {/* --- 3. FLOATING CIRCULAR CAMERA BOKEH ORBS --- */}
-            {/* Orb 1 (Mid-left soft orb) */}
-            <circle cx="490" cy="440" r="18" fill="#ffca80" filter="url(#epicBokehHeavy)" opacity="0.6" />
-            {/* Orb 2 (Center-left soft glow) */}
-            <circle cx="280" cy="310" r="28" fill="#FC6301" filter="url(#epicBokehHeavy)" opacity="0.45" />
-            {/* Orb 3 (Right side soft orb) */}
-            <circle cx="1160" cy="460" r="22" fill="#ffaa40" filter="url(#epicBokehHeavy)" opacity="0.5" />
-            {/* Orb 4 (Center soft low orb) */}
-            <circle cx="850" cy="590" r="16" fill="#ffca80" filter="url(#epicBokehMedium)" opacity="0.4" />
+            {/* --- 3. DAW STUDIO AUDIO EQUALIZER SPECTRUM BARS (OUT-OF-FOCUS) --- */}
+            <g transform="translate(610, 230)" filter="url(#epicBokehHeavy)" opacity="0.45">
+              <rect x="0" y="45" width="9" height="55" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="18" y="22" width="9" height="78" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="36" y="8" width="9" height="92" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="54" y="32" width="9" height="68" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="72" y="14" width="9" height="86" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="90" y="38" width="9" height="62" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="108" y="55" width="9" height="45" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="126" y="34" width="9" height="66" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="144" y="18" width="9" height="82" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="162" y="48" width="9" height="52" rx="4.5" fill="url(#epicOrangeBeam)" />
+            </g>
+
+            {/* --- 4. STUDIO MONITOR ACOUSTIC SOUND RIPPLE RINGS --- */}
+            <g transform="translate(230, 470)" filter="url(#epicBokehHeavy)" opacity="0.32">
+              <circle cx="0" cy="0" r="75" fill="none" stroke="#FC6301" strokeWidth="2.5" strokeDasharray="6 8" />
+              <circle cx="0" cy="0" r="120" fill="none" stroke="#ffaa40" strokeWidth="2" strokeDasharray="10 12" />
+              <circle cx="0" cy="0" r="165" fill="none" stroke="#FC6301" strokeWidth="1.5" strokeDasharray="14 16" />
+            </g>
+
+            {/* --- 5. NATURAL CIRCULAR CAMERA APERTURE BOKEH ORBS --- */}
+            <circle cx="480" cy="430" r="42" fill="url(#musicBokehCircle)" filter="url(#epicBokehMedium)" opacity="0.8" />
+            <circle cx="280" cy="300" r="56" fill="url(#musicBokehCircle)" filter="url(#epicBokehHeavy)" opacity="0.65" />
+            <circle cx="1060" cy="390" r="48" fill="url(#musicBokehCircle)" filter="url(#epicBokehMedium)" opacity="0.75" />
+            <circle cx="740" cy="650" r="64" fill="url(#musicBokehCircle)" filter="url(#epicBokehHeavy)" opacity="0.5" />
+            <circle cx="860" cy="560" r="32" fill="url(#musicBokehCircle)" filter="url(#epicBokehSoft)" opacity="0.7" />
           </svg>
 
           {/* Floating Glowing Bokeh Dust Particles (Subtle Animation) */}
@@ -1125,42 +1105,100 @@ export function EpicSupportAssistant({
             </span>
           </div>
 
-          {/* Header Title with Self-Contained Glow strictly behind title (Never touches messages) */}
-          <div className="text-center pt-8 pb-3 relative overflow-hidden">
-            {/* Ambient Glow strictly behind the header title area */}
-            <div className="absolute inset-0 pointer-events-none -z-0 overflow-hidden">
-              <div className="absolute -top-16 -left-16 w-[500px] h-[220px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/15 to-transparent blur-3xl" />
-              <div className="absolute top-2 left-1/4 w-[340px] h-[180px] bg-[#FC6301]/10 rounded-full blur-[90px]" />
-              <div className="absolute top-2 right-1/4 w-[340px] h-[180px] bg-amber-600/10 rounded-full blur-[90px]" />
+          {/* Header Title with Seamlessly Dissolved Musical Bokeh Atmosphere */}
+          <div className="relative w-full pt-14 sm:pt-18 pb-4 text-center select-none">
+            {/* Seamless Ambient Musical Bokeh Backdrop: 100% dissolved into #080706 with ZERO cutoff line */}
+            <div 
+              className="absolute inset-x-0 top-0 h-[340px] pointer-events-none select-none overflow-hidden -z-0"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 25%, rgba(0,0,0,0.6) 65%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 25%, rgba(0,0,0,0.6) 65%, transparent 100%)'
+              }}
+            >
+              {/* Deep Atmospheric Studio Stage Glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[750px] h-[220px] bg-[radial-gradient(ellipse_75%_50%_at_50%_10%,_rgba(252,99,1,0.16)_0%,_rgba(255,123,43,0.06)_45%,_transparent_75%)] blur-3xl" />
+              <div className="absolute -top-16 -left-12 w-[500px] h-[200px] -rotate-[30deg] bg-gradient-to-r from-[#FC6301]/16 via-amber-500/08 to-transparent blur-3xl" />
+              <div className="absolute -top-16 -right-12 w-[500px] h-[200px] rotate-[30deg] bg-gradient-to-l from-[#FC6301]/14 via-amber-600/06 to-transparent blur-3xl" />
+
+              {/* Chat Header Musical Bokeh SVG (Center kept completely clean and dark for 100% text contrast) */}
+              <svg
+                className="absolute inset-0 w-full h-full"
+                viewBox="0 0 1200 340"
+                preserveAspectRatio="xMidYMin slice"
+              >
+                <defs>
+                  <filter id="chatBokehHeavy" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="16" />
+                  </filter>
+                  <filter id="chatBokehMedium" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="8" />
+                  </filter>
+                  <linearGradient id="chatNoteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#ffe4c4" stopOpacity="0.75" />
+                    <stop offset="45%" stopColor="#ffaa40" stopOpacity="0.55" />
+                    <stop offset="100%" stopColor="#FC6301" stopOpacity="0.2" />
+                  </linearGradient>
+                  <linearGradient id="chatWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="transparent" />
+                    <stop offset="20%" stopColor="#FC6301" stopOpacity="0.35" />
+                    <stop offset="50%" stopColor="#ffaa40" stopOpacity="0.45" />
+                    <stop offset="80%" stopColor="#FC6301" stopOpacity="0.35" />
+                    <stop offset="100%" stopColor="transparent" />
+                  </linearGradient>
+                </defs>
+
+                {/* Soft Glowing Audio Wave traversing far behind header */}
+                <path
+                  d="M 20 180 C 220 110, 420 240, 600 170 S 950 90, 1180 190"
+                  fill="none"
+                  stroke="url(#chatWaveGrad)"
+                  strokeWidth="3"
+                  filter="url(#chatBokehMedium)"
+                  opacity="0.45"
+                />
+
+                {/* Soft Blurred Floating Beamed Notes ♫ (Far left side) */}
+                <g transform="translate(180, 100) rotate(-14) scale(0.7)" filter="url(#chatBokehMedium)" opacity="0.45">
+                  <ellipse cx="0" cy="30" rx="14" ry="9" transform="rotate(-25 0 30)" fill="url(#chatNoteGrad)" />
+                  <ellipse cx="44" cy="20" rx="14" ry="9" transform="rotate(-25 44 20)" fill="url(#chatNoteGrad)" />
+                  <rect x="11" y="-15" width="3.5" height="45" rx="1.5" fill="url(#chatNoteGrad)" />
+                  <rect x="55" y="-25" width="3.5" height="45" rx="1.5" fill="url(#chatNoteGrad)" />
+                  <polygon points="11,-15 58.5,-25 58.5,-16 11,-6" fill="url(#chatNoteGrad)" />
+                </g>
+
+                {/* Soft Eighth Note ♪ (Far right side) */}
+                <g transform="translate(1020, 110) rotate(14) scale(0.65)" filter="url(#chatBokehMedium)" opacity="0.4">
+                  <ellipse cx="0" cy="24" rx="13" ry="8.5" transform="rotate(-25 0 24)" fill="url(#chatNoteGrad)" />
+                  <rect x="10" y="-24" width="3" height="48" rx="1.5" fill="url(#chatNoteGrad)" />
+                  <path d="M 13 -24 C 28 -19, 33 -4, 24 12 C 30 0, 27 -14, 13 -19 Z" fill="url(#chatNoteGrad)" />
+                </g>
+
+                {/* Outer Camera Aperture Bokeh Orbs (Pushed away from center) */}
+                <circle cx="280" cy="190" r="16" fill="#ffca80" filter="url(#chatBokehHeavy)" opacity="0.25" />
+                <circle cx="920" cy="180" r="18" fill="#FC6301" filter="url(#chatBokehHeavy)" opacity="0.2" />
+              </svg>
             </div>
 
-            <button
-              onClick={handleResetToHero}
-              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c] border border-white/10 relative z-10"
-            >
-              <ArrowLeft size={13} />
-              <span className="hidden sm:inline">Start over</span>
-            </button>
-
-            <div className="space-y-1 relative z-10">
-              <p className="text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase text-zinc-400 font-mono">
+            {/* Title Text Content (Crisp, High-Contrast, Zero Center Obscurity) */}
+            <div className="space-y-1.5 relative z-10 px-4">
+              <p className="text-[11px] sm:text-xs font-semibold tracking-[0.24em] uppercase text-zinc-400 font-mono">
                 Your Chat With
               </p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
                 Producer Toy Support Assistant
               </h2>
-            </div>
-
-            {/* Date Pill */}
-            <div className="pt-3 relative z-10">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e] border border-white/10 text-[11px] text-zinc-400 font-medium shadow-sm">
-                {formatCurrentDate()}
-              </span>
             </div>
           </div>
 
           {/* Main Chat Feed (100% Crystal Clear, Crisp Full Opacity on All Messages) */}
-          <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-44 flex-1">
+          <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 pt-2 pb-44 flex-1 space-y-6">
+            
+            {/* Date Pill: Positioned well below the title with generous breathing room, exactly like Epic Games */}
+            <div className="text-center pt-8 pb-4">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-[#18181c] border border-white/[0.08] text-xs text-zinc-400 font-medium select-none shadow-sm">
+                {formatCurrentDate()}
+              </span>
+            </div>
             
             {messages.map((msg) => {
               if (msg.sender === 'user') {
@@ -1219,68 +1257,71 @@ export function EpicSupportAssistant({
                         </div>
                       )}
 
-                      {/* Product Overview Poster Cards (Rendered with high-res poster, details, and direct button) */}
+                      {/* Product Overview Poster Cards (Mobile 2x2 Grid with Exact Square 1:1 Posters) */}
                       {msg.recommendedProducts && msg.recommendedProducts.length > 0 && (
-                        <div className="pt-2 pb-1 space-y-3">
+                        <div
+                          className={`pt-2 pb-1 ${
+                            msg.recommendedProducts.length === 1
+                              ? 'grid grid-cols-1 sm:grid-cols-2 max-w-sm'
+                              : 'grid grid-cols-2 gap-2 sm:gap-3.5'
+                          }`}
+                        >
                           {msg.recommendedProducts.map((prod) => (
                             <div
                               key={prod.id}
-                              className="rounded-xl bg-[#202024] border border-[#2f2f35] hover:border-[#FC6301]/60 p-4 sm:p-5 transition-all duration-200 shadow-lg group"
+                              className="rounded-xl bg-[#202024] border border-[#2f2f35] hover:border-[#FC6301]/60 p-2 sm:p-3.5 transition-all duration-200 shadow-lg group flex flex-col justify-between"
                             >
-                              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                                {/* Poster Image with Zoom on hover */}
+                              <div>
+                                {/* Exact 1:1 Square Poster Image */}
                                 <Link
                                   href={`/p/${prod.slug}`}
-                                  className="w-full sm:w-32 h-36 sm:h-32 rounded-lg overflow-hidden shrink-0 relative bg-[#151518] border border-[#303036] shadow-sm group-hover:border-[#FC6301]/50 transition-colors block"
+                                  className="aspect-square w-full rounded-lg overflow-hidden relative bg-[#151518] border border-[#303036] shadow-sm group-hover:border-[#FC6301]/50 transition-colors block mb-2 sm:mb-2.5"
                                 >
                                   <Image
                                     src={prod.cover_image}
                                     alt={prod.name}
                                     fill
-                                    sizes="(max-width: 640px) 100vw, 128px"
+                                    sizes="(max-width: 640px) 50vw, 240px"
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                                   />
                                 </Link>
 
-                                {/* Product Details & Overview (Clean Minimalist Solid Style) */}
-                                <div className="flex-1 space-y-2 text-left w-full">
-                                  {/* Title and Price Header */}
-                                  <div className="flex items-start justify-between gap-3 flex-wrap">
-                                    <Link href={`/p/${prod.slug}`}>
-                                      <h4 className="text-base sm:text-lg font-bold text-white group-hover:text-[#FC6301] transition-colors flex items-center gap-1.5">
-                                        <span>{prod.name}</span>
-                                        <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-[#FC6301]" />
-                                      </h4>
-                                    </Link>
+                                {/* Product Details: Title & Price Header */}
+                                <div className="space-y-1">
+                                  <Link href={`/p/${prod.slug}`} className="block">
+                                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#FC6301] transition-colors line-clamp-1 leading-snug">
+                                      {prod.name}
+                                    </h4>
+                                  </Link>
 
-                                    <div className="flex items-baseline gap-1.5">
-                                      {prod.original_price_usd && (
-                                        <span className="text-xs text-zinc-500 line-through">
-                                          ${prod.original_price_usd}
-                                        </span>
-                                      )}
-                                      <span className="text-base font-extrabold text-white">
-                                        ${prod.price_usd}
+                                  <div className="flex items-baseline gap-1.5 flex-wrap">
+                                    {prod.original_price_usd && (
+                                      <span className="text-[10px] sm:text-xs text-zinc-500 line-through">
+                                        ${prod.original_price_usd}
                                       </span>
-                                    </div>
+                                    )}
+                                    <span className="text-xs sm:text-sm font-extrabold text-white">
+                                      ${prod.price_usd}
+                                    </span>
                                   </div>
 
-                                  <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed">
+                                  {/* Description (2 lines clamp on mobile) */}
+                                  <p className="text-[11px] sm:text-xs text-zinc-400 line-clamp-2 leading-tight pt-0.5">
                                     {prod.short_description ||
                                       'High-fidelity, professionally recorded sounds crafted specifically for music producers and beatmakers.'}
                                   </p>
-
-                                  {/* Action button aligned to right */}
-                                  <div className="pt-2 flex justify-end">
-                                    <Link
-                                      href={`/p/${prod.slug}`}
-                                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-xs shadow-md transition-all shrink-0 active:scale-95"
-                                    >
-                                      <span>View Product</span>
-                                      <ArrowRight size={13} strokeWidth={2.5} />
-                                    </Link>
-                                  </div>
                                 </div>
+                              </div>
+
+                              {/* View Product CTA Button */}
+                              <div className="pt-2.5 sm:pt-3 mt-auto">
+                                <Link
+                                  href={`/p/${prod.slug}`}
+                                  className="w-full inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-2 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-[11px] sm:text-xs shadow-md transition-all active:scale-95 text-center"
+                                >
+                                  <span>View Product</span>
+                                  <ArrowRight size={12} strokeWidth={2.5} />
+                                </Link>
                               </div>
                             </div>
                           ))}
