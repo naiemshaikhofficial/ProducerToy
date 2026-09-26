@@ -129,6 +129,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/\bchatgpt\b/gi, 'Producer Toy Assistant')
       .replace(/^#{1,4}\s+/gm, '') // Remove ### headings
       .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
+      .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '[$1]($2)') // Strip stars around links
   }
 
   // Helper to extract recommended products from AI response and user query

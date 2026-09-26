@@ -152,11 +152,15 @@ export function EpicSupportAssistant({
     }
   }, [messages, isTyping, isChatStarted])
 
-  // Parses markdown links [Text](/url) and bold **text** into clickable React elements
+  // Parses markdown links [Text](/url) and bold **text** into clickable React elements without raw asterisks
   const renderBoldText = (text: string, keyPrefix: string): React.ReactNode => {
+    if (!text) return null
+    // If text has unmatched or stray double asterisks, clean them up safely
     const boldRegex = /\*\*([^*]+)\*\*/g
     const parts = text.split(boldRegex)
-    if (parts.length === 1) return text
+    if (parts.length === 1) {
+      return text.replace(/\*\*/g, '')
+    }
 
     return parts.map((part, pIdx) => {
       if (pIdx % 2 === 1) {
@@ -166,7 +170,7 @@ export function EpicSupportAssistant({
           </strong>
         )
       }
-      return part
+      return part.replace(/\*\*/g, '')
     })
   }
 
@@ -198,9 +202,13 @@ export function EpicSupportAssistant({
       let lastIndex = 0
       let match: RegExpExecArray | null
 
-      const lineRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+      // Matches bold links **[Text](url)** as well as standard [Text](url)
+      const lineRegex = /(?:\*\*\[([^\]]+)\]\(([^)]+)\)\*\*|\[([^\]]+)\]\(([^)]+)\))/g
       while ((match = lineRegex.exec(contentToParse)) !== null) {
-        const [fullMatch, linkText, url] = match
+        const fullMatch = match[0]
+        const linkText = match[1] || match[3]
+        const url = match[2] || match[4]
+        const isBold = fullMatch.startsWith('**')
         const matchIndex = match.index
 
         if (matchIndex > lastIndex) {
@@ -209,6 +217,12 @@ export function EpicSupportAssistant({
         }
 
         const isExternal = url.startsWith('http://') || url.startsWith('https://')
+        const linkContent = isBold ? (
+          <strong className="font-bold">{linkText}</strong>
+        ) : (
+          linkText
+        )
+
         if (isExternal) {
           elements.push(
             <a
@@ -218,7 +232,7 @@ export function EpicSupportAssistant({
               rel="noopener noreferrer"
               className="text-[#FC6301] hover:text-[#ff751a] font-semibold underline underline-offset-2 decoration-[#FC6301]/60 hover:decoration-[#ff751a] inline-flex items-center gap-0.5 transition-colors cursor-pointer"
             >
-              <span>{linkText}</span>
+              <span>{linkContent}</span>
               <ExternalLink size={12} className="inline ml-0.5" />
             </a>
           )
@@ -229,7 +243,7 @@ export function EpicSupportAssistant({
               href={url}
               className="text-[#FC6301] hover:text-[#ff751a] font-semibold underline underline-offset-2 decoration-[#FC6301]/60 hover:decoration-[#ff751a] transition-colors cursor-pointer"
             >
-              {linkText}
+              {linkContent}
             </Link>
           )
         }
@@ -809,7 +823,7 @@ export function EpicSupportAssistant({
 
           {/* Server Status: Exact Epic Games style with green dot & checkmark */}
           <div className="absolute top-5 right-6 sm:top-6 sm:right-10 z-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] bg-[#140e0a]/90 border border-white/10 text-xs text-zinc-300 shadow-xl backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] bg-[#140e0a] border border-[#2b201a] text-xs text-zinc-300 shadow-xl">
               <span className="text-zinc-400 font-normal">Server status:</span>
               <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-semibold text-xs">
                 <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center text-black">
@@ -898,9 +912,9 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
           
-          {/* Epic Games Sticky Sub-Header: Seamless extension of site header with centered title */}
+          {/* Epic Games Sticky Sub-Header: Seamless extension of site header with centered title (Solid, Zero Glassmorphism) */}
           <div
-            className={`fixed top-[60px] sm:top-[72px] lg:top-[76px] left-0 right-0 z-40 h-13 sm:h-14 bg-[#121212]/95 backdrop-blur-md border-b border-white/[0.08] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center px-4 ${
+            className={`fixed top-[60px] sm:top-[72px] lg:top-[76px] left-0 right-0 z-40 h-13 sm:h-14 bg-[#121212] border-b border-[#252525] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center px-4 ${
               isSubHeaderVisible
                 ? 'translate-y-0 opacity-100 shadow-md shadow-black/50 pointer-events-auto'
                 : '-translate-y-full opacity-0 pointer-events-none'
@@ -1011,13 +1025,13 @@ export function EpicSupportAssistant({
                           {msg.recommendedProducts.map((prod) => (
                             <div
                               key={prod.id}
-                              className="rounded-2xl bg-[#130f0c] border border-white/10 hover:border-[#FC6301]/50 p-4 transition-all duration-200 shadow-xl group"
+                              className="rounded-xl bg-[#202024] border border-[#2f2f35] hover:border-[#FC6301]/60 p-4 sm:p-5 transition-all duration-200 shadow-lg group"
                             >
                               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
                                 {/* Poster Image with Zoom on hover */}
                                 <Link
                                   href={`/p/${prod.slug}`}
-                                  className="w-full sm:w-32 h-36 sm:h-32 rounded-xl overflow-hidden shrink-0 relative bg-black/50 border border-white/10 shadow-md group-hover:border-[#FC6301]/40 transition-colors block"
+                                  className="w-full sm:w-32 h-36 sm:h-32 rounded-lg overflow-hidden shrink-0 relative bg-[#151518] border border-[#303036] shadow-sm group-hover:border-[#FC6301]/50 transition-colors block"
                                 >
                                   <Image
                                     src={prod.cover_image}
@@ -1028,12 +1042,17 @@ export function EpicSupportAssistant({
                                   />
                                 </Link>
 
-                                {/* Product Details & Overview */}
+                                {/* Product Details & Overview (Clean Minimalist Solid Style) */}
                                 <div className="flex-1 space-y-2 text-left w-full">
-                                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#FC6301]/15 text-[#FC6301] border border-[#FC6301]/30">
-                                      {prod.product_type === 'sample_pack' ? 'Sample Pack' : 'Audio Plugin'} &bull; Royalty-Free
-                                    </span>
+                                  {/* Title and Price Header */}
+                                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                                    <Link href={`/p/${prod.slug}`}>
+                                      <h4 className="text-base sm:text-lg font-bold text-white group-hover:text-[#FC6301] transition-colors flex items-center gap-1.5">
+                                        <span>{prod.name}</span>
+                                        <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-[#FC6301]" />
+                                      </h4>
+                                    </Link>
+
                                     <div className="flex items-baseline gap-1.5">
                                       {prod.original_price_usd && (
                                         <span className="text-xs text-zinc-500 line-through">
@@ -1046,27 +1065,16 @@ export function EpicSupportAssistant({
                                     </div>
                                   </div>
 
-                                  <Link href={`/p/${prod.slug}`}>
-                                    <h4 className="text-base sm:text-lg font-bold text-white group-hover:text-[#FC6301] transition-colors flex items-center gap-1.5">
-                                      <span>{prod.name}</span>
-                                      <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-[#FC6301]" />
-                                    </h4>
-                                  </Link>
-
                                   <p className="text-xs text-zinc-300 line-clamp-3 leading-relaxed">
                                     {prod.short_description ||
                                       'High-fidelity, professionally recorded sounds crafted specifically for music producers and beatmakers.'}
                                   </p>
 
-                                  <div className="pt-2 flex items-center justify-between gap-3 flex-wrap">
-                                    <span className="text-[11px] text-zinc-400 font-medium flex items-center gap-1">
-                                      <CheckCircle2 size={13} className="text-emerald-400" />
-                                      <span>Instant Download in Your Library</span>
-                                    </span>
-
+                                  {/* Action button aligned to right */}
+                                  <div className="pt-2 flex justify-end">
                                     <Link
                                       href={`/p/${prod.slug}`}
-                                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-xs shadow-md transition-all shrink-0 active:scale-95"
+                                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-xs shadow-md transition-all shrink-0 active:scale-95"
                                     >
                                       <span>View Product</span>
                                       <ArrowRight size={13} strokeWidth={2.5} />
@@ -1129,16 +1137,16 @@ export function EpicSupportAssistant({
                             )}
                           </div>
 
-                          {/* Helpful feedback toggle */}
-                          <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-zinc-400">
+                          {/* Helpful feedback toggle (Solid Buttons, Zero Glassmorphism) */}
+                          <div className="pt-3 border-t border-[#26262b] flex items-center justify-between text-xs text-zinc-400">
                             <span>Did this solve your problem?</span>
                             <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleFeedback(msg.id, true)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
+                                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
                                   msg.feedback === 'yes'
                                     ? 'bg-emerald-600 text-white border-emerald-500'
-                                    : 'bg-[#221812] text-zinc-300 hover:text-white border-[#332218]'
+                                    : 'bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]'
                                 }`}
                               >
                                 <ThumbsUp size={12} />
@@ -1146,10 +1154,10 @@ export function EpicSupportAssistant({
                               </button>
                               <button
                                 onClick={() => handleFeedback(msg.id, false)}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
+                                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer ${
                                   msg.feedback === 'no'
-                                    ? 'bg-rose-900/80 text-white border-rose-600'
-                                    : 'bg-[#221812] text-zinc-300 hover:text-white border-[#332218]'
+                                    ? 'bg-rose-600 text-white border-rose-500'
+                                    : 'bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]'
                                 }`}
                               >
                                 <ThumbsDown size={12} />
@@ -1253,20 +1261,20 @@ export function EpicSupportAssistant({
                         </div>
                       )}
 
-                      {/* Ticket Confirmation */}
+                      {/* Ticket Confirmation (Solid Opaque, Zero Glassmorphism) */}
                       {msg.ticketNumber && (
-                        <div className="p-3.5 rounded-xl bg-[#0f1f14] border border-emerald-500/40 space-y-2 text-xs text-emerald-300 animate-in fade-in">
+                        <div className="p-4 rounded-xl bg-[#142019] border border-[#22442e] space-y-2.5 text-xs text-emerald-300 shadow-lg animate-in fade-in">
                           <p className="font-semibold flex items-center gap-1.5 text-emerald-400">
                             <CheckCircle2 size={14} />
                             Ticket #{msg.ticketNumber} created!
                           </p>
-                          <p className="text-zinc-300">
+                          <p className="text-zinc-300 leading-relaxed">
                             Our senior audio engineers have received your inquiry at <span className="text-white font-medium">support@producertoy.com</span>. A confirmation was sent to <span className="text-white font-medium">{ticketEmail}</span>.
                           </p>
                           <div className="pt-1">
                             <Link
                               href="/account"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 hover:text-white font-medium text-xs transition-colors"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#1b3324] hover:bg-[#23422e] border border-[#2d583b] text-emerald-200 hover:text-white font-medium text-xs transition-colors"
                             >
                               <span>Track in Account Dashboard</span>
                               <ExternalLink size={12} />
@@ -1335,12 +1343,16 @@ export function EpicSupportAssistant({
                   className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-5 py-3.5 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
-                {/* Circle Arrow Button (Producer Toy Orange) */}
+                {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
                 <button
                   type="submit"
                   disabled={!chatInput.trim() || isTyping}
                   aria-label="Send message"
-                  className="w-11 h-11 rounded-full bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-30 disabled:hover:bg-[#FC6301] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#FC6301]/25 active:scale-95"
+                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+                    chatInput.trim().length > 0
+                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
+                      : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
+                  }`}
                 >
                   <ArrowRight size={16} strokeWidth={2.5} />
                 </button>
