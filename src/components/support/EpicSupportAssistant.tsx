@@ -119,6 +119,29 @@ export function EpicSupportAssistant({
   // Chat history for Screen 2
   const [messages, setMessages] = useState<ChatMessage[]>([])
 
+  // Sticky sub-header bar state for Screen 2 (Exact Epic Games feature)
+  const [isSubHeaderVisible, setIsSubHeaderVisible] = useState(false)
+
+  useEffect(() => {
+    if (!isChatStarted) {
+      setIsSubHeaderVisible(false)
+      return
+    }
+
+    const handleScroll = () => {
+      // Reveal sticky sub-header when user scrolls down past header (> 90px)
+      if (window.scrollY > 90) {
+        setIsSubHeaderVisible(true)
+      } else {
+        setIsSubHeaderVisible(false)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [isChatStarted])
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -561,12 +584,16 @@ export function EpicSupportAssistant({
 
   const handleResetToHero = () => {
     setIsChatStarted(false)
+    setIsSubHeaderVisible(false)
     setHeroInput('')
     setInputError('')
     setChatInput('')
     setMessages([])
     setIsTyping(false)
     setIsHeroLoading(false)
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   return (
@@ -871,6 +898,19 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
           
+          {/* Epic Games Sticky Sub-Header: Seamless extension of site header with centered title */}
+          <div
+            className={`fixed top-[60px] sm:top-[72px] lg:top-[76px] left-0 right-0 z-40 h-13 sm:h-14 bg-[#121212]/95 backdrop-blur-md border-b border-white/[0.08] transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] flex items-center justify-center px-4 ${
+              isSubHeaderVisible
+                ? 'translate-y-0 opacity-100 shadow-md shadow-black/50 pointer-events-auto'
+                : '-translate-y-full opacity-0 pointer-events-none'
+            }`}
+          >
+            <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-200 select-none font-sans">
+              Producer Toy Support Assistant
+            </span>
+          </div>
+
           {/* Header Title with Self-Contained Glow strictly behind title (Never touches messages) */}
           <div className="text-center pt-8 pb-3 relative overflow-hidden">
             {/* Ambient Glow strictly behind the header title area */}
