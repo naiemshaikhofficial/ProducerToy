@@ -13,6 +13,7 @@ import {
   Send,
   Loader2,
   MoreHorizontal,
+  MoreVertical,
   ExternalLink,
   ThumbsUp,
   ThumbsDown,
@@ -1254,34 +1255,28 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         /* SCREEN 2: CHAT ASSISTANT INTERACTION (100% Crisp, Pure Dark, No Overlays) */
         /* ========================================================================= */
-        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
+        <div className="support-page-container w-full h-[calc(100dvh-60px)] sm:h-[calc(100dvh-72px)] lg:h-[calc(100dvh-76px)] bg-[#080706] text-white font-sans flex flex-col overflow-hidden relative">
           
-          {/* Epic Games Sticky Sub-Header with Smooth Opacity Gradient Dissolve */}
-          <div
-            className={`fixed top-[60px] sm:top-[72px] lg:top-[76px] left-0 right-0 z-40 pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              isSubHeaderVisible
-                ? 'translate-y-0 opacity-100'
-                : '-translate-y-full opacity-0'
-            }`}
-          >
-            {/* Centered Title Bar on pure dark background matching page (#080706) */}
-            <div className="w-full bg-[#080706] h-12 sm:h-14 flex items-center justify-center px-4 pointer-events-auto">
+          {/* 1. Epic Games Sticky Header (Fixed at top of chat view, Zero Glassmorphism) */}
+          <div className="flex-shrink-0 w-full bg-[#080706] z-20 relative">
+            <div className="w-full h-12 sm:h-13 flex items-center justify-center px-4 border-b border-white/[0.04]">
               <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans">
                 Producer Toy Support Assistant
               </span>
             </div>
-
-            {/* Smooth Epic Games Gradient Fade (Messages fade in opacity as they scroll underneath) */}
+            {/* Top Dissolve Gradient: Messages fade smoothly into background as they scroll up */}
             <div 
-              className="w-full h-20 sm:h-28 pointer-events-none"
+              className="absolute top-full left-0 right-0 h-10 sm:h-14 pointer-events-none z-10"
               style={{
-                background: 'linear-gradient(to bottom, #080706 0%, #080706 15%, rgba(8, 7, 6, 0.85) 45%, rgba(8, 7, 6, 0.4) 75%, transparent 100%)',
+                background: 'linear-gradient(to bottom, #080706 0%, rgba(8, 7, 6, 0.85) 40%, rgba(8, 7, 6, 0.3) 75%, transparent 100%)',
               }}
             />
           </div>
 
-          {/* Header Title with Seamlessly Dissolved Musical Bokeh Atmosphere */}
-          <div className="relative w-full pt-14 sm:pt-18 pb-4 text-center select-none">
+          {/* 2. Scrollable Chat Feed Area (ONLY THIS SCROLLS!) */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden w-full relative z-0">
+            {/* Header Title with Seamlessly Dissolved Musical Bokeh Atmosphere */}
+            <div className="relative w-full pt-8 pb-2 text-center select-none">
             {/* Seamless Ambient Musical Bokeh Backdrop: 100% dissolved into #080706 with ZERO cutoff line */}
             <div 
               className="absolute inset-x-0 top-0 h-[340px] pointer-events-none select-none overflow-hidden -z-0"
@@ -1948,87 +1943,99 @@ export function EpicSupportAssistant({
             })})()}
 
             <div ref={messagesEndRef} />
+          </main>
+        </div>
 
-            {/* Writing Box or Start New Conversation Button at Bottom of Chat */}
-            <div className="pt-4 pb-12">
-              {isChatEnded || messages.some((m) => !!m.ticketNumber || m.feedback === 'yes') ? (
-                <div className="w-full animate-in fade-in zoom-in-95 duration-200">
+        {/* 3. Epic Games Sticky Bottom Search / Input Bar (Stuck permanently at bottom, Zero Glassmorphism) */}
+        <div className="flex-shrink-0 w-full bg-[#080706] z-20 relative border-t border-white/[0.04]">
+          {/* Top Subtle Gradient Fade above the input bar */}
+          <div 
+            className="absolute -top-6 left-0 right-0 h-6 pointer-events-none"
+            style={{
+              background: 'linear-gradient(to top, #080706 0%, rgba(8, 7, 6, 0.7) 50%, transparent 100%)',
+            }}
+          />
+
+          {/* Solid Bottom Bar Container (100% Solid #080706, No Glassmorphism) */}
+          <div className="w-full max-w-5xl mx-auto px-4 sm:px-8 lg:px-10 pb-5 sm:pb-6 pt-3">
+            {isChatEnded || messages.some((m) => !!m.ticketNumber || m.feedback === 'yes') ? (
+              <div className="w-full animate-in fade-in zoom-in-95 duration-200">
+                <button
+                  type="button"
+                  onClick={handleResetToHero}
+                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-sm sm:text-[15px] transition-all duration-200 shadow-xl shadow-[#FC6301]/25 active:scale-[0.99] cursor-pointer"
+                >
+                  <RotateCcw size={16} strokeWidth={2.4} />
+                  <span>Start New Conversation</span>
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={handleChatSubmit}
+                className="flex items-center gap-2.5 sm:gap-3 w-full"
+              >
+                {/* 3 Dots / Menu Button with End Chat Popover */}
+                <div className="relative" ref={optionsMenuRef}>
+                  {/* End Chat Popover Tooltip (Opens directly ABOVE the button) */}
+                  {isOptionsMenuOpen && (
+                    <div className="absolute bottom-full mb-3 left-0 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsOptionsMenuOpen(false)
+                          setIsChatEnded(true)
+                        }}
+                        className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1c1410] hover:bg-[#281b15] border border-[#33221a] text-xs font-semibold text-zinc-200 hover:text-white shadow-2xl transition-all cursor-pointer whitespace-nowrap"
+                      >
+                        <Ban size={13} className="text-zinc-400" />
+                        <span>End chat</span>
+                      </button>
+                    </div>
+                  )}
+
                   <button
                     type="button"
-                    onClick={handleResetToHero}
-                    className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-2xl bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-sm sm:text-base transition-all duration-200 shadow-xl shadow-[#FC6301]/25 active:scale-[0.99] cursor-pointer"
-                  >
-                    <RotateCcw size={18} strokeWidth={2.4} />
-                    <span>Start New Conversation</span>
-                  </button>
-                </div>
-              ) : (
-                <form
-                  onSubmit={handleChatSubmit}
-                  className="flex items-center gap-3 w-full"
-                >
-                  {/* 3 Dots / Menu Button with End Chat Popover */}
-                  <div className="relative" ref={optionsMenuRef}>
-                    {/* End Chat Popover Tooltip (Opens directly ABOVE the button) */}
-                    {isOptionsMenuOpen && (
-                      <div className="absolute bottom-full mb-3 left-0 z-50 animate-in fade-in zoom-in-95 duration-150">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsOptionsMenuOpen(false)
-                            setIsChatEnded(true)
-                          }}
-                          className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1c1410] hover:bg-[#281b15] border border-[#33221a] text-xs font-semibold text-zinc-200 hover:text-white shadow-2xl transition-all cursor-pointer whitespace-nowrap"
-                        >
-                          <Ban size={13} className="text-zinc-400" />
-                          <span>End chat</span>
-                        </button>
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => setIsOptionsMenuOpen((prev) => !prev)}
-                      title="Options"
-                      aria-label="Chat options"
-                      className={`w-12 h-12 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
-                        isOptionsMenuOpen
-                          ? 'bg-[#241710] border-[#FC6301]/60 text-white'
-                          : 'bg-[#16120e] hover:bg-[#1e1510] border-white/[0.08] text-zinc-400 hover:text-white'
-                      }`}
-                    >
-                      <MoreHorizontal size={20} />
-                    </button>
-                  </div>
-
-                  {/* Writing Box Input (Exact Epic Games rounded box with subtle border) */}
-                  <input
-                    ref={chatInputRef}
-                    type="text"
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Write a message..."
-                    disabled={isTyping}
-                    className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-6 py-4 text-[15px] sm:text-base text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
-                  />
-
-                  {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
-                  <button
-                    type="submit"
-                    disabled={!chatInput.trim() || isTyping}
-                    aria-label="Send message"
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
-                      chatInput.trim().length > 0
-                        ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
-                        : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
+                    onClick={() => setIsOptionsMenuOpen((prev) => !prev)}
+                    title="Options"
+                    aria-label="Chat options"
+                    className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
+                      isOptionsMenuOpen
+                        ? 'bg-[#241710] border-[#FC6301]/60 text-white'
+                        : 'bg-[#18181c] hover:bg-[#222228] border-white/[0.08] text-zinc-400 hover:text-white'
                     }`}
                   >
-                    <ArrowRight size={18} strokeWidth={2.5} />
+                    <MoreVertical size={18} />
                   </button>
-                </form>
-              )}
-            </div>
-          </main>
+                </div>
+
+                {/* Writing Box Input (Exact Epic Games rounded box with subtle border, solid #141417, no glassmorphism) */}
+                <input
+                  ref={chatInputRef}
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Write a message..."
+                  disabled={isTyping}
+                  className="flex-1 bg-[#141417] hover:bg-[#18181c] focus:bg-[#18181c] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                />
+
+                {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
+                <button
+                  type="submit"
+                  disabled={!chatInput.trim() || isTyping}
+                  aria-label="Send message"
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+                    chatInput.trim().length > 0
+                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
+                      : 'bg-white/[0.06] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
+                  }`}
+                >
+                  <ArrowRight size={16} strokeWidth={2.5} />
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
 
         </div>
       )}
