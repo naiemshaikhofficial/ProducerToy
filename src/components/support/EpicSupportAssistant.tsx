@@ -267,8 +267,12 @@ function checkIsInappropriateLanguage(text: string): boolean {
   if (vulgarRegex.test(t)) return true
 
   // 2. Hindi / Urdu / Hinglish Gaaliyan & Abusive words (Indian local slangs)
-  const hindiAbuseRegex = /\b(madarchod|madarchodd|maderchod|mc|bhenchod|behenchod|bc|bhosdike|bhosdika|bsdk|bhosdi|lauda|loda|laude|lode|lund|gaand|gand|gandu|randi|r@ndi|harami|kamina|kamine|kutta|kutte|kamini|bhadwe|bhadva|tatte|jhant|jhat|chodna|choda|chodo|chudai|chudwana|chut|chutiya|chutiye|chutmarike|khanki|hijde|hijra|hijda|chakka|gaandu)\b/i
+  const hindiAbuseRegex = /\b(madarchod|madarchodd|maderchod|mc|bhenchod|behenchod|bc|bhosdike|bhosdika|bsdk|bhosdi|lauda|loda|laude|lode|lund|gaand|gand|gandu|randi|r@ndi|harami|kamina|kamine|kutta|kutte|kamini|bhadwe|bhadva|tatte|jhant|jhat|chodna|choda|chodo|chudai|chudwana|chod|chut|chutiya|chutiye|chutmarike|khanki|hijde|hijra|hijda|chakka|gaandu|chud)\b/i
   if (hindiAbuseRegex.test(t)) return true
+
+  // Abusive phrases in Hindi/Hinglish
+  const hindiPhraseRegex = /(teri ma|teri maa|ma chod|maa chod|chod dunga|chod de|chud gaya|bhen ke lode|behen ke lode|lund ke baal)/i
+  if (hindiPhraseRegex.test(t)) return true
 
   // 3. English Profanity & Slurs
   const englishAbuseRegex = /\b(fuck|fucking|fucker|fck|motherfucker|bitch|bastard|asshole|dick|pussy|slut|whore|cunt)\b/i
@@ -292,31 +296,52 @@ function checkIsInappropriateLanguage(text: string): boolean {
 function isHinglishQuery(text: string): boolean {
   const devanagari = /[\u0900-\u097F]/
   if (devanagari.test(text)) return false
-  const hinglishWords = /\b(karega|karegi|karo|karna|de|mera|mere|meri|sath|banegi|banja|bhai|batao|kripya|nahi|hoga|raha|rahe|hai|ho|tha|the|apna|aap|tum|ka|ki|ke|ko|se|me|par|madarchod|bhenchod|behenchod|bhosdike|bhosdika|bsdk|chutiya|chutiye|lauda|loda|laude|lode|lund|gaand|gandu|randi|harami|kamina|kamine|bhadwe|tatte|jhant|khanki|hijde|hijra|chudai|chodo)\b/i
+  const hinglishWords = /\b(karega|karegi|karo|karna|de|mera|mere|meri|sath|banegi|banja|bhai|batao|kripya|nahi|hoga|raha|rahe|hai|ho|tha|the|apna|aap|tum|ka|ki|ke|ko|se|me|par|madarchod|bhenchod|behenchod|bhosdike|bhosdika|bsdk|chutiya|chutiye|lauda|loda|laude|lode|lund|gaand|gandu|randi|harami|kamina|kamine|bhadwe|tatte|jhant|khanki|hijde|hijra|chudai|chodo|chod|teri|tera|tere|maa|ma|baal|dunga|kutta|kutte|chakka)\b/i
   return hinglishWords.test(text)
 }
 
 function getDeterministicWarning(strike: number, query: string): string {
-  const hinglish = isHinglishQuery(query)
+  const isDevanagari = /[\u0900-\u097F]/.test(query)
+  const hinglish = !isDevanagari && isHinglishQuery(query)
 
   if (strike <= 1) {
-    return hinglish
-      ? "Kripya appropriate aur respectful bhasha ka upyog karein. Producer Toy Support Assistant sirf music software, sample packs aur store orders ke liye hai. Inappropriate ya abusive language ka upyog jari rakhne par hum chat session end kar sakte hain."
-      : "Please use appropriate and respectful language. The Producer Toy Support Desk is dedicated to assisting with music production software, sample packs, and orders. Continued use of inappropriate or abusive words may result in this chat session being terminated."
+    if (hinglish) {
+      return "Strike 1/4: Kripya sammanjanak aur shalin bhasha ka upyog karein. Producer Toy Support Desk keval music production, sample packs, aur order assistance ke liye hai. Yadi aap aage bhi anuchit ya abusive bhasha ka prayog karenge, toh is chat session ko terminate kar diya jayega. Kripya batayein main aapki kya madad kar sakta hoon."
+    }
+    if (isDevanagari) {
+      return "Strike 1/4: कृपया सम्मानजनक और शालीन भाषा का प्रयोग करें। Producer Toy Support Desk केवल संगीत उत्पादन, सैंपल पैक्स, और ऑर्डर सहायता के लिए है। यदि आप अनुचित भाषा का उपयोग जारी रखते हैं, तो इस चैट सत्र को समाप्त किया जाएगा। कृपया बताइए मैं आपकी क्या सहायता कर सकता हूँ।"
+    }
+    return "Strike 1/4: Please use appropriate and respectful language. The Producer Toy Support Desk is dedicated to assisting with music production software, sample packs, and orders. Continued use of inappropriate or abusive language will result in this chat session being terminated. How can I assist you with your music production needs?"
   }
+
   if (strike === 2) {
-    return hinglish
-      ? "Warning (2/4): Kripya gaali-galoch ya vulgar words ka upyog na karein. Humari support policy ke tehat agar aapne aisi bhasha jari rakhi, toh hume yeh chat session turant end karna padega."
-      : "Warning (2/4): Please refrain from using vulgar, offensive, or inappropriate language. Continued violation of our support policy will result in termination of this chat session."
+    if (hinglish) {
+      return "Strike 2/4: Warning: Kripya abusive ya vulgar language ka prayog na karein. Producer Toy Support Desk sirf professional music production aur legitimate product support ke liye hai. Agar aap aisi bhasha jari rakhenge toh session turant terminate kar diya jayega."
+    }
+    if (isDevanagari) {
+      return "Strike 2/4: चेतावनी: कृपया अभद्र या आपत्तिजनक भाषा का प्रयोग न करें। Producer Toy Support Desk केवल संगीत उत्पादन और ऑर्डर से जुड़े प्रश्नों के लिए है। यदि आप ऐसी भाषा जारी रखेंगे तो सत्र तुरंत समाप्त कर दिया जाएगा।"
+    }
+    return "Strike 2/4: Warning: Please refrain from using vulgar, offensive, or abusive language. The Producer Toy Support Desk is reserved for legitimate audio software and order inquiries. Continued inappropriate language will lead to immediate chat termination."
   }
+
   if (strike === 3) {
-    return hinglish
-      ? "Final Warning (3/4): Yeh aapki aakhri warning hai. Kripya maryadit bhasha banaye rakhein. Agar agla message bhi inappropriate hua, toh yeh chat session turant permanently end ho jayega."
-      : "Final Warning (3/4): This is your final warning to communicate respectfully. Any further inappropriate message will immediately and permanently terminate this chat session."
+    if (hinglish) {
+      return "Strike 3/4: Final Warning: Yeh aapki aakhri warning hai. Kripya abusive bhasha turant band karein. Agar agla message bhi inappropriate hua, toh is chat session ko bina kisi warning ke turant aur permanently terminate kar diya jayega."
+    }
+    if (isDevanagari) {
+      return "Strike 3/4: अंतिम चेतावनी: कृपया अपमानजनक भाषा का प्रयोग तुरंत बंद करें। यदि अगला संदेश भी अनुचित हुआ, तो इस चैट सत्र को तुरंत और स्थायी रूप से समाप्त कर दिया जाएगा।"
+    }
+    return "Strike 3/4: Final Warning: Please stop using abusive language immediately. This is your last warning. Any further inappropriate messages will immediately and permanently terminate this support session."
   }
-  return hinglish
-    ? "Baar-baar abusive aur inappropriate bhasha ka upyog karne ke karan yeh support session permanently terminate kar diya gaya hai. Agar aapko legitimate technical assistance chahiye, toh kripya nayi conversation shuru karein aur respectful bhasha banaye rakhein."
-    : "This support session has been permanently terminated due to repeated violations of our communication policy. If you need legitimate technical assistance with our software or orders, please start a new conversation and maintain professional communication."
+
+  // Strike 4+ (Terminated)
+  if (hinglish) {
+    return "This support session has now been permanently terminated due to repeated policy violations. Kripya legitimate technical assistance ke liye nayi conversation shuru karein aur respectful bhasha banaye rakhein."
+  }
+  if (isDevanagari) {
+    return "बार-बार नियमों का उल्लंघन करने के कारण यह सहायता सत्र स्थायी रूप से समाप्त कर दिया गया है। जब आप सम्मानपूर्वक संवाद करने के लिए तैयार हों, तब कृपया नया सत्र प्रारंभ करें।"
+  }
+  return "This support session has now been permanently terminated due to repeated policy violations. Please start a new conversation when you are ready to communicate respectfully."
 }
 
 function ComingSoonAlertBox({
@@ -421,6 +446,7 @@ export function EpicSupportAssistant({
   const [chatInput, setChatInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [policyStrikes, setPolicyStrikes] = useState(0)
+  const strikesRef = useRef(0)
 
   const { user } = useAuth()
 
@@ -739,6 +765,29 @@ export function EpicSupportAssistant({
           : undefined
 
         const isHeroAbuse = checkIsInappropriateLanguage(query)
+        if (isHeroAbuse) {
+          strikesRef.current = 1
+          setPolicyStrikes(1)
+          const finalContent = getDeterministicWarning(1, query)
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === thinkingMsgId
+                ? {
+                    id: `asst-${Date.now()}`,
+                    sender: 'assistant',
+                    timestamp: formatCurrentTime(),
+                    content: finalContent,
+                    isWarning: true,
+                    isThinking: false,
+                    isSourcesOpen: false,
+                    needsTicket: false,
+                    canEscalateToTicket: false,
+                  }
+                : m
+            )
+          )
+          return
+        }
 
         const [groqRes] = await Promise.all([
           askGroqSupportAction(query, [], clientUser, 0),
@@ -746,32 +795,22 @@ export function EpicSupportAssistant({
         ])
 
         const isViolation =
-          isHeroAbuse ||
           Boolean(groqRes?.isPolicyViolation) ||
+          Boolean(groqRes?.shouldTerminateChat) ||
           (groqRes?.answer &&
             (groqRes.answer.toLowerCase().includes('strike') ||
               groqRes.answer.toLowerCase().includes('warning') ||
-              groqRes.answer.toLowerCase().includes('inappropriate')))
+              groqRes.answer.toLowerCase().includes('inappropriate') ||
+              groqRes.answer.toLowerCase().includes('terminated') ||
+              groqRes.answer.toLowerCase().includes('चेतावनी') ||
+              groqRes.answer.toLowerCase().includes('समाप्त') ||
+              groqRes.answer.toLowerCase().includes('apmanjanak') ||
+              groqRes.answer.toLowerCase().includes('chetwani')))
 
         if (isViolation) {
+          strikesRef.current = 1
           setPolicyStrikes(1)
-        }
-
-        if (isViolation) {
-          const userUsedRoman = !/[\u0900-\u097F]/.test(query)
-          const llmUsedDevanagari = /[\u0900-\u097F]/.test(groqRes?.answer || '')
-          const shouldOverrideWithHinglish = userUsedRoman && llmUsedDevanagari
-
-          let finalContent = groqRes?.answer || ''
-          if (
-            shouldOverrideWithHinglish ||
-            !finalContent ||
-            finalContent.includes('I’m sorry, but I can’t help') ||
-            finalContent.includes("I'm sorry") ||
-            finalContent.includes('flattered')
-          ) {
-            finalContent = getDeterministicWarning(1, query)
-          }
+          const finalContent = getDeterministicWarning(1, query)
 
           setMessages((prev) =>
             prev.map((m) =>
@@ -784,6 +823,8 @@ export function EpicSupportAssistant({
                     isWarning: true,
                     isThinking: false,
                     isSourcesOpen: false,
+                    needsTicket: false,
+                    canEscalateToTicket: false,
                   }
                 : m
             )
@@ -834,6 +875,30 @@ export function EpicSupportAssistant({
           )
         }
       } catch (err) {
+        const isCatchAbuse = checkIsInappropriateLanguage(query)
+        if (isCatchAbuse) {
+          strikesRef.current = 1
+          setPolicyStrikes(1)
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === thinkingMsgId
+                ? {
+                    id: `asst-${Date.now()}`,
+                    sender: 'assistant',
+                    timestamp: formatCurrentTime(),
+                    content: getDeterministicWarning(1, query),
+                    isWarning: true,
+                    isThinking: false,
+                    isSourcesOpen: false,
+                    needsTicket: false,
+                    canEscalateToTicket: false,
+                  }
+                : m
+            )
+          )
+          return
+        }
+
         const localMatch = findLocalAnswer(query)
         setMessages((prev) =>
           prev.map((m) =>
@@ -858,7 +923,7 @@ export function EpicSupportAssistant({
   const handleChatSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     const text = chatInput.trim()
-    if (!text || isTyping) return
+    if (!text || isTyping || isChatEnded || strikesRef.current >= 4) return
 
     const time = formatCurrentTime()
     const userMsg: ChatMessage = {
@@ -880,6 +945,43 @@ export function EpicSupportAssistant({
     setChatInput('')
     setIsTyping(true)
 
+    // Immediate local abuse check (deterministic, Roman Hinglish, fast, 100% reliable)
+    const isLocalAbuse = checkIsInappropriateLanguage(text)
+    if (isLocalAbuse) {
+      setTimeout(() => {
+        strikesRef.current += 1
+        const currentStrike = strikesRef.current
+        setPolicyStrikes(currentStrike)
+
+        const shouldEnd = currentStrike >= 4
+        if (shouldEnd) {
+          setIsChatEnded(true)
+        }
+
+        const warningText = getDeterministicWarning(currentStrike, text)
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === thinkingMsgId
+              ? {
+                  id: `asst-${Date.now()}`,
+                  sender: 'assistant',
+                  timestamp: formatCurrentTime(),
+                  content: warningText,
+                  isWarning: true,
+                  isThinking: false,
+                  isSourcesOpen: false,
+                  needsTicket: false,
+                  canEscalateToTicket: false,
+                }
+              : m
+          )
+        )
+        setIsTyping(false)
+      }, 350)
+      return
+    }
+
     // Build recent conversation history for Groq
     const history = messages
       .filter((m) => !m.isThinking && (m.content || m.article?.question))
@@ -898,8 +1000,7 @@ export function EpicSupportAssistant({
           }
         : undefined
 
-      const isLocalAbuse = checkIsInappropriateLanguage(text)
-      const currentStrikesToSend = policyStrikes
+      const currentStrikesToSend = strikesRef.current
 
       const [groqRes] = await Promise.all([
         askGroqSupportAction(text, history, clientUser, currentStrikesToSend),
@@ -908,8 +1009,8 @@ export function EpicSupportAssistant({
       setIsTyping(false)
 
       const isViolation =
-        isLocalAbuse ||
         Boolean(groqRes?.isPolicyViolation) ||
+        Boolean(groqRes?.shouldTerminateChat) ||
         (groqRes?.answer &&
           (groqRes.answer.toLowerCase().includes('strike') ||
             groqRes.answer.toLowerCase().includes('warning') ||
@@ -920,35 +1021,17 @@ export function EpicSupportAssistant({
             groqRes.answer.toLowerCase().includes('apmanjanak') ||
             groqRes.answer.toLowerCase().includes('chetwani')))
 
-      const nextStrikes = isViolation ? policyStrikes + 1 : policyStrikes
       if (isViolation) {
-        setPolicyStrikes(nextStrikes)
-      }
+        strikesRef.current += 1
+        const currentStrike = strikesRef.current
+        setPolicyStrikes(currentStrike)
 
-      const shouldEndChat = isViolation && (nextStrikes >= 4 || Boolean(groqRes?.shouldTerminateChat))
-      if (shouldEndChat) {
-        setIsChatEnded(true)
-      }
-
-      if (isViolation) {
-        const userUsedRoman = !/[\u0900-\u097F]/.test(text)
-        const llmUsedDevanagari = /[\u0900-\u097F]/.test(groqRes?.answer || '')
-        const shouldOverrideWithHinglish = userUsedRoman && llmUsedDevanagari
-
-        let finalContent = groqRes?.answer || ''
+        const shouldEndChat = currentStrike >= 4 || Boolean(groqRes?.shouldTerminateChat)
         if (shouldEndChat) {
-          finalContent = isHinglishQuery(text)
-            ? "Baar-baar abusive aur inappropriate bhasha ka upyog karne ke karan yeh support session permanently terminate kar diya gaya hai. Agar aapko legitimate technical assistance chahiye, toh kripya nayi conversation shuru karein aur respectful bhasha banaye rakhein."
-            : "This support session has been permanently terminated due to repeated violations of our communication policy. If you need legitimate technical assistance with our software or orders, please start a new conversation and maintain professional communication."
-        } else if (
-          shouldOverrideWithHinglish ||
-          !finalContent ||
-          finalContent.includes('I’m sorry, but I can’t help') ||
-          finalContent.includes("I'm sorry") ||
-          finalContent.includes('flattered')
-        ) {
-          finalContent = getDeterministicWarning(nextStrikes, text)
+          setIsChatEnded(true)
         }
+
+        const warningText = getDeterministicWarning(currentStrike, text)
 
         setMessages((prev) =>
           prev.map((m) =>
@@ -957,10 +1040,12 @@ export function EpicSupportAssistant({
                   id: `asst-${Date.now()}`,
                   sender: 'assistant',
                   timestamp: formatCurrentTime(),
-                  content: finalContent,
+                  content: warningText,
                   isWarning: true,
                   isThinking: false,
                   isSourcesOpen: false,
+                  needsTicket: false,
+                  canEscalateToTicket: false,
                 }
               : m
           )
@@ -1011,6 +1096,34 @@ export function EpicSupportAssistant({
       }
     } catch (e) {
       setIsTyping(false)
+      const isCatchAbuse = checkIsInappropriateLanguage(text)
+      if (isCatchAbuse) {
+        strikesRef.current += 1
+        const currentStrike = strikesRef.current
+        setPolicyStrikes(currentStrike)
+        if (currentStrike >= 4) {
+          setIsChatEnded(true)
+        }
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === thinkingMsgId
+              ? {
+                  id: `asst-${Date.now()}`,
+                  sender: 'assistant',
+                  timestamp: formatCurrentTime(),
+                  content: getDeterministicWarning(currentStrike, text),
+                  isWarning: true,
+                  isThinking: false,
+                  isSourcesOpen: false,
+                  needsTicket: false,
+                  canEscalateToTicket: false,
+                }
+              : m
+          )
+        )
+        return
+      }
+
       const localMatch = findLocalAnswer(text)
       setMessages((prev) =>
         prev.map((m) =>
@@ -1148,6 +1261,8 @@ export function EpicSupportAssistant({
     setIsChatStarted(false)
     setIsSubHeaderVisible(false)
     setIsChatEnded(false)
+    strikesRef.current = 0
+    setPolicyStrikes(0)
     setHeroInput('')
     setInputError('')
     setChatInput('')
@@ -1384,12 +1499,13 @@ export function EpicSupportAssistant({
                 <input
                   type="text"
                   value={heroInput}
+                  disabled={isHeroLoading}
                   onChange={(e) => {
                     setHeroInput(e.target.value)
                     if (inputError) setInputError('')
                   }}
                   placeholder="Describe your problem here"
-                  className={`flex-1 bg-[#130d08] hover:bg-[#18100a] focus:bg-[#18100a] border rounded-[10px] px-5 py-3 sm:py-3.5 text-sm sm:text-[15px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl ${
+                  className={`flex-1 bg-[#130d08] hover:bg-[#18100a] focus:bg-[#18100a] border rounded-[10px] px-5 py-3 sm:py-3.5 text-sm sm:text-[15px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
                       : 'border-white/20 hover:border-white/30 focus:border-[#FC6301]'
@@ -1622,6 +1738,18 @@ export function EpicSupportAssistant({
                     ) : (
                       <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[20px] p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
                         
+                        {/* Policy Notice Badge if warning */}
+                        {msg.isWarning && (
+                          <div className="flex items-center gap-2 border-b border-amber-500/20 pb-3 mb-2">
+                            <div className="w-5 h-5 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                              <AlertTriangle size={12} />
+                            </div>
+                            <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
+                              Policy Notice &bull; Communication Guidelines
+                            </span>
+                          </div>
+                        )}
+
                         {/* AI Content with Clickable Direct Redirect Links */}
                         {msg.content && (
                           <div className="text-[#d1d1d6] leading-[1.75] space-y-3.5">
@@ -1894,8 +2022,8 @@ export function EpicSupportAssistant({
                         </div>
                       )}
 
-                      {/* Answer Sources Dropdown & Helpful Feedback ONLY on genuine answer cards (NOT on greetings) */}
-                      {!msg.isGreeting && (
+                      {/* Answer Sources Dropdown & Helpful Feedback ONLY on genuine answer cards (NOT on greetings, NOT on warnings) */}
+                      {!msg.isGreeting && !msg.isWarning && (
                         <>
                           {/* Answer Sources Dropdown (Exact Match with Epic Games Screenshot) */}
                           <div className="pt-2">
@@ -2023,7 +2151,7 @@ export function EpicSupportAssistant({
                 )}
 
                 {/* Standalone Separate Dialog Box for Feedback (Exact Epic Games Dialog Shape, Solid #18181c) */}
-                {isLatestAssistant && !msg.ticketNumber && !msg.isGreeting && !msg.isThinking && (
+                {isLatestAssistant && !msg.ticketNumber && !msg.isGreeting && !msg.isThinking && !msg.isWarning && !isChatEnded && policyStrikes < 4 && (
                   <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
                     {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
@@ -2091,7 +2219,7 @@ export function EpicSupportAssistant({
                 )}
 
                 {/* Standalone Separate Dialog Box for Ticket Escalation (Exact Epic Games Dialog Shape, Solid #18181c) */}
-                {msg.needsTicket && !msg.ticketNumber && msg.feedback !== 'yes' && !msg.isThinking && (
+                {msg.needsTicket && !msg.ticketNumber && msg.feedback !== 'yes' && !msg.isThinking && !msg.isWarning && !isChatEnded && policyStrikes < 4 && (
                   <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
                     {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
@@ -2250,7 +2378,7 @@ export function EpicSupportAssistant({
 
           {/* Solid Bottom Bar Container (100% Solid #080706, No Glassmorphism) */}
           <div className="w-full max-w-5xl mx-auto px-4 sm:px-8 lg:px-10 pb-5 sm:pb-6 pt-3">
-            {isChatEnded || messages.some((m) => !!m.ticketNumber || m.feedback === 'yes') ? (
+            {isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => !!m.ticketNumber || m.feedback === 'yes') ? (
               <div className="w-full flex flex-col items-center gap-2.5 animate-in fade-in zoom-in-95 duration-200">
                 <p className="text-xs text-zinc-500 font-medium select-none tracking-wide">
                   Chat ended.
@@ -2309,18 +2437,24 @@ export function EpicSupportAssistant({
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Write a message..."
-                  disabled={isTyping}
-                  className="flex-1 bg-[#141417] hover:bg-[#18181c] focus:bg-[#18181c] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  placeholder={
+                    isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4
+                      ? 'Chat ended.'
+                      : isTyping || messages.some((m) => m.isThinking)
+                      ? 'Assistant is thinking...'
+                      : 'Write a message...'
+                  }
+                  disabled={isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
+                  className="flex-1 bg-[#141417] hover:bg-[#18181c] focus:bg-[#18181c] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
                 />
 
                 {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
                 <button
                   type="submit"
-                  disabled={!chatInput.trim() || isTyping}
+                  disabled={!chatInput.trim() || isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
                   aria-label="Send message"
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
-                    chatInput.trim().length > 0
+                    chatInput.trim().length > 0 && !isTyping && !isChatEnded && policyStrikes < 4 && strikesRef.current < 4 && !messages.some((m) => m.isThinking)
                       ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
                       : 'bg-white/[0.06] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
                   }`}
