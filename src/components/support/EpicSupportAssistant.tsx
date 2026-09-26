@@ -701,47 +701,28 @@ export function EpicSupportAssistant({
         </div>
       ) : (
         /* ========================================================================= */
-        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Crystal Clear, No Top Opacity Bug)  */
+        /* SCREEN 2: CHAT ASSISTANT INTERACTION (100% Crisp, Pure Dark, No Overlays) */
         /* ========================================================================= */
-        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative overflow-hidden">
+        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
           
-          {/* Top Dissolve Background strictly behind the header (Height limited to 200px, NEVER overlays chat messages) */}
-          <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden pointer-events-none z-0">
-            {/* Glowing Angled Light Beam & Warm Ambience */}
-            <div className="absolute -top-16 -left-16 w-[700px] h-[260px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/18 to-transparent blur-3xl pointer-events-none" />
-            <div className="absolute top-4 left-1/4 w-[360px] h-[260px] bg-[#FC6301]/10 rounded-full blur-[100px] pointer-events-none" />
-            <div className="absolute top-4 right-1/4 w-[360px] h-[260px] bg-amber-600/10 rounded-full blur-[100px] pointer-events-none" />
+          {/* Header Title with Self-Contained Glow strictly behind title (Never touches messages) */}
+          <div className="text-center pt-8 pb-3 relative overflow-hidden">
+            {/* Ambient Glow strictly behind the header title area */}
+            <div className="absolute inset-0 pointer-events-none -z-0 overflow-hidden">
+              <div className="absolute -top-16 -left-16 w-[500px] h-[220px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/15 to-transparent blur-3xl" />
+              <div className="absolute top-2 left-1/4 w-[340px] h-[180px] bg-[#FC6301]/10 rounded-full blur-[90px]" />
+              <div className="absolute top-2 right-1/4 w-[340px] h-[180px] bg-amber-600/10 rounded-full blur-[90px]" />
+            </div>
 
-            {/* Abstract Glowing Lines */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none opacity-20 overflow-hidden"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <linearGradient id="chatDissolveLine" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FC6301" stopOpacity="0.4" />
-                  <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.15" />
-                  <stop offset="100%" stopColor="transparent" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d="M -100 120 L 500 40 L 1000 180 L 1600 60" fill="none" stroke="url(#chatDissolveLine)" strokeWidth="1.5" />
-            </svg>
-
-            {/* Clean bottom fade into page background behind header only */}
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[#080706]" />
-          </div>
-
-          {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant (Centered over dissolve background) */}
-          <div className="text-center pt-8 pb-3 relative z-10">
             <button
               onClick={handleResetToHero}
-              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c] border border-white/10"
+              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c] border border-white/10 relative z-10"
             >
               <ArrowLeft size={13} />
               <span className="hidden sm:inline">Start over</span>
             </button>
 
-            <div className="space-y-1">
+            <div className="space-y-1 relative z-10">
               <p className="text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase text-zinc-400 font-mono">
                 Your Chat With
               </p>
@@ -751,15 +732,15 @@ export function EpicSupportAssistant({
             </div>
 
             {/* Date Pill */}
-            <div className="pt-3">
+            <div className="pt-3 relative z-10">
               <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e] border border-white/10 text-[11px] text-zinc-400 font-medium shadow-sm">
                 {formatCurrentDate()}
               </span>
             </div>
           </div>
 
-          {/* Main Chat Feed (relative z-10: Always 100% crisp & full opacity, never covered by any background overlay) */}
-          <main className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-44 flex-1">
+          {/* Main Chat Feed (100% Crystal Clear, Crisp Full Opacity on All Messages) */}
+          <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-44 flex-1">
             
             {messages.map((msg) => {
               if (msg.sender === 'user') {
