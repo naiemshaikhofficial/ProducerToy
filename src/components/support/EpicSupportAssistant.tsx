@@ -1211,10 +1211,10 @@ export function EpicSupportAssistant({
           </div>
 
           {/* Main Chat Feed (100% Crystal Clear, Crisp Full Opacity on All Messages) */}
-          <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 pt-2 pb-44 flex-1 space-y-6">
+          <main className="w-full max-w-5xl mx-auto px-4 sm:px-8 lg:px-10 pt-2 pb-48 flex-1 space-y-8 sm:space-y-10">
             
             {/* Date Pill: Positioned well below the title with generous breathing room, exactly like Epic Games */}
-            <div className="text-center pt-8 pb-4">
+            <div className="text-center pt-8 pb-4 sm:pb-6">
               <span className="inline-block px-4 py-1.5 rounded-full bg-[#18181c] border border-white/[0.08] text-xs text-zinc-400 font-medium select-none shadow-sm">
                 {formatCurrentDate()}
               </span>
@@ -1224,13 +1224,13 @@ export function EpicSupportAssistant({
               if (msg.sender === 'user') {
                 return (
                   /* User Bubble (Right-aligned, with "You [Time]" & Producer Toy sunset orange gradient) */
-                  <div key={msg.id} className="flex flex-col items-end space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                    <div className="text-xs text-zinc-400 pr-1 flex items-center gap-1.5">
+                  <div key={msg.id} className="flex flex-col items-end space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                    <div className="text-xs text-zinc-400 pr-1 flex items-center gap-2">
                       <span className="font-semibold text-zinc-300">You</span>
                       <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
                     </div>
 
-                    <div className="bg-gradient-to-r from-[#de5200] via-[#FC6301] to-[#ff7b2b] text-white font-medium px-5 py-3 rounded-2xl rounded-tr-xs max-w-lg shadow-lg shadow-[#FC6301]/20 text-sm sm:text-[14.5px] leading-relaxed">
+                    <div className="bg-gradient-to-r from-[#de5200] via-[#FC6301] to-[#ff7b2b] text-white font-medium px-6 py-3.5 sm:px-7 sm:py-4 rounded-2xl rounded-tr-xs max-w-xl sm:max-w-2xl shadow-lg shadow-[#FC6301]/20 text-[14.5px] sm:text-[15.5px] leading-relaxed">
                       {msg.content}
                     </div>
                   </div>
@@ -1239,40 +1239,40 @@ export function EpicSupportAssistant({
 
               /* Assistant Bubble */
               return (
-                <div key={msg.id} className="flex flex-col items-start space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-2xl">
+                <div key={msg.id} className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-4xl">
                   
                   {/* Assistant Header: Clean Robot Avatar (NO box, NO squeezing) + Name + Timestamp */}
-                  <div className="flex items-center gap-2 text-xs text-zinc-400 px-1">
+                  <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                     <Image
                       src="/images/robot-avatar.png"
                       alt="Producer Toy Support Assistant"
-                      width={22}
-                      height={22}
-                      className="w-[22px] h-[22px] object-contain shrink-0"
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 object-contain shrink-0"
                     />
-                    <span className="font-semibold text-zinc-200 text-xs">Producer Toy Support Assistant</span>
-                    <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
+                    <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">Producer Toy Support Assistant</span>
+                    <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                   </div>
 
                   {/* Thinking Spinner Card with Clean Robot Avatar */}
                   {msg.isThinking ? (
-                    <div className="inline-flex items-center gap-3 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-sm px-6 py-4 shadow-xl w-fit">
+                    <div className="inline-flex items-center gap-3.5 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-xs px-7 py-5 shadow-xl w-fit">
                       <Image
                         src="/images/robot-avatar.png"
                         alt="Thinking..."
-                        width={22}
-                        height={22}
-                        className="w-[22px] h-[22px] object-contain shrink-0"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain shrink-0"
                       />
                       <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
-                      <span className="text-zinc-300 text-sm font-normal">Thinking...</span>
+                      <span className="text-zinc-300 text-sm sm:text-[15px] font-normal">Thinking...</span>
                     </div>
                   ) : (
-                    <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl rounded-tl-sm p-6 sm:p-7 text-[14.5px] sm:text-[15px] leading-relaxed space-y-4 shadow-2xl w-full">
+                    <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[22px] rounded-tl-xs p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
                       
                       {/* AI Content with Clickable Direct Redirect Links */}
                       {msg.content && (
-                        <div className="text-[#d1d1d6] leading-relaxed space-y-2">
+                        <div className="text-[#d1d1d6] leading-[1.75] space-y-3.5">
                           {renderFormattedAnswer(msg.content)}
                         </div>
                       )}
@@ -1585,13 +1585,13 @@ export function EpicSupportAssistant({
                     onClick={() => setIsOptionsMenuOpen((prev) => !prev)}
                     title="Options"
                     aria-label="Chat options"
-                    className={`w-11 h-11 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
+                    className={`w-12 h-12 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
                       isOptionsMenuOpen
                         ? 'bg-[#241710] border-[#FC6301]/60 text-white'
                         : 'bg-[#16120e] hover:bg-[#1e1510] border-white/[0.08] text-zinc-400 hover:text-white'
                     }`}
                   >
-                    <MoreHorizontal size={18} />
+                    <MoreHorizontal size={20} />
                   </button>
                 </div>
 
@@ -1603,7 +1603,7 @@ export function EpicSupportAssistant({
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Write a message..."
                   disabled={isTyping}
-                  className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-5 py-3.5 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-6 py-4 text-[15px] sm:text-base text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
                 {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
@@ -1611,13 +1611,13 @@ export function EpicSupportAssistant({
                   type="submit"
                   disabled={!chatInput.trim() || isTyping}
                   aria-label="Send message"
-                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
                     chatInput.trim().length > 0
                       ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
                       : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
                   }`}
                 >
-                  <ArrowRight size={16} strokeWidth={2.5} />
+                  <ArrowRight size={18} strokeWidth={2.5} />
                 </button>
               </form>
             </div>
