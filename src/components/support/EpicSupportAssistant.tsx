@@ -40,7 +40,7 @@ import {
   ComingSoonProduct,
   subscribeDropAlertAction,
 } from '@/actions/groqSupportAction'
-import { openPrintableInvoice } from '@/components/BillingHistory'
+import { openPrintableInvoice } from '@/lib/invoiceUtils'
 import { createSupportTicketAction } from '@/actions/supportActions'
 import { useAuth } from '@/context/AuthContext'
 
@@ -434,26 +434,49 @@ export function EpicSupportAssistant({
     }
   }, [messages, isTyping, isChatStarted])
 
-  // Parses markdown links [Text](/url) and bold **text** into clickable React elements without raw asterisks
+  // Parses markdown links [Text](/url), bold **text**, and single *text* into clean bold elements without raw asterisks
   const renderBoldText = (text: string, keyPrefix: string): React.ReactNode => {
     if (!text) return null
-    // If text has unmatched or stray double asterisks, clean them up safely
-    const boldRegex = /\*\*([^*]+)\*\*/g
-    const parts = text.split(boldRegex)
-    if (parts.length === 1) {
-      return text.replace(/\*\*/g, '')
-    }
 
-    return parts.map((part, pIdx) => {
-      if (pIdx % 2 === 1) {
-        return (
-          <strong key={`${keyPrefix}-bold-${pIdx}`} className="font-semibold text-white">
-            {part}
+    // Match both **bold** and *italic/bold*
+    const regex = /(\*\*([^*]+)\*\*|\*([^*]+)\*)/g
+    const elements: React.ReactNode[] = []
+    let lastIndex = 0
+    let match: RegExpExecArray | null
+    let idx = 0
+
+    while ((match = regex.exec(text)) !== null) {
+      const matchStart = match.index
+      const matchEnd = regex.lastIndex
+
+      if (matchStart > lastIndex) {
+        const plainText = text.substring(lastIndex, matchStart).replace(/\*/g, '')
+        if (plainText) {
+          elements.push(<span key={`${keyPrefix}-t-${idx++}`}>{plainText}</span>)
+        }
+      }
+
+      // match[2] is inside **, match[3] is inside *
+      const boldContent = match[2] || match[3] || ''
+      if (boldContent) {
+        elements.push(
+          <strong key={`${keyPrefix}-b-${idx++}`} className="font-semibold text-white">
+            {boldContent}
           </strong>
         )
       }
-      return part.replace(/\*\*/g, '')
-    })
+
+      lastIndex = matchEnd
+    }
+
+    if (lastIndex < text.length) {
+      const remaining = text.substring(lastIndex).replace(/\*/g, '')
+      if (remaining) {
+        elements.push(<span key={`${keyPrefix}-t-${idx++}`}>{remaining}</span>)
+      }
+    }
+
+    return elements.length > 0 ? elements : text.replace(/\*/g, '')
   }
 
   const renderFormattedAnswer = (text: string) => {
@@ -628,7 +651,7 @@ export function EpicSupportAssistant({
         isThinking: true,
       }
 
-      setMessages([userMsg, introMsg, thinkingMsg])
+      setMessages([introMsg, userMsg, thinkingMsg])
 
       // Query Groq AI with fallback to local knowledge
       try {
@@ -841,6 +864,9 @@ export function EpicSupportAssistant({
         return m
       })
     )
+    if (helpful) {
+      setIsChatEnded(true)
+    }
   }
 
   const handleCreateTicket = async (msgId: string, subjectQuery?: string) => {
@@ -1785,21 +1811,16 @@ export function EpicSupportAssistant({
                             </div>
                           )}
 
-                          {/* If user clicked 'Yes': Show Chat Ended with Start New Conversation button */}
+                          {/* If user clicked 'Yes': Show Chat Ended faint */}
                           {msg.feedback === 'yes' && (
-                            <div className="pt-3 border-t border-[#26262b] space-y-2.5 animate-in fade-in">
+                            <div className="pt-3 border-t border-[#26262b] space-y-1.5 animate-in fade-in">
                               <p className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
                                 <CheckCircle2 size={14} className="text-emerald-400" />
-                                <span>Glad that helped! Chat ended.</span>
+                                <span>Glad that helped!</span>
                               </p>
-                              <button
-                                type="button"
-                                onClick={handleResetToHero}
-                                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border border-[#333] text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
-                              >
-                                <RotateCcw size={12} />
-                                <span>Start New Conversation</span>
-                              </button>
+                              <p className="text-xs text-zinc-500 font-medium select-none">
+                                Chat ended.
+                              </p>
                             </div>
                           )}
                         </>
@@ -1902,17 +1923,9 @@ export function EpicSupportAssistant({
                           <p className="text-zinc-300 text-xs sm:text-[13.5px] leading-relaxed">
                             Our team has received your message and will review it shortly. We will get back to you directly via email.
                           </p>
-                          <div className="pt-1 flex items-center gap-3">
-                            <span className="text-xs text-zinc-500 font-medium">Chat ended.</span>
-                            <button
-                              type="button"
-                              onClick={handleResetToHero}
-                              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border border-[#333] text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
-                            >
-                              <RotateCcw size={12} />
-                              <span>Start New Conversation</span>
-                            </button>
-                          </div>
+                          <p className="pt-1 text-xs text-zinc-500 font-medium select-none">
+                            Chat ended.
+                          </p>
                         </div>
                       )}
 
@@ -1925,71 +1938,84 @@ export function EpicSupportAssistant({
 
             <div ref={messagesEndRef} />
 
-            {/* Writing Box at Bottom of Chat (Exact 1:1 Match with Epic Games Screenshot) */}
+            {/* Writing Box or Start New Conversation Button at Bottom of Chat */}
             <div className="pt-4 pb-12">
-              <form
-                onSubmit={handleChatSubmit}
-                className="flex items-center gap-3 w-full"
-              >
-                {/* 3 Dots / Menu Button with End Chat Popover */}
-                <div className="relative" ref={optionsMenuRef}>
-                  {/* End Chat Popover Tooltip (Opens directly ABOVE the button) */}
-                  {isOptionsMenuOpen && (
-                    <div className="absolute bottom-full mb-3 left-0 z-50 animate-in fade-in zoom-in-95 duration-150">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsOptionsMenuOpen(false)
-                          handleResetToHero()
-                        }}
-                        className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1c1410] hover:bg-[#281b15] border border-[#33221a] text-xs font-semibold text-zinc-200 hover:text-white shadow-2xl transition-all cursor-pointer whitespace-nowrap"
-                      >
-                        <Ban size={13} className="text-zinc-400" />
-                        <span>End chat</span>
-                      </button>
-                    </div>
-                  )}
-
+              {isChatEnded || messages.some((m) => !!m.ticketNumber || m.feedback === 'yes') ? (
+                <div className="w-full animate-in fade-in zoom-in-95 duration-200">
                   <button
                     type="button"
-                    onClick={() => setIsOptionsMenuOpen((prev) => !prev)}
-                    title="Options"
-                    aria-label="Chat options"
-                    className={`w-12 h-12 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
-                      isOptionsMenuOpen
-                        ? 'bg-[#241710] border-[#FC6301]/60 text-white'
-                        : 'bg-[#16120e] hover:bg-[#1e1510] border-white/[0.08] text-zinc-400 hover:text-white'
-                    }`}
+                    onClick={handleResetToHero}
+                    className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-2xl bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-sm sm:text-base transition-all duration-200 shadow-xl shadow-[#FC6301]/25 active:scale-[0.99] cursor-pointer"
                   >
-                    <MoreHorizontal size={20} />
+                    <RotateCcw size={18} strokeWidth={2.4} />
+                    <span>Start New Conversation</span>
                   </button>
                 </div>
-
-                {/* Writing Box Input (Exact Epic Games rounded box with subtle border) */}
-                <input
-                  ref={chatInputRef}
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Write a message..."
-                  disabled={isTyping}
-                  className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-6 py-4 text-[15px] sm:text-base text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
-                />
-
-                {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
-                <button
-                  type="submit"
-                  disabled={!chatInput.trim() || isTyping}
-                  aria-label="Send message"
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
-                    chatInput.trim().length > 0
-                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
-                      : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
-                  }`}
+              ) : (
+                <form
+                  onSubmit={handleChatSubmit}
+                  className="flex items-center gap-3 w-full"
                 >
-                  <ArrowRight size={18} strokeWidth={2.5} />
-                </button>
-              </form>
+                  {/* 3 Dots / Menu Button with End Chat Popover */}
+                  <div className="relative" ref={optionsMenuRef}>
+                    {/* End Chat Popover Tooltip (Opens directly ABOVE the button) */}
+                    {isOptionsMenuOpen && (
+                      <div className="absolute bottom-full mb-3 left-0 z-50 animate-in fade-in zoom-in-95 duration-150">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsOptionsMenuOpen(false)
+                            setIsChatEnded(true)
+                          }}
+                          className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#1c1410] hover:bg-[#281b15] border border-[#33221a] text-xs font-semibold text-zinc-200 hover:text-white shadow-2xl transition-all cursor-pointer whitespace-nowrap"
+                        >
+                          <Ban size={13} className="text-zinc-400" />
+                          <span>End chat</span>
+                        </button>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setIsOptionsMenuOpen((prev) => !prev)}
+                      title="Options"
+                      aria-label="Chat options"
+                      className={`w-12 h-12 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
+                        isOptionsMenuOpen
+                          ? 'bg-[#241710] border-[#FC6301]/60 text-white'
+                          : 'bg-[#16120e] hover:bg-[#1e1510] border-white/[0.08] text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      <MoreHorizontal size={20} />
+                    </button>
+                  </div>
+
+                  {/* Writing Box Input (Exact Epic Games rounded box with subtle border) */}
+                  <input
+                    ref={chatInputRef}
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Write a message..."
+                    disabled={isTyping}
+                    className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-6 py-4 text-[15px] sm:text-base text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  />
+
+                  {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
+                  <button
+                    type="submit"
+                    disabled={!chatInput.trim() || isTyping}
+                    aria-label="Send message"
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
+                      chatInput.trim().length > 0
+                        ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
+                        : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
+                    }`}
+                  >
+                    <ArrowRight size={18} strokeWidth={2.5} />
+                  </button>
+                </form>
+              )}
             </div>
           </main>
 

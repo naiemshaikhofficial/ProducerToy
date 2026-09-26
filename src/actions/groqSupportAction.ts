@@ -425,7 +425,7 @@ EXACT INSTRUCTION:
   const isUserLoggedIn = Boolean(userEmail || userId)
   const userAccountSummary = `
 USER SESSION & DATABASE STATUS:
-- Logged-in User: ${isUserLoggedIn ? `YES (Logged in as ${userName} <${userEmail}>, User ID: ${userId})` : 'Guest / Not Logged In'}
+- Logged-in User: ${isUserLoggedIn ? `YES (Logged in as ${userName} <${userEmail}>)` : 'Guest / Not Logged In'}
 - Verified Purchases Count: ${userPurchases.length}
 - Owned Products: ${userPurchases.map((p) => p.products?.name || p.product_id).join(', ') || 'None'}
 - Recent Orders: ${userOrders.map((o) => `[Order #${o.order_number} | Status: ${o.payment_status} | Amount: ${o.currency || '$'}${o.total_amount}]`).join(', ') || 'None'}
@@ -434,9 +434,11 @@ ${adminActionResultNotes}`
   // 6. Comprehensive System Prompt
   const systemPrompt = `You are the official "Producer Toy Technical Support Specialist", an expert audio engineer and senior administrative specialist for Producer Toy (producertoy.com) — the premier marketplace for music producers and sound designers.
 
-CRITICAL IDENTITY & BRAND RULES:
+CRITICAL IDENTITY & PRIVACY RULES:
 - You are exclusively the internal technical support specialist of Producer Toy with full administrative access to store records, orders, invoices, and cloud audio delivery systems.
 - NEVER mention "Groq", "Llama", "Qwen", "OpenAI", "ChatGPT", "Meta", or any third-party AI provider or LLM under any circumstances.
+- NEVER mention or output technical database IDs, internal UUIDs, or User IDs (e.g. any long hexadecimal string like 86e854f5...). Only refer to the user by their name (${userName}) or email (${userEmail}).
+- ACCURACY GUARANTEE: Never hallucinate or invent BPM, sample counts, formats, or product specs that are not explicitly provided in the verified store inventory below. If specific data is not listed, state that it is not specified and advise the user that they can submit a support ticket for official confirmation from our senior sound engineers.
 - If asked who is answering or how you operate, respond that you are the official Producer Toy Technical Support Desk powered by Producer Toy's internal audio engineering knowledge base.
 - Speak in a polite, highly knowledgeable, and human-like technical tone.
 
@@ -510,6 +512,9 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/\bqwen(\s*\d+(\.\d+)?)?\b/gi, 'Producer Toy Support')
       .replace(/\bopenai\b/gi, 'Producer Toy')
       .replace(/\bchatgpt\b/gi, 'Producer Toy Assistant')
+      .replace(/\(User ID:\s*[a-f0-9-]+\)/gi, '')
+      .replace(/User ID:\s*[a-f0-9-]+/gi, '')
+      .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, '')
       .replace(/^#{1,4}\s+/gm, '') // Remove ### headings
       .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
       .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '[$1]($2)') // Strip stars around links
@@ -567,7 +572,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
         model: 'qwen/qwen3.8-27b',
         messages: formattedMessages,
         temperature: 0.35,
-        max_tokens: 650,
+        max_tokens: 1200,
       }),
     })
 
@@ -583,7 +588,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
           model: 'openai/gpt-oss-120b',
           messages: formattedMessages,
           temperature: 0.35,
-          max_tokens: 650,
+          max_tokens: 1200,
         }),
       })
 
