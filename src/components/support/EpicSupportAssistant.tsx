@@ -1445,7 +1445,7 @@ export function EpicSupportAssistant({
                         <span className="text-zinc-300 text-sm sm:text-[15px] font-normal">Thinking...</span>
                       </div>
                     ) : (
-                      <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[22px] rounded-tl-xs p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
+                      <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[20px] p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
                         
                         {/* AI Content with Clickable Direct Redirect Links */}
                         {msg.content && (
@@ -1749,134 +1749,8 @@ export function EpicSupportAssistant({
                               </div>
                             )}
                           </div>
-
-                          {/* Helpful feedback toggle ONLY on the latest assistant response before feedback is chosen */}
-                          {isLatestAssistant && !msg.ticketNumber && !msg.feedback && (
-                            <div className="pt-3 border-t border-[#26262b] flex items-center justify-between text-xs text-zinc-400">
-                              <span>Did this solve your problem?</span>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleFeedback(msg.id, true)}
-                                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]"
-                                >
-                                  <ThumbsUp size={12} />
-                                  <span>Yes</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleFeedback(msg.id, false)}
-                                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border font-semibold transition-all cursor-pointer bg-[#222228] text-zinc-300 hover:text-white border-[#33333d]"
-                                >
-                                  <ThumbsDown size={12} />
-                                  <span>No</span>
-                                </button>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* If user clicked 'Yes': Show Chat Ended faint */}
-                          {msg.feedback === 'yes' && (
-                            <div className="pt-3 border-t border-[#26262b] space-y-1.5 animate-in fade-in">
-                              <p className="text-xs text-emerald-400 flex items-center gap-1.5 font-medium">
-                                <CheckCircle2 size={14} className="text-emerald-400" />
-                                <span>Glad that helped!</span>
-                              </p>
-                              <p className="text-xs text-zinc-500 font-medium select-none">
-                                Chat ended.
-                              </p>
-                            </div>
-                          )}
                         </>
                       )}
-
-                      {/* Inline Ticket Escalation Form (Pure Solid Dark, Zero Glassmorphism) */}
-                      {msg.needsTicket && !msg.ticketNumber && (
-                        <div className="mt-4 pt-4 border-t border-[#26262b] space-y-3.5 animate-in fade-in">
-                          {!user ? (
-                            <div className="space-y-3">
-                              <div className="flex items-start gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-[#202025] border border-white/5 flex items-center justify-center shrink-0 text-[#FC6301] mt-0.5">
-                                  <Lock size={15} />
-                                </div>
-                                <div className="space-y-1">
-                                  <p className="text-xs sm:text-[13px] font-semibold text-white">
-                                    Sign In Required for Ticket Tracking
-                                  </p>
-                                  <p className="text-xs text-zinc-400 leading-relaxed">
-                                    Please sign in to your Producer Toy account to submit this ticket directly to our senior audio engineering desk. This allows our team to connect your licenses and enables 1-click tracking.
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-3 pt-1">
-                                <Link
-                                  href={`/auth?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/support')}`}
-                                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-                                >
-                                  <LogIn size={13} />
-                                  <span>Sign In to Submit & Track</span>
-                                </Link>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div className="flex items-center justify-between flex-wrap gap-2">
-                                <p className="text-xs sm:text-[13px] text-zinc-200 font-medium">
-                                  Submit this request directly to our senior audio engineering desk:
-                                </p>
-                                <span className="text-[11px] text-zinc-400 bg-[#202025] px-2.5 py-0.5 rounded-md border border-white/5 font-mono">
-                                  {user.email}
-                                </span>
-                              </div>
-
-                              {ticketError && (
-                                <p className="text-xs text-rose-400">{ticketError}</p>
-                              )}
-
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <input
-                                  type="text"
-                                  value={ticketName}
-                                  onChange={(e) => setTicketName(e.target.value)}
-                                  placeholder="Your Name (Optional)"
-                                  className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
-                                />
-                                <input
-                                  type="email"
-                                  required
-                                  value={ticketEmail}
-                                  onChange={(e) => setTicketEmail(e.target.value)}
-                                  placeholder="Your Email *"
-                                  className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
-                                />
-                              </div>
-
-                              <div className="flex justify-end pt-1">
-                                <button
-                                  type="button"
-                                  onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
-                                  disabled={isSubmittingTicket}
-                                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-                                >
-                                  {isSubmittingTicket ? (
-                                    <>
-                                      <Loader2 size={13} className="animate-spin" />
-                                      <span>Submitting...</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Send size={13} />
-                                      <span>Submit to Audio Desk</span>
-                                    </>
-                                  )}
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      )}
-
                     </div>
                   )}
 
@@ -1900,8 +1774,8 @@ export function EpicSupportAssistant({
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
 
-                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #141417) */}
-                    <div className="w-full bg-[#141417] border border-white/[0.08] text-white rounded-2xl rounded-tl-xs px-6 py-5 sm:px-8 sm:py-6 shadow-xl space-y-4">
+                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #18181c, Exact Epic Games Dialog Shape) */}
+                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-4">
                       {/* Top Header Badge */}
                       <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
                         <div className="flex items-center gap-2">
@@ -1910,14 +1784,14 @@ export function EpicSupportAssistant({
                             Official Drop Alert &bull; Coming Soon
                           </span>
                         </div>
-                        <span className="text-[10px] font-mono font-bold text-zinc-400 bg-[#1c1c22] px-2.5 py-1 rounded-md border border-white/[0.06]">
+                        <span className="text-[10px] font-mono font-bold text-zinc-400 bg-[#222228] px-2.5 py-1 rounded-md border border-white/[0.06]">
                           In Final Audio Mastering
                         </span>
                       </div>
 
                       {/* Product Preview Row */}
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden relative bg-[#1c1c22] border border-white/[0.08] shrink-0 flex items-center justify-center">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden relative bg-[#222228] border border-white/[0.08] shrink-0 flex items-center justify-center">
                           {msg.comingSoonProduct.cover_image && !msg.comingSoonProduct.cover_image.includes('placeholder') ? (
                             <Image
                               src={msg.comingSoonProduct.cover_image}
@@ -1943,7 +1817,7 @@ export function EpicSupportAssistant({
                           <p className="text-xs sm:text-[13px] text-zinc-400 line-clamp-1">
                             {msg.comingSoonProduct.short_description || 'Master-grade audio sound pack in final audio engineering.'}
                           </p>
-                          <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-semibold bg-[#1c1c22] text-amber-300 border border-amber-500/20">
+                          <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-semibold bg-[#222228] text-amber-300 border border-amber-500/20">
                             Expected Launch Price: ${msg.comingSoonProduct.price_usd}
                           </span>
                         </div>
@@ -1973,6 +1847,179 @@ export function EpicSupportAssistant({
                   </div>
                 )}
 
+                {/* Standalone Separate Dialog Box for Feedback (Exact Epic Games Dialog Shape, Solid #18181c) */}
+                {isLatestAssistant && !msg.ticketNumber && !msg.isGreeting && !msg.isThinking && (
+                  <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
+                    {/* Robot Avatar Header */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
+                      <Image
+                        src="/images/robot-avatar.png"
+                        alt="Producer Toy Support Assistant"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain shrink-0"
+                      />
+                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Assistant
+                      </span>
+                      <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
+                    </div>
+
+                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #18181c, Exact Epic Games Dialog Shape) */}
+                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-5 sm:p-6 shadow-2xl space-y-3">
+                      {!msg.feedback ? (
+                        <div className="flex items-center justify-between gap-4 flex-wrap">
+                          <span className="text-xs sm:text-sm font-medium text-zinc-300">
+                            Did this solve your problem?
+                          </span>
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => handleFeedback(msg.id, true)}
+                              className="flex items-center gap-1.5 px-4 py-2 rounded-xl border font-semibold text-xs transition-all cursor-pointer bg-[#222228] text-zinc-200 hover:text-white hover:bg-[#2c2c34] border-white/[0.08]"
+                            >
+                              <ThumbsUp size={13} className="text-[#00d66c]" />
+                              <span>Yes</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleFeedback(msg.id, false)}
+                              className="flex items-center gap-1.5 px-4 py-2 rounded-xl border font-semibold text-xs transition-all cursor-pointer bg-[#222228] text-zinc-200 hover:text-white hover:bg-[#2c2c34] border-white/[0.08]"
+                            >
+                              <ThumbsDown size={13} className="text-zinc-400" />
+                              <span>No</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : msg.feedback === 'yes' ? (
+                        <div className="space-y-1.5 animate-in fade-in">
+                          <p className="text-xs sm:text-sm text-emerald-400 flex items-center gap-2 font-semibold">
+                            <CheckCircle2 size={16} className="text-emerald-400" />
+                            <span>Glad that helped!</span>
+                          </p>
+                          <p className="text-xs text-zinc-500 font-medium select-none">
+                            Chat ended.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1 animate-in fade-in">
+                          <p className="text-xs sm:text-sm text-amber-400 font-semibold flex items-center gap-2">
+                            <span>We&apos;re sorry this didn&apos;t resolve your issue.</span>
+                          </p>
+                          <p className="text-xs text-zinc-400">
+                            Please submit a support ticket below to connect directly with our senior audio engineering desk.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Standalone Separate Dialog Box for Ticket Escalation (Exact Epic Games Dialog Shape, Solid #18181c) */}
+                {msg.needsTicket && !msg.ticketNumber && msg.feedback !== 'yes' && !msg.isThinking && (
+                  <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
+                    {/* Robot Avatar Header */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
+                      <Image
+                        src="/images/robot-avatar.png"
+                        alt="Producer Toy Support Assistant"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain shrink-0"
+                      />
+                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Assistant
+                      </span>
+                      <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
+                    </div>
+
+                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #18181c, Exact Epic Games Dialog Shape) */}
+                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-4">
+                      {!user ? (
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-[#202025] border border-white/5 flex items-center justify-center shrink-0 text-[#FC6301] mt-0.5">
+                              <Lock size={15} />
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-xs sm:text-[13px] font-semibold text-white">
+                                Sign In Required for Ticket Tracking
+                              </p>
+                              <p className="text-xs text-zinc-400 leading-relaxed">
+                                Please sign in to your Producer Toy account to submit this ticket directly to our senior audio engineering desk. This allows our team to connect your licenses and enables 1-click tracking.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 pt-1">
+                            <Link
+                              href={`/auth?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/support')}`}
+                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                            >
+                              <LogIn size={13} />
+                              <span>Sign In to Submit & Track</span>
+                            </Link>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between flex-wrap gap-2">
+                            <p className="text-xs sm:text-[13px] text-zinc-200 font-medium">
+                              Submit this request directly to our senior audio engineering desk:
+                            </p>
+                            <span className="text-[11px] text-zinc-400 bg-[#202025] px-2.5 py-0.5 rounded-md border border-white/5 font-mono">
+                              {user.email}
+                            </span>
+                          </div>
+
+                          {ticketError && (
+                            <p className="text-xs text-rose-400">{ticketError}</p>
+                          )}
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <input
+                              type="text"
+                              value={ticketName}
+                              onChange={(e) => setTicketName(e.target.value)}
+                              placeholder="Your Name (Optional)"
+                              className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
+                            />
+                            <input
+                              type="email"
+                              required
+                              value={ticketEmail}
+                              onChange={(e) => setTicketEmail(e.target.value)}
+                              placeholder="Your Email *"
+                              className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
+                            />
+                          </div>
+
+                          <div className="flex justify-end pt-1">
+                            <button
+                              type="button"
+                              onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
+                              disabled={isSubmittingTicket}
+                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                            >
+                              {isSubmittingTicket ? (
+                                <>
+                                  <Loader2 size={13} className="animate-spin" />
+                                  <span>Submitting...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Send size={13} />
+                                  <span>Submit to Audio Desk</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Standalone Separate Message Box for Ticket Confirmation (Zero Glassmorphism) */}
                 {msg.ticketNumber && (
                   <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
@@ -1991,8 +2038,8 @@ export function EpicSupportAssistant({
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
 
-                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #141417) */}
-                    <div className="w-full bg-[#141417] border border-white/[0.08] text-white rounded-2xl rounded-tl-xs px-6 py-5 sm:px-8 sm:py-6 shadow-xl space-y-3">
+                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #18181c, Exact Epic Games Dialog Shape) */}
+                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-3">
                       <p className="font-semibold text-white text-base sm:text-lg flex items-center gap-2.5">
                         <CheckCircle2 size={18} className="text-[#00d66c] shrink-0" />
                         <span>We have received your request!</span>
@@ -2001,7 +2048,7 @@ export function EpicSupportAssistant({
                         Our team has received your message and will review it shortly. We will get back to you directly via email.
                       </p>
                       <div className="pt-1 flex items-center gap-2">
-                        <span className="text-xs text-zinc-400 font-mono bg-[#1c1c22] px-3 py-1.5 rounded-lg border border-white/[0.06]">
+                        <span className="text-xs text-zinc-400 font-mono bg-[#222228] px-3 py-1.5 rounded-lg border border-white/[0.06]">
                           Ticket Ref: #{msg.ticketNumber}
                         </span>
                       </div>

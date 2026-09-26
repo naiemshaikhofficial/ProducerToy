@@ -256,43 +256,43 @@ export async function askGroqSupportAction(
     queryLower.includes('order details') ||
     queryLower.includes('order number')
 
-  // Find candidate product user is asking about
+  // Common generic words that should never trigger product matching
+  const GENERIC_PRODUCT_WORDS = new Set([
+    'pack', 'packs', 'sound', 'sounds', 'loop', 'loops', 'free', 'vst', 'vsts',
+    'tool', 'tools', 'kit', 'kits', 'drum', 'drums', 'beat', 'beats', 'instrument',
+    'instruments', 'sample', 'samples', 'audio', 'music', 'plugin', 'plugins',
+    'master', 'like', 'product', 'products', 'item', 'items', 'what', 'dont', 'doesnt'
+  ])
+
+  // Find candidate product user is asking about completely dynamically from live database
   let candidateProduct: any = null
   for (const p of allProducts) {
-    const nameLower = p.name.toLowerCase()
-    const slugLower = p.slug.toLowerCase()
-    if (
-      queryLower.includes(nameLower) ||
-      queryLower.includes(slugLower) ||
-      (slugLower === 'tabla-masters' && queryLower.includes('tabla')) ||
-      (slugLower === 'sexy-drill' && (queryLower.includes('drill') || queryLower.includes('sexy')))
-    ) {
+    const nameLower = (p.name || '').toLowerCase()
+    const slugLower = (p.slug || '').toLowerCase()
+
+    // 1. Direct match on name or slug
+    if (queryLower.includes(nameLower) || queryLower.includes(slugLower)) {
+      candidateProduct = p
+      break
+    }
+
+    // 2. Meaningful keyword matching (individual words of 4+ characters in product name, non-generic)
+    const nameWords = nameLower
+      .split(/\s+/)
+      .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
+    if (nameWords.length > 0 && nameWords.some((w: string) => queryLower.includes(w))) {
       candidateProduct = p
       break
     }
   }
 
-  // Fallback for Sexy Drill if not found in db query
-  if (!candidateProduct && (queryLower.includes('drill') || queryLower.includes('sexy'))) {
-    candidateProduct = {
-      id: '18bb0ec4-8a6f-4f0c-a8f2-f9255ccc586c',
-      name: 'Sexy Drill',
-      slug: 'sexy-drill',
-      cover_image: 'https://imagizer.imageshack.com/img923/2628/V8MFyO.png',
-      price_usd: 9.99,
-      is_coming_soon: true,
-      product_type: 'sample_pack',
-      short_description: 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
-    }
-  }
-
-  // A. Check Coming Soon Products (e.g. Sexy Drill)
+  // A. Check Coming Soon Products (Works dynamically for ANY unreleased product in database)
   if (candidateProduct && candidateProduct.is_coming_soon) {
     comingSoonProduct = {
       id: candidateProduct.id,
       name: candidateProduct.name,
       slug: candidateProduct.slug,
-      cover_image: candidateProduct.cover_image || '/images/products/placeholder.png',
+      cover_image: candidateProduct.cover_image || '',
       price_usd: Number(candidateProduct.price_usd || 0),
       release_date: candidateProduct.release_date || null,
       short_description: candidateProduct.short_description || null,
@@ -507,6 +507,20 @@ CRITICAL RULES FOR AUTONOMOUS ADMINISTRATIVE PROBLEM RESOLUTION:
    - Loyalty rewards: [Toywards Rewards](/features/toywards)
    - Contact or human desk: [Support Desk](/support)
 
+CRITICAL RULES FOR REFUND, RETURN, OR "DONT LIKE A PRODUCT" INQUIRIES:
+- If a user asks "what if i dont like a product", "can I get a refund if I don't like the sounds", "not satisfied with product", "change of mind", "sound quality not as expected", or asks about returns/refunds:
+  1. STRICT ACCURATE POLICY (NEVER HALLUCINATE A 7-DAY RETURN WINDOW FOR CHANGE OF MIND):
+     - As per Producer Toy's official [Refund Policy](/refund-policy), digital downloads (sample packs, sound kits, loops, presets, VST plugins) are irrevocable digital goods delivered immediately to the account upon checkout.
+     - Completed purchases are STRICTLY NON-REFUNDABLE for "change of mind", subjective dislike, or personal sound preference once accessed or downloaded.
+  2. ALWAYS ADVISE AUDITIONING DEMOS BEFORE PURCHASE:
+     - Clearly explain that every product page on Producer Toy includes playable high-fidelity audio demos, stems preview players, and complete sound lists specifically so producers can preview and evaluate the exact sound quality before purchasing.
+  3. WHEN ARE REFUNDS OR REPLACEMENTS ALLOWED?
+     - ONLY in cases of technical defects, corrupted/unreadable archives that our support engineers cannot resolve within our SLA, or accidental duplicate purchases of the identical product on the same account.
+  4. ABSOLUTE FORBIDDEN MISTAKES ON REFUND QUERIES:
+     - NEVER tell the user to navigate to "Billing & Transactions" and click "Request Refund" (no such self-service button exists for digital downloads).
+     - NEVER claim there is a 7-day or 14-day refund window if they don't like the sounds.
+     - NEVER mention upcoming unreleased products (such as Sexy Drill) or promote drop alerts when answering a refund or complaint query!
+
 CRITICAL LANGUAGE MATCHING RULE:
 - ALWAYS detect and respond in the EXACT same language and script the user communicates in:
   1. Hinglish (Roman Hindi / Urdu, e.g. "konsa sample best rahega", "sexy drill purchase kyu nahi ho raha"):
@@ -542,7 +556,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '[$1]($2)') // Strip stars around links
   }
 
-  // Helper to extract recommended products from AI response and user query
+  // Helper to extract recommended products from AI response and user query (Excludes Coming Soon products)
   const findMatchedProducts = (text: string): RecommendedProduct[] => {
     const result: RecommendedProduct[] = []
     const textLower = (text || '').toLowerCase()
@@ -550,22 +564,23 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
 
     if (allProducts && allProducts.length > 0) {
       for (const p of allProducts) {
-        const nameLower = p.name.toLowerCase()
-        const slugLower = p.slug.toLowerCase()
+        // Never put unreleased Coming Soon products in the purchase recommendation grid
+        if (p.is_coming_soon) continue
+
+        const nameLower = (p.name || '').toLowerCase()
+        const slugLower = (p.slug || '').toLowerCase()
         const isMatched =
           textLower.includes(nameLower) ||
           textLower.includes(slugLower) ||
           qLower.includes(nameLower) ||
-          qLower.includes(slugLower) ||
-          (slugLower === 'tabla-masters' && (qLower.includes('tabla') || textLower.includes('tabla'))) ||
-          (slugLower === 'sexy-drill' && (qLower.includes('drill') || textLower.includes('drill')))
+          qLower.includes(slugLower)
 
         if (isMatched && !result.some((r) => r.id === p.id)) {
           result.push({
             id: p.id,
             name: p.name,
             slug: p.slug,
-            cover_image: p.cover_image || '/images/products/placeholder.png',
+            cover_image: p.cover_image || '',
             price_usd: Number(p.price_usd || 0),
             original_price_usd: p.original_price_usd ? Number(p.original_price_usd) : null,
             product_type: p.product_type || 'sample_pack',
@@ -624,23 +639,31 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       const rawAnswer = fallbackData.choices?.[0]?.message?.content || ''
       const cleanedAnswer = scrubBrandNames(rawAnswer)
 
-      const resolveComingSoon = (ans: string): ComingSoonProduct | null => {
+      const resolveComingSoon = (): ComingSoonProduct | null => {
         if (comingSoonProduct) return comingSoonProduct
-        const combined = `${query} ${ans}`.toLowerCase()
-        if (
-          combined.includes('sexy drill') ||
-          combined.includes('sexy-drill') ||
-          (combined.includes('drill') && (combined.includes('coming soon') || combined.includes('drop alert') || combined.includes('tempo') || combined.includes('bpm')))
-        ) {
-          const dbDrill = allProducts.find((p) => p.slug === 'sexy-drill' || p.name.toLowerCase().includes('drill'))
-          return {
-            id: dbDrill?.id || '18bb0ec4-8a6f-4f0c-a8f2-f9255ccc586c',
-            name: dbDrill?.name || 'Sexy Drill',
-            slug: dbDrill?.slug || 'sexy-drill',
-            cover_image: dbDrill?.cover_image || 'https://imagizer.imageshack.com/img923/2628/V8MFyO.png',
-            price_usd: Number(dbDrill?.price_usd || 9.99),
-            release_date: dbDrill?.release_date || null,
-            short_description: dbDrill?.short_description || 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
+        const queryText = (query || '').toLowerCase()
+        for (const p of allProducts) {
+          if (p.is_coming_soon) {
+            const nameLower = (p.name || '').toLowerCase()
+            const slugLower = (p.slug || '').toLowerCase()
+            const nameWords = nameLower
+              .split(/\s+/)
+              .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
+            if (
+              queryText.includes(nameLower) ||
+              queryText.includes(slugLower) ||
+              (nameWords.length > 0 && nameWords.some((w: string) => queryText.includes(w)))
+            ) {
+              return {
+                id: p.id,
+                name: p.name,
+                slug: p.slug,
+                cover_image: p.cover_image || '',
+                price_usd: Number(p.price_usd || 0),
+                release_date: p.release_date || null,
+                short_description: p.short_description || null,
+              }
+            }
           }
         }
         return null
@@ -652,7 +675,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
         recommendedProducts: findMatchedProducts(cleanedAnswer),
         verifiedDownload,
         verifiedOrder,
-        comingSoonProduct: resolveComingSoon(cleanedAnswer),
+        comingSoonProduct: resolveComingSoon(),
         canEscalateToTicket,
       }
     }
@@ -661,23 +684,31 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
     const rawAnswer = data.choices?.[0]?.message?.content || ''
     const cleanedAnswer = scrubBrandNames(rawAnswer)
 
-    const resolveComingSoon = (ans: string): ComingSoonProduct | null => {
+    const resolveComingSoon = (): ComingSoonProduct | null => {
       if (comingSoonProduct) return comingSoonProduct
-      const combined = `${query} ${ans}`.toLowerCase()
-      if (
-        combined.includes('sexy drill') ||
-        combined.includes('sexy-drill') ||
-        (combined.includes('drill') && (combined.includes('coming soon') || combined.includes('drop alert') || combined.includes('tempo') || combined.includes('bpm')))
-      ) {
-        const dbDrill = allProducts.find((p) => p.slug === 'sexy-drill' || p.name.toLowerCase().includes('drill'))
-        return {
-          id: dbDrill?.id || '18bb0ec4-8a6f-4f0c-a8f2-f9255ccc586c',
-          name: dbDrill?.name || 'Sexy Drill',
-          slug: dbDrill?.slug || 'sexy-drill',
-          cover_image: dbDrill?.cover_image || 'https://imagizer.imageshack.com/img923/2628/V8MFyO.png',
-          price_usd: Number(dbDrill?.price_usd || 9.99),
-          release_date: dbDrill?.release_date || null,
-          short_description: dbDrill?.short_description || 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
+      const queryText = (query || '').toLowerCase()
+      for (const p of allProducts) {
+        if (p.is_coming_soon) {
+          const nameLower = (p.name || '').toLowerCase()
+          const slugLower = (p.slug || '').toLowerCase()
+          const nameWords = nameLower
+            .split(/\s+/)
+            .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
+          if (
+            queryText.includes(nameLower) ||
+            queryText.includes(slugLower) ||
+            (nameWords.length > 0 && nameWords.some((w: string) => queryText.includes(w)))
+          ) {
+            return {
+              id: p.id,
+              name: p.name,
+              slug: p.slug,
+              cover_image: p.cover_image || '',
+              price_usd: Number(p.price_usd || 0),
+              release_date: p.release_date || null,
+              short_description: p.short_description || null,
+            }
+          }
         }
       }
       return null
@@ -689,7 +720,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       recommendedProducts: findMatchedProducts(cleanedAnswer),
       verifiedDownload,
       verifiedOrder,
-      comingSoonProduct: resolveComingSoon(cleanedAnswer),
+      comingSoonProduct: resolveComingSoon(),
       canEscalateToTicket,
     }
   } catch (error: any) {
