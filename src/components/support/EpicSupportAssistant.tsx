@@ -178,7 +178,7 @@ export function EpicSupportAssistant({
         sender: 'assistant',
         timestamp: time,
         content:
-          "Hey 👋 I'm the Producer Toy Support Assistant. I'm here to help you with your Producer Toy questions and issues.",
+          "Hey 👋 I'm the Producer Toy Support Assistant. I'm AI-powered and here to help you with your Producer Toy questions and issues.",
         isGreeting: true,
         isThinking: false,
       }
@@ -521,22 +521,49 @@ export function EpicSupportAssistant({
         </div>
       ) : (
         /* ========================================================================= */
-        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Full Website Scroll, Exact Theme)   */
+        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Exact Match with Epic Games Layout) */
         /* ========================================================================= */
-        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative">
+        <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative overflow-hidden">
           
-          {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant */}
-          <div className="text-center pt-8 pb-3 relative bg-[#080706]">
+          {/* Top Dissolve Background (Exact Epic Games Atmospheric Fade) */}
+          <div className="absolute top-0 left-0 right-0 h-[380px] overflow-hidden pointer-events-none -z-0">
+            {/* Glowing Angled Light Beam & Warm Ambience */}
+            <div className="absolute -top-16 -left-16 w-[700px] h-[320px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/18 to-transparent blur-3xl pointer-events-none" />
+            <div className="absolute top-1/4 left-1/5 w-[420px] h-[420px] bg-[#FC6301]/10 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute top-8 right-1/4 w-[480px] h-[320px] bg-amber-600/10 rounded-full blur-[140px] pointer-events-none" />
+
+            {/* Abstract Glowing Lines */}
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none opacity-20 overflow-hidden"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="chatDissolveLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FC6301" stopOpacity="0.4" />
+                  <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M -100 150 L 500 50 L 1000 280 L 1600 80" fill="none" stroke="url(#chatDissolveLine)" strokeWidth="1.5" />
+              <path d="M 50 320 L 700 140 L 1200 300 L 1800 180" fill="none" stroke="url(#chatDissolveLine)" strokeWidth="1" strokeDasharray="4 6" />
+            </svg>
+
+            {/* Smooth Vertical Dissolve Gradient Fade to pure dark background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#080706]/75 to-[#080706]" />
+          </div>
+
+          {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant (Centered over dissolve background) */}
+          <div className="text-center pt-8 pb-3 relative z-10">
             <button
               onClick={handleResetToHero}
-              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c] border border-white/10"
+              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c]/80 border border-white/10 backdrop-blur-md"
             >
               <ArrowLeft size={13} />
               <span className="hidden sm:inline">Start over</span>
             </button>
 
             <div className="space-y-1">
-              <p className="text-[10px] sm:text-[11px] font-bold tracking-widest uppercase text-zinc-400 font-mono">
+              <p className="text-[10px] sm:text-[11px] font-semibold tracking-widest uppercase text-zinc-400 font-mono">
                 Your Chat With
               </p>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -546,7 +573,7 @@ export function EpicSupportAssistant({
 
             {/* Date Pill */}
             <div className="pt-3">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e] border border-white/10 text-[11px] text-zinc-400 font-medium">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e]/80 border border-white/10 text-[11px] text-zinc-400 font-medium backdrop-blur-sm shadow-sm">
                 {formatCurrentDate()}
               </span>
             </div>
@@ -592,8 +619,7 @@ export function EpicSupportAssistant({
                       <span className="text-zinc-300 text-sm font-normal">Thinking...</span>
                     </div>
                   ) : (
-                    /* Full Assistant Response Card (Exact Match with Circled Screenshot) */
-                    <div className="bg-[#15110e] border border-white/[0.08] text-zinc-200 rounded-2xl rounded-tl-sm p-6 text-sm sm:text-[14.5px] leading-relaxed space-y-4 shadow-2xl w-full">
+                    <div className="bg-[#15110e] border border-white/[0.08] text-zinc-200 rounded-2xl rounded-tl-sm px-5 py-4 text-sm sm:text-[14.5px] leading-relaxed space-y-3.5 shadow-xl w-full">
                       
                       {/* AI Content */}
                       {msg.content && (
@@ -803,7 +829,7 @@ export function EpicSupportAssistant({
                   </button>
                 </div>
 
-                {/* Writing Box Input */}
+                {/* Writing Box Input (Exact Epic Games rounded box with subtle border) */}
                 <input
                   ref={chatInputRef}
                   type="text"
@@ -811,7 +837,7 @@ export function EpicSupportAssistant({
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Write a message..."
                   disabled={isTyping}
-                  className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  className="flex-1 bg-[#14100c] hover:bg-[#1a140f] focus:bg-[#1a140f] border border-white/15 focus:border-[#FC6301] rounded-2xl px-5 py-3.5 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
                 {/* Circle Arrow Button (Producer Toy Orange) */}
@@ -821,7 +847,7 @@ export function EpicSupportAssistant({
                   aria-label="Send message"
                   className="w-11 h-11 rounded-full bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-30 disabled:hover:bg-[#FC6301] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#FC6301]/25 active:scale-95"
                 >
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} strokeWidth={2.5} />
                 </button>
               </form>
             </div>

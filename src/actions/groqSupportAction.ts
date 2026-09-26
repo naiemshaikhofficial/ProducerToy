@@ -87,7 +87,7 @@ Formatting Instructions:
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'qwen/qwen3.8-27b',
+        model: 'llama-3.3-70b-versatile',
         messages: formattedMessages,
         temperature: 0.5,
         max_tokens: 650,
@@ -95,7 +95,7 @@ Formatting Instructions:
     })
 
     if (!response.ok) {
-      // Fallback to gpt-oss-120b if qwen encounters any issue
+      // Fallback to llama-3.1-8b-instant if 70b encounters any issue
       const fallbackResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -103,7 +103,7 @@ Formatting Instructions:
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'openai/gpt-oss-120b',
+          model: 'llama-3.1-8b-instant',
           messages: formattedMessages,
           temperature: 0.5,
           max_tokens: 500,
