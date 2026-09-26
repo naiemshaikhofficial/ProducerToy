@@ -825,186 +825,211 @@ export function EpicSupportAssistant({
           <div className="absolute -top-36 -left-32 w-[900px] h-[650px] -rotate-[38deg] bg-gradient-to-r from-[#FC6301]/40 via-amber-500/22 to-transparent blur-3xl pointer-events-none z-0" />
           <div className="absolute top-1/4 right-[2%] w-[260px] h-[600px] bg-gradient-to-b from-[#FC6301]/25 via-amber-600/12 to-transparent blur-3xl rounded-full pointer-events-none z-0" />
           
-          {/* Rich 3D Perspective Trusses, Architectural Frames & Hexagonal Bokeh Elements */}
+          {/* Authentic Producer Toy Musical Elements (Studio DAW EQ, Glowing Audio Waves, Musical Notes & Sequencer) */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden"
             viewBox="0 0 1440 900"
             preserveAspectRatio="xMidYMid slice"
           >
             <defs>
-              {/* Linear Gradients for Structural Neon Lines */}
-              <linearGradient id="ptNeonOrangeStrong" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffb366" stopOpacity="1" />
-                <stop offset="45%" stopColor="#FC6301" stopOpacity="0.95" />
-                <stop offset="85%" stopColor="#ff7a1a" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#FC6301" stopOpacity="0.15" />
+              {/* Neon Musical Gradients */}
+              <linearGradient id="ptMusicGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffe0b2" stopOpacity="1" />
+                <stop offset="35%" stopColor="#ffb366" stopOpacity="0.95" />
+                <stop offset="70%" stopColor="#FC6301" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#d9480f" stopOpacity="0.4" />
               </linearGradient>
 
-              <linearGradient id="ptNeonOrangeMuted" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ff9a42" stopOpacity="0.8" />
-                <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.5" />
+              <linearGradient id="ptAudioBarGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.15" />
+                <stop offset="60%" stopColor="#ff7a1a" stopOpacity="0.65" />
+                <stop offset="95%" stopColor="#ffca80" stopOpacity="1" />
+              </linearGradient>
+
+              <linearGradient id="ptWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#FC6301" stopOpacity="0" />
+                <stop offset="20%" stopColor="#ff7a1a" stopOpacity="0.75" />
+                <stop offset="50%" stopColor="#ffb366" stopOpacity="0.9" />
+                <stop offset="80%" stopColor="#FC6301" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#FC6301" stopOpacity="0" />
+              </linearGradient>
+
+              <linearGradient id="ptVinylGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffaa40" stopOpacity="0.35" />
+                <stop offset="50%" stopColor="#FC6301" stopOpacity="0.15" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
-              <linearGradient id="ptTrussFaceFill" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.15" />
-                <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.06" />
-                <stop offset="100%" stopColor="#1a0c04" stopOpacity="0.5" />
-              </linearGradient>
-
-              <linearGradient id="ptHexBokehGrad" x1="20%" y1="0%" x2="80%" y2="100%">
-                <stop offset="0%" stopColor="#ffaa40" stopOpacity="0.45" />
-                <stop offset="45%" stopColor="#FC6301" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#d9480f" stopOpacity="0.08" />
-              </linearGradient>
-
-              {/* Glow & Blur Filters for Realistic Camera Depth of Field */}
-              <filter id="ptSoftBokehBlur" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="8" />
-              </filter>
-              <filter id="ptHeavyBokehBlur" x="-40%" y="-40%" width="180%" height="180%">
-                <feGaussianBlur stdDeviation="18" />
-              </filter>
-              <filter id="ptNeonGlow" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+              {/* Glowing Filters for Studio Neon Illumination */}
+              <filter id="ptMusicGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
                 <feMerge>
                   <feMergeNode in="coloredBlur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
+
+              <filter id="ptSoftNoteBlur" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="6" />
+              </filter>
             </defs>
 
-            {/* --- STAGE RIGGING / TRUSS 1: Main Left 3D Perspective Scaffolding --- */}
-            {/* 3D Tilted Top Extrusion Face */}
-            <polygon
-              points="40,150 140,60 440,140 350,230"
-              fill="url(#ptTrussFaceFill)"
-              stroke="url(#ptNeonOrangeStrong)"
-              strokeWidth="2.2"
-              filter="url(#ptNeonGlow)"
-              opacity="0.95"
-            />
-            {/* Top face cross-brace */}
-            <line x1="40" y1="150" x2="440" y2="140" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="6 6" opacity="0.75" />
-
-            {/* 3D Tilted Front Face Panel */}
-            <polygon
-              points="40,150 350,230 270,680 -20,570"
-              fill="url(#ptTrussFaceFill)"
-              stroke="url(#ptNeonOrangeStrong)"
+            {/* --- 1. ANALOG SYNTH AUDIO SINE WAVEFORMS --- */}
+            {/* Primary flowing audio frequency wave */}
+            <path
+              d="M-60,330 C180,240 320,400 540,320 C760,240 920,410 1140,330 C1280,270 1380,360 1500,320"
+              fill="none"
+              stroke="url(#ptWaveGrad)"
               strokeWidth="2.5"
-              filter="url(#ptNeonGlow)"
-              opacity="1"
-            />
-
-            {/* Front Face Modular Section Dividers & Diagonal 'X' Bracing (Matching Stage Scaffolding) */}
-            <line x1="40" y1="150" x2="270" y2="680" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2" opacity="0.8" />
-            <line x1="350" y1="230" x2="-20" y2="570" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2" opacity="0.8" />
-            <line x1="10" y1="360" x2="310" y2="455" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2.2" opacity="0.9" />
-            <line x1="10" y1="360" x2="350" y2="230" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.5" strokeDasharray="6 8" opacity="0.7" />
-            <line x1="10" y1="360" x2="270" y2="680" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.5" strokeDasharray="6 8" opacity="0.7" />
-
-            {/* 3D Perspective Right Edge Depth Plane */}
-            <polygon
-              points="350,230 440,140 370,590 270,680"
-              fill="url(#ptTrussFaceFill)"
-              stroke="url(#ptNeonOrangeStrong)"
-              strokeWidth="2"
+              filter="url(#ptMusicGlow)"
               opacity="0.85"
             />
-            <line x1="350" y1="230" x2="370" y2="590" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="5 7" opacity="0.65" />
-
-            {/* Junction Nodes / Truss Joint Rivets */}
-            <circle cx="40" cy="150" r="4" fill="#ffca80" filter="url(#ptNeonGlow)" />
-            <circle cx="350" cy="230" r="5" fill="#ffca80" filter="url(#ptNeonGlow)" />
-            <circle cx="270" cy="680" r="4.5" fill="#FC6301" />
-            <circle cx="-20" cy="570" r="4" fill="#FC6301" />
-            <circle cx="140" cy="60" r="3.5" fill="#ffca80" />
-            <circle cx="440" cy="140" r="4" fill="#ffca80" filter="url(#ptNeonGlow)" />
-            <circle cx="10" cy="360" r="4" fill="#ffca80" />
-            <circle cx="310" cy="455" r="4" fill="#ffca80" />
-
-            {/* --- SECONDARY BACKGROUND TRUSS (Deeper in 3D Space) --- */}
-            <polygon
-              points="-80,280 160,350 110,750 -120,650"
+            {/* Secondary harmonic resonance wave */}
+            <path
+              d="M-40,350 Q120,290 280,360 T600,330 T920,370 T1240,320 T1480,350"
               fill="none"
-              stroke="url(#ptNeonOrangeMuted)"
-              strokeWidth="1.8"
-              strokeDasharray="5 6"
+              stroke="#ffaa40"
+              strokeWidth="1.2"
+              strokeDasharray="6 6"
+              opacity="0.45"
+            />
+
+            {/* --- 2. FLOATING MUSICAL NOTES (♪, ♫, ♩) --- */}
+            {/* Musical Element A: Large Beamed Eighth Note (♫) floating in mid-left field */}
+            <g transform="translate(240, 240) rotate(-12)" filter="url(#ptMusicGlow)" opacity="0.9">
+              {/* Left Note Head (Angled Ellipse) */}
+              <ellipse cx="25" cy="85" rx="18" ry="13" transform="rotate(-20 25 85)" fill="url(#ptMusicGold)" />
+              {/* Right Note Head */}
+              <ellipse cx="85" cy="65" rx="18" ry="13" transform="rotate(-20 85 65)" fill="url(#ptMusicGold)" />
+              {/* Vertical Stems */}
+              <rect x="38" y="15" width="4.5" height="70" rx="2" fill="url(#ptMusicGold)" />
+              <rect x="98" y="-5" width="4.5" height="70" rx="2" fill="url(#ptMusicGold)" />
+              {/* Dual Top Connecting Beams */}
+              <polygon points="38,15 102.5,-5 102.5,6 38,26" fill="url(#ptMusicGold)" />
+              <polygon points="38,32 102.5,12 102.5,20 38,40" fill="url(#ptMusicGold)" opacity="0.8" />
+              {/* Note Sparkle Accent */}
+              <circle cx="28" cy="82" r="3.5" fill="#ffffff" opacity="0.8" />
+              <circle cx="88" cy="62" r="3.5" fill="#ffffff" opacity="0.8" />
+            </g>
+
+            {/* Musical Element B: Floating Single Eighth Note (♪) with curved flag on right side */}
+            <g transform="translate(1120, 260) rotate(14)" filter="url(#ptMusicGlow)" opacity="0.88">
+              {/* Note Head */}
+              <ellipse cx="25" cy="85" rx="17" ry="12" transform="rotate(-22 25 85)" fill="url(#ptMusicGold)" />
+              {/* Stem */}
+              <rect x="38" y="10" width="4.5" height="75" rx="2" fill="url(#ptMusicGold)" />
+              {/* Curved Note Flag */}
+              <path
+                d="M42.5,10 C70,22 82,50 78,82 C72,55 58,40 42.5,35 Z"
+                fill="url(#ptMusicGold)"
+              />
+              <circle cx="28" cy="82" r="3" fill="#ffffff" opacity="0.75" />
+            </g>
+
+            {/* Musical Element C: Soft Ambient Background Quarter Note (♩) near lower-left */}
+            <g transform="translate(130, 480) rotate(-8)" filter="url(#ptSoftNoteBlur)" opacity="0.65">
+              <ellipse cx="26" cy="80" rx="20" ry="14" transform="rotate(-20 26 80)" fill="url(#ptMusicGold)" />
+              <rect x="41" y="5" width="5" height="75" rx="2" fill="url(#ptMusicGold)" />
+            </g>
+
+            {/* Musical Element D: Delicate Treble Clef Silhouette Flourish (Right background) */}
+            <path
+              d="M1280,480 C1270,450 1285,420 1305,420 C1325,420 1335,445 1320,470 C1305,495 1270,520 1270,555 C1270,580 1290,600 1315,595 C1330,590 1340,575 1335,560 C1330,548 1315,548 1310,558 M1300,390 L1300,620 C1300,640 1285,655 1265,650 C1250,645 1245,630 1255,620 C1265,612 1280,620 1280,630"
+              fill="none"
+              stroke="#FC6301"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              filter="url(#ptMusicGlow)"
               opacity="0.5"
             />
-            <line x1="-80" y1="280" x2="110" y2="750" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="4 6" opacity="0.4" />
 
-            {/* Long Overhead Stage Rigging Rail (Spanning Across Top Left to Center) */}
-            <line x1="-100" y1="50" x2="620" y2="560" stroke="url(#ptNeonOrangeStrong)" strokeWidth="3" filter="url(#ptNeonGlow)" opacity="0.9" />
-            <line x1="-60" y1="10" x2="660" y2="520" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.8" strokeDasharray="8 10" opacity="0.6" />
-            {/* Ladder Rungs connecting the two rails */}
-            <line x1="30" y1="155" x2="70" y2="115" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
-            <line x1="170" y1="265" x2="210" y2="225" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
-            <line x1="310" y1="375" x2="350" y2="335" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
-            <line x1="450" y1="485" x2="490" y2="445" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.4" opacity="0.55" />
+            {/* --- 3. STUDIO DAW EQUALIZER (EQ) SPECTRUM VISUALIZER BARS --- */}
+            {/* Left Cluster EQ Bars (Bass / Low-Mid Frequencies) */}
+            <g transform="translate(340, 390)">
+              {/* Horizontal Reference Line (-6dB mark) */}
+              <line x1="-15" y1="50" x2="115" y2="50" stroke="#FC6301" strokeWidth="1" strokeDasharray="3 4" opacity="0.3" />
+              {/* Frequency Bars */}
+              <rect x="0" y="45" width="8" height="50" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.75" />
+              <rect x="16" y="25" width="8" height="70" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.85" />
+              <rect x="32" y="8" width="8" height="87" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.95" />
+              <rect x="48" y="32" width="8" height="63" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.8" />
+              <rect x="64" y="18" width="8" height="77" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.9" />
+              <rect x="80" y="40" width="8" height="55" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.7" />
+              <rect x="96" y="52" width="8" height="43" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.6" />
 
-            {/* --- RIGHT SIDE BALANCED ARCHITECTURAL PERSPECTIVE ELEMENTS --- */}
-            <line x1="960" y1="-30" x2="1620" y2="510" stroke="url(#ptNeonOrangeStrong)" strokeWidth="2.4" opacity="0.75" />
-            <line x1="1000" y1="-50" x2="1660" y2="490" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.5" strokeDasharray="6 8" opacity="0.5" />
-            {/* Receding geometric frame in right midground */}
-            <polygon
-              points="1160,510 1440,610 1400,820 1130,720"
-              fill="url(#ptTrussFaceFill)"
-              stroke="url(#ptNeonOrangeMuted)"
-              strokeWidth="1.6"
-              opacity="0.55"
-            />
-            <line x1="1160" y1="510" x2="1400" y2="820" stroke="url(#ptNeonOrangeMuted)" strokeWidth="1.2" strokeDasharray="5 7" opacity="0.4" />
+              {/* Peak Floating Decibel Indicator Dots */}
+              <rect x="0" y="38" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.9" />
+              <rect x="16" y="18" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.9" />
+              <rect x="32" y="0" width="8" height="3.5" rx="1.5" fill="#ffffff" filter="url(#ptMusicGlow)" opacity="1" />
+              <rect x="48" y="24" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.85" />
+              <rect x="64" y="10" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.9" />
+              <rect x="80" y="32" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.75" />
+              <rect x="96" y="45" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.65" />
+            </g>
 
-            {/* --- ICONIC FLOATING HEXAGONAL BOKEH ELEMENTS (Epic Games Signature) --- */}
-            {/* Hexagon 1: Large soft-blurred bokeh in mid-left field */}
-            <polygon
-              points="350,290 395,316 395,368 350,394 305,368 305,316"
-              fill="url(#ptHexBokehGrad)"
-              stroke="#ffb366"
-              strokeWidth="2.2"
-              filter="url(#ptSoftBokehBlur)"
-              opacity="0.9"
-            />
-            {/* Hexagon 1 Crisp Core */}
-            <polygon
-              points="350,298 388,320 388,364 350,386 312,364 312,320"
-              fill="none"
-              stroke="#ffaa40"
-              strokeWidth="1.5"
-              opacity="0.8"
-            />
+            {/* Right Cluster EQ Bars (Mid / High-Treble Air Frequencies) */}
+            <g transform="translate(1000, 390)">
+              {/* Horizontal Reference Line (-6dB mark) */}
+              <line x1="-15" y1="50" x2="115" y2="50" stroke="#FC6301" strokeWidth="1" strokeDasharray="3 4" opacity="0.3" />
+              {/* Frequency Bars */}
+              <rect x="0" y="48" width="8" height="47" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.65" />
+              <rect x="16" y="30" width="8" height="65" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.8" />
+              <rect x="32" y="14" width="8" height="81" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.9" />
+              <rect x="48" y="5" width="8" height="90" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.95" />
+              <rect x="64" y="28" width="8" height="67" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.85" />
+              <rect x="80" y="44" width="8" height="51" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.7" />
+              <rect x="96" y="55" width="8" height="40" rx="4" fill="url(#ptAudioBarGrad)" opacity="0.6" />
 
-            {/* Hexagon 2: Smaller crisp floating hexagon near center */}
-            <polygon
-              points="480,410 500,422 500,444 480,456 460,444 460,422"
-              fill="url(#ptHexBokehGrad)"
-              stroke="#ffca80"
-              strokeWidth="2"
-              filter="url(#ptNeonGlow)"
-              opacity="0.95"
-            />
+              {/* Peak Floating Decibel Indicator Dots */}
+              <rect x="0" y="41" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.75" />
+              <rect x="16" y="22" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.85" />
+              <rect x="32" y="6" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.9" />
+              <rect x="48" y="-3" width="8" height="3.5" rx="1.5" fill="#ffffff" filter="url(#ptMusicGlow)" opacity="1" />
+              <rect x="64" y="20" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.85" />
+              <rect x="80" y="36" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.75" />
+              <rect x="96" y="48" width="8" height="3" rx="1.5" fill="#ffe0b2" opacity="0.6" />
+            </g>
 
-            {/* Hexagon 3: Subtle floating hexagon on right side */}
-            <polygon
-              points="1080,380 1110,397 1110,431 1080,448 1050,431 1050,397"
-              fill="url(#ptHexBokehGrad)"
-              stroke="#ffaa40"
-              strokeWidth="1.5"
-              filter="url(#ptSoftBokehBlur)"
-              opacity="0.65"
-            />
+            {/* --- 4. STUDIO ROTARY CUTOFF KNOB & VINYL RECORD GROOVES --- */}
+            <g transform="translate(160, 260)">
+              {/* Concentric Vinyl Sampling Grooves */}
+              <circle cx="0" cy="0" r="130" fill="none" stroke="url(#ptVinylGrad)" strokeWidth="1" strokeDasharray="6 8" opacity="0.45" />
+              <circle cx="0" cy="0" r="95" fill="none" stroke="url(#ptVinylGrad)" strokeWidth="1.2" strokeDasharray="4 6" opacity="0.55" />
+              <circle cx="0" cy="0" r="60" fill="none" stroke="url(#ptVinylGrad)" strokeWidth="1.4" opacity="0.65" />
+              {/* Synthesizer Rotary Filter Knob Active Arc (Cutoff 75%) */}
+              <circle cx="0" cy="0" r="32" fill="#140a04" stroke="#FC6301" strokeWidth="2" opacity="0.9" />
+              <path
+                d="M -22,22 A 32,32 0 1,1 22,22"
+                fill="none"
+                stroke="#ffaa40"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                filter="url(#ptMusicGlow)"
+              />
+              {/* Indicator Notch */}
+              <line x1="0" y1="-18" x2="0" y2="-28" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" filter="url(#ptMusicGlow)" />
+            </g>
 
-            {/* Hexagon 4: Heavy foreground blurred orb near bottom-left */}
-            <polygon
-              points="170,580 215,606 215,658 170,684 125,658 125,606"
-              fill="url(#ptHexBokehGrad)"
-              stroke="#FC6301"
-              strokeWidth="2.5"
-              filter="url(#ptHeavyBokehBlur)"
-              opacity="0.75"
-            />
+            {/* --- 5. 16-STEP BEAT SEQUENCER (808 / MPC DRUM GRID UNDER SEARCH) --- */}
+            <g transform="translate(460, 600)" opacity="0.6">
+              {/* Sequencer Track Rail */}
+              <line x1="0" y1="8" x2="520" y2="8" stroke="#FC6301" strokeWidth="1" strokeDasharray="4 6" opacity="0.4" />
+              {/* 16 Step Rhythm Trigger Pads with Accent on Quarter Beats (1, 5, 9, 13) */}
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((step) => {
+                const isDownbeat = step % 4 === 0
+                return (
+                  <circle
+                    key={step}
+                    cx={step * 34.5 + 8}
+                    cy={8}
+                    r={isDownbeat ? 5 : 3}
+                    fill={isDownbeat ? '#ffca80' : '#FC6301'}
+                    filter={isDownbeat ? 'url(#ptMusicGlow)' : undefined}
+                    opacity={isDownbeat ? 0.95 : 0.6}
+                  />
+                )
+              })}
+            </g>
           </svg>
 
           {/* Floating Glowing Bokeh Dust Particles (Subtle Animation) */}
