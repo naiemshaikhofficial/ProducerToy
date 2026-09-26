@@ -23,12 +23,12 @@ export async function liveSearchAction(query: string): Promise<SearchProductResu
     // First try exact ilike on name for speed
     const { data: quickMatches } = await supabase
       .from('products')
-      .select('id, name, slug, cover_image, price_usd, product_type, brands(name), categories(name), tags')
+      .select('id, name, slug, cover_image, price_usd, product_type, brands(name), short_description')
       .eq('is_active', true)
       .ilike('name', `%${cleanQuery}%`)
       .limit(6)
 
-    if (quickMatches && quickMatches.length >= 4) {
+    if (quickMatches && quickMatches.length > 0) {
       return quickMatches.map((item: any) => {
         const brandName = Array.isArray(item.brands)
           ? item.brands[0]?.name
@@ -48,7 +48,7 @@ export async function liveSearchAction(query: string): Promise<SearchProductResu
     // Fallback to rich fuzzy multi-field & synonym search
     const { data: allActive } = await supabase
       .from('products')
-      .select('id, name, slug, cover_image, price_usd, product_type, brands(name), categories(name), tags, short_description')
+      .select('id, name, slug, cover_image, price_usd, product_type, brands(name), short_description')
       .eq('is_active', true)
       .limit(80)
 

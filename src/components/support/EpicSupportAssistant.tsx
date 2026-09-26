@@ -569,46 +569,61 @@ export function EpicSupportAssistant({
   return (
     <>
       {/* ========================================================================= */}
-      {/* SCREEN 1: HERO LANDING STATE (Exact Match with Screenshot 1 & 2)          */}
+      {/* SCREEN 1: HERO LANDING STATE (Exact 1:1 Epic Games Style in Orange Shade) */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
+        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#070503] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background Lights with Studio Elements Circled in Screenshot */}
-          <div className="absolute inset-0 bg-[#080706] pointer-events-none -z-0" />
+          {/* Ambient Glowing Background: Exact Epic Games angled geometry in rich orange shade */}
+          <div className="absolute inset-0 bg-[#070503] pointer-events-none -z-10" />
           
-          {/* 1. Angled Studio Light Rig / Beams on Left (Circled in screenshot) */}
-          <div className="absolute -top-16 -left-20 w-[620px] h-[340px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/18 to-transparent blur-3xl pointer-events-none -z-0" />
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20 -z-0 overflow-hidden">
+          {/* 1. Large Angled Studio Light Rig / Beams on Left (Matching Epic Games Trusses) */}
+          <div className="absolute -top-24 -left-28 w-[720px] h-[480px] -rotate-45 bg-gradient-to-r from-[#FC6301]/35 via-amber-500/20 to-transparent blur-3xl pointer-events-none -z-10" />
+          
+          {/* Angled 3D Truss & Light Vector Lines */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30 -z-10 overflow-hidden">
             <defs>
-              <linearGradient id="ptStudioBeam" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.5" />
-                <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.2" />
+              <linearGradient id="ptEpicBeamOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.8" />
+                <stop offset="40%" stopColor="#ff7824" stopOpacity="0.4" />
+                <stop offset="85%" stopColor="#f59e0b" stopOpacity="0.1" />
+                <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="ptTrussLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.6" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
             </defs>
-            <path d="M -80 180 L 400 520" stroke="url(#ptStudioBeam)" strokeWidth="2" fill="none" />
-            <path d="M 60 40 L 480 480" stroke="url(#ptStudioBeam)" strokeWidth="1.5" strokeDasharray="6 8" fill="none" />
+            {/* Strong angled perspective light beams */}
+            <path d="M -120 120 L 520 620" stroke="url(#ptEpicBeamOrange)" strokeWidth="3" fill="none" />
+            <path d="M -60 40 L 680 640" stroke="url(#ptEpicBeamOrange)" strokeWidth="1.5" strokeDasharray="8 10" fill="none" />
+            <path d="M 40 -80 L 820 540" stroke="url(#ptEpicBeamOrange)" strokeWidth="1" fill="none" />
+            {/* Geometric angled trusses like Epic Games 3D background */}
+            <path d="M 80 80 L 260 220 L 180 340 L 40 200 Z" stroke="url(#ptTrussLine)" strokeWidth="1.5" fill="none" opacity="0.6" />
+            <path d="M 260 220 L 440 360 L 360 480 L 180 340 Z" stroke="url(#ptTrussLine)" strokeWidth="1" strokeDasharray="4 6" fill="none" opacity="0.4" />
+            {/* Right side subtle diagonal beam */}
+            <path d="M 900 -50 L 1700 580" stroke="url(#ptEpicBeamOrange)" strokeWidth="1.5" fill="none" opacity="0.5" />
           </svg>
 
-          {/* 2. Vertical Studio Light Pillar on Bottom Left (Circled in screenshot) */}
-          <div className="absolute bottom-0 left-[16%] w-[130px] h-[360px] bg-gradient-to-t from-[#FC6301]/18 via-amber-600/08 to-transparent blur-2xl rounded-full pointer-events-none -z-0" />
+          {/* 2. Floating Bokeh / Glowing Dust Particles (Exact Match with Epic Games) */}
+          <div className="absolute top-1/4 left-[22%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-70 pointer-events-none -z-10 animate-pulse" />
+          <div className="absolute top-1/3 left-[28%] w-1.5 h-1.5 rounded-full bg-amber-400 opacity-80 pointer-events-none -z-10" />
+          <div className="absolute bottom-1/3 left-[18%] w-4 h-4 rounded-full bg-[#ff7824] blur-[2px] opacity-60 pointer-events-none -z-10" />
+          <div className="absolute top-1/5 right-[24%] w-2 h-2 rounded-full bg-amber-400 opacity-60 pointer-events-none -z-10" />
+          <div className="absolute bottom-1/4 right-[20%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-70 pointer-events-none -z-10 animate-pulse" />
 
-          {/* 3. Soft Lens Flare / Bokeh Orb at Bottom Center (Circled in screenshot) */}
-          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[220px] h-[180px] bg-[radial-gradient(circle_at_50%_50%,_rgba(252,99,1,0.14),_rgba(245,158,11,0.05)_50%,_transparent_75%)] blur-2xl pointer-events-none -z-0" />
+          {/* 3. Warm Ambient Beam on Right */}
+          <div className="absolute top-1/4 right-[5%] w-[180px] h-[520px] bg-gradient-to-b from-[#FC6301]/20 via-amber-600/10 to-transparent blur-3xl rounded-full pointer-events-none -z-10" />
 
-          {/* 4. Vertical Ambient Beam on Right (Circled in screenshot) */}
-          <div className="absolute top-1/4 right-[7%] w-[140px] h-[440px] bg-gradient-to-b from-amber-500/15 via-[#FC6301]/10 to-transparent blur-2xl rounded-full pointer-events-none -z-0" />
+          {/* 4. Center ambient warm aura behind heading */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(252,99,1,0.14),_transparent_70%)] blur-3xl pointer-events-none -z-10" />
 
-          {/* Center ambient glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1100px] h-[550px] bg-[radial-gradient(ellipse_75%_55%_at_50%_45%,_rgba(252,99,1,0.12),_transparent_70%)] blur-3xl pointer-events-none -z-0" />
-
-          {/* Server Status: Square/rectangular with slightly rounded sides and subtle border (Exact Match with Screenshot) */}
-          <div className="absolute top-4 right-4 sm:top-5 sm:right-8 z-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#141217] border border-white/15 text-xs text-zinc-300 shadow-lg">
-              <span className="text-zinc-400">Server status:</span>
+          {/* Server Status: Exact Epic Games style with green dot & checkmark */}
+          <div className="absolute top-5 right-6 sm:top-6 sm:right-10 z-20">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] bg-[#140e0a]/90 border border-white/10 text-xs text-zinc-300 shadow-xl backdrop-blur-sm">
+              <span className="text-zinc-400 font-normal">Server status:</span>
               <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-semibold text-xs">
-                <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center flex-shrink-0">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center text-black">
                   <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
@@ -618,19 +633,19 @@ export function EpicSupportAssistant({
             </div>
           </div>
 
-          {/* Center Hero Heading & Input (Strictly centered vertically & horizontally) */}
+          {/* Center Hero Heading & Input (Strictly centered 1:1 with Epic Games) */}
           <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
-            <div className="space-y-2 mb-6 sm:mb-7">
-              <p className="text-sm font-normal text-zinc-300 tracking-normal">
+            <div className="space-y-2 mb-7 sm:mb-8">
+              <p className="text-sm sm:text-[15px] font-medium text-zinc-300 tracking-normal">
                 Producer Toy Support
               </p>
-              <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-tight">
+              <h1 className="text-4xl sm:text-[48px] font-bold text-white tracking-tight leading-tight">
                 How can we help?
               </h1>
             </div>
 
-            {/* Problem Input Box: Exact 1:1 wide box matching Epic Games */}
-            <form onSubmit={handleHeroSubmit} className="w-full max-w-[680px] mx-auto">
+            {/* Problem Input Box: Exact 1:1 match with Epic Games screenshot */}
+            <form onSubmit={handleHeroSubmit} className="w-full max-w-[650px] mx-auto">
               <div className="flex items-center gap-3 w-full">
                 <input
                   type="text"
@@ -640,7 +655,7 @@ export function EpicSupportAssistant({
                     if (inputError) setInputError('')
                   }}
                   placeholder="Describe your problem here"
-                  className={`flex-1 bg-[#141217] hover:bg-[#1a1720] focus:bg-[#1a1720] border rounded-[10px] px-5 py-3.5 sm:py-4 text-sm sm:text-base text-white placeholder-zinc-400 focus:outline-none transition-all shadow-xl ${
+                  className={`flex-1 bg-[#130d08] hover:bg-[#18100a] focus:bg-[#18100a] border rounded-[10px] px-5 py-3 sm:py-3.5 text-sm sm:text-[15px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
                       : 'border-white/20 hover:border-white/30 focus:border-[#FC6301]'
@@ -651,11 +666,7 @@ export function EpicSupportAssistant({
                   type="submit"
                   disabled={isHeroLoading}
                   aria-label="Submit problem"
-                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all cursor-pointer flex-shrink-0 ${
-                    heroInput.trim()
-                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/30 active:scale-95'
-                      : 'bg-[#1a1720] hover:bg-[#231f2c] border border-white/10 text-zinc-500 hover:text-zinc-300'
-                  }`}
+                  className="w-11 h-11 rounded-full bg-[#FC6301] hover:bg-[#ff751a] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#FC6301]/30 active:scale-95"
                 >
                   {isHeroLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -674,14 +685,14 @@ export function EpicSupportAssistant({
               )}
             </form>
 
-            {/* Disclaimer Note */}
-            <p className="text-xs text-zinc-400/90 mt-5">
+            {/* Disclaimer Note (Underlined links exactly like Epic Games screenshot) */}
+            <p className="text-xs text-zinc-400 mt-4.5">
               By continuing, you agree to our{' '}
-              <Link href="/terms" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
+              <Link href="/terms" className="text-zinc-300 hover:text-white underline underline-offset-2">
                 Terms
               </Link>{' '}
               and acknowledge our{' '}
-              <Link href="/privacy" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
+              <Link href="/privacy" className="text-zinc-300 hover:text-white underline underline-offset-2">
                 Privacy Policy
               </Link>
               .
@@ -690,16 +701,16 @@ export function EpicSupportAssistant({
         </div>
       ) : (
         /* ========================================================================= */
-        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Exact Match with Epic Games Layout) */
+        /* SCREEN 2: CHAT ASSISTANT INTERACTION (Crystal Clear, No Top Opacity Bug)  */
         /* ========================================================================= */
         <div className="support-page-container w-full flex-1 min-h-[calc(100vh-76px)] bg-[#080706] text-white font-sans flex flex-col justify-between relative overflow-hidden">
           
-          {/* Top Dissolve Background (Exact Epic Games Atmospheric Fade) */}
-          <div className="absolute top-0 left-0 right-0 h-[380px] overflow-hidden pointer-events-none -z-0">
+          {/* Top Dissolve Background strictly behind the header (Height limited to 200px, NEVER overlays chat messages) */}
+          <div className="absolute top-0 left-0 right-0 h-[200px] overflow-hidden pointer-events-none z-0">
             {/* Glowing Angled Light Beam & Warm Ambience */}
-            <div className="absolute -top-16 -left-16 w-[700px] h-[320px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/18 to-transparent blur-3xl pointer-events-none" />
-            <div className="absolute top-1/4 left-1/5 w-[420px] h-[420px] bg-[#FC6301]/10 rounded-full blur-[140px] pointer-events-none" />
-            <div className="absolute top-8 right-1/4 w-[480px] h-[320px] bg-amber-600/10 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute -top-16 -left-16 w-[700px] h-[260px] -rotate-45 bg-gradient-to-r from-[#FC6301]/25 via-amber-500/18 to-transparent blur-3xl pointer-events-none" />
+            <div className="absolute top-4 left-1/4 w-[360px] h-[260px] bg-[#FC6301]/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-4 right-1/4 w-[360px] h-[260px] bg-amber-600/10 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Abstract Glowing Lines */}
             <svg
@@ -713,12 +724,11 @@ export function EpicSupportAssistant({
                   <stop offset="100%" stopColor="transparent" stopOpacity="0" />
                 </linearGradient>
               </defs>
-              <path d="M -100 150 L 500 50 L 1000 280 L 1600 80" fill="none" stroke="url(#chatDissolveLine)" strokeWidth="1.5" />
-              <path d="M 50 320 L 700 140 L 1200 300 L 1800 180" fill="none" stroke="url(#chatDissolveLine)" strokeWidth="1" strokeDasharray="4 6" />
+              <path d="M -100 120 L 500 40 L 1000 180 L 1600 60" fill="none" stroke="url(#chatDissolveLine)" strokeWidth="1.5" />
             </svg>
 
-            {/* Smooth Vertical Dissolve Gradient Fade to pure dark background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#080706]/75 to-[#080706]" />
+            {/* Clean bottom fade into page background behind header only */}
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[#080706]" />
           </div>
 
           {/* Header Title: YOUR CHAT WITH / Producer Toy Support Assistant (Centered over dissolve background) */}
@@ -748,8 +758,8 @@ export function EpicSupportAssistant({
             </div>
           </div>
 
-          {/* Main Chat Feed with Full Website Scroll (No nested scrollbar, scrolls entire page) */}
-          <main className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-44 flex-1">
+          {/* Main Chat Feed (relative z-10: Always 100% crisp & full opacity, never covered by any background overlay) */}
+          <main className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-44 flex-1">
             
             {messages.map((msg) => {
               if (msg.sender === 'user') {
@@ -772,30 +782,28 @@ export function EpicSupportAssistant({
               return (
                 <div key={msg.id} className="flex flex-col items-start space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-2xl">
                   
-                  {/* Assistant Header: Robot Avatar + Name + Timestamp */}
+                  {/* Assistant Header: Clean Robot Avatar (NO box, NO squeezing) + Name + Timestamp */}
                   <div className="flex items-center gap-2 text-xs text-zinc-400 px-1">
-                    <div className="w-6 h-6 rounded-md bg-[#251811] border border-[#3d251a] flex items-center justify-center overflow-hidden flex-shrink-0">
-                      <Image
-                        src="/images/robot-avatar.png"
-                        alt="Support Assistant"
-                        width={22}
-                        height={22}
-                        className="w-[18px] h-[18px] object-contain"
-                      />
-                    </div>
+                    <Image
+                      src="/images/robot-avatar.png"
+                      alt="Producer Toy Support Assistant"
+                      width={22}
+                      height={22}
+                      className="w-[22px] h-[22px] object-contain shrink-0"
+                    />
                     <span className="font-semibold text-zinc-200 text-xs">Producer Toy Support Assistant</span>
                     <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
                   </div>
 
-                  {/* Thinking Spinner Card with Robot Avatar */}
+                  {/* Thinking Spinner Card with Clean Robot Avatar */}
                   {msg.isThinking ? (
                     <div className="inline-flex items-center gap-3 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-sm px-6 py-4 shadow-xl w-fit">
                       <Image
                         src="/images/robot-avatar.png"
                         alt="Thinking..."
-                        width={20}
-                        height={20}
-                        className="w-5 h-5 object-contain"
+                        width={22}
+                        height={22}
+                        className="w-[22px] h-[22px] object-contain shrink-0"
                       />
                       <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
                       <span className="text-zinc-300 text-sm font-normal">Thinking...</span>
