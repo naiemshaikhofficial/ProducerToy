@@ -154,7 +154,7 @@ export async function askGroqSupportAction(
         .map((p) => {
           const price = p.price_usd ? `$${p.price_usd}` : 'Free'
           const desc = p.short_description ? ` - ${p.short_description}` : ''
-          const bpmInfo = p.bpm ? ` [${p.bpm} BPM]` : ''
+          const bpmInfo = (p.bpm && !p.is_coming_soon) ? ` [${p.bpm} BPM]` : (p.is_coming_soon ? ' [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING]' : '')
           const sizeInfo = p.file_size ? ` [${p.file_size}]` : ''
           const statusInfo = p.is_coming_soon ? ' [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET]' : ' [STATUS: AVAILABLE FOR INSTANT PURCHASE]'
           return `- [${p.name}](/p/${p.slug}) (${price}, ${p.product_type})${statusInfo}${bpmInfo}${sizeInfo}${desc}`
@@ -269,6 +269,20 @@ export async function askGroqSupportAction(
     ) {
       candidateProduct = p
       break
+    }
+  }
+
+  // Fallback for Sexy Drill if not found in db query
+  if (!candidateProduct && (queryLower.includes('drill') || queryLower.includes('sexy'))) {
+    candidateProduct = {
+      id: 'prod-sexy-drill',
+      name: 'Sexy Drill',
+      slug: 'sexy-drill',
+      cover_image: '/images/products/placeholder.png',
+      price_usd: 9.99,
+      is_coming_soon: true,
+      product_type: 'sample_pack',
+      short_description: 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
     }
   }
 
@@ -449,7 +463,7 @@ ${isUserLoggedIn ? `- The user IS ALREADY LOGGED IN as ${userName} (${userEmail}
 
 LIVE PRODUCER TOY STORE INVENTORY (QUERY RESULT FROM DATABASE):
 ${liveInventoryList || `- [Tabla Master's](/p/tabla-masters) ($19.99, sample_pack) [STATUS: AVAILABLE FOR INSTANT PURCHASE] [120 BPM] - Authentic Indian tabla sample pack featuring professionally recorded dry & processed hits, loops, and rolls.
-- [Sexy Drill](/p/sexy-drill) ($9.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [140 BPM] - Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.`}
+- [Sexy Drill](/p/sexy-drill) ($9.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING] - Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.`}
 
 CRITICAL RULES FOR COMING SOON PRODUCTS (e.g. "Sexy Drill"):
 - When a user asks about "Sexy Drill" or why it cannot be purchased (e.g. "purchase kyu nahi ho raha", "buy kyu nahi kar pa raha"):
@@ -457,6 +471,15 @@ CRITICAL RULES FOR COMING SOON PRODUCTS (e.g. "Sexy Drill"):
   2. Explain that our audio engineering team is currently finalizing the master 808 slides, drum one-shots, and mix stems. That is why purchase/checkout is temporarily disabled.
   3. NEVER blame guest mode or tell the user to log in or retry payment for a Coming Soon pack.
   4. Inform the user that an official Drop Alert notification card has been provided below where they can get notified the moment it launches!
+- GENUINE BPM / TEMPO INQUIRY RULE FOR "SEXY DRILL":
+  If the user asks about the BPM or tempo of "Sexy Drill" (e.g. "sexy drill ka bpm kya hai"):
+  GENUINE ANSWER: You must clearly state that because "Sexy Drill" is currently in our Coming Soon lineup and our audio engineers are in the middle of final audio mastering and sound design, its official tempo (BPM) has NOT yet been officially announced or released. Once the pack launches officially, the verified BPM and stem tempos will be published on the store page. NEVER invent or claim that its official tempo is 140 BPM!
+- GENUINE RULE FOR FREE PRODUCTS / FREE PLUGINS INQUIRIES:
+  If the user asks about free plugins, free tools, free sample packs, or free downloads (e.g. "free music production tools"):
+  GENUINE ANSWER: Be 100% honest, authentic, and transparent. Clearly state that Producer Toy currently does NOT have any 100% free products or free VST plugins in the database/store catalog. All current sound releases are premium commercial master archives (such as Tabla Master's and upcoming Sexy Drill).
+  NEVER hallucinate or link to free plugins or claim that free tools exist.
+  NEVER tell the user to clear browser cache, disable ad-blockers, or switch browsers.
+  Politely invite them to explore our master releases at [Producer Toy Store](/store) or subscribe to be notified of future promotional releases.
 
 CRITICAL RULES FOR AUTONOMOUS ADMINISTRATIVE PROBLEM RESOLUTION:
 1. When user asks about a missing file, broken link, or says "payment confirmed but file not received":
@@ -477,7 +500,6 @@ CRITICAL RULES FOR AUTONOMOUS ADMINISTRATIVE PROBLEM RESOLUTION:
      - Tempo (BPM), musical key signatures, loop stems, and one-shots.
 4. Navigation Links:
    - Mentioning downloads: [Your Library](/library)
-   - Free tools: [Free VST Plugins](/free-vst-plugins)
    - Store catalog: [Producer Toy Store](/store)
    - Billing & receipts: [Billing & Transactions](/account?tab=transactions)
    - Account settings: [Account Settings](/account)
@@ -602,13 +624,35 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       const rawAnswer = fallbackData.choices?.[0]?.message?.content || ''
       const cleanedAnswer = scrubBrandNames(rawAnswer)
 
+      const resolveComingSoon = (ans: string): ComingSoonProduct | null => {
+        if (comingSoonProduct) return comingSoonProduct
+        const combined = `${query} ${ans}`.toLowerCase()
+        if (
+          combined.includes('sexy drill') ||
+          combined.includes('sexy-drill') ||
+          (combined.includes('drill') && (combined.includes('coming soon') || combined.includes('drop alert') || combined.includes('tempo') || combined.includes('bpm')))
+        ) {
+          const dbDrill = allProducts.find((p) => p.slug === 'sexy-drill' || p.name.toLowerCase().includes('drill'))
+          return {
+            id: dbDrill?.id || 'prod-sexy-drill',
+            name: dbDrill?.name || 'Sexy Drill',
+            slug: dbDrill?.slug || 'sexy-drill',
+            cover_image: dbDrill?.cover_image || '/images/products/placeholder.png',
+            price_usd: Number(dbDrill?.price_usd || 9.99),
+            release_date: dbDrill?.release_date || null,
+            short_description: dbDrill?.short_description || 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
+          }
+        }
+        return null
+      }
+
       return {
         success: true,
         answer: cleanedAnswer,
         recommendedProducts: findMatchedProducts(cleanedAnswer),
         verifiedDownload,
         verifiedOrder,
-        comingSoonProduct,
+        comingSoonProduct: resolveComingSoon(cleanedAnswer),
         canEscalateToTicket,
       }
     }
@@ -617,13 +661,35 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
     const rawAnswer = data.choices?.[0]?.message?.content || ''
     const cleanedAnswer = scrubBrandNames(rawAnswer)
 
+    const resolveComingSoon = (ans: string): ComingSoonProduct | null => {
+      if (comingSoonProduct) return comingSoonProduct
+      const combined = `${query} ${ans}`.toLowerCase()
+      if (
+        combined.includes('sexy drill') ||
+        combined.includes('sexy-drill') ||
+        (combined.includes('drill') && (combined.includes('coming soon') || combined.includes('drop alert') || combined.includes('tempo') || combined.includes('bpm')))
+      ) {
+        const dbDrill = allProducts.find((p) => p.slug === 'sexy-drill' || p.name.toLowerCase().includes('drill'))
+        return {
+          id: dbDrill?.id || 'prod-sexy-drill',
+          name: dbDrill?.name || 'Sexy Drill',
+          slug: dbDrill?.slug || 'sexy-drill',
+          cover_image: dbDrill?.cover_image || '/images/products/placeholder.png',
+          price_usd: Number(dbDrill?.price_usd || 9.99),
+          release_date: dbDrill?.release_date || null,
+          short_description: dbDrill?.short_description || 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
+        }
+      }
+      return null
+    }
+
     return {
       success: true,
       answer: cleanedAnswer,
       recommendedProducts: findMatchedProducts(cleanedAnswer),
       verifiedDownload,
       verifiedOrder,
-      comingSoonProduct,
+      comingSoonProduct: resolveComingSoon(cleanedAnswer),
       canEscalateToTicket,
     }
   } catch (error: any) {

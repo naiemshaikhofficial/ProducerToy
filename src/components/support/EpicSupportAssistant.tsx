@@ -374,6 +374,7 @@ export function EpicSupportAssistant({
 
   // Options popover menu (End chat)
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false)
+  const [isChatScrolled, setIsChatScrolled] = useState(false)
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -1257,8 +1258,10 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         <div className="support-page-container w-full h-[calc(100dvh-60px)] sm:h-[calc(100dvh-72px)] lg:h-[calc(100dvh-76px)] bg-[#080706] text-white font-sans flex flex-col overflow-hidden relative">
           
-          {/* 1. Epic Games Sticky Header (Fixed at top of chat view, Zero Glassmorphism) */}
-          <div className="flex-shrink-0 w-full bg-[#080706] z-20 relative">
+          {/* 1. Epic Games Sticky Header (Only visible on scroll down, Zero Glassmorphism) */}
+          <div className={`flex-shrink-0 w-full bg-[#080706] z-20 relative transition-all duration-300 ease-in-out ${
+            isChatScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'
+          }`}>
             <div className="w-full h-12 sm:h-13 flex items-center justify-center px-4 border-b border-white/[0.04]">
               <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans">
                 Producer Toy Support Assistant
@@ -1274,7 +1277,13 @@ export function EpicSupportAssistant({
           </div>
 
           {/* 2. Scrollable Chat Feed Area (ONLY THIS SCROLLS!) */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden w-full relative z-0">
+          <div 
+            onScroll={(e) => {
+              const isPast = e.currentTarget.scrollTop > 50
+              if (isPast !== isChatScrolled) setIsChatScrolled(isPast)
+            }}
+            className="flex-1 overflow-y-auto overflow-x-hidden w-full relative z-0"
+          >
             {/* Header Title with Seamlessly Dissolved Musical Bokeh Atmosphere */}
             <div className="relative w-full pt-8 pb-2 text-center select-none">
             {/* Seamless Ambient Musical Bokeh Backdrop: 100% dissolved into #080706 with ZERO cutoff line */}
@@ -1396,7 +1405,8 @@ export function EpicSupportAssistant({
 
                 /* Assistant Bubble */
                 return (
-                  <div key={msg.id} className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-4xl">
+                  <React.Fragment key={msg.id}>
+                    <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-4xl">
                     
                     {/* Assistant Header: Clean Robot Avatar (NO box, NO squeezing) + Name + Timestamp */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
@@ -1919,28 +1929,49 @@ export function EpicSupportAssistant({
                         </div>
                       )}
 
-                      {/* Generic Confirmation Acknowledgement (Zero Glassmorphism, Clean Native Text) */}
-                      {msg.ticketNumber && (
-                        <div className="pt-3.5 border-t border-[#26262b] space-y-2.5 animate-in fade-in">
-                          <p className="font-semibold text-white text-sm sm:text-[14.5px] flex items-center gap-2">
-                            <CheckCircle2 size={16} className="text-[#00d66c] shrink-0" />
-                            <span>We have received your request!</span>
-                          </p>
-                          <p className="text-zinc-300 text-xs sm:text-[13.5px] leading-relaxed">
-                            Our team has received your message and will review it shortly. We will get back to you directly via email.
-                          </p>
-                          <p className="pt-1 text-xs text-zinc-500 font-medium select-none">
-                            Chat ended.
-                          </p>
-                        </div>
-                      )}
-
                     </div>
                   )}
 
                 </div>
-              )
-            })})()}
+
+                {/* Standalone Separate Message Box for Ticket Confirmation (Zero Glassmorphism) */}
+                {msg.ticketNumber && (
+                  <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
+                    {/* Robot Avatar Header */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
+                      <Image
+                        src="/images/robot-avatar.png"
+                        alt="Producer Toy Support Assistant"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain shrink-0"
+                      />
+                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Assistant
+                      </span>
+                      <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
+                    </div>
+
+                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #141417) */}
+                    <div className="w-full bg-[#141417] border border-white/[0.08] text-white rounded-2xl rounded-tl-xs px-6 py-5 sm:px-8 sm:py-6 shadow-xl space-y-3">
+                      <p className="font-semibold text-white text-base sm:text-lg flex items-center gap-2.5">
+                        <CheckCircle2 size={18} className="text-[#00d66c] shrink-0" />
+                        <span>We have received your request!</span>
+                      </p>
+                      <p className="text-zinc-300 text-sm sm:text-[14.5px] leading-relaxed">
+                        Our team has received your message and will review it shortly. We will get back to you directly via email.
+                      </p>
+                      <div className="pt-1 flex items-center gap-2">
+                        <span className="text-xs text-zinc-400 font-mono bg-[#1c1c22] px-3 py-1.5 rounded-lg border border-white/[0.06]">
+                          Ticket Ref: #{msg.ticketNumber}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </React.Fragment>
+            )
+          })})()}
 
             <div ref={messagesEndRef} />
           </main>
@@ -1959,7 +1990,10 @@ export function EpicSupportAssistant({
           {/* Solid Bottom Bar Container (100% Solid #080706, No Glassmorphism) */}
           <div className="w-full max-w-5xl mx-auto px-4 sm:px-8 lg:px-10 pb-5 sm:pb-6 pt-3">
             {isChatEnded || messages.some((m) => !!m.ticketNumber || m.feedback === 'yes') ? (
-              <div className="w-full animate-in fade-in zoom-in-95 duration-200">
+              <div className="w-full flex flex-col items-center gap-2.5 animate-in fade-in zoom-in-95 duration-200">
+                <p className="text-xs text-zinc-500 font-medium select-none tracking-wide">
+                  Chat ended.
+                </p>
                 <button
                   type="button"
                   onClick={handleResetToHero}
