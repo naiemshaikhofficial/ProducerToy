@@ -275,10 +275,10 @@ export async function askGroqSupportAction(
   // Fallback for Sexy Drill if not found in db query
   if (!candidateProduct && (queryLower.includes('drill') || queryLower.includes('sexy'))) {
     candidateProduct = {
-      id: 'prod-sexy-drill',
+      id: '18bb0ec4-8a6f-4f0c-a8f2-f9255ccc586c',
       name: 'Sexy Drill',
       slug: 'sexy-drill',
-      cover_image: '/images/products/placeholder.png',
+      cover_image: 'https://imagizer.imageshack.com/img923/2628/V8MFyO.png',
       price_usd: 9.99,
       is_coming_soon: true,
       product_type: 'sample_pack',
@@ -634,10 +634,10 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
         ) {
           const dbDrill = allProducts.find((p) => p.slug === 'sexy-drill' || p.name.toLowerCase().includes('drill'))
           return {
-            id: dbDrill?.id || 'prod-sexy-drill',
+            id: dbDrill?.id || '18bb0ec4-8a6f-4f0c-a8f2-f9255ccc586c',
             name: dbDrill?.name || 'Sexy Drill',
             slug: dbDrill?.slug || 'sexy-drill',
-            cover_image: dbDrill?.cover_image || '/images/products/placeholder.png',
+            cover_image: dbDrill?.cover_image || 'https://imagizer.imageshack.com/img923/2628/V8MFyO.png',
             price_usd: Number(dbDrill?.price_usd || 9.99),
             release_date: dbDrill?.release_date || null,
             short_description: dbDrill?.short_description || 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',
@@ -671,10 +671,10 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       ) {
         const dbDrill = allProducts.find((p) => p.slug === 'sexy-drill' || p.name.toLowerCase().includes('drill'))
         return {
-          id: dbDrill?.id || 'prod-sexy-drill',
+          id: dbDrill?.id || '18bb0ec4-8a6f-4f0c-a8f2-f9255ccc586c',
           name: dbDrill?.name || 'Sexy Drill',
           slug: dbDrill?.slug || 'sexy-drill',
-          cover_image: dbDrill?.cover_image || '/images/products/placeholder.png',
+          cover_image: dbDrill?.cover_image || 'https://imagizer.imageshack.com/img923/2628/V8MFyO.png',
           price_usd: Number(dbDrill?.price_usd || 9.99),
           release_date: dbDrill?.release_date || null,
           short_description: dbDrill?.short_description || 'Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.',

@@ -28,6 +28,7 @@ import {
   FileText,
   ShieldCheck,
   Bell,
+  Music,
 } from 'lucide-react'
 import {
   KNOWLEDGE_BASE,
@@ -280,18 +281,27 @@ function ComingSoonAlertBox({
     try {
       const res = await subscribeDropAlertAction(email, productSlug, productName)
       setStatus('success')
-      setMsg(res.message || `You're on the list! We'll alert you the moment ${productName} drops.`)
+      setMsg(res.message || `You're on the VIP alert list! We'll email ${email} the moment ${productName} drops.`)
     } catch {
       setStatus('success')
-      setMsg(`Notification alert set for ${email}!`)
+      setMsg(`You're on the VIP alert list! We'll email ${email} the moment ${productName} drops.`)
     }
   }
 
   if (status === 'success') {
     return (
-      <div className="p-3 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
-        <CheckCircle2 size={14} className="shrink-0" />
-        <span>{msg}</span>
+      <div className="p-3.5 sm:p-4 rounded-xl bg-[#101c14] border border-[#1e3826] text-white text-xs sm:text-[13px] flex items-start gap-3 animate-in fade-in duration-200">
+        <div className="w-5 h-5 rounded-full bg-[#00d66c]/20 border border-[#00d66c]/40 flex items-center justify-center shrink-0 mt-0.5 text-[#00d66c]">
+          <CheckCircle2 size={13} />
+        </div>
+        <div className="space-y-1">
+          <p className="font-semibold text-white text-[13px] sm:text-sm">
+            You're on the VIP alert list!
+          </p>
+          <p className="text-zinc-300 text-xs sm:text-[12.5px] leading-relaxed">
+            We'll email <span className="text-[#00d66c] font-medium">{email}</span> the moment {productName} drops.
+          </p>
+        </div>
       </div>
     )
   }
@@ -1617,68 +1627,6 @@ export function EpicSupportAssistant({
                           </div>
                         )}
 
-                        {/* Autonomous Resolution: Coming Soon Drop Alert Interactive Card */}
-                        {msg.comingSoonProduct && (
-                          <div className="rounded-xl bg-[#141417] border border-[#2d2d34] p-4 sm:p-5 space-y-3.5 shadow-xl">
-                            <div className="flex items-center justify-between gap-2 border-b border-[#2d2d34] pb-2.5">
-                              <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                                <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
-                                  Official Drop Alert &bull; Coming Soon
-                                </span>
-                              </div>
-                              <span className="text-[10px] font-mono font-bold text-zinc-400 bg-[#222228] px-2 py-0.5 rounded border border-white/5">
-                                In Final Audio Mastering
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-3.5">
-                              {msg.comingSoonProduct.cover_image && (
-                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg overflow-hidden relative bg-[#18181b] border border-[#333] shrink-0">
-                                  <Image
-                                    src={msg.comingSoonProduct.cover_image}
-                                    alt={msg.comingSoonProduct.name}
-                                    fill
-                                    sizes="64px"
-                                    className="object-cover"
-                                  />
-                                </div>
-                              )}
-                              <div className="space-y-0.5 min-w-0 flex-1">
-                                <h4 className="text-sm sm:text-base font-bold text-white truncate">
-                                  {msg.comingSoonProduct.name}
-                                </h4>
-                                <p className="text-[11px] sm:text-xs text-zinc-400 line-clamp-1">
-                                  {msg.comingSoonProduct.short_description || 'High-fidelity audio sample pack in final production.'}
-                                </p>
-                                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-[#222228] text-amber-300 border border-amber-500/20">
-                                  Expected Launch Price: ${msg.comingSoonProduct.price_usd}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Drop Alert Subscription Input & CTA */}
-                            <ComingSoonAlertBox
-                              productName={msg.comingSoonProduct.name}
-                              productSlug={msg.comingSoonProduct.slug}
-                              initialEmail={user?.email || ''}
-                            />
-
-                            <div className="pt-1 border-t border-[#222228] flex items-center justify-between">
-                              <Link
-                                href={`/p/${msg.comingSoonProduct.slug}`}
-                                className="inline-flex items-center gap-1.5 text-xs text-[#FC6301] hover:underline font-semibold"
-                              >
-                                <span>Preview {msg.comingSoonProduct.name} Page</span>
-                                <ArrowRight size={12} />
-                              </Link>
-                              <span className="text-[11px] text-zinc-500">
-                                Status: Not yet purchasable
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
                       {/* Product Overview Poster Cards (Mobile 2x2 Grid with Exact Square 1:1 Posters) */}
                       {msg.recommendedProducts && msg.recommendedProducts.length > 0 && (
                         <div
@@ -1933,6 +1881,97 @@ export function EpicSupportAssistant({
                   )}
 
                 </div>
+
+                {/* Standalone Separate Dialog Box for Coming Soon Drop Alert (Zero Glassmorphism) */}
+                {msg.comingSoonProduct && (
+                  <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
+                    {/* Robot Avatar Header */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
+                      <Image
+                        src="/images/robot-avatar.png"
+                        alt="Producer Toy Support Assistant"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain shrink-0"
+                      />
+                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Assistant
+                      </span>
+                      <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
+                    </div>
+
+                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #141417) */}
+                    <div className="w-full bg-[#141417] border border-white/[0.08] text-white rounded-2xl rounded-tl-xs px-6 py-5 sm:px-8 sm:py-6 shadow-xl space-y-4">
+                      {/* Top Header Badge */}
+                      <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-[#FC6301] animate-pulse" />
+                          <span className="text-[11px] font-bold text-[#FC6301] uppercase tracking-wider">
+                            Official Drop Alert &bull; Coming Soon
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono font-bold text-zinc-400 bg-[#1c1c22] px-2.5 py-1 rounded-md border border-white/[0.06]">
+                          In Final Audio Mastering
+                        </span>
+                      </div>
+
+                      {/* Product Preview Row */}
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden relative bg-[#1c1c22] border border-white/[0.08] shrink-0 flex items-center justify-center">
+                          {msg.comingSoonProduct.cover_image && !msg.comingSoonProduct.cover_image.includes('placeholder') ? (
+                            <Image
+                              src={msg.comingSoonProduct.cover_image}
+                              alt={msg.comingSoonProduct.name}
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <Image
+                              src="https://imagizer.imageshack.com/img923/2628/V8MFyO.png"
+                              alt={msg.comingSoonProduct.name}
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <h4 className="text-base sm:text-lg font-bold text-white truncate">
+                            {msg.comingSoonProduct.name}
+                          </h4>
+                          <p className="text-xs sm:text-[13px] text-zinc-400 line-clamp-1">
+                            {msg.comingSoonProduct.short_description || 'Master-grade audio sound pack in final audio engineering.'}
+                          </p>
+                          <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-semibold bg-[#1c1c22] text-amber-300 border border-amber-500/20">
+                            Expected Launch Price: ${msg.comingSoonProduct.price_usd}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Drop Alert Subscription Form (Zero Glassmorphism) */}
+                      <ComingSoonAlertBox
+                        productName={msg.comingSoonProduct.name}
+                        productSlug={msg.comingSoonProduct.slug}
+                        initialEmail={user?.email || ''}
+                      />
+
+                      {/* Footer Preview Link */}
+                      <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs">
+                        <Link
+                          href={`/p/${msg.comingSoonProduct.slug}`}
+                          className="inline-flex items-center gap-1.5 text-[#FC6301] hover:text-[#ff751a] font-semibold transition-colors"
+                        >
+                          <span>Preview {msg.comingSoonProduct.name} Page</span>
+                          <ArrowRight size={13} />
+                        </Link>
+                        <span className="text-[11px] text-zinc-500">
+                          Status: Not yet purchasable
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Standalone Separate Message Box for Ticket Confirmation (Zero Glassmorphism) */}
                 {msg.ticketNumber && (
