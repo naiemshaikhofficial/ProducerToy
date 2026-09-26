@@ -425,18 +425,18 @@ export function EpicSupportAssistant({
       {/* SCREEN 1: HERO LANDING STATE (Exact Match with Screenshot 1 & 2)          */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#0c0a1a] text-white font-sans selection:bg-[#0074e4] selection:text-white overflow-hidden flex flex-col items-center justify-center">
+        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#0c0a1a] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background Lights matching Epic Games screenshot */}
+          {/* Ambient Glowing Background Lights */}
           <div className="absolute inset-0 bg-[#0c0a1a] pointer-events-none -z-0" />
           
           {/* Angled neon violet/magenta light beam on left */}
           <div className="absolute -top-20 -left-20 w-[650px] h-[350px] -rotate-45 bg-gradient-to-r from-purple-600/30 via-fuchsia-600/20 to-transparent blur-3xl pointer-events-none -z-0" />
           <div className="absolute top-1/4 left-1/10 w-[420px] h-[420px] bg-purple-600/15 rounded-full blur-[140px] pointer-events-none -z-0" />
 
-          {/* Deep ambient violet bloom in center & bottom */}
+          {/* Deep ambient violet bloom in center & warm orange ambient bloom */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[1200px] h-[650px] bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,_rgba(147,51,234,0.14),_rgba(88,28,135,0.06)_50%,_transparent_80%)] blur-3xl pointer-events-none -z-0" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none -z-0" />
+          <div className="absolute bottom-0 right-1/4 w-[500px] h-[400px] bg-[#FC6301]/10 rounded-full blur-[150px] pointer-events-none -z-0" />
 
           {/* Server Status Pill (Top Right Corner, as circled in screenshot) */}
           <div className="absolute top-4 right-4 sm:top-6 sm:right-8 z-20">
@@ -464,7 +464,7 @@ export function EpicSupportAssistant({
               </h1>
             </div>
 
-            {/* Problem Input Box + Blue Circle Arrow Button */}
+            {/* Problem Input Box + Vibrant Orange Circle Arrow Button */}
             <form onSubmit={handleHeroSubmit} className="w-full max-w-[580px] mx-auto">
               <div className="flex items-center gap-3 w-full">
                 <input
@@ -478,7 +478,7 @@ export function EpicSupportAssistant({
                   className={`flex-1 bg-[#141026]/90 hover:bg-[#191430] focus:bg-[#191430] border rounded-xl px-5 py-3.5 sm:py-4 text-sm sm:text-[15px] text-white placeholder-zinc-400 focus:outline-none transition-all shadow-2xl backdrop-blur-md ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
-                      : 'border-white/15 focus:border-[#0074e4]'
+                      : 'border-white/15 focus:border-[#FC6301]'
                   }`}
                 />
 
@@ -486,7 +486,7 @@ export function EpicSupportAssistant({
                   type="submit"
                   disabled={isHeroLoading}
                   aria-label="Submit problem"
-                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#0074e4] hover:bg-[#0062c4] active:scale-95 text-white flex items-center justify-center transition-all shadow-lg shadow-[#0074e4]/30 cursor-pointer flex-shrink-0"
+                  className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#FC6301] hover:bg-[#ff751a] active:scale-95 text-white flex items-center justify-center transition-all shadow-lg shadow-[#FC6301]/30 cursor-pointer flex-shrink-0"
                 >
                   {isHeroLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin text-white" />
@@ -508,11 +508,11 @@ export function EpicSupportAssistant({
             {/* Disclaimer Note */}
             <p className="text-xs sm:text-[13px] text-zinc-400/90 mt-5 sm:mt-6">
               By continuing, you agree to our{' '}
-              <Link href="/terms" className="text-zinc-300 hover:text-white underline underline-offset-2">
+              <Link href="/terms" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
                 Terms
               </Link>{' '}
               and acknowledge our{' '}
-              <Link href="/privacy" className="text-zinc-300 hover:text-white underline underline-offset-2">
+              <Link href="/privacy" className="text-zinc-300 hover:text-[#FC6301] underline underline-offset-2">
                 Privacy Policy
               </Link>
               .
@@ -811,15 +811,15 @@ export function EpicSupportAssistant({
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Write a message..."
                   disabled={isTyping}
-                  className="flex-1 bg-[#141026] hover:bg-[#18132e] focus:bg-[#18132e] border border-white/10 focus:border-[#0074e4] rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                  className="flex-1 bg-[#141026] hover:bg-[#18132e] focus:bg-[#18132e] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3.5 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
                 />
 
-                {/* Circle Arrow Button (Epic blue) */}
+                {/* Circle Arrow Button (Producer Toy Orange) */}
                 <button
                   type="submit"
                   disabled={!chatInput.trim() || isTyping}
                   aria-label="Send message"
-                  className="w-11 h-11 rounded-full bg-[#0074e4] hover:bg-[#0062c4] disabled:opacity-30 disabled:hover:bg-[#0074e4] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#0074e4]/25 active:scale-95"
+                  className="w-11 h-11 rounded-full bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-30 disabled:hover:bg-[#FC6301] text-white flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-lg shadow-[#FC6301]/25 active:scale-95"
                 >
                   <ArrowRight size={16} />
                 </button>
