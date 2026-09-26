@@ -64,6 +64,7 @@ interface ChatMessage {
   ticketNumber?: string
   isThinking?: boolean
   isGreeting?: boolean
+  isWarning?: boolean
 }
 
 interface AnswerSourceItem {
@@ -257,6 +258,67 @@ function getAnswerSources(msg: ChatMessage): AnswerSourceItem[] {
   return Array.from(uniqueMap.values()).slice(0, 2)
 }
 
+function checkIsInappropriateLanguage(text: string): boolean {
+  if (!text) return false
+  const t = text.toLowerCase()
+
+  // 1. Explicit Sexual & Vulgar terms (English & Hindi / Hinglish)
+  const vulgarRegex = /\b(sex|porn|nude|nudes|boobs|blowjob|handjob|cum|penis|vagina|dildo|horny|lust|orgasm|incest)\b/i
+  if (vulgarRegex.test(t)) return true
+
+  // 2. Hindi / Urdu / Hinglish Gaaliyan & Abusive words (Indian local slangs)
+  const hindiAbuseRegex = /\b(madarchod|madarchodd|maderchod|mc|bhenchod|behenchod|bc|bhosdike|bhosdika|bsdk|bhosdi|lauda|loda|laude|lode|lund|gaand|gand|gandu|randi|r@ndi|harami|kamina|kamine|kutta|kutte|kamini|bhadwe|bhadva|tatte|jhant|jhat|chodna|choda|chodo|chudai|chudwana|chut|chutiya|chutiye|chutmarike|khanki|hijde|hijra|hijda|chakka|gaandu)\b/i
+  if (hindiAbuseRegex.test(t)) return true
+
+  // 3. English Profanity & Slurs
+  const englishAbuseRegex = /\b(fuck|fucking|fucker|fck|motherfucker|bitch|bastard|asshole|dick|pussy|slut|whore|cunt)\b/i
+  if (englishAbuseRegex.test(t)) return true
+
+  // 4. Inappropriate Sexual / Romantic Solicitation
+  const solicitationRegex = /(will you be my gf|be my gf|be my girlfriend|girlfriend banegi|gf banegi|gf banja|girlfriend banja|mere sath sex|sex kar|sex karo|sex karega|sex karegi|sex karne de|have sex with me|wanna fuck|fuck me|kiss me|nangi photo)\b/i
+  if (solicitationRegex.test(t)) return true
+
+  // 5. Global Regional Slurs (Spanish, Russian, French, German, Italian, Arabic, Turkish, Tagalog, Portuguese)
+  const globalSlursRegex = /\b(puta|puto|pendejo|cabron|hijo de puta|verga|chinga|blyat|suka|cyka|nahui|pizdets|ebat|merde|putain|connard|salope|encule|arschloch|hurensohn|scheisse|wichser|vaffanculo|stronzo|cazzo|sharmouta|sharmuta|kos omak|orospu|sikik|amk|putangina|tangina|gago|caralho|porra)\b/i
+  if (globalSlursRegex.test(t)) return true
+
+  // 6. Devanagari Hindi abuse
+  const devanagariAbuse = /(मादरचोद|बहनचोद|भोसड़ीके|चूतिया|लंड|गांड|रंडी|हरामी|कमीने|सेक्स|हिजड़े|लौड़े)/i
+  if (devanagariAbuse.test(t)) return true
+
+  return false
+}
+
+function isHinglishQuery(text: string): boolean {
+  const devanagari = /[\u0900-\u097F]/
+  if (devanagari.test(text)) return false
+  const hinglishWords = /\b(karega|karegi|karo|karna|de|mera|mere|meri|sath|banegi|banja|bhai|batao|kripya|nahi|hoga|raha|rahe|hai|ho|tha|the|apna|aap|tum|ka|ki|ke|ko|se|me|par|madarchod|bhenchod|behenchod|bhosdike|bhosdika|bsdk|chutiya|chutiye|lauda|loda|laude|lode|lund|gaand|gandu|randi|harami|kamina|kamine|bhadwe|tatte|jhant|khanki|hijde|hijra|chudai|chodo)\b/i
+  return hinglishWords.test(text)
+}
+
+function getDeterministicWarning(strike: number, query: string): string {
+  const hinglish = isHinglishQuery(query)
+
+  if (strike <= 1) {
+    return hinglish
+      ? "Kripya appropriate aur respectful bhasha ka upyog karein. Producer Toy Support Assistant sirf music software, sample packs aur store orders ke liye hai. Inappropriate ya abusive language ka upyog jari rakhne par hum chat session end kar sakte hain."
+      : "Please use appropriate and respectful language. The Producer Toy Support Desk is dedicated to assisting with music production software, sample packs, and orders. Continued use of inappropriate or abusive words may result in this chat session being terminated."
+  }
+  if (strike === 2) {
+    return hinglish
+      ? "Warning (2/4): Kripya gaali-galoch ya vulgar words ka upyog na karein. Humari support policy ke tehat agar aapne aisi bhasha jari rakhi, toh hume yeh chat session turant end karna padega."
+      : "Warning (2/4): Please refrain from using vulgar, offensive, or inappropriate language. Continued violation of our support policy will result in termination of this chat session."
+  }
+  if (strike === 3) {
+    return hinglish
+      ? "Final Warning (3/4): Yeh aapki aakhri warning hai. Kripya maryadit bhasha banaye rakhein. Agar agla message bhi inappropriate hua, toh yeh chat session turant permanently end ho jayega."
+      : "Final Warning (3/4): This is your final warning to communicate respectfully. Any further inappropriate message will immediately and permanently terminate this chat session."
+  }
+  return hinglish
+    ? "Baar-baar abusive aur inappropriate bhasha ka upyog karne ke karan yeh support session permanently terminate kar diya gaya hai. Agar aapko legitimate technical assistance chahiye, toh kripya nayi conversation shuru karein aur respectful bhasha banaye rakhein."
+    : "This support session has been permanently terminated due to repeated violations of our communication policy. If you need legitimate technical assistance with our software or orders, please start a new conversation and maintain professional communication."
+}
+
 function ComingSoonAlertBox({
   productName,
   productSlug,
@@ -358,6 +420,7 @@ export function EpicSupportAssistant({
   // Chat message input on Screen 2
   const [chatInput, setChatInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [policyStrikes, setPolicyStrikes] = useState(0)
 
   const { user } = useAuth()
 
@@ -675,10 +738,58 @@ export function EpicSupportAssistant({
             }
           : undefined
 
+        const isHeroAbuse = checkIsInappropriateLanguage(query)
+
         const [groqRes] = await Promise.all([
-          askGroqSupportAction(query, [], clientUser),
+          askGroqSupportAction(query, [], clientUser, 0),
           new Promise((r) => setTimeout(r, 650)),
         ])
+
+        const isViolation =
+          isHeroAbuse ||
+          Boolean(groqRes?.isPolicyViolation) ||
+          (groqRes?.answer &&
+            (groqRes.answer.toLowerCase().includes('strike') ||
+              groqRes.answer.toLowerCase().includes('warning') ||
+              groqRes.answer.toLowerCase().includes('inappropriate')))
+
+        if (isViolation) {
+          setPolicyStrikes(1)
+        }
+
+        if (isViolation) {
+          const userUsedRoman = !/[\u0900-\u097F]/.test(query)
+          const llmUsedDevanagari = /[\u0900-\u097F]/.test(groqRes?.answer || '')
+          const shouldOverrideWithHinglish = userUsedRoman && llmUsedDevanagari
+
+          let finalContent = groqRes?.answer || ''
+          if (
+            shouldOverrideWithHinglish ||
+            !finalContent ||
+            finalContent.includes('I’m sorry, but I can’t help') ||
+            finalContent.includes("I'm sorry") ||
+            finalContent.includes('flattered')
+          ) {
+            finalContent = getDeterministicWarning(1, query)
+          }
+
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === thinkingMsgId
+                ? {
+                    id: `asst-${Date.now()}`,
+                    sender: 'assistant',
+                    timestamp: formatCurrentTime(),
+                    content: finalContent,
+                    isWarning: true,
+                    isThinking: false,
+                    isSourcesOpen: false,
+                  }
+                : m
+            )
+          )
+          return
+        }
 
         if (groqRes && groqRes.success && groqRes.answer) {
           setMessages((prev) =>
@@ -787,11 +898,75 @@ export function EpicSupportAssistant({
           }
         : undefined
 
+      const isLocalAbuse = checkIsInappropriateLanguage(text)
+      const currentStrikesToSend = policyStrikes
+
       const [groqRes] = await Promise.all([
-        askGroqSupportAction(text, history, clientUser),
+        askGroqSupportAction(text, history, clientUser, currentStrikesToSend),
         new Promise((r) => setTimeout(r, 650)),
       ])
       setIsTyping(false)
+
+      const isViolation =
+        isLocalAbuse ||
+        Boolean(groqRes?.isPolicyViolation) ||
+        (groqRes?.answer &&
+          (groqRes.answer.toLowerCase().includes('strike') ||
+            groqRes.answer.toLowerCase().includes('warning') ||
+            groqRes.answer.toLowerCase().includes('inappropriate') ||
+            groqRes.answer.toLowerCase().includes('terminated') ||
+            groqRes.answer.toLowerCase().includes('चेतावनी') ||
+            groqRes.answer.toLowerCase().includes('समाप्त') ||
+            groqRes.answer.toLowerCase().includes('apmanjanak') ||
+            groqRes.answer.toLowerCase().includes('chetwani')))
+
+      const nextStrikes = isViolation ? policyStrikes + 1 : policyStrikes
+      if (isViolation) {
+        setPolicyStrikes(nextStrikes)
+      }
+
+      const shouldEndChat = isViolation && (nextStrikes >= 4 || Boolean(groqRes?.shouldTerminateChat))
+      if (shouldEndChat) {
+        setIsChatEnded(true)
+      }
+
+      if (isViolation) {
+        const userUsedRoman = !/[\u0900-\u097F]/.test(text)
+        const llmUsedDevanagari = /[\u0900-\u097F]/.test(groqRes?.answer || '')
+        const shouldOverrideWithHinglish = userUsedRoman && llmUsedDevanagari
+
+        let finalContent = groqRes?.answer || ''
+        if (shouldEndChat) {
+          finalContent = isHinglishQuery(text)
+            ? "Baar-baar abusive aur inappropriate bhasha ka upyog karne ke karan yeh support session permanently terminate kar diya gaya hai. Agar aapko legitimate technical assistance chahiye, toh kripya nayi conversation shuru karein aur respectful bhasha banaye rakhein."
+            : "This support session has been permanently terminated due to repeated violations of our communication policy. If you need legitimate technical assistance with our software or orders, please start a new conversation and maintain professional communication."
+        } else if (
+          shouldOverrideWithHinglish ||
+          !finalContent ||
+          finalContent.includes('I’m sorry, but I can’t help') ||
+          finalContent.includes("I'm sorry") ||
+          finalContent.includes('flattered')
+        ) {
+          finalContent = getDeterministicWarning(nextStrikes, text)
+        }
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === thinkingMsgId
+              ? {
+                  id: `asst-${Date.now()}`,
+                  sender: 'assistant',
+                  timestamp: formatCurrentTime(),
+                  content: finalContent,
+                  isWarning: true,
+                  isThinking: false,
+                  isSourcesOpen: false,
+                }
+              : m
+          )
+        )
+        return
+      }
 
       if (groqRes && groqRes.success && groqRes.answer) {
         setMessages((prev) =>

@@ -78,6 +78,8 @@ export interface GroqResponse {
   verifiedOrder?: VerifiedOrder | null
   comingSoonProduct?: ComingSoonProduct | null
   canEscalateToTicket?: boolean
+  isPolicyViolation?: boolean
+  shouldTerminateChat?: boolean
 }
 
 export interface ClientUserInfo {
@@ -89,7 +91,8 @@ export interface ClientUserInfo {
 export async function askGroqSupportAction(
   query: string,
   history: ChatMessageInput[] = [],
-  clientUser?: ClientUserInfo
+  clientUser?: ClientUserInfo,
+  currentStrikes: number = 0
 ): Promise<GroqResponse> {
   const apiKey = process.env.GROQ_API_KEY
 
@@ -521,12 +524,26 @@ CRITICAL RULES FOR REFUND, RETURN, OR "DONT LIKE A PRODUCT" INQUIRIES:
      - NEVER claim there is a 7-day or 14-day refund window if they don't like the sounds.
      - NEVER mention upcoming unreleased products (such as Sexy Drill) or promote drop alerts when answering a refund or complaint query!
 
+CRITICAL INAPPROPRIATE / ABUSIVE / VULGAR LANGUAGE & CODE OF CONDUCT (UNIVERSAL - ANY REGIONAL LANGUAGE OR LOCAL COUNTRY SLANG):
+- You must detect any abusive language, profanity, swearing, slurs, cursing, sexual remarks, or dating solicitations ("be my gf", "sex", "sex kar", "chudai", "madarchod", "bhenchod", "chutiya", "lund", "fuck", "bitch", "puta", "blyat", "merde", "kos omak", "orospu", "tangina", etc.) in ANY REGIONAL LANGUAGE, DIALECT, OR COUNTRY-SPECIFIC SLANG WORLDWIDE.
+- If the user's message contains any vulgar, abusive, sexually explicit, or inappropriate words:
+  - NEVER output generic refusals like "I'm sorry, but I can't help with that" or "I'm flattered by your kind words"!
+  - NEVER entertain jokes or apologize timidly.
+  - You MUST start your response with: [POLICY_VIOLATION]
+  - STRIKE LEVEL ${currentStrikes + 1} OF 4:
+    - Strike 1: Politely but firmly instruct them to use appropriate and respectful language. State that Producer Toy Support Desk is strictly for music production software, sample packs, and order assistance, and warn that continued use of inappropriate language will result in this chat session being terminated.
+    - Strike 2: Give a stern Second Warning (2/3). State that vulgar or offensive words are strictly prohibited and remind them that the chat will be closed if it continues.
+    - Strike 3: Give a Final Warning (3/3). State that this is their last warning and any further inappropriate message will immediately and permanently terminate the session.
+    - Strike 4 (or higher): Output [TERMINATE_CHAT] along with the final statement that this support session has now been terminated due to repeated policy violations, and they must start a new conversation when ready to communicate respectfully.
+  - ALWAYS deliver the warning in the EXACT SAME LANGUAGE and SCRIPT that the user used.
+  - SCRIPT RULE: If the user wrote in Roman/Latin letters (e.g. "khanki", "laude", "madarchod", "hijde", "karega", "sex kar"), YOU MUST RESPOND IN ROMAN HINGLISH! NEVER output Devanagari script (हिंदी) unless the user typed in Devanagari characters.
+
 CRITICAL LANGUAGE MATCHING RULE:
 - ALWAYS detect and respond in the EXACT same language and script the user communicates in:
-  1. Hinglish (Roman Hindi / Urdu, e.g. "konsa sample best rahega", "sexy drill purchase kyu nahi ho raha"):
-     -> ALWAYS respond in natural, professional, polite Hinglish! (e.g. "Sexy Drill abhi official Coming Soon status par hai aur store par publicly release nahi hua hai. Humari sound design team iske 808s aur drum stems final master kar rahi hai...").
+  1. Hinglish (Roman Hindi / Urdu, e.g. "konsa sample best rahega", "sexy drill purchase kyu nahi ho raha", "madarchod", "laude"):
+     -> ALWAYS respond in natural, professional, polite Hinglish using English/Roman letters! NEVER use Devanagari script if user typed in Roman letters!
   2. Hindi / Devanagari script:
-     -> ALWAYS respond in respectful, clear Hindi in Devanagari script!
+     -> ONLY respond in Devanagari script if user wrote in Devanagari script!
   3. English:
      -> Respond in fluent, professional English.
 
@@ -554,6 +571,9 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/^#{1,4}\s+/gm, '') // Remove ### headings
       .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
       .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '[$1]($2)') // Strip stars around links
+      .replace(/\[POLICY_VIOLATION\]/gi, '')
+      .replace(/\[TERMINATE_CHAT\]/gi, '')
+      .trim()
   }
 
   // Helper to extract recommended products from AI response and user query (Excludes Coming Soon products)
@@ -637,7 +657,14 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
 
       const fallbackData = await fallbackResponse.json()
       const rawAnswer = fallbackData.choices?.[0]?.message?.content || ''
-      const cleanedAnswer = scrubBrandNames(rawAnswer)
+      const isPolicyViolation = rawAnswer.includes('[POLICY_VIOLATION]') || rawAnswer.includes('[TERMINATE_CHAT]')
+      const shouldTerminateChat = (currentStrikes + 1 >= 4) || rawAnswer.includes('[TERMINATE_CHAT]')
+      const cleanedAnswer = scrubBrandNames(
+        rawAnswer
+          .replace(/\[POLICY_VIOLATION\]/g, '')
+          .replace(/\[TERMINATE_CHAT\]/g, '')
+          .trim()
+      )
 
       const resolveComingSoon = (): ComingSoonProduct | null => {
         if (comingSoonProduct) return comingSoonProduct
@@ -672,17 +699,26 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       return {
         success: true,
         answer: cleanedAnswer,
-        recommendedProducts: findMatchedProducts(cleanedAnswer),
-        verifiedDownload,
-        verifiedOrder,
-        comingSoonProduct: resolveComingSoon(),
-        canEscalateToTicket,
+        recommendedProducts: isPolicyViolation ? [] : findMatchedProducts(cleanedAnswer),
+        verifiedDownload: isPolicyViolation ? null : verifiedDownload,
+        verifiedOrder: isPolicyViolation ? null : verifiedOrder,
+        comingSoonProduct: isPolicyViolation ? null : resolveComingSoon(),
+        canEscalateToTicket: isPolicyViolation ? false : canEscalateToTicket,
+        isPolicyViolation,
+        shouldTerminateChat,
       }
     }
 
     const data = await response.json()
     const rawAnswer = data.choices?.[0]?.message?.content || ''
-    const cleanedAnswer = scrubBrandNames(rawAnswer)
+    const isPolicyViolation = rawAnswer.includes('[POLICY_VIOLATION]') || rawAnswer.includes('[TERMINATE_CHAT]')
+    const shouldTerminateChat = (currentStrikes + 1 >= 4) || rawAnswer.includes('[TERMINATE_CHAT]')
+    const cleanedAnswer = scrubBrandNames(
+      rawAnswer
+        .replace(/\[POLICY_VIOLATION\]/g, '')
+        .replace(/\[TERMINATE_CHAT\]/g, '')
+        .trim()
+    )
 
     const resolveComingSoon = (): ComingSoonProduct | null => {
       if (comingSoonProduct) return comingSoonProduct
@@ -717,11 +753,13 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
     return {
       success: true,
       answer: cleanedAnswer,
-      recommendedProducts: findMatchedProducts(cleanedAnswer),
-      verifiedDownload,
-      verifiedOrder,
-      comingSoonProduct: resolveComingSoon(),
-      canEscalateToTicket,
+      recommendedProducts: isPolicyViolation ? [] : findMatchedProducts(cleanedAnswer),
+      verifiedDownload: isPolicyViolation ? null : verifiedDownload,
+      verifiedOrder: isPolicyViolation ? null : verifiedOrder,
+      comingSoonProduct: isPolicyViolation ? null : resolveComingSoon(),
+      canEscalateToTicket: isPolicyViolation ? false : canEscalateToTicket,
+      isPolicyViolation,
+      shouldTerminateChat,
     }
   } catch (error: any) {
     console.error('Support Action Exception:', error)
