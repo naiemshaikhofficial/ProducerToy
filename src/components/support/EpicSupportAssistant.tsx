@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowRight,
   CheckCircle2,
@@ -18,6 +19,8 @@ import {
   AlertTriangle,
   ArrowLeft,
   Ban,
+  Lock,
+  LogIn,
 } from 'lucide-react'
 import {
   KNOWLEDGE_BASE,
@@ -25,6 +28,7 @@ import {
 } from './supportKnowledgeData'
 import { askGroqSupportAction } from '@/actions/groqSupportAction'
 import { createSupportTicketAction } from '@/actions/supportActions'
+import { useAuth } from '@/context/AuthContext'
 
 interface ChatMessage {
   id: string
@@ -61,11 +65,24 @@ export function EpicSupportAssistant({
   const [chatInput, setChatInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
 
+  const { user } = useAuth()
+
   // Ticket creation inline state
   const [ticketName, setTicketName] = useState('')
   const [ticketEmail, setTicketEmail] = useState(initialEmail)
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false)
   const [ticketError, setTicketError] = useState('')
+
+  // Sync authenticated user info
+  useEffect(() => {
+    if (user?.email && !ticketEmail) {
+      setTicketEmail(user.email)
+    }
+    const fullName = user?.user_metadata?.full_name || user?.user_metadata?.name || ''
+    if (fullName && !ticketName) {
+      setTicketName(fullName)
+    }
+  }, [user])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<HTMLInputElement>(null)
@@ -473,7 +490,8 @@ export function EpicSupportAssistant({
   }
 
   const handleCreateTicket = async (msgId: string, subjectQuery?: string) => {
-    if (!ticketEmail.trim()) {
+    const emailToSend = ticketEmail.trim() || user?.email || ''
+    if (!emailToSend) {
       setTicketError('Please provide your email address.')
       return
     }
@@ -482,16 +500,45 @@ export function EpicSupportAssistant({
     setTicketError('')
 
     try {
+      const customerName = ticketName.trim() || user?.user_metadata?.full_name || 'Producer'
+      const queryText = subjectQuery || 'Technical Support Inquiry'
+
+      // 1. Create ticket in Supabase database with user association
       const res = await createSupportTicketAction({
-        name: ticketName.trim() || 'Producer',
-        email: ticketEmail.trim(),
-        category: 'Support Assistant Inquiry',
+        name: customerName,
+        email: emailToSend,
+        category: 'Senior Audio Engineering Desk',
         priority: 'NORMAL',
-        subject: subjectQuery || 'Technical Support Inquiry',
-        description: `Customer submitted via Producer Toy Support Assistant regarding: "${subjectQuery}".\n\nDirect audio technician assistance requested.`,
+        subject: queryText,
+        description: `Customer submitted via Producer Toy Support Assistant.\nInquiry: "${queryText}".\nDirect senior audio engineer assistance requested.`,
       })
 
       if (res && res.success && res.ticketNumber) {
+        // 2. Dispatch email directly to support@producertoy.com via FormSubmit.co
+        try {
+          await fetch('https://formsubmit.co/ajax/support@producertoy.com', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({
+              _subject: `[Senior Audio Desk] New Support Ticket #${res.ticketNumber} from ${customerName}`,
+              ticket_number: res.ticketNumber,
+              customer_name: customerName,
+              customer_email: emailToSend,
+              account_type: user?.id ? `Registered Member (${user.email})` : 'Guest Account',
+              inquiry_details: queryText,
+              message: `New ticket #${res.ticketNumber} submitted to Senior Audio Engineering Desk.\n\nCustomer: ${customerName} (${emailToSend})\nInquiry Details: "${queryText}"\nCreated At: ${new Date().toLocaleString()}`,
+              _replyto: emailToSend,
+              _template: 'table',
+              _captcha: 'false',
+            }),
+          })
+        } catch (formSubmitErr) {
+          console.warn('[FormSubmit Notification Warning]', formSubmitErr)
+        }
+
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
@@ -558,7 +605,7 @@ export function EpicSupportAssistant({
 
           {/* Server Status: Square/rectangular with slightly rounded sides and subtle border (Exact Match with Screenshot) */}
           <div className="absolute top-4 right-4 sm:top-5 sm:right-8 z-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#110d0a]/95 border border-white/15 text-xs text-zinc-300 shadow-lg backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md bg-[#141217] border border-white/15 text-xs text-zinc-300 shadow-lg">
               <span className="text-zinc-400">Server status:</span>
               <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-semibold text-xs">
                 <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center flex-shrink-0">
@@ -572,7 +619,7 @@ export function EpicSupportAssistant({
           </div>
 
           {/* Center Hero Heading & Input (Strictly centered vertically & horizontally) */}
-          <main className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
+          <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
             <div className="space-y-2 mb-6 sm:mb-7">
               <p className="text-sm font-normal text-zinc-300 tracking-normal">
                 Producer Toy Support
@@ -582,9 +629,9 @@ export function EpicSupportAssistant({
               </h1>
             </div>
 
-            {/* Problem Input Box: Square-ish with slightly rounded sides (rounded-lg) and matched width */}
-            <form onSubmit={handleHeroSubmit} className="w-full max-w-[490px] mx-auto">
-              <div className="flex items-center gap-2.5 w-full">
+            {/* Problem Input Box: Exact 1:1 wide box matching Epic Games */}
+            <form onSubmit={handleHeroSubmit} className="w-full max-w-[680px] mx-auto">
+              <div className="flex items-center gap-3 w-full">
                 <input
                   type="text"
                   value={heroInput}
@@ -593,7 +640,7 @@ export function EpicSupportAssistant({
                     if (inputError) setInputError('')
                   }}
                   placeholder="Describe your problem here"
-                  className={`flex-1 bg-[#130f0c]/90 hover:bg-[#18130f] focus:bg-[#18130f] border rounded-lg px-4.5 py-2.5 sm:py-3 text-sm text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl backdrop-blur-md ${
+                  className={`flex-1 bg-[#141217] hover:bg-[#1a1720] focus:bg-[#1a1720] border rounded-[10px] px-5 py-3.5 sm:py-4 text-sm sm:text-base text-white placeholder-zinc-400 focus:outline-none transition-all shadow-xl ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
                       : 'border-white/20 hover:border-white/30 focus:border-[#FC6301]'
@@ -604,10 +651,10 @@ export function EpicSupportAssistant({
                   type="submit"
                   disabled={isHeroLoading}
                   aria-label="Submit problem"
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer flex-shrink-0 ${
+                  className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all cursor-pointer flex-shrink-0 ${
                     heroInput.trim()
                       ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/30 active:scale-95'
-                      : 'bg-[#1b1511] hover:bg-[#241c16] border border-white/10 text-zinc-500 hover:text-zinc-300'
+                      : 'bg-[#1a1720] hover:bg-[#231f2c] border border-white/10 text-zinc-500 hover:text-zinc-300'
                   }`}
                 >
                   {isHeroLoading ? (
@@ -678,7 +725,7 @@ export function EpicSupportAssistant({
           <div className="text-center pt-8 pb-3 relative z-10">
             <button
               onClick={handleResetToHero}
-              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c]/80 border border-white/10 backdrop-blur-md"
+              className="absolute left-4 sm:left-8 top-8 text-zinc-400 hover:text-white text-xs flex items-center gap-1.5 cursor-pointer transition-colors px-3 py-1.5 rounded-lg bg-[#14100c] border border-white/10"
             >
               <ArrowLeft size={13} />
               <span className="hidden sm:inline">Start over</span>
@@ -695,7 +742,7 @@ export function EpicSupportAssistant({
 
             {/* Date Pill */}
             <div className="pt-3">
-              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e]/80 border border-white/10 text-[11px] text-zinc-400 font-medium backdrop-blur-sm shadow-sm">
+              <span className="inline-block px-3.5 py-1 rounded-full bg-[#16120e] border border-white/10 text-[11px] text-zinc-400 font-medium shadow-sm">
                 {formatCurrentDate()}
               </span>
             </div>
@@ -725,18 +772,31 @@ export function EpicSupportAssistant({
               return (
                 <div key={msg.id} className="flex flex-col items-start space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200 w-full max-w-2xl">
                   
-                  {/* Assistant Header: Bot Icon + Name + Timestamp */}
+                  {/* Assistant Header: Robot Avatar + Name + Timestamp */}
                   <div className="flex items-center gap-2 text-xs text-zinc-400 px-1">
-                    <div className="w-5 h-5 rounded-md bg-[#251811] border border-[#3d251a] flex items-center justify-center text-[#FC6301]">
-                      <Bot size={13} />
+                    <div className="w-6 h-6 rounded-md bg-[#251811] border border-[#3d251a] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      <Image
+                        src="/images/robot-avatar.png"
+                        alt="Support Assistant"
+                        width={22}
+                        height={22}
+                        className="w-[18px] h-[18px] object-contain"
+                      />
                     </div>
                     <span className="font-semibold text-zinc-200 text-xs">Producer Toy Support Assistant</span>
                     <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
                   </div>
 
-                  {/* Thinking Spinner Card (Exact Match with Epic Games Screenshot) */}
+                  {/* Thinking Spinner Card with Robot Avatar */}
                   {msg.isThinking ? (
                     <div className="inline-flex items-center gap-3 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-sm px-6 py-4 shadow-xl w-fit">
+                      <Image
+                        src="/images/robot-avatar.png"
+                        alt="Thinking..."
+                        width={20}
+                        height={20}
+                        className="w-5 h-5 object-contain"
+                      />
                       <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
                       <span className="text-zinc-300 text-sm font-normal">Thinking...</span>
                     </div>
@@ -841,51 +901,86 @@ export function EpicSupportAssistant({
                       {/* Inline Ticket Escalation Form (If answer didn't help or requested) */}
                       {msg.needsTicket && (
                         <div className="mt-3 p-4 rounded-xl bg-[#140e0b] border border-[#3b2318] space-y-3 animate-in fade-in">
-                          <p className="text-xs text-zinc-200 font-medium">
-                            Submit this request directly to our senior audio engineering desk:
-                          </p>
+                          {!user ? (
+                            <div className="space-y-3">
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-[#FC6301]/20 flex items-center justify-center shrink-0 text-[#FC6301] mt-0.5">
+                                  <Lock size={15} />
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-xs font-semibold text-white">
+                                    Sign In Required for Ticket Tracking
+                                  </p>
+                                  <p className="text-xs text-zinc-400 leading-relaxed">
+                                    Please sign in to your Producer Toy account to submit this ticket to our senior audio engineering desk. This allows our team to connect your licenses and enables 1-click tracking from your dashboard.
+                                  </p>
+                                </div>
+                              </div>
 
-                          {ticketError && (
-                            <p className="text-xs text-rose-400">{ticketError}</p>
-                          )}
+                              <div className="flex items-center gap-3 pt-1">
+                                <Link
+                                  href={`/auth?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/support')}`}
+                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                                >
+                                  <LogIn size={13} />
+                                  <span>Sign In to Submit & Track</span>
+                                </Link>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs text-zinc-200 font-medium">
+                                  Submit this request directly to our senior audio engineering desk:
+                                </p>
+                                <span className="text-[10px] text-zinc-400 bg-[#221812] px-2 py-0.5 rounded border border-[#332218]">
+                                  {user.email}
+                                </span>
+                              </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            <input
-                              type="text"
-                              value={ticketName}
-                              onChange={(e) => setTicketName(e.target.value)}
-                              placeholder="Your Name (Optional)"
-                              className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
-                            />
-                            <input
-                              type="email"
-                              required
-                              value={ticketEmail}
-                              onChange={(e) => setTicketEmail(e.target.value)}
-                              placeholder="Your Email *"
-                              className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
-                            />
-                          </div>
-
-                          <div className="flex justify-end pt-1">
-                            <button
-                              onClick={() => handleCreateTicket(msg.id, msg.content || 'Technical Assistance')}
-                              disabled={isSubmittingTicket}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-                            >
-                              {isSubmittingTicket ? (
-                                <>
-                                  <Loader2 size={13} className="animate-spin" />
-                                  <span>Submitting...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Send size={13} />
-                                  <span>Submit to Audio Desk</span>
-                                </>
+                              {ticketError && (
+                                <p className="text-xs text-rose-400">{ticketError}</p>
                               )}
-                            </button>
-                          </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                <input
+                                  type="text"
+                                  value={ticketName}
+                                  onChange={(e) => setTicketName(e.target.value)}
+                                  placeholder="Your Name (Optional)"
+                                  className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
+                                />
+                                <input
+                                  type="email"
+                                  required
+                                  value={ticketEmail}
+                                  onChange={(e) => setTicketEmail(e.target.value)}
+                                  placeholder="Your Email *"
+                                  className="bg-[#1e1510] border border-[#332218] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FC6301]"
+                                />
+                              </div>
+
+                              <div className="flex justify-end pt-1">
+                                <button
+                                  onClick={() => handleCreateTicket(msg.id, msg.content || 'Technical Assistance')}
+                                  disabled={isSubmittingTicket}
+                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FC6301] hover:bg-[#ea580c] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+                                >
+                                  {isSubmittingTicket ? (
+                                    <>
+                                      <Loader2 size={13} className="animate-spin" />
+                                      <span>Submitting...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Send size={13} />
+                                      <span>Submit to Audio Desk</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
                       )}
 
@@ -897,8 +992,17 @@ export function EpicSupportAssistant({
                             Ticket #{msg.ticketNumber} created!
                           </p>
                           <p className="text-zinc-300">
-                            Our audio engineers have received your inquiry. A confirmation was sent to {ticketEmail}.
+                            Our senior audio engineers have received your inquiry at <span className="text-white font-medium">support@producertoy.com</span>. A confirmation was sent to <span className="text-white font-medium">{ticketEmail}</span>.
                           </p>
+                          <div className="pt-1">
+                            <Link
+                              href="/account"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 hover:text-white font-medium text-xs transition-colors"
+                            >
+                              <span>Track in Account Dashboard</span>
+                              <ExternalLink size={12} />
+                            </Link>
+                          </div>
                         </div>
                       )}
 
