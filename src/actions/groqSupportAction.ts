@@ -56,12 +56,16 @@ Core Knowledge Base:
    - Ableton Live: Open Preferences > Plug-Ins. Hold ALT (Windows) or OPTION (Mac) and click "Rescan".
    - Logic Pro: Open Settings > Plug-in Manager > "Reset & Rescan Selection".
 
-Formatting Instructions:
-- Answer in a clear, friendly, expert tone like Epic Games Support Assistant.
-- Keep the answer concise and actionable.
-- Always include the relevant direct markdown links for navigation.`
+CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
+- NEVER use asterisks '*' or bullet dashes '-' at the start of lines. NEVER output bullet points with '*'.
+- When providing instructions or steps, ALWAYS format as clean numbered lists:
+  1. **Step Name**: Explanation.
+  2. **Step Name**: Explanation.
+- Never use markdown heading tags like '###' or '##'.
+- Write cleanly and elegantly with bold labels and regular text, exactly like the Epic Games Support Assistant.
+- Always include relevant direct markdown links for navigation.`
 
-  // Helper to scrub any accidental engine leaks from answers
+  // Helper to scrub any accidental engine leaks or stray asterisks from answers
   const scrubBrandNames = (text: string) => {
     if (!text) return ''
     return text
@@ -70,6 +74,8 @@ Formatting Instructions:
       .replace(/\bqwen(\s*\d+(\.\d+)?)?\b/gi, 'Producer Toy Support')
       .replace(/\bopenai\b/gi, 'Producer Toy')
       .replace(/\bchatgpt\b/gi, 'Producer Toy Assistant')
+      .replace(/^#{1,4}\s+/gm, '') // Remove ### headings
+      .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
   }
 
   try {

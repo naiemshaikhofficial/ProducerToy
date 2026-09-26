@@ -132,20 +132,38 @@ export function EpicSupportAssistant({
   const renderFormattedAnswer = (text: string) => {
     if (!text) return null
 
-    const lines = text.split('\n')
+    // Clean up lines: remove leading asterisks or dashes
+    const rawLines = text.split('\n')
 
-    return lines.map((line, lIdx) => {
+    return rawLines.map((rawLine, lIdx) => {
+      // Strip starting asterisks, dashes, or markdown headers (e.g. "* Item", "- Item", "### Header")
+      const line = rawLine.replace(/^[\*\-]\s+/, '').replace(/^#{1,4}\s+/, '').trim()
+
+      if (!line) {
+        return <span key={lIdx} className="block h-2" />
+      }
+
+      // Check if line starts with a number like "1. " or "2. "
+      const numMatch = line.match(/^(\d+\.)\s+(.*)$/)
+      let prefix: React.ReactNode = null
+      let contentToParse = line
+
+      if (numMatch) {
+        prefix = <span className="font-bold text-white mr-1.5">{numMatch[1]}</span>
+        contentToParse = numMatch[2]
+      }
+
       const elements: React.ReactNode[] = []
       let lastIndex = 0
       let match: RegExpExecArray | null
 
       const lineRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-      while ((match = lineRegex.exec(line)) !== null) {
+      while ((match = lineRegex.exec(contentToParse)) !== null) {
         const [fullMatch, linkText, url] = match
         const matchIndex = match.index
 
         if (matchIndex > lastIndex) {
-          const before = line.substring(lastIndex, matchIndex)
+          const before = contentToParse.substring(lastIndex, matchIndex)
           elements.push(renderBoldText(before, `l-${lIdx}-b-${lastIndex}`))
         }
 
@@ -178,15 +196,15 @@ export function EpicSupportAssistant({
         lastIndex = matchIndex + fullMatch.length
       }
 
-      if (lastIndex < line.length) {
-        elements.push(renderBoldText(line.substring(lastIndex), `l-${lIdx}-a-${lastIndex}`))
+      if (lastIndex < contentToParse.length) {
+        elements.push(renderBoldText(contentToParse.substring(lastIndex), `l-${lIdx}-a-${lastIndex}`))
       }
 
       return (
-        <React.Fragment key={lIdx}>
-          {elements.length > 0 ? elements : <span className="block h-2" />}
-          {lIdx < lines.length - 1 && <br />}
-        </React.Fragment>
+        <div key={lIdx} className="leading-relaxed">
+          {prefix}
+          {elements}
+        </div>
       )
     })
   }
@@ -718,16 +736,16 @@ export function EpicSupportAssistant({
 
                   {/* Thinking Spinner Card (Exact Match with Epic Games Screenshot) */}
                   {msg.isThinking ? (
-                    <div className="inline-flex items-center gap-3 bg-[#15110e] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-sm px-5 py-3.5 shadow-xl w-fit">
+                    <div className="inline-flex items-center gap-3 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-sm px-6 py-4 shadow-xl w-fit">
                       <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
                       <span className="text-zinc-300 text-sm font-normal">Thinking...</span>
                     </div>
                   ) : (
-                    <div className="bg-[#15110e] border border-white/[0.08] text-zinc-200 rounded-2xl rounded-tl-sm px-5 py-4 text-sm sm:text-[14.5px] leading-relaxed space-y-3.5 shadow-xl w-full">
+                    <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl rounded-tl-sm p-6 sm:p-7 text-[14.5px] sm:text-[15px] leading-relaxed space-y-4 shadow-2xl w-full">
                       
                       {/* AI Content with Clickable Direct Redirect Links */}
                       {msg.content && (
-                        <div className="text-zinc-200 leading-relaxed">
+                        <div className="text-[#d1d1d6] leading-relaxed space-y-2">
                           {renderFormattedAnswer(msg.content)}
                         </div>
                       )}
@@ -756,14 +774,14 @@ export function EpicSupportAssistant({
                       {/* Answer Sources Dropdown & Helpful Feedback ONLY on genuine answer cards (NOT on greetings) */}
                       {!msg.isGreeting && (
                         <>
-                          {/* Answer Sources Dropdown (Exact Screenshot 4) */}
+                          {/* Answer Sources Dropdown (Exact Match with Epic Games Screenshot) */}
                           <div className="pt-2">
                             <button
                               onClick={() => toggleSources(msg.id)}
-                              className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#201814] hover:bg-[#281d18] border border-[#33221a] text-xs text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                              className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg bg-[#222227] hover:bg-[#2b2b32] border border-white/5 text-xs text-zinc-300 hover:text-white transition-colors cursor-pointer font-medium"
                             >
-                              <span className="font-medium">Answer sources</span>
-                              {msg.isSourcesOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                              <span>Answer sources</span>
+                              {msg.isSourcesOpen ? <ChevronUp size={14} className="text-zinc-400" /> : <ChevronDown size={14} className="text-zinc-400" />}
                             </button>
 
                             {msg.isSourcesOpen && (
