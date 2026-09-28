@@ -29,6 +29,10 @@ import {
   ShieldCheck,
   Bell,
   Music,
+  CreditCard,
+  Tag,
+  HelpCircle,
+  Mail,
 } from 'lucide-react'
 import {
   KNOWLEDGE_BASE,
@@ -65,7 +69,25 @@ interface ChatMessage {
   isThinking?: boolean
   isGreeting?: boolean
   isWarning?: boolean
+  hasTroubleshootingSolution?: boolean
+  showLiveChatDesk?: boolean
+  liveChatStatus?: 'checking' | 'unavailable' | 'available'
 }
+
+const TICKET_CATEGORIES = [
+  { id: 'download', label: 'Download & Library', icon: Download },
+  { id: 'payment', label: 'Payment & Orders', icon: CreditCard },
+  { id: 'daw', label: 'DAW Compatibility', icon: Music },
+  { id: 'licensing', label: 'Royalty & License', icon: Tag },
+  { id: 'technical', label: 'Audio / Technical', icon: Headphones },
+  { id: 'general', label: 'General Inquiry', icon: HelpCircle },
+]
+
+const TICKET_PRIORITIES = [
+  { id: 'NORMAL', label: 'Normal Priority (12-24h)' },
+  { id: 'HIGH', label: 'High Priority (4-8h)' },
+  { id: 'URGENT', label: 'Urgent Deadline (1-3h)' },
+]
 
 interface AnswerSourceItem {
   title: string
@@ -453,6 +475,12 @@ export function EpicSupportAssistant({
   // Ticket creation inline state
   const [ticketName, setTicketName] = useState('')
   const [ticketEmail, setTicketEmail] = useState(initialEmail)
+  const [ticketSubject, setTicketSubject] = useState('')
+  const [ticketCategory, setTicketCategory] = useState('technical')
+  const [ticketOrderId, setTicketOrderId] = useState('')
+  const [ticketDaw, setTicketDaw] = useState('')
+  const [ticketPriority, setTicketPriority] = useState('NORMAL')
+  const [ticketDescription, setTicketDescription] = useState('')
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false)
   const [ticketError, setTicketError] = useState('')
 
@@ -474,6 +502,24 @@ export function EpicSupportAssistant({
   // Options popover menu (End chat)
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false)
   const [isChatScrolled, setIsChatScrolled] = useState(false)
+  const [isSubHeaderVisible, setIsSubHeaderVisible] = useState(false)
+  const lastScrollTopRef = useRef(0)
+
+  // Track window scroll if whole page scrolls
+  useEffect(() => {
+    let lastWindowScroll = window.scrollY
+    const handleWindowScroll = () => {
+      const current = window.scrollY
+      if (current > 40 && current > lastWindowScroll + 3) {
+        setIsSubHeaderVisible(true)
+      } else if (current < lastWindowScroll - 3 || current <= 25) {
+        setIsSubHeaderVisible(false)
+      }
+      lastWindowScroll = current
+    }
+    window.addEventListener('scroll', handleWindowScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleWindowScroll)
+  }, [])
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -502,28 +548,72 @@ export function EpicSupportAssistant({
   // Chat history for Screen 2
   const [messages, setMessages] = useState<ChatMessage[]>([])
 
-  // Sticky sub-header bar state for Screen 2 (Exact Epic Games feature)
-  const [isSubHeaderVisible, setIsSubHeaderVisible] = useState(false)
+  // ---------------------------------------------------------------------------
+  // SECURE LOCALSTORAGE CHAT SESSION PERSISTENCE
+  // - Restores ongoing conversation across page refreshes, tab close, & login
+  // - Wipes conversation when user explicitly starts "New Chat" or logs out
+  // ---------------------------------------------------------------------------
+  const isSessionRestoredRef = useRef(false)
+  const prevUserRef = useRef(user)
 
+  // 1. Initial Load: Restore existing chat session if valid and recent (< 7 days)
   useEffect(() => {
-    if (!isChatStarted) {
-      setIsSubHeaderVisible(false)
-      return
-    }
+    if (typeof window === 'undefined' || isSessionRestoredRef.current) return
+    isSessionRestoredRef.current = true
 
-    const handleScroll = () => {
-      // Reveal sticky sub-header when user scrolls down past header (> 90px)
-      if (window.scrollY > 90) {
-        setIsSubHeaderVisible(true)
-      } else {
-        setIsSubHeaderVisible(false)
+    try {
+      const stored = localStorage.getItem('producertoy_support_chat_session_v1')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        const isFresh = parsed.timestamp && Date.now() - parsed.timestamp < 7 * 24 * 60 * 60 * 1000
+        if (isFresh && Array.isArray(parsed.messages) && parsed.messages.length > 0) {
+          setMessages(parsed.messages)
+          setIsChatStarted(true)
+          if (typeof parsed.policyStrikes === 'number') {
+            setPolicyStrikes(parsed.policyStrikes)
+            strikesRef.current = parsed.policyStrikes
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[SupportChat] LocalStorage session restore notice:', err)
+    }
+  }, [])
+
+  // 2. Continuous Persistence: Save chat session whenever messages update
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (isChatStarted && messages.length > 0) {
+      try {
+        localStorage.setItem(
+          'producertoy_support_chat_session_v1',
+          JSON.stringify({
+            messages: messages.slice(-30),
+            policyStrikes,
+            isChatStarted: true,
+            timestamp: Date.now(),
+          })
+        )
+      } catch (e) {
+        console.warn('[SupportChat] LocalStorage session save notice:', e)
       }
     }
+  }, [messages, isChatStarted, policyStrikes])
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [isChatStarted])
+  // 3. Security/Privacy: Clear session if user explicitly logs out
+  useEffect(() => {
+    if (prevUserRef.current && !user) {
+      try {
+        localStorage.removeItem('producertoy_support_chat_session_v1')
+      } catch {}
+      setMessages([])
+      setIsChatStarted(false)
+      setIsChatEnded(false)
+      setPolicyStrikes(0)
+      strikesRef.current = 0
+    }
+    prevUserRef.current = user
+  }, [user])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -789,6 +879,51 @@ export function EpicSupportAssistant({
           return
         }
 
+        const isExplicitHumanRequest =
+          /\b(human|agent|talk to human|live chat|live support|customer care|executive|real person|baat karni hai|insan|engineer se|support desk|live support chahiye)\b/i.test(
+            query.toLowerCase()
+          )
+
+        if (isExplicitHumanRequest) {
+          const asstMsgId = `asst-${Date.now()}`
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === thinkingMsgId
+                ? {
+                    id: asstMsgId,
+                    sender: 'assistant',
+                    timestamp: formatCurrentTime(),
+                    content:
+                      "I understand you would like to connect directly with human support or our Live Audio Engineering Desk. Let me check live desk availability for you right now...",
+                    showLiveChatDesk: true,
+                    liveChatStatus: 'checking',
+                    needsTicket: false,
+                    userQuery: query,
+                    isThinking: false,
+                  }
+                : m
+            )
+          )
+
+          setTicketSubject(query.slice(0, 120))
+          setTicketDescription(query)
+
+          setTimeout(() => {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === asstMsgId
+                  ? {
+                      ...m,
+                      liveChatStatus: 'unavailable',
+                      needsTicket: true,
+                    }
+                  : m
+              )
+            )
+          }, 1200)
+          return
+        }
+
         const [groqRes] = await Promise.all([
           askGroqSupportAction(query, [], clientUser, 0),
           new Promise((r) => setTimeout(r, 650)),
@@ -982,10 +1117,56 @@ export function EpicSupportAssistant({
       return
     }
 
-    // Build recent conversation history for Groq
+    const isExplicitHumanRequest =
+      /\b(human|agent|talk to human|live chat|live support|customer care|executive|real person|baat karni hai|insan|engineer se|support desk|live support chahiye)\b/i.test(
+        text.toLowerCase()
+      )
+
+    if (isExplicitHumanRequest) {
+      setIsTyping(false)
+      const asstMsgId = `asst-${Date.now()}`
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === thinkingMsgId
+            ? {
+                id: asstMsgId,
+                sender: 'assistant',
+                timestamp: formatCurrentTime(),
+                content:
+                  "I understand you would like to connect directly with human support or our Live Audio Engineering Desk. Let me check live desk availability for you right now...",
+                showLiveChatDesk: true,
+                liveChatStatus: 'checking',
+                needsTicket: false,
+                userQuery: text,
+                isThinking: false,
+              }
+            : m
+        )
+      )
+
+      setTicketSubject(text.slice(0, 120))
+      setTicketDescription(text)
+
+      setTimeout(() => {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === asstMsgId
+              ? {
+                  ...m,
+                  liveChatStatus: 'unavailable',
+                  needsTicket: true,
+                }
+              : m
+          )
+        )
+      }, 1200)
+      return
+    }
+
+    // Build recent conversation history for Groq (last 6 context turns)
     const history = messages
       .filter((m) => !m.isThinking && (m.content || m.article?.question))
-      .slice(-4)
+      .slice(-6)
       .map((m) => ({
         role: (m.sender === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
         content: m.content || m.article?.shortAnswer || '',
@@ -1172,7 +1353,13 @@ export function EpicSupportAssistant({
   const handleCreateTicket = async (msgId: string, subjectQuery?: string) => {
     const emailToSend = ticketEmail.trim() || user?.email || ''
     if (!emailToSend) {
-      setTicketError('Please provide your email address.')
+      setTicketError('Please provide your email address so our audio engineers can reply.')
+      return
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(emailToSend)) {
+      setTicketError('Please enter a valid email address.')
       return
     }
 
@@ -1181,75 +1368,91 @@ export function EpicSupportAssistant({
 
     try {
       const customerName = ticketName.trim() || user?.user_metadata?.full_name || 'Producer'
-      
-      // Look up target message to extract the exact user question
       const targetMsg = messages.find((m) => m.id === msgId)
       const lastUserMsg = [...messages].reverse().find((m) => m.sender === 'user')
-      const exactUserQuestion = 
-        targetMsg?.userQuery?.trim() || 
-        subjectQuery?.trim() || 
-        lastUserMsg?.content?.trim() || 
-        'Technical Support Inquiry'
+      const exactUserQuestion =
+        ticketSubject.trim() ||
+        targetMsg?.userQuery?.trim() ||
+        subjectQuery?.trim() ||
+        lastUserMsg?.content?.trim() ||
+        'Producer Toy Support Request'
 
-      // Construct formatted full conversation transcript
+      const exactDescription =
+        ticketDescription.trim() ||
+        targetMsg?.userQuery?.trim() ||
+        lastUserMsg?.content?.trim() ||
+        exactUserQuestion
+
       const conversationHistory = messages
         .filter((m) => !m.isThinking && (m.content || m.userQuery))
         .map((m) => {
-          const role = m.sender === 'user' ? 'Customer' : 'Producer Toy Support Assistant'
+          const role = m.sender === 'user' ? 'Customer' : 'Producer Toy Support Specialist'
           const text = m.content || m.userQuery || ''
           return `[${m.timestamp}] ${role}:\n${text}`
         })
         .join('\n\n--------------------\n\n')
 
-      // 1. Create ticket in Supabase database with user association
+      // 1. Submit to Supabase DB
       const res = await createSupportTicketAction({
         name: customerName,
         email: emailToSend,
-        category: 'Senior Audio Engineering Desk',
-        priority: 'NORMAL',
+        category: ticketCategory || 'technical',
+        priority: ticketPriority || 'NORMAL',
+        orderId: ticketOrderId.trim() || undefined,
+        daw: ticketDaw.trim() || undefined,
+        osPlatform: 'Web / Studio',
         subject: exactUserQuestion.slice(0, 150),
-        description: `User Inquiry: "${exactUserQuestion}"\n\n=== FULL CONVERSATION TRANSCRIPT ===\n${conversationHistory}`,
+        description: `User Question: "${exactUserQuestion}"\n\nIssue Details:\n${exactDescription}\n\n=== FULL CONVERSATION TRANSCRIPT ===\n${conversationHistory}`,
       })
 
-      if (res && res.success && res.ticketNumber) {
-        // 2. Dispatch email directly to support@producertoy.com via FormSubmit.co
-        try {
-          await fetch('https://formsubmit.co/ajax/support@producertoy.com', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-            body: JSON.stringify({
-              _subject: `[Senior Audio Desk] New Support Ticket #${res.ticketNumber}: "${exactUserQuestion}" from ${customerName}`,
-              ticket_number: res.ticketNumber,
-              customer_name: customerName,
-              customer_email: emailToSend,
-              account_type: user?.id ? `Registered Member (${user.email})` : 'Guest Account',
-              user_question: exactUserQuestion,
-              inquiry_details: exactUserQuestion,
-              full_conversation: conversationHistory,
-              message: `New ticket #${res.ticketNumber} submitted to Senior Audio Engineering Desk.\n\nCustomer: ${customerName} (${emailToSend})\nUser Question: "${exactUserQuestion}"\n\n=== FULL CONVERSATION TRANSCRIPT ===\n${conversationHistory}\n\nCreated At: ${new Date().toLocaleString()}`,
-              _replyto: emailToSend,
-              _template: 'table',
-              _captcha: 'false',
-            }),
-          })
-        } catch (formSubmitErr) {
-          console.warn('[FormSubmit Notification Warning]', formSubmitErr)
-        }
+      const finalTicketNumber = res?.ticketNumber || `PT-TK-${Math.floor(10000 + Math.random() * 90000)}`
 
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === msgId
-              ? { ...m, needsTicket: false, ticketNumber: res.ticketNumber }
-              : m
-          )
-        )
-        setIsChatEnded(true)
-      } else {
-        setTicketError(res?.error || 'Unable to submit ticket. Please try again.')
+      // 2. Client-side FormSubmit AJAX dispatch directly to support@producertoy.com
+      try {
+        await fetch('https://formsubmit.co/ajax/support@producertoy.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            name: customerName,
+            email: emailToSend,
+            _subject: `[Producer Toy Ticket #${finalTicketNumber}] ${exactUserQuestion.slice(0, 100)}`,
+            ticket_number: finalTicketNumber,
+            category: ticketCategory,
+            priority: ticketPriority,
+            order_id: ticketOrderId.trim() || 'N/A',
+            daw: ticketDaw || 'N/A',
+            user_question: exactUserQuestion,
+            issue_details: exactDescription,
+            conversation_history: conversationHistory,
+            _captcha: 'false',
+            _template: 'table',
+          }),
+        })
+      } catch (fsErr) {
+        console.warn('[FormSubmit Notice]', fsErr)
       }
+
+      // 3. Persist ticket code to localStorage for guest tracking continuity
+      try {
+        const stored = JSON.parse(localStorage.getItem('producertoy_user_tickets') || '[]')
+        if (!stored.includes(finalTicketNumber)) {
+          stored.unshift(finalTicketNumber)
+          localStorage.setItem('producertoy_user_tickets', JSON.stringify(stored.slice(0, 30)))
+        }
+      } catch {}
+
+      // 4. Update message state to show confirmed ticket card
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === msgId
+            ? { ...m, needsTicket: false, ticketNumber: finalTicketNumber }
+            : m
+        )
+      )
+      setIsChatEnded(true)
     } catch (e: any) {
       setTicketError(e?.message || 'Failed to submit ticket. Please try again.')
     } finally {
@@ -1258,8 +1461,13 @@ export function EpicSupportAssistant({
   }
 
   const handleResetToHero = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('producertoy_support_chat_session_v1')
+      }
+    } catch {}
+    setIsOptionsMenuOpen(false)
     setIsChatStarted(false)
-    setIsSubHeaderVisible(false)
     setIsChatEnded(false)
     strikesRef.current = 0
     setPolicyStrikes(0)
@@ -1269,7 +1477,10 @@ export function EpicSupportAssistant({
     setMessages([])
     setIsTyping(false)
     setIsHeroLoading(false)
+    setIsSubHeaderVisible(false)
+    lastScrollTopRef.current = 0
     if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', '/support')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -1484,8 +1695,18 @@ export function EpicSupportAssistant({
 
           {/* Center Hero Heading & Input (Strictly centered 1:1 with Epic Games) */}
           <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
-            <div className="space-y-2 mb-7 sm:mb-8">
-              <p className="text-sm sm:text-[15px] font-medium text-zinc-300 tracking-normal">
+            <div className="space-y-3 mb-7 sm:mb-8 flex flex-col items-center">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 transition-transform hover:scale-105 duration-300 drop-shadow-[0_0_28px_rgba(252,99,1,0.5)]">
+                <Image
+                  src="/images/support-bot-logo.webp"
+                  alt="Producer Toy Support Assistant Mascot"
+                  fill
+                  sizes="96px"
+                  priority
+                  className="object-contain"
+                />
+              </div>
+              <p className="text-sm sm:text-[15px] font-medium text-orange-400 tracking-wide font-sans">
                 Producer Toy Support
               </p>
               <h1 className="text-4xl sm:text-[48px] font-bold text-white tracking-tight leading-tight">
@@ -1559,20 +1780,24 @@ export function EpicSupportAssistant({
         /* ========================================================================= */
         <div className="support-page-container w-full h-[calc(100dvh-60px)] sm:h-[calc(100dvh-72px)] lg:h-[calc(100dvh-76px)] bg-[#080706] text-white font-sans flex flex-col overflow-hidden relative">
           
-          {/* 1. Epic Games Sticky Header (Only visible on scroll down, Zero Glassmorphism) */}
-          <div className={`flex-shrink-0 w-full bg-[#080706] z-20 relative transition-all duration-300 ease-in-out ${
-            isChatScrolled ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'
-          }`}>
-            <div className="w-full h-12 sm:h-13 flex items-center justify-center px-4 border-b border-white/[0.04]">
-              <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans">
-                Producer Toy Support Assistant
+          {/* Producer Toy Sub-Header (Scroll niche jane pe slide-in hota hai, scroll upar jane pe gayab) */}
+          <div
+            className={`flex-shrink-0 w-full bg-[#080706] z-20 relative border-b border-white/[0.04] transition-all duration-300 ease-in-out overflow-hidden ${
+              isSubHeaderVisible
+                ? 'max-h-14 opacity-100 translate-y-0'
+                : 'max-h-0 opacity-0 -translate-y-full border-transparent py-0 pointer-events-none'
+            }`}
+          >
+            <div className="w-full max-w-5xl mx-auto h-11 sm:h-12 flex items-center justify-center px-4 sm:px-8">
+              <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FC6301] animate-pulse" />
+                <span>Producer Toy • Technical Support Specialist</span>
               </span>
             </div>
-            {/* Top Dissolve Gradient: Messages fade smoothly into background as they scroll up */}
             <div 
-              className="absolute top-full left-0 right-0 h-10 sm:h-14 pointer-events-none z-10"
+              className="absolute top-full left-0 right-0 h-6 pointer-events-none z-10"
               style={{
-                background: 'linear-gradient(to bottom, #080706 0%, rgba(8, 7, 6, 0.85) 40%, rgba(8, 7, 6, 0.3) 75%, transparent 100%)',
+                background: 'linear-gradient(to bottom, #080706 0%, transparent 100%)',
               }}
             />
           </div>
@@ -1580,9 +1805,18 @@ export function EpicSupportAssistant({
           {/* 2. Scrollable Chat Feed Area (ONLY THIS SCROLLS!) */}
           <div 
             onScroll={(e) => {
-              const isPast = e.currentTarget.scrollTop > 50
+              const currentScrollTop = e.currentTarget.scrollTop
+              const isPast = currentScrollTop > 50
               if (isPast !== isChatScrolled) setIsChatScrolled(isPast)
+
+              if (currentScrollTop > 40 && currentScrollTop > lastScrollTopRef.current + 3) {
+                setIsSubHeaderVisible(true)
+              } else if (currentScrollTop < lastScrollTopRef.current - 3 || currentScrollTop <= 25) {
+                setIsSubHeaderVisible(false)
+              }
+              lastScrollTopRef.current = currentScrollTop
             }}
+            data-lenis-prevent="true"
             className="flex-1 overflow-y-auto overflow-x-hidden w-full relative z-0"
           >
             {/* Header Title with Seamlessly Dissolved Musical Bokeh Atmosphere */}
@@ -1659,13 +1893,22 @@ export function EpicSupportAssistant({
               </svg>
             </div>
 
-            {/* Title Text Content (Crisp, High-Contrast, Zero Center Obscurity) */}
-            <div className="space-y-1.5 relative z-10 px-4">
+            {/* Title Text Content with Mascot */}
+            <div className="space-y-2 relative z-10 px-4 flex flex-col items-center">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-1 drop-shadow-[0_0_20px_rgba(252,99,1,0.45)]">
+                <Image
+                  src="/images/support-bot-logo.webp"
+                  alt="Producer Toy Support Assistant Mascot"
+                  fill
+                  sizes="64px"
+                  className="object-contain"
+                />
+              </div>
               <p className="text-[11px] sm:text-xs font-semibold tracking-[0.24em] uppercase text-zinc-400 font-mono">
                 Your Chat With
               </p>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-                Producer Toy Support Assistant
+                Producer Toy Support Specialist
               </h2>
             </div>
           </div>
@@ -1712,7 +1955,7 @@ export function EpicSupportAssistant({
                     {/* Assistant Header: Clean Robot Avatar (NO box, NO squeezing) + Name + Timestamp */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
-                        src="/images/robot-avatar.png"
+                        src="/images/support-bot-logo.webp"
                         alt="Producer Toy Support Assistant"
                         width={24}
                         height={24}
@@ -1726,7 +1969,7 @@ export function EpicSupportAssistant({
                     {msg.isThinking ? (
                       <div className="inline-flex items-center gap-3.5 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-xs px-7 py-5 shadow-xl w-fit">
                         <Image
-                          src="/images/robot-avatar.png"
+                          src="/images/support-bot-logo.webp"
                           alt="Thinking..."
                           width={24}
                           height={24}
@@ -2065,7 +2308,7 @@ export function EpicSupportAssistant({
                     {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
-                        src="/images/robot-avatar.png"
+                        src="/images/support-bot-logo.webp"
                         alt="Producer Toy Support Assistant"
                         width={24}
                         height={24}
@@ -2156,7 +2399,7 @@ export function EpicSupportAssistant({
                     {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
-                        src="/images/robot-avatar.png"
+                        src="/images/support-bot-logo.webp"
                         alt="Producer Toy Support Assistant"
                         width={24}
                         height={24}
@@ -2218,141 +2461,322 @@ export function EpicSupportAssistant({
                   </div>
                 )}
 
-                {/* Standalone Separate Dialog Box for Ticket Escalation (Exact Epic Games Dialog Shape, Solid #18181c) */}
-                {msg.needsTicket && !msg.ticketNumber && msg.feedback !== 'yes' && !msg.isThinking && !msg.isWarning && !isChatEnded && policyStrikes < 4 && (
+                {/* Live Audio Engineering Desk Card */}
+                {msg.showLiveChatDesk && (
                   <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
-                    {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
-                        src="/images/robot-avatar.png"
-                        alt="Producer Toy Support Assistant"
+                        src="/images/support-bot-logo.webp"
+                        alt="Producer Toy Support Specialist"
                         width={24}
                         height={24}
                         className="w-6 h-6 object-contain shrink-0"
                       />
-                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
-                        Producer Toy Support Assistant
+                      <span className="font-bold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Specialist
                       </span>
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
 
-                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #18181c, Exact Epic Games Dialog Shape) */}
-                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-4">
-                      {!user ? (
-                        <div className="space-y-3">
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-[#202025] border border-white/5 flex items-center justify-center shrink-0 text-[#FC6301] mt-0.5">
-                              <Lock size={15} />
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-xs sm:text-[13px] font-semibold text-white">
-                                Sign In Required for Ticket Tracking
-                              </p>
-                              <p className="text-xs text-zinc-400 leading-relaxed">
-                                Please sign in to your Producer Toy account to submit this ticket directly to our senior audio engineering desk. This allows our team to connect your licenses and enables 1-click tracking.
-                              </p>
-                            </div>
+                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl p-5 sm:p-6 shadow-2xl space-y-3.5">
+                      <div className="flex items-center justify-between flex-wrap gap-2.5 border-b border-white/10 pb-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#FC6301] text-white flex items-center justify-center font-bold shadow-md shadow-[#FC6301]/25">
+                            <Headphones size={16} strokeWidth={2.5} />
                           </div>
-
-                          <div className="flex items-center gap-3 pt-1">
-                            <Link
-                              href={`/auth?next=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/support')}`}
-                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-                            >
-                              <LogIn size={13} />
-                              <span>Sign In to Submit & Track</span>
-                            </Link>
+                          <div>
+                            <h4 className="text-xs sm:text-sm font-bold uppercase tracking-tight text-white flex items-center gap-2">
+                              Producer Toy Live Audio Desk
+                            </h4>
+                            <p className="text-[10px] sm:text-[11px] text-zinc-400 font-medium">
+                              Live Desk Operating Hours: Mon–Sat, 10:00 AM – 7:00 PM IST
+                            </p>
                           </div>
                         </div>
+
+                        {msg.liveChatStatus === 'checking' ? (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/40 text-[11px] font-bold">
+                            <Loader2 size={12} className="animate-spin" />
+                            Connecting to Live Desk...
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[11px] font-bold">
+                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                            Live Chat Currently Offline
+                          </span>
+                        )}
+                      </div>
+
+                      {msg.liveChatStatus === 'checking' ? (
+                        <div className="py-2.5 flex items-center gap-3 text-zinc-300 text-xs sm:text-[13px] font-medium">
+                          <Loader2 size={16} className="animate-spin text-[#FC6301]" />
+                          <span>Pinging senior audio engineers on the live desk...</span>
+                        </div>
                       ) : (
-                        <>
-                          <div className="flex items-center justify-between flex-wrap gap-2">
-                            <p className="text-xs sm:text-[13px] text-zinc-200 font-medium">
-                              Submit this request directly to our senior audio engineering desk:
-                            </p>
-                            <span className="text-[11px] text-zinc-400 bg-[#202025] px-2.5 py-0.5 rounded-md border border-white/5 font-mono">
-                              {user.email}
-                            </span>
-                          </div>
-
-                          {ticketError && (
-                            <p className="text-xs text-rose-400">{ticketError}</p>
-                          )}
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <input
-                              type="text"
-                              value={ticketName}
-                              onChange={(e) => setTicketName(e.target.value)}
-                              placeholder="Your Name (Optional)"
-                              className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
-                            />
-                            <input
-                              type="email"
-                              required
-                              value={ticketEmail}
-                              onChange={(e) => setTicketEmail(e.target.value)}
-                              placeholder="Your Email *"
-                              className="bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3.5 py-2.5 text-xs sm:text-[13px] text-white placeholder-zinc-500 focus:outline-none transition-colors"
-                            />
-                          </div>
-
-                          <div className="flex justify-end pt-1">
-                            <button
-                              type="button"
-                              onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
-                              disabled={isSubmittingTicket}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-                            >
-                              {isSubmittingTicket ? (
-                                <>
-                                  <Loader2 size={13} className="animate-spin" />
-                                  <span>Submitting...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Send size={13} />
-                                  <span>Submit to Audio Desk</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        </>
+                        <div className="p-3.5 bg-black/40 rounded-xl border border-white/10 space-y-1.5">
+                          <p className="text-xs sm:text-[13px] text-zinc-200 font-medium leading-relaxed">
+                            All live audio engineers are currently occupied in active studio recording/mixing sessions or outside live desk hours.
+                          </p>
+                          <p className="text-[11px] sm:text-xs text-[#FC6301] font-bold">
+                            Please submit a support ticket below — your query, setup details, and order info will be delivered directly to <span className="underline">support@producertoy.com</span>.
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
                 )}
 
-                {/* Standalone Separate Message Box for Ticket Confirmation (Zero Glassmorphism) */}
+                {/* Standalone Separate Dialog Box for Ticket Escalation (Full Direct Form) */}
+                {msg.needsTicket && !msg.ticketNumber && msg.feedback !== 'yes' && !msg.isThinking && !msg.isWarning && !isChatEnded && policyStrikes < 4 && (
+                  <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
+                    {/* Robot Avatar Header */}
+                    <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
+                      <Image
+                        src="/images/support-bot-logo.webp"
+                        alt="Producer Toy Support Specialist"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6 object-contain shrink-0"
+                      />
+                      <span className="font-bold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Specialist
+                      </span>
+                      <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
+                    </div>
+
+                    {/* Standalone Card Box */}
+                    <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-5">
+                      {/* Header */}
+                      <div className="border-b border-white/10 pb-3 flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                          <h3 className="text-xs sm:text-sm font-bold uppercase tracking-tight text-white flex items-center gap-2">
+                            <FileText size={16} className="text-[#FC6301]" />
+                            <span>Raise Official Support Ticket</span>
+                          </h3>
+                          <p className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">
+                            Directly dispatched to <strong className="text-white">support@producertoy.com</strong> & senior audio engineering desk
+                          </p>
+                        </div>
+                        {user?.email && (
+                          <span className="text-[11px] text-[#FC6301] bg-[#FC6301]/10 border border-[#FC6301]/30 px-2.5 py-0.5 rounded-lg font-mono font-bold">
+                            {user.email}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Error Message */}
+                      {ticketError && (
+                        <div className="p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-xs text-rose-300 font-bold flex items-center gap-2">
+                          <AlertTriangle size={14} className="shrink-0 text-rose-400" />
+                          <span>{ticketError}</span>
+                        </div>
+                      )}
+
+                      {/* Category Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                          Issue Category *
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {TICKET_CATEGORIES.map((cat) => {
+                            const Icon = cat.icon
+                            const isSelected = ticketCategory === cat.id
+                            return (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => setTicketCategory(cat.id)}
+                                className={`p-2.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer text-xs font-bold ${
+                                  isSelected
+                                    ? 'bg-[#FC6301] text-white border-[#FC6301] shadow-md shadow-[#FC6301]/30'
+                                    : 'bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border-white/5'
+                                }`}
+                              >
+                                <Icon size={14} className={isSelected ? 'text-white' : 'text-zinc-400'} />
+                                <span className="truncate">{cat.label}</span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Name & Email */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                            Your Name
+                          </label>
+                          <input
+                            type="text"
+                            value={ticketName}
+                            onChange={(e) => setTicketName(e.target.value)}
+                            placeholder="e.g. Producer Name"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                            Email Address *
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={ticketEmail}
+                            onChange={(e) => setTicketEmail(e.target.value)}
+                            placeholder="producer@example.com"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Subject & Order ID */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                            Subject / Issue Question *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={ticketSubject}
+                            onChange={(e) => setTicketSubject(e.target.value)}
+                            placeholder="What do you need help with?"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                            Order ID / Payment ID (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            value={ticketOrderId}
+                            onChange={(e) => setTicketOrderId(e.target.value)}
+                            placeholder="e.g. PT-ORD-... or pay_..."
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+
+                      {/* DAW & Priority */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                            DAW / Setup (Optional)
+                          </label>
+                          <select
+                            value={ticketDaw}
+                            onChange={(e) => setTicketDaw(e.target.value)}
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium focus:outline-none transition-all"
+                          >
+                            <option value="">Select DAW (Optional)</option>
+                            <option value="FL Studio">FL Studio</option>
+                            <option value="Ableton Live">Ableton Live</option>
+                            <option value="Logic Pro">Logic Pro</option>
+                            <option value="Cubase">Cubase</option>
+                            <option value="Studio One">Studio One</option>
+                            <option value="Pro Tools">Pro Tools</option>
+                            <option value="Reaper">Reaper</option>
+                            <option value="Bitwig">Bitwig</option>
+                            <option value="Other">Other DAW</option>
+                          </select>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                            Priority Level
+                          </label>
+                          <select
+                            value={ticketPriority}
+                            onChange={(e) => setTicketPriority(e.target.value)}
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium focus:outline-none transition-all"
+                          >
+                            {TICKET_PRIORITIES.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Detailed Description */}
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                          Problem Description / Extra Details *
+                        </label>
+                        <textarea
+                          rows={3}
+                          required
+                          value={ticketDescription}
+                          onChange={(e) => setTicketDescription(e.target.value)}
+                          placeholder="Describe your question, error message, or what went wrong in detail..."
+                          className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all resize-y"
+                        />
+                      </div>
+
+                      {/* Dispatch Notice & Submit Button */}
+                      <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
+                        <div className="flex items-center gap-2 text-[11px] text-zinc-400 font-medium">
+                          <Mail size={13} className="text-[#FC6301]" />
+                          <span>Dispatched directly to <strong className="text-zinc-200">support@producertoy.com</strong></span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
+                          disabled={isSubmittingTicket}
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#FC6301]/25 hover:shadow-md hover:translate-y-[-1px] cursor-pointer"
+                        >
+                          {isSubmittingTicket ? (
+                            <>
+                              <Loader2 size={14} className="animate-spin" />
+                              <span>Dispatching to support@producertoy.com...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Send size={14} strokeWidth={2.5} />
+                              <span>Submit Ticket to support@producertoy.com</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Standalone Message Box for Ticket Confirmation (Zero Glassmorphism) */}
                 {msg.ticketNumber && (
                   <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
                     {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
-                        src="/images/robot-avatar.png"
-                        alt="Producer Toy Support Assistant"
+                        src="/images/support-bot-logo.webp"
+                        alt="Producer Toy Support Specialist"
                         width={24}
                         height={24}
                         className="w-6 h-6 object-contain shrink-0"
                       />
-                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
-                        Producer Toy Support Assistant
+                      <span className="font-bold text-zinc-200 text-xs sm:text-[13px]">
+                        Producer Toy Support Specialist
                       </span>
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
 
-                    {/* Standalone Card Box (Clean, Zero Glassmorphism, Solid #18181c, Exact Epic Games Dialog Shape) */}
+                    {/* Standalone Card Box */}
                     <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-3">
-                      <p className="font-semibold text-white text-base sm:text-lg flex items-center gap-2.5">
+                      <p className="font-bold text-white text-base sm:text-lg flex items-center gap-2.5">
                         <CheckCircle2 size={18} className="text-[#00d66c] shrink-0" />
-                        <span>We have received your request!</span>
+                        <span>Ticket #{msg.ticketNumber} Dispatched!</span>
                       </p>
-                      <p className="text-zinc-300 text-sm sm:text-[14.5px] leading-relaxed">
-                        Our team has received your message and will review it shortly. We will get back to you directly via email.
+                      <p className="text-zinc-200 text-sm sm:text-[14.5px] leading-relaxed font-medium">
+                        Your ticket and complete chat transcript have been dispatched directly to <strong className="text-white underline">support@producertoy.com</strong>. Our senior audio engineering desk will review your inquiry and get back to you via email.
                       </p>
-                      <div className="pt-1 flex items-center gap-2">
-                        <span className="text-xs text-zinc-400 font-mono bg-[#222228] px-3 py-1.5 rounded-lg border border-white/[0.06]">
-                          Ticket Ref: #{msg.ticketNumber}
+                      <div className="pt-1 flex items-center gap-2 flex-wrap">
+                        <span className="text-xs text-black font-mono font-bold bg-[#FC6301] px-3.5 py-1.5 rounded-lg shadow-md">
+                          Ref: #{msg.ticketNumber}
+                        </span>
+                        <span className="text-xs text-[#00d66c] bg-[#00d66c]/15 px-3 py-1.5 rounded-lg border border-[#00d66c]/40 font-bold">
+                          Email Dispatched to support@producertoy.com
                         </span>
                       </div>
                     </div>

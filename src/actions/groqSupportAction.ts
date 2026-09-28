@@ -4,6 +4,45 @@ import { getAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { signDownloadToken } from '@/lib/security'
+import fs from 'fs'
+import path from 'path'
+
+function getGroqApiKey(): string | null {
+  if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim()) {
+    return process.env.GROQ_API_KEY.trim()
+  }
+  try {
+    const envPath = path.resolve(process.cwd(), '.env.local')
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8')
+      const match = content.match(/GROQ_API_KEY\s*=\s*(.+)/)
+      if (match && match[1]) {
+        const val = match[1].trim().replace(/^['"]|['"]$/g, '')
+        process.env.GROQ_API_KEY = val
+        return val
+      }
+    }
+  } catch (err) {
+    console.warn('[getGroqApiKey] Error reading .env.local:', err)
+  }
+  return null
+}
+
+function ensureSupabaseAdminEnv() {
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL) return
+  try {
+    const envPath = path.resolve(process.cwd(), '.env.local')
+    if (fs.existsSync(envPath)) {
+      const content = fs.readFileSync(envPath, 'utf8')
+      const mUrl = content.match(/NEXT_PUBLIC_SUPABASE_URL\s*=\s*(.+)/)
+      if (mUrl && mUrl[1]) process.env.NEXT_PUBLIC_SUPABASE_URL = mUrl[1].trim().replace(/^['"]|['"]$/g, '')
+      const mKey = content.match(/SUPABASE_SERVICE_ROLE_KEY\s*=\s*(.+)/)
+      if (mKey && mKey[1]) process.env.SUPABASE_SERVICE_ROLE_KEY = mKey[1].trim().replace(/^['"]|['"]$/g, '')
+    }
+  } catch (err) {
+    console.warn('[ensureSupabaseAdminEnv] Error reading .env.local:', err)
+  }
+}
 
 export interface RecommendedProduct {
   id: string
@@ -94,7 +133,9 @@ export async function askGroqSupportAction(
   clientUser?: ClientUserInfo,
   currentStrikes: number = 0
 ): Promise<GroqResponse> {
-  const apiKey = process.env.GROQ_API_KEY
+  try {
+    ensureSupabaseAdminEnv()
+    const apiKey = getGroqApiKey()
 
   if (!apiKey) {
     return {
@@ -548,6 +589,10 @@ CRITICAL LANGUAGE MATCHING RULE:
      -> Respond in fluent, professional English.
 
 CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
+- PROPORTIONAL ANSWERS:
+  - If user gives a brief greeting or acknowledgement ('hi', 'ok', 'thanks', 'kya haal hai'): Reply in 1-2 friendly, polite lines. Do NOT write long paragraphs.
+  - If user reports an issue, payment question, or guide: Provide the full, complete step-by-step resolution without cutting off.
+- NO RAW MARKDOWN TABLES: NEVER output raw markdown tables (| Column | Column |). Tables look cramped, awkward, and broken on mobile and chat bubbles. Always format with clean bullet points or numbered steps with bold titles.
 - NEVER use asterisks '*' or bullet dashes '-' at the start of lines. NEVER output bullet points with '*'.
 - When providing instructions or steps, ALWAYS format as clean numbered lists:
   1. **Step Name**: Explanation.
@@ -560,6 +605,10 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
   const scrubBrandNames = (text: string) => {
     if (!text) return ''
     return text
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+      .replace(/^(?:thought|thinking|reasoning|scratchpad):\s*[\s\S]*?\n\n/gi, '')
+      .replace(/^The user (?:says|asks|wants)[\s\S]*?(?:We must|So we can|Let's|Therefore|Recommendation:)[\s\S]*?\n\n/i, '')
       .replace(/\bgroq\b/gi, 'Producer Toy')
       .replace(/\bllama\s*3(\.\d+)?\b/gi, 'Producer Toy Support')
       .replace(/\bqwen(\s*\d+(\.\d+)?)?\b/gi, 'Producer Toy Support')
@@ -568,6 +617,8 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/\(User ID:\s*[a-f0-9-]+\)/gi, '')
       .replace(/User ID:\s*[a-f0-9-]+/gi, '')
       .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, '')
+      .replace(/\s*\(\s*\d+\s*(?:verified\s+purchases?|downloads?|sales?|orders?|buyers?|community\s+downloads?)\s*\)/gi, '')
+      .replace(/\b\d+\s+(?:verified\s+purchases?|community\s+downloads?)\b/gi, 'many producers')
       .replace(/^#{1,4}\s+/gm, '') // Remove ### headings
       .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
       .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '[$1]($2)') // Strip stars around links
@@ -612,155 +663,144 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
     return result
   }
 
-  try {
-    const formattedMessages = [
-      { role: 'system', content: systemPrompt },
-      ...history.slice(-4), // keep last 4 context turns
-      { role: 'user', content: query },
-    ]
+  const resolveComingSoon = (): ComingSoonProduct | null => {
+    if (comingSoonProduct) return comingSoonProduct
+    const queryText = (query || '').toLowerCase()
+    for (const p of allProducts) {
+      if (p.is_coming_soon) {
+        const nameLower = (p.name || '').toLowerCase()
+        const slugLower = (p.slug || '').toLowerCase()
+        const nameWords = nameLower
+          .split(/\s+/)
+          .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
+        if (
+          queryText.includes(nameLower) ||
+          queryText.includes(slugLower) ||
+          (nameWords.length > 0 && nameWords.some((w: string) => queryText.includes(w)))
+        ) {
+          return {
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            cover_image: p.cover_image || '',
+            price_usd: Number(p.price_usd || 0),
+            release_date: p.release_date || null,
+            short_description: p.short_description || null,
+          }
+        }
+      }
+    }
+    return null
+  }
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'qwen/qwen3.8-27b',
-        messages: formattedMessages,
-        temperature: 0.35,
-        max_tokens: 1200,
-      }),
-    })
+  // Dynamic Smart Token Sizing based on intent & complexity:
+  const isComplexQuery =
+    /\b(fail|failed|broken|corrupt|not working|urgent|problem|scam|fraud|money cut|refund|stuck|help me|issue|dhokha|paise kat gaye|latency|unzip|extract|download nahi|link nahi|can't download|cant download|deducted|receipt|invoice|bill|gateway|guide|step|how to|kaise|what about)\b/i.test(query)
+  const isShortGreeting =
+    /^(hi|hello|hey|ok|okay|thanks|thank you|shukriya|dhanyawad|bye|yo)\b/i.test(query.trim())
 
-    if (!response.ok) {
-      // Fallback to openai/gpt-oss-120b
-      const fallbackResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  let dynamicMaxTokens = 900
+  if (isComplexQuery) {
+    dynamicMaxTokens = 1500
+  } else if (isShortGreeting && query.trim().length < 25) {
+    dynamicMaxTokens = 350
+  }
+
+  // Send up to last 6 messages (3 turns) for rich conversational context
+  const compactHistory = history.slice(-6).map((h) => ({
+    role: h.role,
+    content: h.content.length > 400 ? h.content.slice(0, 400) + '...' : h.content,
+  }))
+
+  const formattedMessages = [
+    { role: 'system', content: systemPrompt },
+    ...compactHistory,
+    { role: 'user', content: query },
+  ]
+
+  // Multi-Model Auto-Fallback & Token Optimization Hierarchy:
+  // 1. Primary: 'qwen/qwen3.8-27b'
+  // 2. High-IQ Reasoning Fallback: 'openai/gpt-oss-120b'
+  // 3. High-Throughput Fallback: 'openai/gpt-oss-20b'
+  // 4. Resilient Fallback: 'llama-3.3-70b-versatile'
+  // 5. Ultrafast Fallback: 'llama-3.1-8b-instant'
+  const modelsToTry = [
+    'qwen/qwen3.8-27b',
+    'openai/gpt-oss-120b',
+    'openai/gpt-oss-20b',
+    'llama-3.3-70b-versatile',
+    'llama-3.1-8b-instant',
+  ]
+
+  let rawAnswer = ''
+
+  for (const model of modelsToTry) {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: 'openai/gpt-oss-120b',
+          model,
           messages: formattedMessages,
-          temperature: 0.35,
-          max_tokens: 1200,
+          temperature: 0.3,
+          max_tokens: dynamicMaxTokens,
+          reasoning_format: 'hidden',
         }),
+        signal: controller.signal,
       })
 
-      if (!fallbackResponse.ok) {
-        const errText = await fallbackResponse.text()
-        console.error('Support API Error:', errText)
-        return { success: false, error: 'Support desk is currently busy. Please try again.' }
-      }
+      clearTimeout(timeoutId)
 
-      const fallbackData = await fallbackResponse.json()
-      const rawAnswer = fallbackData.choices?.[0]?.message?.content || ''
-      const isPolicyViolation = rawAnswer.includes('[POLICY_VIOLATION]') || rawAnswer.includes('[TERMINATE_CHAT]')
-      const shouldTerminateChat = (currentStrikes + 1 >= 4) || rawAnswer.includes('[TERMINATE_CHAT]')
-      const cleanedAnswer = scrubBrandNames(
-        rawAnswer
-          .replace(/\[POLICY_VIOLATION\]/g, '')
-          .replace(/\[TERMINATE_CHAT\]/g, '')
-          .trim()
-      )
-
-      const resolveComingSoon = (): ComingSoonProduct | null => {
-        if (comingSoonProduct) return comingSoonProduct
-        const queryText = (query || '').toLowerCase()
-        for (const p of allProducts) {
-          if (p.is_coming_soon) {
-            const nameLower = (p.name || '').toLowerCase()
-            const slugLower = (p.slug || '').toLowerCase()
-            const nameWords = nameLower
-              .split(/\s+/)
-              .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
-            if (
-              queryText.includes(nameLower) ||
-              queryText.includes(slugLower) ||
-              (nameWords.length > 0 && nameWords.some((w: string) => queryText.includes(w)))
-            ) {
-              return {
-                id: p.id,
-                name: p.name,
-                slug: p.slug,
-                cover_image: p.cover_image || '',
-                price_usd: Number(p.price_usd || 0),
-                release_date: p.release_date || null,
-                short_description: p.short_description || null,
-              }
-            }
-          }
+      if (response.ok) {
+        const data = await response.json()
+        const choice = data.choices?.[0]?.message
+        // STRICT: Never fall back to reasoning/scratchpad! Only content is customer-facing.
+        const candidate = (choice?.content || '').trim()
+        if (candidate) {
+          rawAnswer = candidate
+          break
         }
-        return null
+      } else {
+        console.warn(`[askGroqSupportAction] Model ${model} returned HTTP ${response.status}. Trying next fallback...`)
       }
-
-      return {
-        success: true,
-        answer: cleanedAnswer,
-        recommendedProducts: isPolicyViolation ? [] : findMatchedProducts(cleanedAnswer),
-        verifiedDownload: isPolicyViolation ? null : verifiedDownload,
-        verifiedOrder: isPolicyViolation ? null : verifiedOrder,
-        comingSoonProduct: isPolicyViolation ? null : resolveComingSoon(),
-        canEscalateToTicket: isPolicyViolation ? false : canEscalateToTicket,
-        isPolicyViolation,
-        shouldTerminateChat,
-      }
+    } catch (modelErr) {
+      console.warn(`[askGroqSupportAction] Model ${model} error/timeout:`, modelErr)
     }
+  }
 
-    const data = await response.json()
-    const rawAnswer = data.choices?.[0]?.message?.content || ''
-    const isPolicyViolation = rawAnswer.includes('[POLICY_VIOLATION]') || rawAnswer.includes('[TERMINATE_CHAT]')
-    const shouldTerminateChat = (currentStrikes + 1 >= 4) || rawAnswer.includes('[TERMINATE_CHAT]')
-    const cleanedAnswer = scrubBrandNames(
-      rawAnswer
-        .replace(/\[POLICY_VIOLATION\]/g, '')
-        .replace(/\[TERMINATE_CHAT\]/g, '')
-        .trim()
-    )
-
-    const resolveComingSoon = (): ComingSoonProduct | null => {
-      if (comingSoonProduct) return comingSoonProduct
-      const queryText = (query || '').toLowerCase()
-      for (const p of allProducts) {
-        if (p.is_coming_soon) {
-          const nameLower = (p.name || '').toLowerCase()
-          const slugLower = (p.slug || '').toLowerCase()
-          const nameWords = nameLower
-            .split(/\s+/)
-            .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
-          if (
-            queryText.includes(nameLower) ||
-            queryText.includes(slugLower) ||
-            (nameWords.length > 0 && nameWords.some((w: string) => queryText.includes(w)))
-          ) {
-            return {
-              id: p.id,
-              name: p.name,
-              slug: p.slug,
-              cover_image: p.cover_image || '',
-              price_usd: Number(p.price_usd || 0),
-              release_date: p.release_date || null,
-              short_description: p.short_description || null,
-            }
-          }
-        }
-      }
-      return null
-    }
-
+  if (!rawAnswer) {
     return {
-      success: true,
-      answer: cleanedAnswer,
-      recommendedProducts: isPolicyViolation ? [] : findMatchedProducts(cleanedAnswer),
-      verifiedDownload: isPolicyViolation ? null : verifiedDownload,
-      verifiedOrder: isPolicyViolation ? null : verifiedOrder,
-      comingSoonProduct: isPolicyViolation ? null : resolveComingSoon(),
-      canEscalateToTicket: isPolicyViolation ? false : canEscalateToTicket,
-      isPolicyViolation,
-      shouldTerminateChat,
+      success: false,
+      error: 'Support desk is currently busy. Please try again.',
     }
+  }
+
+  const isPolicyViolation = rawAnswer.includes('[POLICY_VIOLATION]') || rawAnswer.includes('[TERMINATE_CHAT]')
+  const shouldTerminateChat = (currentStrikes + 1 >= 4) || rawAnswer.includes('[TERMINATE_CHAT]')
+  const cleanedAnswer = scrubBrandNames(
+    rawAnswer
+      .replace(/\[POLICY_VIOLATION\]/g, '')
+      .replace(/\[TERMINATE_CHAT\]/g, '')
+      .trim()
+  )
+
+  return {
+    success: true,
+    answer: cleanedAnswer,
+    recommendedProducts: isPolicyViolation ? [] : findMatchedProducts(cleanedAnswer),
+    verifiedDownload: isPolicyViolation ? null : verifiedDownload,
+    verifiedOrder: isPolicyViolation ? null : verifiedOrder,
+    comingSoonProduct: isPolicyViolation ? null : resolveComingSoon(),
+    canEscalateToTicket: isPolicyViolation ? false : canEscalateToTicket,
+    isPolicyViolation,
+    shouldTerminateChat,
+  }
   } catch (error: any) {
     console.error('Support Action Exception:', error)
     return {

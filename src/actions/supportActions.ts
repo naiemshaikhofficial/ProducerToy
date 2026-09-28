@@ -126,6 +126,36 @@ export async function createSupportTicketAction(data: TicketSubmissionData) {
       created_at: new Date().toISOString(),
     })
 
+    // Forward ticket notification to support@producertoy.com via formsubmit.co
+    try {
+      await fetch('https://formsubmit.co/ajax/support@producertoy.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': 'https://producertoy.com',
+          'Referer': 'https://producertoy.com/support',
+        },
+        body: JSON.stringify({
+          ticket_number: ticketNumber,
+          producer_name: name.trim(),
+          email: email.trim().toLowerCase(),
+          _subject: `[Producer Toy #${ticketNumber}] ${subject.trim()}`,
+          category: category,
+          priority: priority,
+          order_id: orderId?.trim() || 'N/A',
+          os_platform: osPlatform || 'N/A',
+          daw: daw || 'N/A',
+          subject: subject.trim(),
+          description: description.trim(),
+          _captcha: 'false',
+          _template: 'table',
+        }),
+      })
+    } catch (fsErr) {
+      console.warn('[createSupportTicketAction] FormSubmit dispatch notice:', fsErr)
+    }
+
     return {
       success: true,
       ticketNumber: ticket.ticket_number,
