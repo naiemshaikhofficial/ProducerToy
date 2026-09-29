@@ -613,9 +613,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                   className={`flex items-center gap-1.5 cursor-pointer transition-colors py-1.5 ${
                     isAboutOpen ? 'text-white' : 'text-zinc-300 hover:text-white'
                   }`}
-                  aria-label="About ProducerToy Menu"
+                  aria-label="About Producer Toy Menu"
                 >
-                  <span>About ProducerToy</span>
+                  <span>About Producer Toy</span>
                   <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isAboutOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
                 </button>
 

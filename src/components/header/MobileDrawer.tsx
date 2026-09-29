@@ -65,15 +65,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   // Derive initial and display name from user
   const displayName = user
     ? user.user_metadata?.full_name ||
-      user.user_metadata?.name ||
-      (user.email ? user.email.split('@')[0] : 'Producer')
+    user.user_metadata?.name ||
+    (user.email ? user.email.split('@')[0] : 'Producer')
     : ''
   const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
     <div className="fixed inset-x-0 bottom-0 top-[58px] z-[55] bg-[#121212] flex flex-col md:hidden animate-in slide-in-from-right duration-200 overflow-y-auto overscroll-contain">
       <div className="p-6 pb-12 flex flex-col gap-6 flex-1">
-        
+
         {/* ========================================================================= */}
         {/* VIEW 1: ACCOUNT SUB-VIEW (When Profile Initial Icon is tapped)             */}
         {/* ========================================================================= */}
@@ -288,11 +288,10 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                                 setRegion(r.id)
                                 setIsMobileRegionOpen(false)
                               }}
-                              className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${
-                                isSelected
-                                  ? 'bg-[#262626] text-white font-bold'
-                                  : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                              }`}
+                              className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${isSelected
+                                ? 'bg-[#262626] text-white font-bold'
+                                : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                                }`}
                             >
                               <div className="flex items-center gap-2">
                                 <span>{r.flag}</span>
@@ -372,7 +371,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     onClick={() => setIsMobileAboutOpen(!isMobileAboutOpen)}
                     className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
                   >
-                    <span>About ProducerToy</span>
+                    <span>About Producer Toy</span>
                     <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileAboutOpen ? 'rotate-180 text-white' : ''}`} />
                   </button>
                   {isMobileAboutOpen && (
@@ -483,83 +482,83 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   )}
                 </div>
 
-              <Link
-                href="/store?on_sale=true"
-                prefetch={true}
-                onClick={onClose}
-                className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
-              >
-                <span>Deals & Sales</span>
-                <ChevronRight className="w-5 h-5 text-zinc-500" />
-              </Link>
-
-              <Link
-                href="/blog"
-                prefetch={true}
-                onClick={onClose}
-                className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
-              >
-                <span>Blog & Guides</span>
-                <ChevronRight className="w-5 h-5 text-zinc-500" />
-              </Link>
-
-              {/* Free Downloads Accordion */}
-              <div className="border-b border-[#202020] pb-2">
-                <button
-                  type="button"
-                  onClick={() => setIsMobileFreeOpen(!isMobileFreeOpen)}
-                  className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
+                <Link
+                  href="/store?on_sale=true"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
                 >
-                  <span className="flex items-center gap-2">
-                    <span>Free Downloads</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FC6301]/20 text-[#FC6301] uppercase">100% Free</span>
-                  </span>
-                  <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileFreeOpen ? 'rotate-180 text-white' : ''}`} />
-                </button>
-                {isMobileFreeOpen && (
-                  <div className="pl-3 py-2 flex flex-col gap-2.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
-                    {freeCategories.length === 0 ? (
-                      <span className="text-xs text-zinc-500 py-1">No free downloads available.</span>
-                    ) : (
-                      freeCategories.map((cat) => (
-                        <div key={cat.id} className="flex flex-col gap-1 pb-1">
-                          <Link
-                            href={cat.exploreUrl}
-                            prefetch={true}
-                            onClick={onClose}
-                            className="text-xs font-bold text-white hover:text-[#FC6301] py-1 block"
-                          >
-                            {cat.name}
-                          </Link>
-                          {cat.subcategories
-                            .filter((s) => !s.name.startsWith('Show All'))
-                            .map((sub, sIdx) => (
-                              <Link
-                                key={sub.id || sIdx}
-                                href={sub.href}
-                                prefetch={true}
-                                onClick={onClose}
-                                className="text-[12px] font-normal text-zinc-400 hover:text-white pl-2.5 py-0.5 block"
-                              >
-                                • {sub.name}
-                              </Link>
-                            ))}
-                        </div>
-                      ))
-                    )}
-                    <Link
-                      href="/store?price=free"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-bold text-[#FC6301] hover:underline pt-1 block"
-                    >
-                      Explore All Free Tools →
-                    </Link>
-                  </div>
-                )}
+                  <span>Deals & Sales</span>
+                  <ChevronRight className="w-5 h-5 text-zinc-500" />
+                </Link>
+
+                <Link
+                  href="/blog"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between"
+                >
+                  <span>Blog & Guides</span>
+                  <ChevronRight className="w-5 h-5 text-zinc-500" />
+                </Link>
+
+                {/* Free Downloads Accordion */}
+                <div className="border-b border-[#202020] pb-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileFreeOpen(!isMobileFreeOpen)}
+                    className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>Free Downloads</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FC6301]/20 text-[#FC6301] uppercase">100% Free</span>
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileFreeOpen ? 'rotate-180 text-white' : ''}`} />
+                  </button>
+                  {isMobileFreeOpen && (
+                    <div className="pl-3 py-2 flex flex-col gap-2.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
+                      {freeCategories.length === 0 ? (
+                        <span className="text-xs text-zinc-500 py-1">No free downloads available.</span>
+                      ) : (
+                        freeCategories.map((cat) => (
+                          <div key={cat.id} className="flex flex-col gap-1 pb-1">
+                            <Link
+                              href={cat.exploreUrl}
+                              prefetch={true}
+                              onClick={onClose}
+                              className="text-xs font-bold text-white hover:text-[#FC6301] py-1 block"
+                            >
+                              {cat.name}
+                            </Link>
+                            {cat.subcategories
+                              .filter((s) => !s.name.startsWith('Show All'))
+                              .map((sub, sIdx) => (
+                                <Link
+                                  key={sub.id || sIdx}
+                                  href={sub.href}
+                                  prefetch={true}
+                                  onClick={onClose}
+                                  className="text-[12px] font-normal text-zinc-400 hover:text-white pl-2.5 py-0.5 block"
+                                >
+                                  • {sub.name}
+                                </Link>
+                              ))}
+                          </div>
+                        ))
+                      )}
+                      <Link
+                        href="/store?price=free"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-bold text-[#FC6301] hover:underline pt-1 block"
+                      >
+                        Explore All Free Tools →
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
             {/* Categories Accordion Section */}
             <div className="mt-4 pt-5 border-t border-[#202020]">

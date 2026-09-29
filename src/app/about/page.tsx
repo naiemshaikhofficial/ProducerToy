@@ -61,27 +61,42 @@ export default function AboutPage() {
       />
 
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (1:1 EPIC GAMES THEME WITH CYAN/PURPLE GLOW & GRAPHIC)    */}
+      {/* 1. HERO BANNER WITH BOTTOM OPACITY DISSOLVE (EPIC GAMES STYLE)            */}
       {/* ========================================================================= */}
-      <section className="relative overflow-hidden border-b border-white/[0.08] pt-16 pb-20 sm:pt-24 sm:pb-28 lg:pt-28 lg:pb-32 px-4 sm:px-8 lg:px-16">
-        {/* Cinematic Epic Gradient Glow matching screenshot */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_15%_25%,rgba(14,84,175,0.32),transparent_70%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_85%_35%,rgba(139,92,246,0.18),transparent_70%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#121212]/50 to-[#121212] pointer-events-none" />
+      <section className="relative w-full overflow-hidden bg-[#121212]">
+        {/* Full Bleed Wide Hero Banner Graphic */}
+        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden">
+          <img
+            src="/about-us-banner.png"
+            alt="About Us - Producer Toy"
+            className="w-full h-auto object-cover object-center max-h-[520px] sm:max-h-[640px] xl:max-h-[740px]"
+            loading="eager"
+          />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center relative z-10">
-          {/* Left Hero Content */}
-          <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/10 text-xs font-semibold text-zinc-300 backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-[#0078F2]" />
+          {/* Bottom Opacity Dissolve Gradient (Melts into the #121212 page background) */}
+          <div className="absolute inset-x-0 bottom-0 h-40 sm:h-64 md:h-80 lg:h-96 bg-gradient-to-t from-[#121212] via-[#121212]/85 to-transparent pointer-events-none" />
+
+          {/* Side Feathering on ultra-wide screens */}
+          <div className="absolute inset-y-0 left-0 w-12 sm:w-28 bg-gradient-to-r from-[#121212]/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-y-0 right-0 w-12 sm:w-28 bg-gradient-to-l from-[#121212]/60 to-transparent pointer-events-none" />
+
+          {/* Top subtle shadow under header */}
+          <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#121212]/60 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Hero Narrative & Call-To-Action (Flows naturally below the dissolved banner) */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 pt-2 sm:pt-6 pb-12 sm:pb-16 relative z-10">
+          <div className="max-w-3xl space-y-5">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#18181c]/80 border border-white/10 text-xs font-semibold text-zinc-300 backdrop-blur-md">
+              <Sparkles className="w-3.5 h-3.5 text-[#FC6301]" />
               <span>The Next Generation Audio Marketplace</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] text-white">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.12] text-white">
               Open to all music creators, sound designers, and audio developers
             </h1>
 
-            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-2xl font-normal">
+            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal">
               Producer Toy is where the world’s best music software developers, sample crafters, and audio engineers sell their VST plugins, instruments, and studio tools to modern beatmakers and DJs worldwide.
             </p>
 
@@ -89,7 +104,7 @@ export default function AboutPage() {
               <Link
                 href="/store"
                 prefetch={true}
-                className="px-7 py-3.5 bg-[#0078F2] hover:bg-[#0066d0] text-white font-bold text-sm rounded-xl transition-all shadow-[0_10px_25px_rgba(0,120,242,0.35)] active:scale-95 flex items-center gap-2 cursor-pointer"
+                className="px-7 py-3.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm rounded-xl transition-all shadow-[0_10px_25px_rgba(252,99,1,0.35)] active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <span>EXPLORE OUR PRODUCTS</span>
                 <ArrowRight className="w-4 h-4" />
@@ -104,77 +119,13 @@ export default function AboutPage() {
               </Link>
             </div>
           </div>
-
-          {/* Right Hero Graphic: Stylized Audio Synth Console & Tech Node (1:1 Epic Games Theme match) */}
-          <div className="lg:col-span-5 flex items-center justify-center relative">
-            <div className="relative w-full max-w-[440px] aspect-square flex items-center justify-center">
-              {/* Outer Neon Glow */}
-              <div className="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-[#0078F2]/30 via-[#8B5CF6]/25 to-pink-500/20 blur-3xl" />
-
-              {/* Central Stylized Audio Workstation Console Graphic */}
-              <div className="relative z-10 w-full p-6 sm:p-8 rounded-3xl bg-[#18181c]/90 border border-white/[0.12] backdrop-blur-2xl shadow-[0_30px_80px_rgba(0,0,0,0.85)] space-y-6">
-                
-                {/* Console Top Bar */}
-                <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-[#FC6301]" />
-                    <span className="w-3 h-3 rounded-full bg-[#0078F2]" />
-                    <span className="w-3 h-3 rounded-full bg-[#10B981]" />
-                  </div>
-                  <div className="text-[11px] font-mono uppercase text-zinc-400 font-bold tracking-wider">
-                    PRODUCER TOY STUDIO
-                  </div>
-                </div>
-
-                {/* Animated Audio Meter Display */}
-                <div className="space-y-2.5 bg-[#121214] p-4 rounded-2xl border border-white/[0.06]">
-                  <div className="flex items-center justify-between text-xs font-semibold text-zinc-300">
-                    <span className="flex items-center gap-2">
-                      <Music2 className="w-4 h-4 text-[#0078F2]" />
-                      Master Waveform Output
-                    </span>
-                    <span className="text-[#10B981] font-mono text-[11px] font-bold">24-BIT / 96kHz</span>
-                  </div>
-
-                  {/* Equalizer Bars */}
-                  <div className="flex items-end justify-between gap-1.5 h-14 pt-2">
-                    {[45, 68, 85, 52, 92, 70, 40, 88, 62, 78, 95, 50, 82, 60, 75].map((h, i) => (
-                      <div
-                        key={i}
-                        className="flex-1 bg-gradient-to-t from-[#0078F2] via-[#8B5CF6] to-[#FC6301] rounded-t-sm"
-                        style={{ height: `${h}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Floating Metrics Cards */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3.5 bg-[#141416] rounded-xl border border-white/[0.06] space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Catalog</span>
-                    <p className="text-lg font-black text-white">100% Royalty Free</p>
-                  </div>
-                  <div className="p-3.5 bg-[#141416] rounded-xl border border-white/[0.06] space-y-1">
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Fulfillment</span>
-                    <p className="text-lg font-black text-[#10B981]">Instant Delivery</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Decorative Badges */}
-              <div className="absolute -top-4 -right-4 bg-[#202026] border border-white/20 px-3.5 py-2 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold text-white z-20 animate-bounce duration-1000">
-                <Gift className="w-4 h-4 text-[#FC6301]" />
-                <span>Free Gifts with Purchase</span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* ========================================================================= */}
       {/* 2. THREE EPIC FEATURE CARDS (EXACT SCREENSHOT LAYOUT MATCH)               */}
       {/* ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 -mt-10 relative z-20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 pb-16 relative z-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
           
           {/* Card 1: More than just a marketplace */}
