@@ -33,6 +33,7 @@ interface MobileDrawerProps {
   onToggleCurrency: () => void
   user: any
   onSignOut?: () => void
+  isSiteVariant?: boolean
 }
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({
@@ -42,6 +43,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   onToggleCurrency,
   user,
   onSignOut,
+  isSiteVariant = false,
 }) => {
   const { region, setRegion, regions } = useCurrency()
   const { unopenedCount } = useGifts()
@@ -50,6 +52,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const [isMobileRegionOpen, setIsMobileRegionOpen] = useState(false)
   const [isMobileFreeOpen, setIsMobileFreeOpen] = useState(false)
   const [isMobileDistributeOpen, setIsMobileDistributeOpen] = useState(false)
+  const [isMobileAboutOpen, setIsMobileAboutOpen] = useState(false)
   const [mobileExpandedCat, setMobileExpandedCat] = useState<CategoryKey | null>(null)
   const { categories: freeCategories } = useFreeCategories()
 
@@ -323,64 +326,162 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               Menu
             </h2>
 
-            {/* Primary Menu Links: Support + Distribute + Clean Routes */}
-            <div className="flex flex-col space-y-4">
-              <Link
-                href="/support"
-                prefetch={true}
-                onClick={onClose}
-                className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
-              >
-                Support
-              </Link>
-
-              {/* Distribute Accordion */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileDistributeOpen(!isMobileDistributeOpen)}
-                  className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
+            {/* Primary Menu Links: Site Variant (Epic Games Site Menu) vs Store Menu */}
+            {isSiteVariant ? (
+              <div className="flex flex-col space-y-4">
+                <Link
+                  href="https://store.producertoy.com"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
                 >
-                  <span>Distribute</span>
-                  <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileDistributeOpen ? 'rotate-180 text-white' : ''}`} />
-                </button>
-                {isMobileDistributeOpen && (
-                  <div className="pl-3 py-2 flex flex-col gap-1.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
-                    <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
-                    >
-                      Distribute on Producer Toy
-                    </Link>
-                    <Link
-                      href="/contact?topic=creator"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
-                    >
-                      Developer Forums
-                    </Link>
-                    <Link
-                      href="/licensing"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
-                    >
-                      Documentation
-                    </Link>
-                    <Link
-                      href="/blog"
-                      prefetch={true}
-                      onClick={onClose}
-                      className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
-                    >
-                      Learning
-                    </Link>
-                  </div>
-                )}
+                  Store
+                </Link>
+
+                <Link
+                  href="/blog"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
+                >
+                  News
+                </Link>
+
+                <Link
+                  href="/support"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
+                >
+                  FAQ
+                </Link>
+
+                <Link
+                  href="/support"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
+                >
+                  Help
+                </Link>
+
+                {/* About ProducerToy Accordion */}
+                <div className="border-b border-[#202020] pb-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileAboutOpen(!isMobileAboutOpen)}
+                    className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
+                  >
+                    <span>About ProducerToy</span>
+                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileAboutOpen ? 'rotate-180 text-white' : ''}`} />
+                  </button>
+                  {isMobileAboutOpen && (
+                    <div className="pl-3 py-2 flex flex-col gap-1.5 bg-[#18181c] rounded-xl my-1.5 animate-in fade-in duration-150">
+                      <Link
+                        href="/about"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        About Us
+                      </Link>
+                      <Link
+                        href="/distribute"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Distribute
+                      </Link>
+                      <Link
+                        href="/licensing"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Licensing
+                      </Link>
+                      <Link
+                        href="/contact"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Contact &amp; Grievance
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href="https://store.producertoy.com"
+                    prefetch={true}
+                    onClick={onClose}
+                    className="w-full py-3 rounded-xl bg-[#0078F2] hover:bg-[#0066d0] text-white text-center font-bold text-sm block shadow-md"
+                  >
+                    Download
+                  </Link>
+                </div>
               </div>
+            ) : (
+              <div className="flex flex-col space-y-4">
+                <Link
+                  href="/support"
+                  prefetch={true}
+                  onClick={onClose}
+                  className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
+                >
+                  Support
+                </Link>
+
+                {/* Distribute Accordion */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileDistributeOpen(!isMobileDistributeOpen)}
+                    className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
+                  >
+                    <span>Distribute</span>
+                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileDistributeOpen ? 'rotate-180 text-white' : ''}`} />
+                  </button>
+                  {isMobileDistributeOpen && (
+                    <div className="pl-3 py-2 flex flex-col gap-1.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
+                      <Link
+                        href="/distribute"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Distribute on Producer Toy
+                      </Link>
+                      <Link
+                        href="/contact?topic=creator"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Developer Forums
+                      </Link>
+                      <Link
+                        href="/licensing"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Documentation
+                      </Link>
+                      <Link
+                        href="/blog"
+                        prefetch={true}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Learning
+                      </Link>
+                    </div>
+                  )}
+                </div>
 
               <Link
                 href="/store?on_sale=true"
@@ -458,6 +559,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 )}
               </div>
             </div>
+          )}
 
             {/* Categories Accordion Section */}
             <div className="mt-4 pt-5 border-t border-[#202020]">

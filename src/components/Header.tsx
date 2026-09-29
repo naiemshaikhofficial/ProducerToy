@@ -137,9 +137,27 @@ export const Header: React.FC = () => {
     setCurrency(currency === 'INR' ? 'USD' : 'INR')
   }
 
+  // Determine if current route is a site/corporate page (About, Support, FAQ, Distribute, Legal, etc.)
+  const isSitePage =
+    pathname === '/about' ||
+    pathname?.startsWith('/about') ||
+    pathname === '/support' ||
+    pathname?.startsWith('/support') ||
+    pathname === '/faq' ||
+    pathname?.startsWith('/faq') ||
+    pathname?.startsWith('/site') ||
+    pathname === '/distribute' ||
+    pathname === '/licensing' ||
+    pathname === '/contact' ||
+    pathname === '/terms' ||
+    pathname === '/privacy' ||
+    pathname === '/refund-policy' ||
+    pathname === '/eula' ||
+    pathname === '/purchase-policy'
+
   // Determine if current route is a shop/catalog browsing page
   const isShopPage =
-    pathname === '/' ||
+    (pathname === '/' ||
     pathname === '/store' ||
     pathname === '/cart' ||
     pathname === '/gifts' ||
@@ -151,15 +169,17 @@ export const Header: React.FC = () => {
     pathname?.startsWith('/brands') ||
     pathname?.startsWith('/blog') ||
     pathname === '/free-vst-plugins' ||
-    pathname === '/free'
+    pathname === '/free') && !isSitePage
 
   return (
     <>
-      {/* Tier 1 Top Header Bar */}
+      {/* Tier 1 Top Header Bar - Always sticky on site pages as requested */}
       <div
         className={`${
           isMobileMenuOpen
             ? 'fixed top-0 left-0 right-0 z-[60]'
+            : isSitePage
+            ? 'sticky top-0 z-[60] backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08]'
             : isShopPage
             ? 'relative z-[60]'
             : 'sticky top-0 z-[60]'
@@ -174,11 +194,12 @@ export const Header: React.FC = () => {
           onOpenCart={() => setIsCartOpen(true)}
           isMobileMenuOpen={isMobileMenuOpen}
           onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          isSiteVariant={isSitePage}
         />
       </div>
 
-      {/* Tier 2 Sub-Header Bar (Only on store/catalog browsing pages) */}
-      {isShopPage && (
+      {/* Tier 2 Sub-Header Bar (Only on store/catalog browsing pages, completely hidden on site pages) */}
+      {isShopPage && !isSitePage && (
         <header className="sticky top-0 z-50 w-full bg-[#121212] select-none">
           <SubBar
             searchQuery={searchQuery}
@@ -221,6 +242,7 @@ export const Header: React.FC = () => {
         onToggleCurrency={toggleCurrency}
         user={user}
         onSignOut={signOut}
+        isSiteVariant={isSitePage}
       />
     </>
   )

@@ -46,6 +46,7 @@ interface TopBarProps {
   onOpenCart: () => void
   isMobileMenuOpen: boolean
   onToggleMobileMenu: () => void
+  isSiteVariant?: boolean
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -57,6 +58,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onOpenCart,
   isMobileMenuOpen,
   onToggleMobileMenu,
+  isSiteVariant = false,
 }) => {
   const { region, setRegion, regions } = useCurrency()
   const { unopenedCount } = useGifts()
@@ -69,8 +71,28 @@ export const TopBar: React.FC<TopBarProps> = ({
   const globeMenuRef = useRef<HTMLDivElement>(null)
   const ecosystemMenuRef = useRef<HTMLDivElement>(null)
   const distributeMenuRef = useRef<HTMLDivElement>(null)
+  const aboutMenuRef = useRef<HTMLDivElement>(null)
   const ecosystemTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const distributeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const aboutTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [isAboutOpen, setIsAboutOpen] = useState(false)
+
+  const handleMouseEnterAbout = () => {
+    if (aboutTimeoutRef.current) {
+      clearTimeout(aboutTimeoutRef.current)
+      aboutTimeoutRef.current = null
+    }
+    setIsAboutOpen(true)
+  }
+
+  const handleMouseLeaveAbout = () => {
+    if (aboutTimeoutRef.current) {
+      clearTimeout(aboutTimeoutRef.current)
+    }
+    aboutTimeoutRef.current = setTimeout(() => {
+      setIsAboutOpen(false)
+    }, 180)
+  }
 
   const handleMouseEnterEcosystem = () => {
     if (ecosystemTimeoutRef.current) {
@@ -142,6 +164,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     return () => {
       if (ecosystemTimeoutRef.current) clearTimeout(ecosystemTimeoutRef.current)
       if (distributeTimeoutRef.current) clearTimeout(distributeTimeoutRef.current)
+      if (aboutTimeoutRef.current) clearTimeout(aboutTimeoutRef.current)
     }
   }, [])
 
@@ -160,14 +183,17 @@ export const TopBar: React.FC<TopBarProps> = ({
       if (distributeMenuRef.current && !distributeMenuRef.current.contains(event.target as Node)) {
         setIsDistributeOpen(false)
       }
+      if (aboutMenuRef.current && !aboutMenuRef.current.contains(event.target as Node)) {
+        setIsAboutOpen(false)
+      }
     }
-    if (isAccountMenuOpen || isGlobeMenuOpen || isEcosystemOpen || isDistributeOpen) {
+    if (isAccountMenuOpen || isGlobeMenuOpen || isEcosystemOpen || isDistributeOpen || isAboutOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isAccountMenuOpen, isGlobeMenuOpen, isEcosystemOpen, isDistributeOpen])
+  }, [isAccountMenuOpen, isGlobeMenuOpen, isEcosystemOpen, isDistributeOpen, isAboutOpen])
 
   // Derive initial and display name only when user is present
   const displayName = user
@@ -539,84 +565,180 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </div>
 
-          {/* STORE Brand Title - Smoothly slides to corner on mobile */}
-          <Link
-            href="/"
-            prefetch={true}
-            className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none flex-shrink-0 ml-2 sm:ml-0"
-          >
-            STORE
-          </Link>
+          {/* Site Navigation (Epic Games 1:1 match) vs Store Navigation */}
+          {isSiteVariant ? (
+            <div className="hidden md:flex items-center gap-6 lg:gap-7 ml-5 lg:ml-7 text-[15px] font-medium text-zinc-300">
+              <Link
+                href="https://store.producertoy.com"
+                prefetch={true}
+                className="hover:text-white transition-colors"
+              >
+                Store
+              </Link>
 
-          <Link
-            href="/support"
-            prefetch={true}
-            className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors ml-6 lg:ml-8"
-          >
-            Support
-          </Link>
+              <Link
+                href="/blog"
+                prefetch={true}
+                className="hover:text-white transition-colors"
+              >
+                News
+              </Link>
 
-          {/* Distribute Dropdown with Hover */}
-          <div
-            className="relative hidden lg:block ml-6 lg:ml-8"
-            ref={distributeMenuRef}
-            onMouseEnter={handleMouseEnterDistribute}
-            onMouseLeave={handleMouseLeaveDistribute}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                setIsDistributeOpen(!isDistributeOpen)
-                setIsEcosystemOpen(false)
-              }}
-              className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${isDistributeOpen
-                ? 'bg-white/[0.08] text-white border border-white/20'
-                : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
-                }`}
-              aria-label="Distribute Menu"
-            >
-              <span>Distribute</span>
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDistributeOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
-            </button>
+              <Link
+                href="/support"
+                prefetch={true}
+                className="hover:text-white transition-colors"
+              >
+                FAQ
+              </Link>
 
-            {/* Distribute Dropdown Menu */}
-            {isDistributeOpen && (
-              <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
-                <Link
-                  href="/distribute"
-                  prefetch={true}
-                  onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+              <Link
+                href="/support"
+                prefetch={true}
+                className="hover:text-white transition-colors"
+              >
+                Help
+              </Link>
+
+              {/* About ProducerToy Dropdown */}
+              <div
+                className="relative"
+                ref={aboutMenuRef}
+                onMouseEnter={handleMouseEnterAbout}
+                onMouseLeave={handleMouseLeaveAbout}
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsAboutOpen(!isAboutOpen)}
+                  className={`flex items-center gap-1.5 cursor-pointer transition-colors py-1.5 ${
+                    isAboutOpen ? 'text-white' : 'text-zinc-300 hover:text-white'
+                  }`}
+                  aria-label="About ProducerToy Menu"
                 >
-                  Distribute on Producer Toy
-                </Link>
-                <Link
-                  href="/contact?topic=creator"
-                  prefetch={true}
-                  onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                >
-                  Developer Forums
-                </Link>
-                <Link
-                  href="/licensing"
-                  prefetch={true}
-                  onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                >
-                  Documentation
-                </Link>
-                <Link
-                  href="/blog"
-                  prefetch={true}
-                  onClick={() => setIsDistributeOpen(false)}
-                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                >
-                  Learning
-                </Link>
+                  <span>About ProducerToy</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isAboutOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
+                </button>
+
+                {isAboutOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-[220px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
+                    <Link
+                      href="/about"
+                      prefetch={true}
+                      onClick={() => setIsAboutOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                    >
+                      About Us
+                    </Link>
+                    <Link
+                      href="/distribute"
+                      prefetch={true}
+                      onClick={() => setIsAboutOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                    >
+                      Distribute
+                    </Link>
+                    <Link
+                      href="/licensing"
+                      prefetch={true}
+                      onClick={() => setIsAboutOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                    >
+                      Licensing
+                    </Link>
+                    <Link
+                      href="/contact"
+                      prefetch={true}
+                      onClick={() => setIsAboutOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
+                    >
+                      Contact &amp; Grievance
+                    </Link>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <>
+              {/* STORE Brand Title - Smoothly slides to corner on mobile */}
+              <Link
+                href="/"
+                prefetch={true}
+                className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none flex-shrink-0 ml-2 sm:ml-0"
+              >
+                STORE
+              </Link>
+
+              <Link
+                href="/support"
+                prefetch={true}
+                className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors ml-6 lg:ml-8"
+              >
+                Support
+              </Link>
+
+              {/* Distribute Dropdown with Hover */}
+              <div
+                className="relative hidden lg:block ml-6 lg:ml-8"
+                ref={distributeMenuRef}
+                onMouseEnter={handleMouseEnterDistribute}
+                onMouseLeave={handleMouseLeaveDistribute}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsDistributeOpen(!isDistributeOpen)
+                    setIsEcosystemOpen(false)
+                  }}
+                  className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${isDistributeOpen
+                    ? 'bg-white/[0.08] text-white border border-white/20'
+                    : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                    }`}
+                  aria-label="Distribute Menu"
+                >
+                  <span>Distribute</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDistributeOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
+                </button>
+
+                {/* Distribute Dropdown Menu */}
+                {isDistributeOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
+                    <Link
+                      href="/distribute"
+                      prefetch={true}
+                      onClick={() => setIsDistributeOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                    >
+                      Distribute on Producer Toy
+                    </Link>
+                    <Link
+                      href="/contact?topic=creator"
+                      prefetch={true}
+                      onClick={() => setIsDistributeOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                    >
+                      Developer Forums
+                    </Link>
+                    <Link
+                      href="/licensing"
+                      prefetch={true}
+                      onClick={() => setIsDistributeOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                    >
+                      Documentation
+                    </Link>
+                    <Link
+                      href="/blog"
+                      prefetch={true}
+                      onClick={() => setIsDistributeOpen(false)}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                    >
+                      Learning
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}
@@ -821,14 +943,24 @@ export const TopBar: React.FC<TopBarProps> = ({
             </div>
           ) : null}
 
-          {/* Primary Action Button: Library (when logged in) or Sign In (when not logged in) */}
-          <Link
-            href={user ? "/library" : "/auth"}
-            prefetch={true}
-            className="bg-[#202020] hover:bg-[#2a2a2a] text-white hover:text-white border border-[#303030] hover:border-zinc-400 font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
-          >
-            {user ? 'Library' : 'Sign In'}
-          </Link>
+          {/* Primary Action Button: On Site Variant shows blue Download button; on Store shows Library / Sign In */}
+          {isSiteVariant ? (
+            <Link
+              href="https://store.producertoy.com"
+              prefetch={true}
+              className="bg-[#0078F2] hover:bg-[#0066d0] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center cursor-pointer tracking-tight"
+            >
+              Download
+            </Link>
+          ) : (
+            <Link
+              href={user ? "/library" : "/auth"}
+              prefetch={true}
+              className="bg-[#202020] hover:bg-[#2a2a2a] text-white hover:text-white border border-[#303030] hover:border-zinc-400 font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
+            >
+              {user ? 'Library' : 'Sign In'}
+            </Link>
+          )}
 
         </div>
 
@@ -844,13 +976,23 @@ export const TopBar: React.FC<TopBarProps> = ({
             </button>
           ) : (
             <div className="flex items-center gap-2.5">
-              <Link
-                href={user ? "/library" : "/auth"}
-                prefetch={true}
-                className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
-              >
-                {user ? 'Library' : 'Sign In'}
-              </Link>
+              {isSiteVariant ? (
+                <Link
+                  href="https://store.producertoy.com"
+                  prefetch={true}
+                  className="bg-[#0078F2] hover:bg-[#0066d0] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
+                >
+                  Download
+                </Link>
+              ) : (
+                <Link
+                  href={user ? "/library" : "/auth"}
+                  prefetch={true}
+                  className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
+                >
+                  {user ? 'Library' : 'Sign In'}
+                </Link>
+              )}
 
               <button
                 onClick={onToggleMobileMenu}
