@@ -1008,6 +1008,20 @@ export function EpicSupportAssistant({
                 : m
             )
           )
+
+          if (groqRes.canEscalateToTicket) {
+            const detectedId =
+              query.match(/\b(?:6E[A-Za-z0-9]+|PAYID-[A-Za-z0-9]+|pay_[A-Za-z0-9]+|CF_[A-Za-z0-9_-]+|cf_[A-Za-z0-9_-]+|PT-ORD-[A-Za-z0-9_-]+|ORD-[A-Za-z0-9_-]+|[0-9A-Za-z]{16,20})\b/i)?.[0] || ''
+            if (detectedId) {
+              setTicketOrderId(detectedId)
+              setTicketCategory('orders')
+              setTicketSubject(`Payment Verification - ${detectedId}`)
+              setTicketDescription(`I made a payment with ID: ${detectedId}. Please verify my transaction and help me access my order.`)
+            } else if (!ticketSubject) {
+              setTicketSubject(query.slice(0, 100))
+              setTicketDescription(query)
+            }
+          }
         } else {
           // Local fallback
           const localMatch = findLocalAnswer(query)
@@ -1380,6 +1394,16 @@ export function EpicSupportAssistant({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(emailToSend)) {
       setTicketError('Please enter a valid email address.')
+      return
+    }
+
+    if (!ticketSubject.trim() || ticketSubject.trim().length < 3) {
+      setTicketError('Please enter a subject / question for your ticket.')
+      return
+    }
+
+    if (!ticketDescription.trim() || ticketDescription.trim().length < 5) {
+      setTicketError('Please provide a description of what went wrong in the details field.')
       return
     }
 
@@ -1811,7 +1835,7 @@ export function EpicSupportAssistant({
             <div className="w-full max-w-5xl mx-auto h-11 sm:h-12 flex items-center justify-center px-4 sm:px-8">
               <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FC6301] animate-pulse" />
-                <span>Producer Toy • Technical Support Specialist</span>
+                <span>Prody • Producer Toy Technical Support</span>
               </span>
             </div>
             <div 
@@ -1928,7 +1952,7 @@ export function EpicSupportAssistant({
                 Your Chat With
               </p>
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-                Producer Toy Support Specialist
+                Prody • Producer Toy Support Specialist
               </h2>
             </div>
           </div>
@@ -1976,12 +2000,12 @@ export function EpicSupportAssistant({
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
                         src="/images/support-bot-logo.webp"
-                        alt="Producer Toy Support Assistant"
+                        alt="Prody"
                         width={24}
                         height={24}
                         className="w-6 h-6 object-contain shrink-0"
                       />
-                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">Producer Toy Support Assistant</span>
+                      <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">Prody</span>
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
 
@@ -2329,13 +2353,13 @@ export function EpicSupportAssistant({
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
                         src="/images/support-bot-logo.webp"
-                        alt="Producer Toy Support Assistant"
+                        alt="Prody"
                         width={24}
                         height={24}
                         className="w-6 h-6 object-contain shrink-0"
                       />
                       <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
-                        Producer Toy Support Assistant
+                        Prody
                       </span>
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
@@ -2420,13 +2444,13 @@ export function EpicSupportAssistant({
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">
                       <Image
                         src="/images/support-bot-logo.webp"
-                        alt="Producer Toy Support Assistant"
+                        alt="Prody"
                         width={24}
                         height={24}
                         className="w-6 h-6 object-contain shrink-0"
                       />
                       <span className="font-semibold text-zinc-200 text-xs sm:text-[13px]">
-                        Producer Toy Support Assistant
+                        Prody
                       </span>
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
@@ -2574,7 +2598,7 @@ export function EpicSupportAssistant({
                             <span>Raise Official Support Ticket</span>
                           </h3>
                           <p className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">
-                            Directly dispatched to <strong className="text-white">support@producertoy.com</strong> & senior audio engineering desk
+                            Directly assigned to our senior audio engineering desk
                           </p>
                         </div>
                         {user?.email && (
@@ -2738,24 +2762,24 @@ export function EpicSupportAssistant({
                       <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
                         <div className="flex items-center gap-2 text-[11px] text-zinc-400 font-medium">
                           <Mail size={13} className="text-[#FC6301]" />
-                          <span>Dispatched directly to <strong className="text-zinc-200">support@producertoy.com</strong></span>
+                          <span>Priority Senior Audio Support Desk</span>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
-                          disabled={isSubmittingTicket}
+                          disabled={isSubmittingTicket || !ticketEmail.trim() || !ticketSubject.trim() || !ticketDescription.trim()}
                           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#FC6301]/25 hover:shadow-md hover:translate-y-[-1px] cursor-pointer"
                         >
                           {isSubmittingTicket ? (
                             <>
                               <Loader2 size={14} className="animate-spin" />
-                              <span>Dispatching to support@producertoy.com...</span>
+                              <span>Submitting Ticket...</span>
                             </>
                           ) : (
                             <>
                               <Send size={14} strokeWidth={2.5} />
-                              <span>Submit Ticket to support@producertoy.com</span>
+                              <span>Submit Official Ticket</span>
                             </>
                           )}
                         </button>
@@ -2786,17 +2810,17 @@ export function EpicSupportAssistant({
                     <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl sm:rounded-[20px] p-6 sm:p-7 shadow-2xl space-y-3">
                       <p className="font-bold text-white text-base sm:text-lg flex items-center gap-2.5">
                         <CheckCircle2 size={18} className="text-[#00d66c] shrink-0" />
-                        <span>Ticket #{msg.ticketNumber} Dispatched!</span>
+                        <span>Ticket #{msg.ticketNumber} Submitted Successfully!</span>
                       </p>
                       <p className="text-zinc-200 text-sm sm:text-[14.5px] leading-relaxed font-medium">
-                        Your ticket and complete chat transcript have been dispatched directly to <strong className="text-white underline">support@producertoy.com</strong>. Our senior audio engineering desk will review your inquiry and get back to you via email.
+                        Your support ticket has been received. Our senior audio engineering desk will review your inquiry and get back to you directly via your registered email.
                       </p>
                       <div className="pt-1 flex items-center gap-2 flex-wrap">
                         <span className="text-xs text-black font-mono font-bold bg-[#FC6301] px-3.5 py-1.5 rounded-lg shadow-md">
                           Ref: #{msg.ticketNumber}
                         </span>
                         <span className="text-xs text-[#00d66c] bg-[#00d66c]/15 px-3 py-1.5 rounded-lg border border-[#00d66c]/40 font-bold">
-                          Email Dispatched to support@producertoy.com
+                          Ticket Registered
                         </span>
                       </div>
                     </div>
