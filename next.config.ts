@@ -31,6 +31,21 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/site/faq',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/site/support',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/site/:path*',
+        destination: '/support',
+        permanent: true,
+      },
+      {
         source: '/help',
         destination: '/support',
         permanent: true,

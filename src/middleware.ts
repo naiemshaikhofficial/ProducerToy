@@ -88,14 +88,40 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301)
   }
 
-  // 2. IP & Rate Limiting on API and sensitive operations
+  // 2. Cross-Domain Routing (store.producertoy.com vs producertoy.com)
+  const isApexDomain = host === 'producertoy.com';
+  const isStoreDomain = host.startsWith('store.');
+
+  const isSupportPath =
+    pathname.startsWith('/support') ||
+    pathname.startsWith('/faq') ||
+    pathname.startsWith('/faqs') ||
+    pathname.startsWith('/help') ||
+    pathname.startsWith('/site');
+
+  const isApi = pathname.startsWith("/api");
+  const isServerAction = request.headers.has('next-action') || request.method === 'POST';
+
+  if (!isLocal) {
+    // If visitor is on store.producertoy.com and visits Support / FAQ -> take to https://producertoy.com/support
+    if (isStoreDomain && isSupportPath) {
+      const targetPath = pathname.startsWith('/support') ? pathname : '/support';
+      const redirectUrl = new URL(targetPath + request.nextUrl.search, 'https://producertoy.com');
+      return NextResponse.redirect(redirectUrl, 308);
+    }
+
+    // If visitor is on root domain producertoy.com but navigates to store / product / cart / account -> take to https://store.producertoy.com
+    if (isApexDomain && !isSupportPath && !isApi && !isServerAction) {
+      const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://store.producertoy.com');
+      return NextResponse.redirect(redirectUrl, 308);
+    }
+  }
+
+  // 3. IP & Rate Limiting on API and sensitive operations
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     request.headers.get('x-real-ip') ||
     request.headers.get('cf-connecting-ip') ||
     '127.0.0.1';
-
-  const isApi = pathname.startsWith("/api");
-  const isServerAction = request.headers.has('next-action') || request.method === 'POST';
 
   if (isApi || isServerAction) {
     const isSensitive = isServerAction || SENSITIVE_PATTERNS.some(pattern => pathname.startsWith(pattern));
