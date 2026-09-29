@@ -113,7 +113,7 @@ export default function AboutPage() {
       </section>
 
       {/* Main Content Area - Aligned exactly with Homepage max-w-[1440px] */}
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-24 space-y-16 sm:space-y-20">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-6 sm:pb-8 space-y-16 sm:space-y-20">
 
         {/* ========================================================================= */}
         {/* 2. THREE MINIMALISTIC FEATURE CARDS (HOMEPAGE THEME MATCH)                */}
@@ -142,23 +142,23 @@ export default function AboutPage() {
               </Link>
             </div>
 
-            {/* Card 2: Toywards Rewards */}
+            {/* Card 2: Exclusive Free Gifts with Orders */}
             <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
               <div className="space-y-3.5">
                 <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <Award className="w-5 h-5" />
+                  <Gift className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Toywards™ Virtual Cash Rewards</h3>
+                <h3 className="text-xl font-bold text-white tracking-tight">Exclusive Free Gifts with Orders</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed font-normal">
-                  Earn 5% Virtual Cash toward future purchases whenever you checkout on Producer Toy. Claim free soundbanks, sample packs, and exclusive discounts right at payment.
+                  Unlock complimentary soundbanks, sample packs, and select VST software plugins on eligible orders. Expand your producer toolkit with zero extra cost.
                 </p>
               </div>
               <Link
-                href="/features/toywards"
+                href="/gifts"
                 prefetch={true}
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:text-zinc-300 transition-colors pt-2"
               >
-                <span>Discover Toywards Rewards</span>
+                <span>Discover Free Gifts</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -403,7 +403,7 @@ export default function AboutPage() {
         {/* ========================================================================= */}
         {/* 5. BOTTOM CTA (HOMEPAGE MATCHING MINIMALISTIC BUTTONS)                     */}
         {/* ========================================================================= */}
-        <section className="py-12 text-center space-y-6">
+        <section className="pt-2 pb-2 text-center space-y-5">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
             Ready to elevate your sound?
           </h2>

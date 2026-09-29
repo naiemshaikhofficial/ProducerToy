@@ -603,18 +603,6 @@ export function EpicCheckoutLayout({
               </div>
             )}
 
-            {/* Toywards Applied Discount */}
-            {rewardDiscountAmount > 0 && (
-              <div className="flex justify-between items-center text-emerald-400 font-medium text-xs animate-in fade-in">
-                <span className="flex items-center gap-1.5">
-                  <ToywardsIcon size={13} />
-                  <span>Toywards Applied</span>
-                </span>
-                <span className="font-semibold">
-                  -{currencySymbol}{rewardDiscountAmount.toFixed(2)}
-                </span>
-              </div>
-            )}
 
             {/* Total Row */}
             <div className="border-t border-[#2c2c2c] pt-3 mt-3 flex justify-between items-baseline">
@@ -844,18 +832,6 @@ export function EpicCheckoutLayout({
                 </div>
               )}
 
-              {/* Toywards Applied Discount */}
-              {rewardDiscountAmount > 0 && (
-                <div className="flex justify-between items-center text-emerald-400 font-medium animate-in fade-in">
-                  <span className="flex items-center gap-1.5">
-                    <ToywardsIcon size={13} />
-                    <span>Toywards Applied</span>
-                  </span>
-                  <span className="font-semibold">
-                    -{currencySymbol}{rewardDiscountAmount.toFixed(2)}
-                  </span>
-                </div>
-              )}
 
               {/* Total Price Row */}
               <div className="flex justify-between items-baseline pt-4 border-t border-[#262626]">
