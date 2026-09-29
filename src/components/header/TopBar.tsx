@@ -215,8 +215,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             onMouseEnter={handleMouseEnterEcosystem}
             onMouseLeave={handleMouseLeaveEcosystem}
             className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isMobileMenuOpen
-              ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
-              : 'opacity-100 translate-x-0 overflow-visible mr-6 sm:mr-7 md:mr-8'
+              ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-6 lg:md:mr-7'
+              : 'opacity-100 translate-x-0 overflow-visible mr-6 lg:mr-7'
               }`}
           >
             <button
@@ -567,7 +567,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Site Navigation (Epic Games 1:1 match) vs Store Navigation */}
           {isSiteVariant ? (
-            <div className="hidden md:flex items-center gap-6 lg:gap-7 ml-5 lg:ml-7 text-[15px] font-medium text-zinc-300">
+            <div className="hidden md:flex items-center gap-6 lg:gap-7 text-[15px] font-medium text-zinc-300">
               <Link
                 href="https://store.producertoy.com"
                 prefetch={true}
