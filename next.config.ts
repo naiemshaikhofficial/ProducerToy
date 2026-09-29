@@ -31,6 +31,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/about-us',
+        destination: '/about',
+        permanent: true,
+      },
+      {
+        source: '/site/about',
+        destination: '/about',
+        permanent: true,
+      },
+      {
         source: '/site/faq',
         destination: '/support',
         permanent: true,

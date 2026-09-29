@@ -97,15 +97,16 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/faq') ||
     pathname.startsWith('/faqs') ||
     pathname.startsWith('/help') ||
-    pathname.startsWith('/site');
+    pathname.startsWith('/site') ||
+    pathname.startsWith('/about');
 
   const isApi = pathname.startsWith("/api");
   const isServerAction = request.headers.has('next-action') || request.method === 'POST';
 
   if (!isLocal) {
-    // If visitor is on store.producertoy.com and visits Support / FAQ -> take to https://producertoy.com/support
+    // If visitor is on store.producertoy.com and visits Support / FAQ / About -> take to https://producertoy.com
     if (isStoreDomain && isSupportPath) {
-      const targetPath = pathname.startsWith('/support') ? pathname : '/support';
+      const targetPath = (pathname.startsWith('/support') || pathname.startsWith('/about')) ? pathname : '/support';
       const redirectUrl = new URL(targetPath + request.nextUrl.search, 'https://producertoy.com');
       return NextResponse.redirect(redirectUrl, 308);
     }
