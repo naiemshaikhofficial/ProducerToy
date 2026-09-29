@@ -218,10 +218,22 @@ export async function askGroqSupportAction(
       console.warn('[askGroqSupportAction] Failed to query products from DB:', dbErr)
     }
 
-    // 4. Fetch User Purchases and Orders with Admin Privileges from Supabase
+    // 4. Fetch User Purchases, Orders, and Tickets with Admin Privileges from Supabase
     let userPurchases: any[] = []
     let userOrders: any[] = []
     let matchedSpecificOrder: any = null
+    let userTickets: any[] = []
+    let matchedSpecificTicket: any = null
+    let ticketEmployeeReplies: Array<{
+      ticketNumber: string
+      status: string
+      subject: string
+      createdAt: string
+      agentName: string
+      agentMessage: string
+      agentReplyTime: string
+    }> = []
+    let ticketStatusSummary = ''
 
     try {
       // A. Query Purchases
@@ -277,6 +289,102 @@ export async function askGroqSupportAction(
             userOrders.unshift(specOrders)
           }
         }
+      }
+
+      // D. Query Live Support Tickets and Staff/Employee Replies
+      userTickets = []
+      matchedSpecificTicket = null
+      ticketEmployeeReplies = []
+      ticketStatusSummary = ''
+
+      // Ticket format scanner: PT-TK-..., PT-TCK-..., SW-TK-..., SW-TCK-..., TK-..., TCK-...
+      const TICKET_REGEX = /\b((?:PT|SW)?-?(?:TCK|TK)-[A-Za-z0-9_-]+)\b/i
+      const scannedTicketMatch = query.match(TICKET_REGEX)
+      const scannedTicketNumber = scannedTicketMatch ? scannedTicketMatch[1].toUpperCase() : null
+
+      const queryLowerForTickets = query.toLowerCase()
+      const isTicketInquiry =
+        Boolean(scannedTicketNumber) ||
+        queryLowerForTickets.includes('ticket') ||
+        queryLowerForTickets.includes('complaint') ||
+        queryLowerForTickets.includes('support request') ||
+        queryLowerForTickets.includes('status of my') ||
+        queryLowerForTickets.includes('ticket status') ||
+        queryLowerForTickets.includes('employee answer') ||
+        queryLowerForTickets.includes('staff reply') ||
+        queryLowerForTickets.includes('did anyone reply') ||
+        queryLowerForTickets.includes('mera ticket') ||
+        queryLowerForTickets.includes('ticket ka kya')
+
+      try {
+        if (scannedTicketNumber || isTicketInquiry || userId || targetEmail) {
+          let tQuery = adminSupabase.from('support_tickets').select('*')
+          if (scannedTicketNumber) {
+            tQuery = tQuery.ilike('ticket_number', scannedTicketNumber)
+          } else if (userId && targetEmail) {
+            tQuery = tQuery.or(`user_id.eq.${userId},email.ilike.${targetEmail}`)
+          } else if (userId) {
+            tQuery = tQuery.eq('user_id', userId)
+          } else if (targetEmail) {
+            tQuery = tQuery.ilike('email', targetEmail)
+          }
+
+          const { data: tData } = await tQuery.order('created_at', { ascending: false }).limit(5)
+          if (tData && tData.length > 0) {
+            userTickets = tData
+            if (scannedTicketNumber) {
+              matchedSpecificTicket = tData[0]
+            }
+
+            // For found tickets, retrieve any employee messages from ticket_messages
+            for (const t of userTickets) {
+              const { data: msgs } = await adminSupabase
+                .from('ticket_messages')
+                .select('*')
+                .eq('ticket_id', t.id)
+                .order('created_at', { ascending: true })
+
+              const agentReplies = (msgs || []).filter(
+                (m: any) =>
+                  m.sender_type?.toUpperCase() === 'AGENT' ||
+                  m.sender_type?.toUpperCase() === 'STAFF' ||
+                  m.sender_type?.toUpperCase() === 'SUPPORT'
+              )
+
+              if (agentReplies.length > 0) {
+                const latest = agentReplies[agentReplies.length - 1]
+                ticketEmployeeReplies.push({
+                  ticketNumber: t.ticket_number,
+                  status: t.status || 'OPEN',
+                  subject: t.subject || 'Support Ticket',
+                  createdAt: t.created_at,
+                  agentName: latest.sender_name || 'Senior Support Engineer',
+                  agentMessage: latest.message,
+                  agentReplyTime: latest.created_at,
+                })
+              }
+            }
+          }
+        }
+      } catch (ticketLookupErr) {
+        console.warn('[askGroqSupportAction] Ticket DB lookup error:', ticketLookupErr)
+      }
+
+      if (userTickets.length > 0) {
+        ticketStatusSummary = `\nLIVE DATABASE SUPPORT TICKETS & EMPLOYEE REPLIES:
+${userTickets
+  .map((t) => {
+    const emp = ticketEmployeeReplies.find((r) => r.ticketNumber === t.ticket_number)
+    const replyText = emp
+      ? `  * EMPLOYEE / AUDIO DESK ANSWER (From ${emp.agentName} on ${new Date(emp.agentReplyTime).toLocaleDateString()}): "${emp.agentMessage}"`
+      : `  * EMPLOYEE RESPONSE: No employee reply has been recorded yet. The ticket is currently ${t.status || 'OPEN'} and under active review by the senior audio engineering desk.`
+    return `- [Ticket #${t.ticket_number}] Subject: "${t.subject}" | Status: ${t.status || 'OPEN'} | Submitted: ${new Date(t.created_at).toLocaleDateString()}\n${replyText}`
+  })
+  .join('\n')}`
+      } else if (scannedTicketNumber) {
+        ticketStatusSummary = `\nLIVE DATABASE SUPPORT TICKETS & EMPLOYEE REPLIES:\n- [NO TICKET FOUND]: Searched for Ticket ID "${scannedTicketNumber}", but no matching record was found in the database. Ask user to double-check the ticket number or provide their registered email address.`
+      } else if (isTicketInquiry && !userId && !targetEmail) {
+        ticketStatusSummary = `\nLIVE DATABASE SUPPORT TICKETS & EMPLOYEE REPLIES:\n- [NOTICE]: User is asking for their ticket status, but no ticket reference number was provided and user is not logged in. Ask them for their Ticket Reference Number (e.g. PT-TK-...) or their registered email address.`
       }
     } catch (adminErr) {
       console.warn('[askGroqSupportAction] Admin DB lookup error:', adminErr)
@@ -640,6 +748,7 @@ USER SESSION & DATABASE STATUS:
 - Logged-in User: ${isUserLoggedIn ? `YES (Logged in as ${userName} <${userEmail}>)` : 'Guest / Not Logged In'}
 - Account Purchases: ${userPurchases.length > 0 ? `${userPurchases.length} items (${userPurchases.map((p) => p.products?.name || p.product_id).join(', ')})` : '0 purchases recorded in Supabase database'}
 - Recent Orders: ${userOrders.length > 0 ? userOrders.map((o) => `[Order #${o.order_number} | Status: ${o.payment_status} | Amount: ${o.currency || '$'}${o.total_amount}]`).join(', ') : 'No recent orders recorded in Supabase database'}
+${ticketStatusSummary}
 ${adminActionResultNotes}`
 
     // 6. Build Modular System Prompt using rules engine
@@ -856,16 +965,38 @@ ${adminActionResultNotes}`
         .trim()
     )
 
-    // If query is off-topic / personal / cricket / non-music and model output had strike or gave wrong topic,
-    // ensure polite generic redirect in user's exact language:
+    // If query is off-topic (cooking, recipes, sports, cricket, GK, non-music):
     if (isOffTopicQuery(query)) {
-      const lang = detectLanguage(query)
-      if (lang === 'english') {
-        cleanedAnswer = `I am exclusively dedicated to helping with music production, sound design, VST plugins, sample packs, and Producer Toy store orders.\n\nHow can I assist you with your music projects, plugins, or sound libraries today?`
-      } else if (lang === 'hindi') {
-        cleanedAnswer = `मैं केवल Producer Toy, संगीत निर्माण, VST प्लगइन्स, सैंपल पैक और स्टोर ऑर्डर्स से संबंधित प्रश्नों में सहायता कर सकता हूँ।\n\nआज आपके संगीत प्रोजेक्ट या साउंड्स में मैं कैसे मदद कर सकता हूँ?`
-      } else {
-        cleanedAnswer = `Mai sirf Producer Toy, music production, sound design, VST plugins, sample packs, aur store orders se related queries me help kar sakta hoon.\n\nAapko music production, audio plugins ya sounds me kis tarah ki help chahiye?`
+      const answerLower = cleanedAnswer.toLowerCase()
+      const alreadyDeclined =
+        answerLower.includes('music') ||
+        answerLower.includes('sound') ||
+        answerLower.includes('vst') ||
+        answerLower.includes('sample pack') ||
+        answerLower.includes('موسيقى') ||
+        answerLower.includes('إنتاج') ||
+        answerLower.includes('میوزک') ||
+        answerLower.includes('संगीत') ||
+        answerLower.includes('producción') ||
+        answerLower.includes('producertoy') ||
+        answerLower.includes('producer toy') ||
+        answerLower.includes('sampleswala')
+
+      if (!alreadyDeclined) {
+        const lang = detectLanguage(query)
+        if (lang === 'arabic') {
+          cleanedAnswer = `عذراً، أنا متخصص حصرياً في دعم إنتاج الموسيقى، وتصميم الصوت، ومكتبات العينات الصوتية (Sample Packs)، ومكونات VST، ودعم طلبات Producer Toy. لا يمكنني الإجابة على أسئلة الطبخ أو المعلومات العامة غير الموسيقية. كيف يمكنني مساعدتك في مشاريعك الموسيقية اليوم؟`
+        } else if (lang === 'urdu') {
+          cleanedAnswer = `معذرت، میں صرف میوزک پروڈکشن، ساؤنڈ ڈیزائن، سیمپل پیکس، VST پلگ انز اور Producer Toy کے آرڈرز سے متعلق سوالات میں مدد کر سکتا ہوں۔ میں کھانوں کی تراکیب یا عمومی معلومات کے سوالات کے جوابات نہیں دے سکتا۔ آپ کے میوزک پروجیکٹس میں میں کس طرح مدد کر سکتا ہوں؟`
+        } else if (lang === 'spanish') {
+          cleanedAnswer = `Lo siento, pero estoy dedicado exclusivamente a la producción musical, diseño de sonido, plugins VST, paquetes de muestras y pedidos de Producer Toy. No puedo responder sobre cocina o preguntas de cultura general. ¿En qué te puedo ayudar hoy con tu música o plugins?`
+        } else if (lang === 'hindi') {
+          cleanedAnswer = `मैं केवल Producer Toy, संगीत निर्माण, VST प्लगइन्स, सैंपल पैक और स्टोर ऑर्डर्स से संबंधित प्रश्नों में सहायता कर सकता हूँ। मैं कुकिंग रेसिपी या सामान्य ज्ञान के प्रश्नों के उत्तर नहीं दे सकता। आपके संगीत प्रोजेक्ट या साउंड्स में मैं कैसे मदद कर सकता हूँ?`
+        } else if (lang === 'hinglish') {
+          cleanedAnswer = `Mai sirf Producer Toy, music production, sound design, VST plugins, sample packs, aur store orders se related queries me help kar sakta hoon. Mai cooking recipes ya general knowledge ke answers nahi de sakta. Aapko music production, audio plugins ya sounds me kis tarah ki help chahiye?`
+        } else {
+          cleanedAnswer = `I am exclusively dedicated to helping with music production, sound design, VST plugins, sample packs, and Producer Toy store orders. I cannot assist with cooking recipes, general trivia, or non-music topics. How can I assist you with your music projects, plugins, or sound libraries today?`
+        }
       }
     }
 

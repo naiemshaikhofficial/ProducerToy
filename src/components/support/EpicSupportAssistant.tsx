@@ -1462,6 +1462,8 @@ export function EpicSupportAssistant({
           body: JSON.stringify({
             name: customerName,
             email: emailToSend,
+            _replyto: emailToSend,
+            _cc: emailToSend,
             _subject: `[Producer Toy Ticket #${finalTicketNumber}] ${exactUserQuestion.slice(0, 100)}`,
             ticket_number: finalTicketNumber,
             category: ticketCategory,
@@ -1477,6 +1479,36 @@ export function EpicSupportAssistant({
         })
       } catch (fsErr) {
         console.warn('[FormSubmit Notice]', fsErr)
+      }
+
+      // 2b. Dispatch user confirmation copy to customer's detected email
+      try {
+        await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(emailToSend)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            _subject: `[Producer Toy Ticket #${finalTicketNumber}] We received your inquiry: ${exactUserQuestion.slice(0, 100)}`,
+            ticket_number: finalTicketNumber,
+            customer_name: customerName,
+            customer_email: emailToSend,
+            category: ticketCategory,
+            priority: ticketPriority,
+            status: 'OPEN (In Review by Senior Audio Desk)',
+            order_id: ticketOrderId.trim() || 'N/A',
+            daw: ticketDaw || 'N/A',
+            your_question_or_issue: exactUserQuestion,
+            details: exactDescription,
+            ticket_link: `https://producertoy.com/support?ticket=${finalTicketNumber}&email=${encodeURIComponent(emailToSend)}`,
+            note: 'Your ticket has been logged in our secure database. Our senior audio engineers will respond shortly. You can also ask our AI assistant anytime for real-time status updates.',
+            _captcha: 'false',
+            _template: 'table',
+          }),
+        })
+      } catch (userFsErr) {
+        console.warn('[FormSubmit User Copy Notice]', userFsErr)
       }
 
       // 3. Persist ticket code to localStorage for guest tracking continuity

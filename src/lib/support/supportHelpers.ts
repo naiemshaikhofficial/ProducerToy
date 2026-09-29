@@ -70,15 +70,32 @@ export function hasProfanityOrAbuse(query: string): boolean {
 }
 
 /**
- * Detect language of user query: english, hindi, hinglish
+ * Detect language of user query: english, hindi, hinglish, arabic, urdu, spanish, other
  */
-export function detectLanguage(query: string): 'english' | 'hindi' | 'hinglish' | 'other' {
+export function detectLanguage(query: string): 'english' | 'hindi' | 'hinglish' | 'arabic' | 'urdu' | 'spanish' | 'other' {
   if (!query) return 'english'
+
+  // Arabic and Urdu script detection
+  if (/[\u0600-\u06FF]/.test(query)) {
+    // Distinctive Urdu characters/words
+    if (/[ٹڈڑںہے]|(\b(کیسے|کیا|ہیں|تھا|تھی|تھے|کیوں|بنائیں|پوچھیں)\b)/.test(query)) {
+      return 'urdu'
+    }
+    return 'arabic'
+  }
+
   // Devanagari script detection
   if (/[\u0900-\u097F]/.test(query)) {
     return 'hindi'
   }
+
   const q = query.toLowerCase()
+
+  // Spanish detection
+  if (/[¿¡]|\b(cómo|como|hacer|receta|música|musica|hola|gracias|por favor|buenos días|buenas tardes)\b/i.test(q)) {
+    return 'spanish'
+  }
+
   const hinglishMarkers = /\b(kya|kyu|kaise|kitna|kitne|hai|hain|nahi|mila|hoga|batao|bataiye|kar|karo|raha|rahe|meri|mera|aap|tum|kaun|kab|apne|mujhe|hum|aur|ye|yeh|wo|woh|bhi|pe|par|ko|se|ne|mari|mara|kuch|sabko|baki|de)\b/i
   if (hinglishMarkers.test(q)) {
     return 'hinglish'
@@ -87,14 +104,41 @@ export function detectLanguage(query: string): 'english' | 'hindi' | 'hinglish' 
 }
 
 /**
- * Helper to identify off-topic questions (sports, cricket, celebrities, personal/private questions,
- * general knowledge, trivia) so we can give a polite redirect WITHOUT any policy strike.
+ * Helper to identify off-topic questions (cooking, recipes, sports, cricket, celebrities, personal,
+ * general knowledge, GK, science, math, history) so we can give a polite redirect WITHOUT any policy strike.
  */
 export function isOffTopicQuery(query: string): boolean {
   if (!query) return false
   const q = query.toLowerCase().trim()
 
   const offTopicKeywords = [
+    // Cooking, Food & Recipes
+    'recipe',
+    'recipes',
+    'cooking',
+    'cook',
+    'biryani',
+    'paella',
+    'pizza',
+    'burger',
+    'curry',
+    'roti',
+    'sabzi',
+    'chai',
+    'tea',
+    'coffee',
+    'cake',
+    'food',
+    'dish',
+    'ingredients',
+    'how to make',
+    'kaise banaye',
+    'kaise banate',
+    'طريقة عمل',
+    'طبخ',
+    'وصفة',
+    'کھانا',
+    'receta',
     // Sports & Cricket
     'virat',
     'kohli',
@@ -129,7 +173,9 @@ export function isOffTopicQuery(query: string): boolean {
     'celebrity',
     'bollywood',
     'hollywood',
-    // Politics & General Knowledge
+    // Politics & General Knowledge / GK
+    'gk',
+    'general knowledge',
     'prime minister',
     'president',
     'modi',
@@ -140,8 +186,10 @@ export function isOffTopicQuery(query: string): boolean {
     'capital of',
     'history of',
     'geography',
-    'recipe',
-    'cooking',
+    'planet',
+    'solar system',
+    'math equation',
+    'chemistry formula',
     'who won',
     // Personal & Private inquiries
     'girlfriend',

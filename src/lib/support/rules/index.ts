@@ -4,6 +4,7 @@ import { getComingSoonRules, type ComingSoonRuleContext } from './comingSoonRule
 import { getGatewayRules } from './gatewayRules'
 import { getPolicyConductRules, type PolicyContext } from './policyConductRules'
 import { getPlatformInfoRules } from './platformInfoRules'
+import { getTicketRules } from './ticketRules'
 
 export * from './identityRules'
 export * from './administrativeRules'
@@ -11,6 +12,7 @@ export * from './comingSoonRules'
 export * from './gatewayRules'
 export * from './policyConductRules'
 export * from './platformInfoRules'
+export * from './ticketRules'
 
 export interface SupportPromptContext {
   identity: IdentityContext
@@ -37,6 +39,7 @@ export function buildSupportSystemPrompt(ctx: SupportPromptContext): string {
     getAdministrativeRules(ctx.admin),
     getComingSoonRules(ctx.comingSoon),
     getGatewayRules(),
+    getTicketRules(),
     getPolicyConductRules(ctx.policy),
     getPlatformInfoRules(),
   ]
