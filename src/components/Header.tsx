@@ -168,6 +168,8 @@ export const Header: React.FC = () => {
     pathname?.startsWith('/p/') ||
     pathname?.startsWith('/brands') ||
     pathname?.startsWith('/blog') ||
+    pathname === '/news' ||
+    pathname?.startsWith('/news') ||
     pathname === '/free-vst-plugins' ||
     pathname === '/free') && !isSitePage
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NewsArticle } from '@/lib/turso/newsDb'
+import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 
 interface NewsPageClientProps {
   initialArticles: NewsArticle[]
@@ -15,7 +16,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   // Top 2 featured articles for the Epic Games billboard hero cards
   const billboardArticles = initialArticles.slice(0, 2)
 
-  // Remaining articles for the list below
+  // Remaining articles for the 1:1 Epic Games horizontal feed
   const feedArticles = initialArticles.slice(2, visibleCount + 2)
   const hasMore = visibleCount + 2 < initialArticles.length
 
@@ -40,7 +41,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white">
+    <div className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
         
         {/* Exact Epic Games Heading */}
@@ -48,26 +49,28 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
           Producer Toy News
         </h1>
 
-        {/* 1:1 Epic Games 2-Billboard Hero Cards */}
+        {/* 1:1 Epic Games 2-Billboard Hero Cards (NO BORDERS, STATIC + LIGHT GLOW HIGHLIGHT ON HOVER) */}
         {billboardArticles.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-12 sm:mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 mb-12 sm:mb-16">
             {billboardArticles.map((article, idx) => (
               <Link
                 key={article.id || idx}
                 href={`/news/${article.slug}`}
                 prefetch={true}
-                className="group flex flex-col cursor-pointer"
+                className="group flex flex-col cursor-pointer border-0"
               >
-                {/* 16:9 Clean Thumbnail (No overlays or stickers) */}
-                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#202024] mb-3 sm:mb-4">
+                {/* 16:9 Clean Thumbnail (Static with Home Page Brightness + Glow Highlight on Hover) */}
+                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#181818] mb-3.5 sm:mb-4">
                   <Image
                     src={article.cover_image}
                     alt={article.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
+                    className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
                     priority={idx === 0}
                   />
+                  {/* Subtle Light Glow Overlay matching Homepage */}
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
                 </div>
 
                 {/* Date stamp */}
@@ -96,55 +99,63 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
           </div>
         )}
 
-        {/* Epic Games Horizontal Stories Feed */}
+        {/* 1:1 Exact Epic Games Horizontal Feed (Matching User Screenshot) */}
         {feedArticles.length > 0 && (
-          <div className="space-y-6 sm:space-y-8 mb-12">
+          <div className="border-t border-[#26262a] pt-1">
             {feedArticles.map((article, idx) => (
-              <Link
-                key={article.id || idx}
-                href={`/news/${article.slug}`}
-                prefetch={true}
-                className="group flex flex-col md:flex-row gap-5 sm:gap-7 items-start pb-6 sm:pb-8 border-b border-[#202024] last:border-b-0 cursor-pointer"
-              >
-                {/* Horizontal Thumbnail (16:9 on desktop, full width on mobile) */}
-                <div className="relative aspect-video w-full md:w-[320px] lg:w-[380px] shrink-0 rounded-2xl overflow-hidden bg-[#202024]">
-                  <Image
-                    src={article.cover_image}
-                    alt={article.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 380px"
-                    className="object-cover group-hover:scale-[1.03] transition-transform duration-300 ease-out"
-                  />
-                </div>
-
-                {/* Content Details */}
-                <div className="flex flex-col flex-1 py-1">
-                  <div className="text-[11px] sm:text-xs font-semibold uppercase text-zinc-400 tracking-wider mb-2">
-                    {formatRelativeDate(article.published_at)}
+              <React.Fragment key={article.id || idx}>
+                <Link
+                  href={`/news/${article.slug}`}
+                  prefetch={true}
+                  className="group flex flex-row gap-5 sm:gap-6 items-center py-5 sm:py-6 border-b border-[#222226] cursor-pointer"
+                >
+                  {/* 16:9 Thumbnail (Left side: Exact Epic Games Dimensions: w-36 sm:w-48 md:w-52 aspect-video) */}
+                  <div className="relative w-36 sm:w-48 md:w-52 aspect-video shrink-0 rounded-lg overflow-hidden bg-[#181818]">
+                    <Image
+                      src={article.cover_image}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 640px) 144px, 208px"
+                      className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
                   </div>
 
-                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug mb-2 line-clamp-2">
-                    {article.title}
-                  </h3>
+                  {/* Content Details: Meta Date + Bold Title + Read more (Exact Epic Games Layout) */}
+                  <div className="flex flex-col justify-center min-w-0 flex-1">
+                    {/* Category / Date Stamp matching Epic: e.g. "FREE VSTS | 4D AGO" */}
+                    <div className="text-[11px] sm:text-xs font-semibold uppercase text-zinc-400 tracking-wider mb-1.5">
+                      {article.category ? `${article.category.toUpperCase()} | ` : ''}{formatRelativeDate(article.published_at)}
+                    </div>
 
-                  <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed mb-4">
-                    {article.excerpt}
-                  </p>
+                    {/* Title (Bold white, hover light) */}
+                    <h3 className="text-sm sm:text-base lg:text-[16px] font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug line-clamp-2 mb-2">
+                      {article.title}
+                    </h3>
 
-                  <div className="mt-auto">
-                    <span className="text-xs sm:text-sm font-semibold text-white group-hover:underline">
-                      Read more
-                    </span>
+                    {/* Read more Link */}
+                    <div>
+                      <span className="text-xs font-semibold text-zinc-300 group-hover:underline">
+                        Read more
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+
+                {/* Optional in-feed Google Ad after 4th item if configured */}
+                {idx === 3 && (
+                  <div className="border-b border-[#222226]">
+                    <NewsGoogleAd slot="news_feed_inline" />
+                  </div>
+                )}
+              </React.Fragment>
             ))}
           </div>
         )}
 
         {/* Load More Button */}
         {hasMore && (
-          <div className="text-center pt-4 pb-12">
+          <div className="text-center pt-4 pb-14">
             <button
               onClick={() => setVisibleCount((prev) => prev + 8)}
               className="px-8 py-3 bg-[#202020] hover:bg-[#282828] text-white font-bold text-xs sm:text-sm rounded-xl border border-[#333333] hover:border-zinc-400 active:scale-95 transition-all shadow-md cursor-pointer"

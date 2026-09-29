@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { NewsArticle } from '@/lib/turso/newsDb'
 import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
+import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 
 interface NewsArticleClientProps {
   article: NewsArticle
@@ -46,8 +47,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         {/* 1:1 Epic Games Split Hero: Ek Taraf Text Card, Ek Taraf Picture */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-10 sm:mb-14 items-stretch">
           
-          {/* Left Hero Card (5 cols) */}
-          <div className="lg:col-span-5 bg-[#18181c] border border-[#26262a] rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-xl min-h-[340px] lg:min-h-[420px]">
+          {/* Left Hero Card (5 cols) - Borderless per user request */}
+          <div className="lg:col-span-5 bg-[#18181c] border-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-xl min-h-[340px] lg:min-h-[420px]">
             <div>
               {/* Top Tag Badge */}
               <div className="mb-4">
@@ -76,8 +77,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             </div>
           </div>
 
-          {/* Right Hero Picture (7 cols) */}
-          <div className="lg:col-span-7 relative aspect-video lg:aspect-auto rounded-2xl overflow-hidden bg-[#18181c] border border-[#26262a] shadow-xl min-h-[340px] lg:min-h-[420px]">
+          {/* Right Hero Picture (7 cols) - Borderless per user request */}
+          <div className="lg:col-span-7 relative aspect-video lg:aspect-auto rounded-2xl overflow-hidden bg-[#18181c] border-0 shadow-xl min-h-[340px] lg:min-h-[420px]">
             <Image
               src={article.cover_image}
               alt={article.title}
@@ -153,6 +154,11 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}
+            </div>
+
+            {/* In-Article Google Ad Slot (Only on News Articles) */}
+            <div className="mt-8">
+              <NewsGoogleAd slot="news_article_inline" />
             </div>
           </div>
 
@@ -235,6 +241,9 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 </div>
               </div>
             )}
+
+            {/* Sidebar Google Ad Slot (Only on News Articles) */}
+            <NewsGoogleAd slot="news_article_sidebar" />
           </aside>
         </div>
 

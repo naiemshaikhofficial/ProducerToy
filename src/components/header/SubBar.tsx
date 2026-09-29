@@ -144,7 +144,7 @@ export const SubBar: React.FC<SubBarProps> = ({
   const currentSectionLabel = (() => {
     if (pathname === '/manufacturers') return 'Brands'
     if (pathname.includes('on_sale')) return 'Deals'
-    if (pathname.includes('free')) return 'Free'
+    if (pathname?.startsWith('/news')) return 'News'
     if (pathname?.startsWith('/blog')) return 'Blog'
     return 'Discover'
   })()
@@ -435,9 +435,12 @@ export const SubBar: React.FC<SubBarProps> = ({
               </button>
             </div>
 
-            {/* Mapped Sub Links: Deals, Brands, Blog */}
+            {/* Mapped Sub Links: Deals, News, Brands, Blog */}
             {NAV_LINKS.map((link) => {
-              const isActive = pathname === link.href
+              const isActive =
+                pathname === link.href ||
+                (link.href === '/news' && pathname?.startsWith('/news')) ||
+                (link.href === '/blog' && pathname?.startsWith('/blog'))
               return (
                 <Link
                   key={link.label}
