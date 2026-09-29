@@ -198,7 +198,7 @@ export default function ToywardsFeaturePage() {
               Have more questions about your Toywards rewards or balance?
             </p>
             <Link
-              href="/contact"
+              href="/support"
               prefetch={true}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-white hover:text-zinc-300 bg-[#202020] hover:bg-[#282828] border border-[#2e2e2e] px-4 py-2 rounded-lg transition-colors"
             >

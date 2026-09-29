@@ -38,7 +38,7 @@ export function CheckoutTrustBadges() {
           <span className="text-zinc-400">Cards</span>
         </div>
 
-        <Link href="/contact" className="text-zinc-400 hover:text-white transition-colors">
+        <Link href="/support" className="text-zinc-400 hover:text-white transition-colors">
           Support Desk
         </Link>
       </div>

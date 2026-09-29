@@ -149,7 +149,7 @@ export default function RefundPolicyPage() {
               To request technical assistance, replacement keys, or submit a refund dispute:
             </p>
             <div className="bg-[#161616] border border-[#242424] rounded-xl p-4 space-y-1.5 text-xs text-zinc-400 mt-2">
-              <p><strong className="text-zinc-200">Step 1:</strong> Visit our <Link href="/contact" className="text-[#FA742B] hover:underline font-semibold">Contact &amp; Support Desk</Link> or email <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a>.</p>
+              <p><strong className="text-zinc-200">Step 1:</strong> Visit our <Link href="/support" className="text-[#FA742B] hover:underline font-semibold">Contact &amp; Support Desk</Link> or email <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a>.</p>
               <p><strong className="text-zinc-200">Step 2:</strong> Include your Order Number (e.g., <code>PT-M...</code>), registered email address, and specific issue details.</p>
               <p><strong className="text-zinc-200">Step 3:</strong> Our technical team will respond within 2–6 hours and guarantee resolution within <strong>D+4 business days</strong>.</p>
               <p><strong className="text-zinc-200">Grievance Escalation:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">grievance@producertoy.com</a></p>

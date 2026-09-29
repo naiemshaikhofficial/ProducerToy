@@ -30,6 +30,31 @@ const nextConfig: NextConfig = {
         destination: '/product/:slug',
         permanent: true,
       },
+      {
+        source: '/help',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/help/:path*',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/help-center',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/faq',
+        destination: '/support',
+        permanent: true,
+      },
+      {
+        source: '/faqs',
+        destination: '/support',
+        permanent: true,
+      },
     ];
   },
   async rewrites() {

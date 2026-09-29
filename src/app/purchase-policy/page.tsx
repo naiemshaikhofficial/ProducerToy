@@ -143,7 +143,7 @@ export default function PurchasePolicyPage() {
               For any questions regarding billing statements, invoice copies, or payment status:
             </p>
             <div className="bg-[#161616] border border-[#242424] rounded-xl p-4 space-y-1.5 text-xs text-zinc-400 mt-2">
-              <p><strong className="text-zinc-200">Support Desk:</strong> <Link href="/contact" className="text-[#FA742B] hover:underline font-semibold">Contact Customer Care</Link></p>
+              <p><strong className="text-zinc-200">Support Desk:</strong> <Link href="/support" className="text-[#FA742B] hover:underline font-semibold">Contact Customer Care &amp; Support</Link></p>
               <p><strong className="text-zinc-200">Email:</strong> <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a></p>
               <p><strong className="text-zinc-200">Operational Hours:</strong> 24/7 Digital Processing • Technical Support Mon–Sat (9:00 AM – 8:00 PM IST)</p>
             </div>
