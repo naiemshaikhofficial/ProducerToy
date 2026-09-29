@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
   ChevronDown,
+  ChevronUp,
   Menu,
   X,
   LogOut,
@@ -62,6 +64,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [isGlobeMenuOpen, setIsGlobeMenuOpen] = useState(false)
   const [isEcosystemOpen, setIsEcosystemOpen] = useState(false)
   const [isDistributeOpen, setIsDistributeOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const accountMenuRef = useRef<HTMLDivElement>(null)
   const globeMenuRef = useRef<HTMLDivElement>(null)
   const ecosystemMenuRef = useRef<HTMLDivElement>(null)
@@ -112,6 +115,28 @@ export const TopBar: React.FC<TopBarProps> = ({
       setIsDistributeOpen(false)
     }, 180)
   }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Lock body scroll on mobile when ecosystem menu is open
+  useEffect(() => {
+    if (isEcosystemOpen && typeof window !== 'undefined' && window.innerWidth < 768) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isEcosystemOpen])
+
+  // Close ecosystem menu when mobile right menu opens
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      setIsEcosystemOpen(false)
+    }
+  }, [isMobileMenuOpen])
 
   useEffect(() => {
     return () => {
@@ -181,10 +206,10 @@ export const TopBar: React.FC<TopBarProps> = ({
               <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
             </button>
 
-            {/* Ecosystem Mega Dropdown */}
+            {/* Desktop Ecosystem Mega Dropdown */}
             {isEcosystemOpen && (
               <div
-                className="absolute left-0 top-full mt-2.5 w-[570px] max-w-[calc(100vw-32px)] bg-[#141416]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.03)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid grid-cols-[220px_1fr] gap-6 text-left select-none pointer-events-auto"
+                className="hidden md:grid absolute left-0 top-full mt-2.5 w-[570px] max-w-[calc(100vw-32px)] bg-[#141416]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.03)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid-cols-[220px_1fr] gap-6 text-left select-none pointer-events-auto"
               >
                 {/* Column 1: Play & Discover */}
                 <div className="space-y-6">
@@ -332,6 +357,185 @@ export const TopBar: React.FC<TopBarProps> = ({
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Mobile 1:1 Epic Games Mobile Ecosystem Drawer */}
+            {isEcosystemOpen && mounted && typeof document !== 'undefined' && createPortal(
+              <div className="fixed inset-0 z-[99999] bg-[#121212] flex flex-col md:hidden select-none animate-in fade-in duration-150">
+                {/* Top Header Bar matching Epic Games Mobile Drawer */}
+                <div className="h-[60px] px-5 flex items-center justify-between border-b border-white/[0.04] flex-shrink-0">
+                  {/* Top Left: Logo with Up Arrow */}
+                  <button
+                    type="button"
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
+                    aria-label="Close Ecosystem Menu"
+                  >
+                    <LogoIcon size={34} />
+                    <ChevronUp className="w-3.5 h-3.5 text-zinc-300" />
+                  </button>
+
+                  {/* Top Right: Clean Close X Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsEcosystemOpen(false)}
+                    className="w-10 h-10 -mr-2 flex items-center justify-center text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                    aria-label="Close Ecosystem Menu"
+                  >
+                    <X className="w-6 h-6 stroke-[2]" />
+                  </button>
+                </div>
+
+                {/* Mobile Scrollable Menu Content */}
+                <div className="flex-1 overflow-y-auto px-6 pt-6 pb-16 space-y-7">
+                  {/* Big Brand Title like 'Epic Games' */}
+                  <h2 className="text-[26px] font-bold text-white tracking-tight">Producer Toy</h2>
+
+                  {/* Section 1: Play */}
+                  <div className="space-y-3">
+                    <h3 className="text-[13px] font-semibold text-zinc-400">Play</h3>
+                    <div className="space-y-1">
+                      <Link
+                        href="/store/sounds"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Music2 className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Sample Packs</span>
+                      </Link>
+
+                      <Link
+                        href="/store/vst-plugins"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Cpu className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>VST Plugins</span>
+                      </Link>
+
+                      <Link
+                        href="/store/presets"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Sparkles className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Synth Presets</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Discover */}
+                  <div className="space-y-3">
+                    <h3 className="text-[13px] font-semibold text-zinc-400">Discover</h3>
+                    <div className="space-y-1">
+                      <Link
+                        href="/store"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <ShoppingBag className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Producer Toy Store</span>
+                      </Link>
+
+                      <Link
+                        href="/store?price=free"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center justify-between py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <div className="flex items-center gap-3.5">
+                          <Gift className="w-5 h-5 text-[#FC6301] flex-shrink-0" />
+                          <span>Free Producer Toys</span>
+                        </div>
+                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FC6301]/20 text-[#FC6301]">
+                          Free
+                        </span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Create */}
+                  <div className="space-y-3">
+                    <h3 className="text-[13px] font-semibold text-zinc-400">Create</h3>
+                    <div className="space-y-1">
+                      <Link
+                        href="/distribute"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Upload className="w-5 h-5 text-[#FC6301] flex-shrink-0" />
+                        <span>Distribute on Producer Toy</span>
+                      </Link>
+
+                      <Link
+                        href="/account"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Users className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Creator Dashboard</span>
+                      </Link>
+
+                      <Link
+                        href="/distribute"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Radio className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Publish Your Music Packs</span>
+                      </Link>
+
+                      <Link
+                        href="/contact?topic=creator"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <MessageSquare className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Developer Forums</span>
+                      </Link>
+
+                      <Link
+                        href="/licensing"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <ShieldCheck className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Licensing & Terms</span>
+                      </Link>
+
+                      <Link
+                        href="/blog"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <BookOpen className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Creator Academy & Guides</span>
+                      </Link>
+
+                      <Link
+                        href="/support"
+                        prefetch={true}
+                        onClick={() => setIsEcosystemOpen(false)}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <HelpCircle className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Help & Support Assistant</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>,
+              document.body
             )}
           </div>
 

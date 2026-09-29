@@ -70,32 +70,90 @@ export function hasProfanityOrAbuse(query: string): boolean {
 }
 
 /**
- * Helper to identify off-topic questions (cartoons, general knowledge, movies, trivia)
- * so we can give a polite redirect WITHOUT any policy strike.
+ * Detect language of user query: english, hindi, hinglish
+ */
+export function detectLanguage(query: string): 'english' | 'hindi' | 'hinglish' | 'other' {
+  if (!query) return 'english'
+  // Devanagari script detection
+  if (/[\u0900-\u097F]/.test(query)) {
+    return 'hindi'
+  }
+  const q = query.toLowerCase()
+  const hinglishMarkers = /\b(kya|kyu|kaise|kitna|kitne|hai|hain|nahi|mila|hoga|batao|bataiye|kar|karo|raha|rahe|meri|mera|aap|tum|kaun|kab|apne|mujhe|hum|aur|ye|yeh|wo|woh|bhi|pe|par|ko|se|ne|mari|mara|kuch|sabko|baki|de)\b/i
+  if (hinglishMarkers.test(q)) {
+    return 'hinglish'
+  }
+  return 'english'
+}
+
+/**
+ * Helper to identify off-topic questions (sports, cricket, celebrities, personal/private questions,
+ * general knowledge, trivia) so we can give a polite redirect WITHOUT any policy strike.
  */
 export function isOffTopicQuery(query: string): boolean {
   if (!query) return false
   const q = query.toLowerCase().trim()
 
   const offTopicKeywords = [
+    // Sports & Cricket
+    'virat',
+    'kohli',
+    'kolhi',
+    'rohit',
+    'sharma',
+    'dhoni',
+    'century',
+    'centuries',
+    'wicket',
+    'wickets',
+    'cricket',
+    'ipl',
+    'football',
+    'messi',
+    'ronaldo',
+    'fifa',
+    'match',
+    'score',
+    // Entertainment & Cartoons
     'chota bheem',
     'chhota bheem',
     'motu patlu',
     'shinchan',
     'doraemon',
     'cartoon',
+    'movie',
+    'cinema',
+    'film',
+    'actor',
+    'actress',
+    'celebrity',
+    'bollywood',
+    'hollywood',
+    // Politics & General Knowledge
     'prime minister',
     'president',
+    'modi',
+    'politics',
+    'election',
     'weather',
-    'cricket',
-    'ipl',
-    'football',
-    'who won',
-    'movie',
-    'recipe',
-    'cooking',
+    'weather today',
     'capital of',
     'history of',
+    'geography',
+    'recipe',
+    'cooking',
+    'who won',
+    // Personal & Private inquiries
+    'girlfriend',
+    'boyfriend',
+    'marriage',
+    'shadi',
+    'salary',
+    'income',
+    'personal',
+    'private',
+    'where do you live',
+    'kaha rehte ho',
     'tell me a joke',
   ]
 

@@ -13,6 +13,7 @@ import {
   ensureSupabaseAdminEnv,
   hasProfanityOrAbuse,
   isOffTopicQuery,
+  detectLanguage,
   scrubBrandNames,
 } from '@/lib/support/supportHelpers'
 import {
@@ -838,7 +839,7 @@ ${adminActionResultNotes}`
 
     let isPolicyViolation = rawAnswer.includes('[POLICY_VIOLATION]') || rawAnswer.includes('[TERMINATE_CHAT]')
 
-    // HARD POLICY ENFORCEMENT: Never strike on off-topic questions (e.g. "what is chota bheem").
+    // HARD POLICY ENFORCEMENT: Never strike on off-topic questions (e.g. "what is chota bheem", Virat Kohli, cricket, movies).
     // Strikes are strictly for actual abusive words / gaaliyan!
     if (isOffTopicQuery(query)) {
       isPolicyViolation = false
@@ -854,6 +855,19 @@ ${adminActionResultNotes}`
         .replace(/\[TERMINATE_CHAT\]/g, '')
         .trim()
     )
+
+    // If query is off-topic / personal / cricket / non-music and model output had strike or gave wrong topic,
+    // ensure polite generic redirect in user's exact language:
+    if (isOffTopicQuery(query)) {
+      const lang = detectLanguage(query)
+      if (lang === 'english') {
+        cleanedAnswer = `I am exclusively dedicated to helping with music production, sound design, VST plugins, sample packs, and Producer Toy store orders.\n\nHow can I assist you with your music projects, plugins, or sound libraries today?`
+      } else if (lang === 'hindi') {
+        cleanedAnswer = `मैं केवल Producer Toy, संगीत निर्माण, VST प्लगइन्स, सैंपल पैक और स्टोर ऑर्डर्स से संबंधित प्रश्नों में सहायता कर सकता हूँ।\n\nआज आपके संगीत प्रोजेक्ट या साउंड्स में मैं कैसे मदद कर सकता हूँ?`
+      } else {
+        cleanedAnswer = `Mai sirf Producer Toy, music production, sound design, VST plugins, sample packs, aur store orders se related queries me help kar sakta hoon.\n\nAapko music production, audio plugins ya sounds me kis tarah ki help chahiye?`
+      }
+    }
 
     // ZERO-TRUST ANTI-HALLUCINATION GUARD:
     // If backend did NOT verify a download, LLM must NEVER output download mirrors or false verifications!
@@ -875,14 +889,21 @@ ${adminActionResultNotes}`
       }
     }
 
-    // Smart answer fallback for "how you can check razorpay" without payment ID
+    // Smart answer fallback for "how you can check razorpay" without payment ID (STRICT LANGUAGE MATCHING)
     const isAskingHowToCheckGateway =
       (queryLower.includes('how') && queryLower.includes('check') && (queryLower.includes('razorpay') || queryLower.includes('cashfree') || queryLower.includes('paypal') || queryLower.includes('gateway'))) ||
       queryLower.includes('how you can check') ||
       queryLower.includes('kaise check karte ho')
 
     if (isAskingHowToCheckGateway && !scannedPaymentId && !scannedOrderNumber) {
-      cleanedAnswer = `Mera system hi is tarah securely integrate aur automate kiya gaya hai ki mai real-time payment status aur order verification safely perform karke aapka delivery issue instantly solve kar deta hoon.\n\nIf you have attempted a purchase and are unsure if it went through, please share your Payment ID (e.g., Razorpay \`pay_...\`, PayPal \`PAYID-...\`, or Cashfree \`order_...\`) so I can verify it for you immediately.`
+      const lang = detectLanguage(query)
+      if (lang === 'english') {
+        cleanedAnswer = `Our system is securely automated and integrated to safely verify real-time payment status and order records, resolving any delivery or download issue immediately.\n\nIf you have attempted a purchase and are unsure if it went through, please share your Payment ID (e.g., Razorpay \`pay_...\`, PayPal \`PAYID-...\`, or Cashfree \`order_...\`) so I can verify it for you immediately.`
+      } else if (lang === 'hindi') {
+        cleanedAnswer = `हमारा सिस्टम पूरी तरह से सुरक्षित और स्वचालित है, जिससे हम रीयल-टाइम में भुगतान स्थिति और ऑर्डर रिकॉर्ड को सुरक्षित रूप से सत्यापित कर आपकी डिलीवरी समस्या का तुरंत समाधान कर देते हैं।\n\nयदि आपने भुगतान किया है और पुष्टि नहीं हुई है, तो कृपया अपना Payment ID (जैसे Razorpay \`pay_...\`, PayPal \`PAYID-...\`, या Cashfree \`order_...\`) साझा करें ताकि मैं तुरंत सत्यापन कर सकूं।`
+      } else {
+        cleanedAnswer = `Mera system hi is tarah securely integrate aur automate kiya gaya hai ki mai real-time payment status aur order verification safely perform karke aapka delivery issue instantly solve kar deta hoon.\n\nIf you have attempted a purchase and are unsure if it went through, please share your Payment ID (e.g., Razorpay \`pay_...\`, PayPal \`PAYID-...\`, or Cashfree \`order_...\`) so I can verify it for you immediately.`
+      }
     }
 
     const isTroubleshootingProblemQuery =
