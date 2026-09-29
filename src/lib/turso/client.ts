@@ -10,8 +10,14 @@ let cachedClient: Client | null = null
 export function getTursoClient(): Client {
   if (cachedClient) return cachedClient
 
-  const url = process.env.TURSO_DATABASE_URL?.trim() || 'file:data_news.db'
-  const authToken = process.env.TURSO_AUTH_TOKEN?.trim() || undefined
+  let url = process.env.TURSO_DATABASE_URL?.trim() || 'file:data_news.db'
+  let authToken = process.env.TURSO_AUTH_TOKEN?.trim() || undefined
+
+  // If the user hasn't replaced the placeholder or URL is invalid, fall back to local SQLite
+  if (url.includes('YOUR_ACCOUNT') || !url.includes('.turso.io') && !url.startsWith('file:')) {
+    url = 'file:data_news.db'
+    authToken = undefined
+  }
 
   cachedClient = createClient({
     url,

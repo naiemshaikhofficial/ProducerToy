@@ -20,7 +20,15 @@ interface GroqRewriteResponse {
 export function sanitizeScrapedText(text: string): string {
   if (!text) return ''
   return text
-    // Remove "Originally reported via...", "Source Coverage...", etc.
+    // Remove ellipses and snippet cutoffs
+    .replace(/\[\.\.\.?\]/gi, '')
+    .replace(/\[\.\.\./gi, '')
+    .replace(/\.\.\./gi, '')
+    // Remove generic boilerplate sections like "How to Get It" or placeholder links
+    .replace(/###?\s*How to Get It[\s\S]*?(?=##|$)/gi, '')
+    .replace(/###?\s*Key Highlights & Features[\s\S]*?(?=##|$)/gi, '')
+    .replace(/\[here\]\([^)]*\)/gi, 'the official developer site')
+    .replace(/\[here\]/gi, '')
     .replace(/[-*•]?\s*\*\*Source Coverage:\*\*.*$/gim, '')
     .replace(/Originally reported via.*$/gim, '')
     .replace(/View post:\s*\[?[^\]\n]+\]?(\([^)]+\))?/gi, '')
