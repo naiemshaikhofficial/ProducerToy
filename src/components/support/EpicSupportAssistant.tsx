@@ -251,6 +251,24 @@ function getAnswerSources(msg: ChatMessage): AnswerSourceItem[] {
         label: 'Refund Policy',
         href: '/refund-policy',
       })
+    } else if (textCombined.includes('distribute') || textCombined.includes('sell') || textCombined.includes('publish') || textCombined.includes('creator')) {
+      sources.push({
+        title: 'Producer Toy Creator & Developer Program (88% Split)',
+        label: 'Distribute on Producer Toy',
+        href: '/distribute',
+      })
+    } else if (textCombined.includes('brand') || textCombined.includes('manufacturer') || textCombined.includes('fabfilter') || textCombined.includes('arturia')) {
+      sources.push({
+        title: 'Producer Toy Audio Manufacturers & Brands (200+)',
+        label: 'View Brands',
+        href: '/manufacturers',
+      })
+    } else if (textCombined.includes('sampleswala') || textCombined.includes('samples wala')) {
+      sources.push({
+        title: 'SamplesWala • Indian Sound Libraries & Vocal Kits (Sister Platform)',
+        label: 'Visit SamplesWala',
+        href: 'https://sampleswala.com',
+      })
     } else if (textCombined.includes('fl studio') || textCombined.includes('ableton') || textCombined.includes('logic') || textCombined.includes('daw') || textCombined.includes('install')) {
       sources.push({
         title: 'Producer Toy Technical Audio & DAW Integration Guide',
@@ -982,6 +1000,7 @@ export function EpicSupportAssistant({
                     comingSoonProduct: groqRes.comingSoonProduct,
                     canEscalateToTicket: groqRes.canEscalateToTicket,
                     needsTicket: !!groqRes.canEscalateToTicket,
+                    hasTroubleshootingSolution: Boolean(groqRes.hasTroubleshootingSolution),
                     userQuery: query,
                     isThinking: false,
                     isSourcesOpen: false,
@@ -1249,6 +1268,7 @@ export function EpicSupportAssistant({
                   comingSoonProduct: groqRes.comingSoonProduct,
                   canEscalateToTicket: groqRes.canEscalateToTicket,
                   needsTicket: !!groqRes.canEscalateToTicket,
+                  hasTroubleshootingSolution: Boolean(groqRes.hasTroubleshootingSolution),
                   userQuery: text,
                   isThinking: false,
                   isSourcesOpen: false,
@@ -2394,7 +2414,7 @@ export function EpicSupportAssistant({
                 )}
 
                 {/* Standalone Separate Dialog Box for Feedback (Exact Epic Games Dialog Shape, Solid #18181c) */}
-                {isLatestAssistant && !msg.ticketNumber && !msg.isGreeting && !msg.isThinking && !msg.isWarning && !isChatEnded && policyStrikes < 4 && (
+                {isLatestAssistant && !msg.ticketNumber && !msg.isGreeting && !msg.isThinking && !msg.isWarning && !isChatEnded && policyStrikes < 4 && (Boolean(msg.hasTroubleshootingSolution) || Boolean(msg.canEscalateToTicket)) && (
                   <div className="flex flex-col items-start space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-300 w-full max-w-4xl pt-2">
                     {/* Robot Avatar Header */}
                     <div className="flex items-center gap-2.5 text-xs sm:text-[13px] text-zinc-400 px-1">

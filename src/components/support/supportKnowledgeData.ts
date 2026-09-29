@@ -74,6 +74,59 @@ export const KNOWLEDGE_BASE: KnowledgeArticle[] = [
     ],
     tags: ['credit', 'tag', 'attribution', 'copyright', 'publishing rights', 'master rights', 'ownership'],
   },
+  {
+    id: 'dist-1',
+    category: 'free_and_licensing',
+    categoryLabel: 'Distribution & Creators',
+    question: 'How do I distribute and sell my sample packs, plugins, or sound kits on Producer Toy?',
+    shortAnswer: 'You can distribute your sounds and VST plugins through the Producer Toy Creator & Developer Program, keeping 88% of all revenue with zero upfront fees.',
+    detailedSteps: [
+      'Join our global developer network: keep 88% revenue share on every sale with instant payouts.',
+      'We distribute across 100+ countries with local currency pricing, multi-region CDN delivery, and automated license protection.',
+      'We accept Sample Packs, Sound Kits, VST Plugins & FX, Synth Presets (Serum, Vital, Massive), and MIDI & Melody Kits.',
+      'Visit our distribution portal at /distribute or apply directly via /contact?topic=distribute.',
+    ],
+    tags: ['distribute', 'distribution', 'sell sounds', 'sell sample pack', 'sell plugin', 'developer program', 'revenue split', '88%', 'publish plugin', 'creator program'],
+    actionCta: {
+      label: 'Distribute on Producer Toy',
+      href: '/distribute',
+    },
+  },
+  {
+    id: 'sister-1',
+    category: 'free_and_licensing',
+    categoryLabel: 'About Us',
+    question: 'What is the relationship between Producer Toy and SamplesWala?',
+    shortAnswer: 'Producer Toy and SamplesWala are sister companies founded by the same team, serving the global and Indian music production communities.',
+    detailedSteps: [
+      'SamplesWala (sampleswala.com) is India\'s dedicated sound library platform focusing on Indian instruments (Tabla, Dholak, Harmonium, Flute), Bollywood loops, and vocal toolkits priced in INR (₹).',
+      'Producer Toy (producertoy.com) is the premier international marketplace for global producers, VST plugins, mixing tools, synth presets, and software toolkits in USD ($) and international currencies.',
+      'Both platforms share the same core values: 24-bit studio audio quality, 100% royalty-free commercial licensing, and instant digital fulfillment.',
+    ],
+    tags: ['sampleswala', 'sister company', 'who is sampleswala', 'sampleswala relationship', 'indian packs', 'samples wala', 'producertoy and sampleswala'],
+    actionCta: {
+      label: 'Visit SamplesWala',
+      href: 'https://sampleswala.com',
+      isExternal: true,
+    },
+  },
+  {
+    id: 'brands-1',
+    category: 'free_and_licensing',
+    categoryLabel: 'Brands & Manufacturers',
+    question: 'What audio plugin brands and manufacturers are available on Producer Toy?',
+    shortAnswer: 'Producer Toy hosts over 200+ industry-leading audio plugin manufacturers and sound design brands.',
+    detailedSteps: [
+      'Our catalog features top global developers including FabFilter, Arturia, IK Multimedia, Native Instruments, Brainworx, D16 Group, Devious Machines, Reveal Sound, Image Line, Slate Digital, Rob Papen, and many more.',
+      'Every brand is officially licensed with genuine developer authorizations, warranty, and instant cloud delivery.',
+      'You can explore all brands, developer profiles, and dedicated brand pages at /manufacturers.',
+    ],
+    tags: ['brands', 'manufacturers', 'how many brands', 'fabfilter', 'arturia', 'native instruments', 'audio brands', 'plugin makers', 'vst brands'],
+    actionCta: {
+      label: 'Browse All Brands',
+      href: '/manufacturers',
+    },
+  },
 
   // 2. SERIAL KEYS & LICENSING
   {

@@ -44,6 +44,136 @@ function ensureSupabaseAdminEnv() {
   }
 }
 
+function getRazorpayCredentials(): { keyId: string | null; keySecret: string | null } {
+  let keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || null
+  let keySecret = process.env.RAZORPAY_KEY_SECRET || null
+
+  if (!keyId || !keySecret) {
+    try {
+      const envPath = path.resolve(process.cwd(), '.env.local')
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, 'utf8')
+        const mKey = content.match(/(?:RAZORPAY_KEY_ID|NEXT_PUBLIC_RAZORPAY_KEY_ID)\s*=\s*(.+)/)
+        if (mKey && mKey[1]) keyId = mKey[1].trim().replace(/^['"]|['"]$/g, '')
+        const mSec = content.match(/RAZORPAY_KEY_SECRET\s*=\s*(.+)/)
+        if (mSec && mSec[1]) keySecret = mSec[1].trim().replace(/^['"]|['"]$/g, '')
+      }
+    } catch (err) {
+      console.warn('[getRazorpayCredentials] Error reading .env.local:', err)
+    }
+  }
+
+  return { keyId, keySecret }
+}
+
+interface RazorpayVerificationResult {
+  verified: boolean
+  paymentId?: string
+  status?: string
+  amount?: number
+  currency?: string
+  email?: string
+  contact?: string
+  method?: string
+  notes?: Record<string, any>
+  createdAt?: string
+  errorReason?: string
+}
+
+async function verifyRazorpayDirect(
+  paymentId: string | null,
+  email: string | null
+): Promise<RazorpayVerificationResult | null> {
+  const { keyId, keySecret } = getRazorpayCredentials()
+  if (!keyId || !keySecret) return null
+
+  const basicAuth = Buffer.from(`${keyId}:${keySecret}`).toString('base64')
+  const rzpHeaders = {
+    Authorization: `Basic ${basicAuth}`,
+    'Content-Type': 'application/json',
+  }
+
+  // 1. Direct Lookup by Payment ID (pay_...)
+  if (paymentId) {
+    try {
+      const res = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}`, {
+        headers: rzpHeaders,
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const p = await res.json()
+        return {
+          verified: p.status === 'captured',
+          paymentId: p.id,
+          status: p.status,
+          amount: p.amount ? p.amount / 100 : 0,
+          currency: p.currency || 'INR',
+          email: p.email || undefined,
+          contact: p.contact || undefined,
+          method: p.method || undefined,
+          notes: p.notes || {},
+          createdAt: p.created_at ? new Date(p.created_at * 1000).toISOString() : undefined,
+          errorReason: p.error_description || p.error_reason || undefined,
+        }
+      }
+    } catch (err) {
+      console.warn('[verifyRazorpayDirect] Direct lookup error:', err)
+    }
+  }
+
+  // 2. Lookup recent payments by Email if customer reports missing purchase
+  if (email) {
+    try {
+      const res = await fetch(`https://api.razorpay.com/v1/payments?count=15`, {
+        headers: rzpHeaders,
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const items = data.items || []
+        const cleanEmail = email.toLowerCase().trim()
+        const matched = items.find(
+          (p: any) =>
+            p.email && p.email.toLowerCase().trim() === cleanEmail && p.status === 'captured'
+        )
+        if (matched) {
+          return {
+            verified: true,
+            paymentId: matched.id,
+            status: matched.status,
+            amount: matched.amount ? matched.amount / 100 : 0,
+            currency: matched.currency || 'INR',
+            email: matched.email || undefined,
+            contact: matched.contact || undefined,
+            method: matched.method || undefined,
+            notes: matched.notes || {},
+            createdAt: matched.created_at ? new Date(matched.created_at * 1000).toISOString() : undefined,
+          }
+        }
+        const failedMatch = items.find(
+          (p: any) =>
+            p.email && p.email.toLowerCase().trim() === cleanEmail && p.status === 'failed'
+        )
+        if (failedMatch) {
+          return {
+            verified: false,
+            paymentId: failedMatch.id,
+            status: failedMatch.status,
+            amount: failedMatch.amount ? failedMatch.amount / 100 : 0,
+            currency: failedMatch.currency || 'INR',
+            email: failedMatch.email || undefined,
+            errorReason: failedMatch.error_description || failedMatch.error_reason || 'Bank or payment network declined',
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[verifyRazorpayDirect] Email search error:', err)
+    }
+  }
+
+  return null
+}
+
 export interface RecommendedProduct {
   id: string
   name: string
@@ -119,6 +249,7 @@ export interface GroqResponse {
   canEscalateToTicket?: boolean
   isPolicyViolation?: boolean
   shouldTerminateChat?: boolean
+  hasTroubleshootingSolution?: boolean
 }
 
 export interface ClientUserInfo {
@@ -308,14 +439,15 @@ export async function askGroqSupportAction(
     'master', 'like', 'product', 'products', 'item', 'items', 'what', 'dont', 'doesnt'
   ])
 
-  // Find candidate product user is asking about completely dynamically from live database
+  // Find candidate product user is asking about across query AND recent conversation history
+  const productSearchText = `${query} ${history.slice(-3).map((h) => h.content).join(' ')}`.toLowerCase()
   let candidateProduct: any = null
   for (const p of allProducts) {
     const nameLower = (p.name || '').toLowerCase()
     const slugLower = (p.slug || '').toLowerCase()
 
     // 1. Direct match on name or slug
-    if (queryLower.includes(nameLower) || queryLower.includes(slugLower)) {
+    if (productSearchText.includes(nameLower) || productSearchText.includes(slugLower)) {
       candidateProduct = p
       break
     }
@@ -324,7 +456,7 @@ export async function askGroqSupportAction(
     const nameWords = nameLower
       .split(/\s+/)
       .filter((w: string) => w.length >= 4 && !GENERIC_PRODUCT_WORDS.has(w))
-    if (nameWords.length > 0 && nameWords.some((w: string) => queryLower.includes(w))) {
+    if (nameWords.length > 0 && nameWords.some((w: string) => productSearchText.includes(w))) {
       candidateProduct = p
       break
     }
@@ -342,12 +474,15 @@ export async function askGroqSupportAction(
       short_description: candidateProduct.short_description || null,
     }
 
+    const approxInr = Math.round((candidateProduct.price_usd || 19.99) * 86)
+
     adminActionResultNotes += `\n[ADMIN CATALOG NOTICE: PRODUCT IS COMING SOON]:
 "${candidateProduct.name}" is marked as COMING SOON in our database. It has NOT been released yet and CANNOT be purchased right now.
 EXACT INSTRUCTION:
 - State clearly and respectfully that "${candidateProduct.name}" has not officially released yet; it is in final audio mastering and will drop very soon!
-- That is why the purchase/buy button is disabled or unavailable.
-- Do NOT say "you are in guest mode", and do NOT tell them to try purchasing again or check payment gateways.
+- If the user asked about price in INR (e.g. "indian rupees mai kitna hoga"), state the launch price: $${candidateProduct.price_usd} USD (approx ₹${approxInr} INR at ~₹85-87/USD, processed via Razorpay/UPI/Cards).
+- That is why checkout / purchase button is not active yet.
+- NEVER tell the user to add it to cart, proceed to checkout, or retry payment for a Coming Soon pack.
 - Reassure them that a "Drop Alert / Notify Me" card has been generated right below this response so they can subscribe to get notified the second it drops!`
   }
 
@@ -367,11 +502,11 @@ EXACT INSTRUCTION:
     }
 
     if (candidateProduct && !candidateProduct.is_coming_soon) {
-      const ownedPurchase = userPurchases.find(
+      let ownedPurchase = userPurchases.find(
         (pur) => pur.product_id === candidateProduct.id || pur.products?.slug === candidateProduct.slug
       )
 
-      const orderHasProduct =
+      let orderHasProduct =
         primaryOrder &&
         (primaryOrder.payment_status === 'completed' || primaryOrder.payment_status === 'paid') &&
         (Array.isArray(primaryOrder.items) &&
@@ -379,8 +514,40 @@ EXACT INSTRUCTION:
 
       const isFreeProduct = Number(candidateProduct.price_usd || 0) <= 0
 
+      // If not found in DB, check live Razorpay payment gateway directly
+      if (!ownedPurchase && !orderHasProduct && !isFreeProduct) {
+        const rzpResult = await verifyRazorpayDirect(scannedPaymentId, targetEmail)
+        if (rzpResult && rzpResult.verified) {
+          try {
+            await adminSupabase.from('purchases').insert({
+              user_id: userId || 'verified-customer',
+              product_id: candidateProduct.id,
+              customer_email: targetEmail || rzpResult.email,
+              amount_paid: rzpResult.amount || candidateProduct.price_usd || 0,
+              currency: rzpResult.currency || 'INR',
+              order_id: `PT-RZP-${(rzpResult.paymentId || 'DIRECT').slice(-8).toUpperCase()}`,
+              razorpay_payment_id: rzpResult.paymentId || null,
+              purchased_at: rzpResult.createdAt || new Date().toISOString(),
+            })
+            ownedPurchase = {
+              product_id: candidateProduct.id,
+              products: candidateProduct,
+              amount_paid: rzpResult.amount,
+              currency: rzpResult.currency,
+              razorpay_payment_id: rzpResult.paymentId,
+            }
+            orderHasProduct = true
+            adminActionResultNotes += `\n[LIVE RAZORPAY VERIFICATION SUCCESS]: Real payment confirmed directly on Razorpay gateway (Payment ID: ${rzpResult.paymentId}, Status: CAPTURED, Amount: ${rzpResult.currency} ${rzpResult.amount}). License has been activated in the database and secure download is generated below.`
+          } catch (autoProvErr) {
+            console.warn('[askGroqSupportAction] Live Razorpay auto-provision warning:', autoProvErr)
+          }
+        } else if (rzpResult && rzpResult.status === 'failed') {
+          adminActionResultNotes += `\n[LIVE RAZORPAY RECORD - PAYMENT FAILED]: Real payment record found on Razorpay (Payment ID: ${rzpResult.paymentId}), but status is FAILED. Error reason: "${rzpResult.errorReason}". Explain honestly to the user that the bank transaction failed and no funds were credited to Producer Toy. If their bank debited money, it will auto-reverse within 3–5 business days.`
+        }
+      }
+
       if (ownedPurchase || orderHasProduct || isFreeProduct) {
-        if (orderHasProduct && !ownedPurchase && (userId || primaryOrder.user_id)) {
+        if (orderHasProduct && !ownedPurchase && (userId || primaryOrder?.user_id)) {
           try {
             await adminSupabase.from('purchases').insert({
               user_id: userId || primaryOrder.user_id,
@@ -427,13 +594,16 @@ EXACT INSTRUCTION:
           isProvisioned: true,
         }
 
-        adminActionResultNotes += `\n[ADMIN VERIFICATION SUCCESS]: User purchase/payment confirmed for "${candidateProduct.name}". Fresh secure CDN download link generated: ${verifiedDownload.downloadUrl}. Inform the user that payment has been verified in the database, license is active, and they can click the direct Download button provided below.`
+        if (!adminActionResultNotes.includes('[LIVE RAZORPAY VERIFICATION SUCCESS]')) {
+          adminActionResultNotes += `\n[ADMIN VERIFICATION SUCCESS]: User purchase/payment confirmed for "${candidateProduct.name}". Fresh secure CDN download link generated: ${verifiedDownload.downloadUrl}. Inform the user that payment has been verified in the database, license is active, and they can click the direct Download button provided below.`
+        }
       } else {
         if (primaryOrder && primaryOrder.payment_status !== 'completed') {
           adminActionResultNotes += `\n[ADMIN RECORD FOUND]: Order #${primaryOrder.order_number} has payment_status: "${primaryOrder.payment_status}". Payment was not completed. Explain politely that no money was settled, and if bank deducted funds, banks auto-reverse within 3-5 days.`
           canEscalateToTicket = true
         } else {
-          adminActionResultNotes += `\n[ADMIN RECORD NOTICE]: No verified purchase of "${candidateProduct.name}" found under email "${targetEmail || 'account'}". Ask user if they used a different checkout email or check [${candidateProduct.name}](/p/${candidateProduct.slug}).`
+          adminActionResultNotes += `\n[ADMIN RECORD NOTICE - NO PAYMENT FOUND]: Checked both database and live Razorpay payment gateway for account "${targetEmail || 'user'}". No completed or captured payment was found. Ask the user for their exact Razorpay Payment ID (starts with pay_..., found in their UPI app or bank statement) so we can look it up directly. STRICT RULE: DO NOT fake payment confirmation, and DO NOT tell the user we added it to their account without a verified payment!`
+          canEscalateToTicket = true
         }
       }
     }
@@ -484,19 +654,20 @@ EXACT INSTRUCTION:
   const userAccountSummary = `
 USER SESSION & DATABASE STATUS:
 - Logged-in User: ${isUserLoggedIn ? `YES (Logged in as ${userName} <${userEmail}>)` : 'Guest / Not Logged In'}
-- Verified Purchases Count: ${userPurchases.length}
-- Owned Products: ${userPurchases.map((p) => p.products?.name || p.product_id).join(', ') || 'None'}
-- Recent Orders: ${userOrders.map((o) => `[Order #${o.order_number} | Status: ${o.payment_status} | Amount: ${o.currency || '$'}${o.total_amount}]`).join(', ') || 'None'}
+- Account Purchases: ${userPurchases.length > 0 ? `${userPurchases.length} items (${userPurchases.map((p) => p.products?.name || p.product_id).join(', ')})` : '0 purchases recorded'}
+- Recent Orders: ${userOrders.length > 0 ? userOrders.map((o) => `[Order #${o.order_number} | Status: ${o.payment_status} | Amount: ${o.currency || '$'}${o.total_amount}]`).join(', ') : 'No recent orders recorded'}
 ${adminActionResultNotes}`
 
   // 6. Comprehensive System Prompt
-  const systemPrompt = `You are the official "Producer Toy Technical Support Specialist", an expert audio engineer and senior administrative specialist for Producer Toy (producertoy.com) — the premier marketplace for music producers and sound designers.
+  const systemPrompt = `You are the official "Producer Toy Technical Support Specialist", an expert audio engineer and senior administrative specialist for Producer Toy (producertoy.com) — the premier international marketplace for music producers and sound designers.
 
 CRITICAL IDENTITY & PRIVACY RULES:
 - You are exclusively the internal technical support specialist of Producer Toy with full administrative access to store records, orders, invoices, and cloud audio delivery systems.
 - NEVER mention "Groq", "Llama", "Qwen", "OpenAI", "ChatGPT", "Meta", or any third-party AI provider or LLM under any circumstances.
 - NEVER mention or output technical database IDs, internal UUIDs, or User IDs (e.g. any long hexadecimal string like 86e854f5...). Only refer to the user by their name (${userName}) or email (${userEmail}).
-- ACCURACY GUARANTEE: Never hallucinate or invent BPM, sample counts, formats, or product specs that are not explicitly provided in the verified store inventory below. If specific data is not listed, state that it is not specified and advise the user that they can submit a support ticket for official confirmation from our senior sound engineers.
+- DATA PROTECTION & CONFIDENTIALITY: Never disclose internal sales numbers, revenue stats, or backend analytics to users. If the user has 0 orders, state politely that no previous purchases were found under their account. NEVER output phrases like "many producers" or invent purchase statistics.
+- ZERO FAKE CLAIMS & PAYMENT VERIFICATION: NEVER tell the user "we verified your payment and added it to your account" unless payment is genuinely confirmed and verified in our database or live Razorpay gateway! If no verified payment exists, politely ask them for their Razorpay Payment ID (starts with pay_...) so we can search the gateway directly.
+- ACCURACY GUARANTEE: Never hallucinate BPM, sample counts, formats, or product availability not in the verified store inventory below.
 - If asked who is answering or how you operate, respond that you are the official Producer Toy Technical Support Desk powered by Producer Toy's internal audio engineering knowledge base.
 - Speak in a polite, highly knowledgeable, and human-like technical tone.
 
@@ -506,100 +677,98 @@ CRITICAL USER SESSION RULES:
 ${isUserLoggedIn ? `- The user IS ALREADY LOGGED IN as ${userName} (${userEmail}). NEVER tell them they are in guest mode, NEVER tell them to log in, and NEVER tell them to create an account.` : `- The user is currently browsing as a guest.`}
 
 LIVE PRODUCER TOY STORE INVENTORY (QUERY RESULT FROM DATABASE):
-${liveInventoryList || `- [Tabla Master's](/p/tabla-masters) ($19.99, sample_pack) [STATUS: AVAILABLE FOR INSTANT PURCHASE] [120 BPM] - Authentic Indian tabla sample pack featuring professionally recorded dry & processed hits, loops, and rolls.
+${liveInventoryList || `- [Tabla Master's](/p/tabla-masters) ($19.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING] - Authentic Indian tabla sample pack featuring professionally recorded dry & processed hits, loops, and rolls.
 - [Sexy Drill](/p/sexy-drill) ($9.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING] - Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.`}
 
-CRITICAL RULES FOR COMING SOON PRODUCTS (e.g. "Sexy Drill"):
-- When a user asks about "Sexy Drill" or why it cannot be purchased (e.g. "purchase kyu nahi ho raha", "buy kyu nahi kar pa raha"):
-  1. Clearly state that "Sexy Drill" is currently in our **Coming Soon** lineup and has NOT officially released yet.
-  2. Explain that our audio engineering team is currently finalizing the master 808 slides, drum one-shots, and mix stems. That is why purchase/checkout is temporarily disabled.
-  3. NEVER blame guest mode or tell the user to log in or retry payment for a Coming Soon pack.
-  4. Inform the user that an official Drop Alert notification card has been provided below where they can get notified the moment it launches!
-- GENUINE BPM / TEMPO INQUIRY RULE FOR "SEXY DRILL":
-  If the user asks about the BPM or tempo of "Sexy Drill" (e.g. "sexy drill ka bpm kya hai"):
-  GENUINE ANSWER: You must clearly state that because "Sexy Drill" is currently in our Coming Soon lineup and our audio engineers are in the middle of final audio mastering and sound design, its official tempo (BPM) has NOT yet been officially announced or released. Once the pack launches officially, the verified BPM and stem tempos will be published on the store page. NEVER invent or claim that its official tempo is 140 BPM!
-- GENUINE RULE FOR FREE PRODUCTS / FREE PLUGINS INQUIRIES:
-  If the user asks about free plugins, free tools, free sample packs, or free downloads (e.g. "free music production tools"):
-  GENUINE ANSWER: Be 100% honest, authentic, and transparent. Clearly state that Producer Toy currently does NOT have any 100% free products or free VST plugins in the database/store catalog. All current sound releases are premium commercial master archives (such as Tabla Master's and upcoming Sexy Drill).
-  NEVER hallucinate or link to free plugins or claim that free tools exist.
-  NEVER tell the user to clear browser cache, disable ad-blockers, or switch browsers.
-  Politely invite them to explore our master releases at [Producer Toy Store](/store) or subscribe to be notified of future promotional releases.
+CRITICAL PLATFORM KNOWLEDGE:
+1. SISTER COMPANIES (PRODUCER TOY & SAMPLESWALA):
+   - Producer Toy (producertoy.com) and SamplesWala (sampleswala.com) are SISTER COMPANIES founded by the same core team!
+   - SamplesWala is India's dedicated sound library platform specializing in Indian/Bollywood/Desi sample packs, acoustic instruments (Tabla, Dholak, Harmonium, Bansuri flute), vocal toolkits, and FL Studio templates in Indian Rupees (INR ₹).
+   - Producer Toy is the premier international marketplace for global beatmakers and music producers, specializing in international sound libraries, VST plugins, mixing toolkits, and software in USD ($) and multi-currency.
+   - If a user asks "what is SamplesWala", "SamplesWala kya hai", or asks about Indian instruments not on Producer Toy: proudly explain that SamplesWala is our sister platform, and direct them to [SamplesWala](https://sampleswala.com)!
+
+2. CREATOR & DEVELOPER DISTRIBUTION PROGRAM (/distribute):
+   - Creators, sound designers, and audio developers can distribute and sell their sound packs, plugins, presets, and MIDI kits on Producer Toy.
+   - 88% Revenue Split: Creators keep 88% of all revenue generated from their products (the highest split in the audio industry). Zero upfront or listing fees.
+   - Global Distribution: Products reach creators in 100+ countries with local currency pricing, multi-region CDN download infrastructure, and instant payouts.
+   - License Protection: Automated license key generation, encrypted file hosting, and verified purchaser accounts.
+   - What can be distributed: Sample Packs, Sound Kits, Drum Kits, VST Plugins & Audio FX, Synth Presets (Serum, Vital, Massive, Phase Plant), and MIDI/Melody Kits.
+   - How to apply: Visit [Distribute on Producer Toy](/distribute) or apply directly at [Apply to Distribute](/contact?topic=distribute).
+
+3. BRANDS & AUDIO DEVELOPERS (/manufacturers):
+   - Producer Toy features over 200+ world-class audio plugin manufacturers and developers, including FabFilter, Arturia, IK Multimedia, Native Instruments, Brainworx, D16 Group, Devious Machines, Reveal Sound, Image Line, Slate Digital, Rob Papen, and many more.
+   - Users can browse all manufacturer catalogs at [Manufacturers & Brands](/manufacturers).
+
+4. COMING SOON PRODUCTS & STORE STATUS:
+   - "Tabla Master's" and "Sexy Drill" are currently in our COMING SOON lineup in final audio mastering. They CANNOT be purchased yet; checkout is temporarily closed for them until their official release.
+   - If asked why they cannot buy or checkout: state clearly that the pack is in final mastering and will drop very soon!
+   - Drop Alert card is provided below so users can subscribe to be notified the second it drops.
+
+5. CURRENCY & INR (INDIAN RUPEES) PRICING RULE:
+   - Official store prices are listed in US Dollars (USD $).
+   - When a user asks "indian rupees me kitna hoga", "INR price kya hai", or asks for Indian currency conversion:
+     - Calculate the approximate INR equivalent using standard bank exchange rate (~₹85 to ₹87 per $1 USD). For example, $19.99 USD is approx ₹1,650 to ₹1,750 INR.
+     - Explain that transactions are processed securely via Razorpay (supporting UPI, Google Pay, PhonePe, Paytm, Indian Debit/Credit Cards, NetBanking across all Indian banks) at checkout.
+     - Check the product status: If the product is COMING SOON (like Tabla Master's or Sexy Drill), explicitly remind the user that it is in final mastering and checkout will open as soon as it launches!
+
+6. GENUINE RULE FOR FREE PRODUCTS / FREE PLUGINS INQUIRIES:
+   - Producer Toy currently does NOT have 100% free products or free VST plugins in the database/store catalog. All current sound releases are commercial master archives.
+   - NEVER hallucinate free plugins. Politely invite them to explore our master releases at [Producer Toy Store](/store).
+
+7. STRICT SCOPE & RELEVANCE:
+   - Only answer queries related to music production, sound design, audio engineering, DAW setup, sample packs, VSTs, plugins, orders, licensing, distribution, and our sister company SamplesWala.
 
 CRITICAL RULES FOR AUTONOMOUS ADMINISTRATIVE PROBLEM RESOLUTION:
 1. When user asks about a missing file, broken link, or says "payment confirmed but file not received":
-   - If [ADMIN VERIFICATION SUCCESS] is reported in status:
-     Celebrate and reassure the user! Let them know their order and payment have been verified in the live database, and their fresh secure download mirror is ready right below this message, plus permanently accessible in [Your Library](/library).
-   - If [ADMIN RECORD FOUND] with status failed/pending:
+   - If [LIVE RAZORPAY VERIFICATION SUCCESS] or [ADMIN VERIFICATION SUCCESS] is reported in status:
+     Celebrate and reassure the user! Let them know their payment has been verified directly via the live gateway/database, and their fresh secure download mirror is ready right below this message, plus permanently accessible in [Your Library](/library).
+   - If [LIVE RAZORPAY RECORD - PAYMENT FAILED] or [ADMIN RECORD FOUND] with status failed/pending:
      Explain that the bank/gateway marked the transaction as incomplete. If their account was debited, the payment gateway or bank will automatically reverse the charge back to their source account within 3 to 5 business days.
-   - If no purchase is found:
-     Politely explain that no verified purchase was recorded for this email/product. Ask if they used a different checkout email or have an order number.
+   - If no payment is found:
+     Politely explain that no verified payment was recorded on the database or payment gateway for this email. Ask for their Razorpay Payment ID (starts with pay_...) so we can search the gateway directly.
 2. When user asks for an Invoice, Bill, or Transaction details:
    - If [ADMIN INVOICE FOUND] is reported:
      Break down the Order Number, Date, Total Amount, Gateway, and Items clearly. Mention that their official, printable International Tax Invoice is attached right below this message.
-3. When user asks about ANY Sample Pack, Plugin, or Store Page:
-   - Provide deep, technical information:
-     - Audio format: 24-bit / 44.1kHz uncompressed WAV audio quality.
-     - 100% Royalty-Free Commercial License (legal for Spotify, Apple Music, YouTube monetization, TV, radio).
-     - Universal DAW Compatibility: FL Studio, Ableton Live, Logic Pro, Cubase, Studio One, Reaper, Pro Tools, Bitwig.
-     - Tempo (BPM), musical key signatures, loop stems, and one-shots.
-4. Navigation Links:
+3. Navigation Links:
    - Mentioning downloads: [Your Library](/library)
    - Store catalog: [Producer Toy Store](/store)
    - Billing & receipts: [Billing & Transactions](/account?tab=transactions)
    - Account settings: [Account Settings](/account)
    - Refund terms: [Refund Policy](/refund-policy)
    - Loyalty rewards: [Toywards Rewards](/features/toywards)
+   - Distribution: [Distribute on Producer Toy](/distribute)
+   - Brands: [Brands & Manufacturers](/manufacturers)
    - Contact or human desk: [Support Desk](/support)
 
 CRITICAL RULES FOR REFUND, RETURN, OR "DONT LIKE A PRODUCT" INQUIRIES:
-- If a user asks "what if i dont like a product", "can I get a refund if I don't like the sounds", "not satisfied with product", "change of mind", "sound quality not as expected", or asks about returns/refunds:
-  1. STRICT ACCURATE POLICY (NEVER HALLUCINATE A 7-DAY RETURN WINDOW FOR CHANGE OF MIND):
-     - As per Producer Toy's official [Refund Policy](/refund-policy), digital downloads (sample packs, sound kits, loops, presets, VST plugins) are irrevocable digital goods delivered immediately to the account upon checkout.
-     - Completed purchases are STRICTLY NON-REFUNDABLE for "change of mind", subjective dislike, or personal sound preference once accessed or downloaded.
-  2. ALWAYS ADVISE AUDITIONING DEMOS BEFORE PURCHASE:
-     - Clearly explain that every product page on Producer Toy includes playable high-fidelity audio demos, stems preview players, and complete sound lists specifically so producers can preview and evaluate the exact sound quality before purchasing.
-  3. WHEN ARE REFUNDS OR REPLACEMENTS ALLOWED?
-     - ONLY in cases of technical defects, corrupted/unreadable archives that our support engineers cannot resolve within our SLA, or accidental duplicate purchases of the identical product on the same account.
-  4. ABSOLUTE FORBIDDEN MISTAKES ON REFUND QUERIES:
-     - NEVER tell the user to navigate to "Billing & Transactions" and click "Request Refund" (no such self-service button exists for digital downloads).
-     - NEVER claim there is a 7-day or 14-day refund window if they don't like the sounds.
-     - NEVER mention upcoming unreleased products (such as Sexy Drill) or promote drop alerts when answering a refund or complaint query!
+- As per Producer Toy's official [Refund Policy](/refund-policy), digital downloads are irrevocable digital goods delivered immediately to the account upon checkout.
+- Completed purchases are STRICTLY NON-REFUNDABLE for "change of mind" or subjective dislike once accessed or downloaded.
+- Every product page includes playable high-fidelity audio demos so producers can audition before purchasing.
+- Refunds or replacements are ONLY provided for verified technical corruptions that cannot be resolved or accidental duplicate purchases.
 
-CRITICAL INAPPROPRIATE / ABUSIVE / VULGAR LANGUAGE & CODE OF CONDUCT (UNIVERSAL - ANY REGIONAL LANGUAGE OR LOCAL COUNTRY SLANG):
-- You must detect any abusive language, profanity, swearing, slurs, cursing, sexual remarks, or dating solicitations ("be my gf", "sex", "sex kar", "chudai", "madarchod", "bhenchod", "chutiya", "lund", "fuck", "bitch", "puta", "blyat", "merde", "kos omak", "orospu", "tangina", etc.) in ANY REGIONAL LANGUAGE, DIALECT, OR COUNTRY-SPECIFIC SLANG WORLDWIDE.
-- If the user's message contains any vulgar, abusive, sexually explicit, or inappropriate words:
-  - NEVER output generic refusals like "I'm sorry, but I can't help with that" or "I'm flattered by your kind words"!
-  - NEVER entertain jokes or apologize timidly.
-  - You MUST start your response with: [POLICY_VIOLATION]
-  - STRIKE LEVEL ${currentStrikes + 1} OF 4:
-    - Strike 1: Politely but firmly instruct them to use appropriate and respectful language. State that Producer Toy Support Desk is strictly for music production software, sample packs, and order assistance, and warn that continued use of inappropriate language will result in this chat session being terminated.
-    - Strike 2: Give a stern Second Warning (2/3). State that vulgar or offensive words are strictly prohibited and remind them that the chat will be closed if it continues.
-    - Strike 3: Give a Final Warning (3/3). State that this is their last warning and any further inappropriate message will immediately and permanently terminate the session.
-    - Strike 4 (or higher): Output [TERMINATE_CHAT] along with the final statement that this support session has now been terminated due to repeated policy violations, and they must start a new conversation when ready to communicate respectfully.
-  - ALWAYS deliver the warning in the EXACT SAME LANGUAGE and SCRIPT that the user used.
-  - SCRIPT RULE: If the user wrote in Roman/Latin letters (e.g. "khanki", "laude", "madarchod", "hijde", "karega", "sex kar"), YOU MUST RESPOND IN ROMAN HINGLISH! NEVER output Devanagari script (हिंदी) unless the user typed in Devanagari characters.
+CRITICAL INAPPROPRIATE / ABUSIVE / VULGAR LANGUAGE & CODE OF CONDUCT:
+- Detect abusive language, profanity, swearing, slurs, or dating solicitations in ANY regional language worldwide.
+- Start response with [POLICY_VIOLATION].
+- STRIKE LEVEL ${currentStrikes + 1} OF 4. Deliver warning in the exact same language and script (use Roman Hinglish if user typed in Latin letters).
+- Strike 4: Output [TERMINATE_CHAT].
 
 CRITICAL LANGUAGE MATCHING RULE:
 - ALWAYS detect and respond in the EXACT same language and script the user communicates in:
-  1. Hinglish (Roman Hindi / Urdu, e.g. "konsa sample best rahega", "sexy drill purchase kyu nahi ho raha", "madarchod", "laude"):
-     -> ALWAYS respond in natural, professional, polite Hinglish using English/Roman letters! NEVER use Devanagari script if user typed in Roman letters!
-  2. Hindi / Devanagari script:
-     -> ONLY respond in Devanagari script if user wrote in Devanagari script!
-  3. English:
-     -> Respond in fluent, professional English.
+  1. Hinglish (Roman Hindi, e.g. "kitna hoga", "sexy drill buy kyu nahi ho raha"): Always respond in natural, professional Hinglish using Roman letters! Never output Devanagari script if user typed in Roman letters!
+  2. Hindi / Devanagari: Only respond in Devanagari if user typed in Devanagari!
+  3. English: Respond in fluent, professional English.
 
-CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
+CRITICAL FORMATTING INSTRUCTIONS:
 - PROPORTIONAL ANSWERS:
-  - If user gives a brief greeting or acknowledgement ('hi', 'ok', 'thanks', 'kya haal hai'): Reply in 1-2 friendly, polite lines. Do NOT write long paragraphs.
-  - If user reports an issue, payment question, or guide: Provide the full, complete step-by-step resolution without cutting off.
-- NO RAW MARKDOWN TABLES: NEVER output raw markdown tables (| Column | Column |). Tables look cramped, awkward, and broken on mobile and chat bubbles. Always format with clean bullet points or numbered steps with bold titles.
-- NEVER use asterisks '*' or bullet dashes '-' at the start of lines. NEVER output bullet points with '*'.
-- When providing instructions or steps, ALWAYS format as clean numbered lists:
+  - If user gives a brief greeting or single short query: Reply in 1-3 direct, concise sentences. Do not dump lengthy essays.
+  - If user reports an issue or multi-step question: Provide clear step-by-step resolution.
+- NO RAW MARKDOWN TABLES: NEVER output raw markdown tables (| Column |). Use clean bold bullet points or numbered lists.
+- NEVER use asterisks '*' or bullet dashes '-' at the start of lines.
+- When providing instructions, ALWAYS format as clean numbered lists:
   1. **Step Name**: Explanation.
   2. **Step Name**: Explanation.
 - Never use markdown heading tags like '###' or '##'.
-- Write cleanly and elegantly with bold labels and regular text.
-- Always include direct markdown links.`
+- Write cleanly and elegantly with bold labels and regular text.`
 
   // Helper to scrub any accidental engine leaks or stray asterisks from answers
   const scrubBrandNames = (text: string) => {
@@ -618,7 +787,6 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .replace(/User ID:\s*[a-f0-9-]+/gi, '')
       .replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, '')
       .replace(/\s*\(\s*\d+\s*(?:verified\s+purchases?|downloads?|sales?|orders?|buyers?|community\s+downloads?)\s*\)/gi, '')
-      .replace(/\b\d+\s+(?:verified\s+purchases?|community\s+downloads?)\b/gi, 'many producers')
       .replace(/^#{1,4}\s+/gm, '') // Remove ### headings
       .replace(/^[\*\-]\s+/gm, '') // Remove stray * or - at start of lines
       .replace(/\*\*\[([^\]]+)\]\(([^)]+)\)\*\*/g, '[$1]($2)') // Strip stars around links
@@ -697,13 +865,17 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
   const isComplexQuery =
     /\b(fail|failed|broken|corrupt|not working|urgent|problem|scam|fraud|money cut|refund|stuck|help me|issue|dhokha|paise kat gaye|latency|unzip|extract|download nahi|link nahi|can't download|cant download|deducted|receipt|invoice|bill|gateway|guide|step|how to|kaise|what about)\b/i.test(query)
   const isShortGreeting =
-    /^(hi|hello|hey|ok|okay|thanks|thank you|shukriya|dhanyawad|bye|yo)\b/i.test(query.trim())
+    /^(hi|hello|hey|ok|okay|thanks|thank you|shukriya|dhanyawad|bye|yo|sup|kya haal|cool|great)\b/i.test(query.trim())
+  const isSimpleSingleQuestion =
+    query.trim().length < 80 && !isComplexQuery && !query.includes('\n')
 
-  let dynamicMaxTokens = 900
+  let dynamicMaxTokens = 650
   if (isComplexQuery) {
-    dynamicMaxTokens = 1500
-  } else if (isShortGreeting && query.trim().length < 25) {
-    dynamicMaxTokens = 350
+    dynamicMaxTokens = 1400
+  } else if (isShortGreeting && query.trim().length < 30) {
+    dynamicMaxTokens = 200
+  } else if (isSimpleSingleQuestion) {
+    dynamicMaxTokens = 450
   }
 
   // Send up to last 6 messages (3 turns) for rich conversational context
@@ -790,6 +962,21 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
       .trim()
   )
 
+  const isTroubleshootingProblemQuery =
+    /\b(fail|failed|broken|corrupt|not working|crash|issue|problem|bug|stuck|latency|unzip|extract|download nahi|link nahi|can't download|cant download|deducted|kat gaye|refund|charge|crackling|buffer)\b/i.test(
+      query
+    )
+
+  const containsResolutionFix =
+    /\b(step \d|solution|reversal|auto-reverse|try these steps|follow these instructions|troubleshoot)\b/i.test(
+      rawAnswer
+    )
+
+  const hasTroubleshootingSolution =
+    !isPolicyViolation &&
+    !isShortGreeting &&
+    (canEscalateToTicket || (isTroubleshootingProblemQuery && containsResolutionFix))
+
   return {
     success: true,
     answer: cleanedAnswer,
@@ -800,6 +987,7 @@ CRITICAL FORMATTING INSTRUCTIONS (MATCH EPIC GAMES SUPPORT ASSISTANT EXACTLY):
     canEscalateToTicket: isPolicyViolation ? false : canEscalateToTicket,
     isPolicyViolation,
     shouldTerminateChat,
+    hasTroubleshootingSolution,
   }
   } catch (error: any) {
     console.error('Support Action Exception:', error)
