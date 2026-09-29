@@ -11,32 +11,44 @@ export interface RawFeedItem {
 
 export const MUSIC_NEWS_FEEDS = [
   {
+    name: 'Google News (Audio Brands Deals)',
+    url: 'https://news.google.com/rss/search?q=(Native+Instruments+OR+FabFilter+OR+iZotope+OR+Arturia+OR+Soundtoys+OR+Universal+Audio)+AND+(deal+OR+sale+OR+discount+OR+free+OR+vst+OR+coupon)&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: true,
+  },
+  {
+    name: 'Google News (Mega VST Deals & Coupons)',
+    url: 'https://news.google.com/rss/search?q=(VST+OR+plugin)+AND+(deal+OR+discount+OR+coupon+OR+giveaway+OR+%22price+drop%22)&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: false,
+  },
+  {
+    name: 'AudioPlugin Guy (Coupons & Sales)',
+    url: 'https://audiopluginguy.com/feed/',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: false,
+  },
+  {
     name: 'Bedroom Producers Blog',
     url: 'https://bedroomproducersblog.com/feed/',
     categoryDefault: 'Free VSTs',
     isPrimary: true,
   },
   {
-    name: 'Rekkerd',
-    url: 'https://rekkerd.org/feed/',
+    name: 'Rekkerd Deals',
+    url: 'https://rekkerd.org/category/deals/feed/',
     categoryDefault: 'Deals & Sales',
+    isPrimary: false,
+  },
+  {
+    name: 'KVR Audio',
+    url: 'https://www.kvraudio.com/news/rss.xml',
+    categoryDefault: 'Tech & Gear',
     isPrimary: false,
   },
   {
     name: 'Gearnews',
     url: 'https://www.gearnews.com/feed/',
-    categoryDefault: 'Tech & Gear',
-    isPrimary: false,
-  },
-  {
-    name: 'MusicTech',
-    url: 'https://musictech.com/feed/',
-    categoryDefault: 'Guides',
-    isPrimary: false,
-  },
-  {
-    name: 'CDM (Create Digital Music)',
-    url: 'https://cdm.link/feed/',
     categoryDefault: 'Tech & Gear',
     isPrimary: false,
   },

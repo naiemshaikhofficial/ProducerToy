@@ -100,35 +100,43 @@ Title: ${item.title}
 Link: ${item.link}
 Content Snippet: ${item.contentSnippet}
 
-REQUIREMENTS:
-1. Optimize for Google #1 ranking with high-intent keywords (free VST plugins, DAW deals, mixing plugins, synthesizers).
+    REQUIREMENTS:
+1. Optimize for Google #1 ranking with high-intent keywords (free VST plugins, DAW deals, mixing plugins, synthesizers, coupon codes).
 2. Format the "content" in clean Markdown with headings (##, ###), bullet points, sound design insights, and step-by-step instructions on how to claim/install.
-3. NEVER mention third-party blogs or external sources (such as Bedroom Producers Blog, Rekkerd, KVR, Gearnews, etc.). Write strictly as the Producer Toy official editorial newsroom.
-4. Determine whether this is 'Free VSTs', 'Deals & Sales', 'Guides', or 'Tech & Gear'.
-5. Determine the badge: 'FREEWARE', 'HOT DEAL', 'GUIDE', or 'NEW RELEASE'.
-6. Extract or estimate specs: Format (VST3, AU, AAX), OS compatibility, Value/Price.
-7. Extract or construct the official developer product download/promo link ("product_url"), such as the developer's official domain (e.g. https://celestdsp.com/drum-spice-promo/ or similar official landing page).
+3. If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Waves, Arturia, Soundtoys, Universal Audio, Plugin Alliance), prominently feature the brand name and the discount in the title.
+4. COUPON CODE DETECTION: If any coupon code, promo code, or voucher code is mentioned (e.g. 'PB50', 'SUMMER2026', etc.), extract it explicitly into the "coupon_code" field and inside "specs" as "Coupon Code".
+5. MEGA DEAL & BADGE CLASSIFICATION:
+   - If discount is 70%+, 80%+, 90%+, price drop, or record-low: set "badge": "MEGA DEAL".
+   - If a coupon code is required: set "badge": "COUPON CODE".
+   - If it's a 100% free giveaway / freeware: set "badge": "FREEWARE".
+   - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
+   - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
+6. NEVER mention third-party scraper blogs (Bedroom Producers Blog, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
+7. Extract or construct the official developer product download/promo link ("product_url"), such as the developer's official domain (e.g. https://celestdsp.com/drum-spice-promo/ or official product landing page).
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object without markdown code blocks, matching this exact schema:
 {
-  "title": "Compelling Title Here",
+  "title": "Compelling Title Here (e.g. Native Instruments Flash Sale: 85% OFF Massive X)",
   "slug": "url-friendly-slug-here",
   "excerpt": "1-2 sentence compelling summary for search engines.",
   "content": "Full markdown content with ## headings and paragraphs.",
-  "category": "Free VSTs",
-  "badge": "FREEWARE",
+  "category": "Deals & Sales",
+  "badge": "MEGA DEAL",
+  "coupon_code": "SUMMER90",
   "reading_time": "3 MIN READ",
-  "deal_price": "FREE",
-  "deal_regular_price": "$79",
-  "product_url": "https://celestdsp.com/drum-spice-promo/",
+  "deal_price": "$19",
+  "deal_regular_price": "$199",
+  "product_url": "https://native-instruments.com/deal",
   "specs": {
+    "Brand": "Native Instruments",
+    "Discount": "90% OFF",
+    "Coupon Code": "SUMMER90",
     "Format": "VST3, AU, AAX",
     "Compatibility": "Windows & macOS (Apple Silicon native)",
-    "Price": "100% Free",
-    "Download": "Available now"
+    "Price": "$19 (Regular $199)"
   },
-  "seo_keywords": "free vst, music production, audio plugin, daw"
+  "seo_keywords": "native instruments sale, massive x deal, coupon code, vst discount"
 }`
 
   const modelsToTry = [

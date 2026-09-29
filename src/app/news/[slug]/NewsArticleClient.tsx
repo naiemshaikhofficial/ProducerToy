@@ -22,6 +22,22 @@ interface NewsArticleClientProps {
 export function NewsArticleClient({ article, relatedArticles }: NewsArticleClientProps) {
   const [copied, setCopied] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
+  const [copiedCoupon, setCopiedCoupon] = useState(false)
+
+  const couponCode =
+    article.specs?.['Coupon Code'] ||
+    article.specs?.['Coupon'] ||
+    article.specs?.['Promo Code'] ||
+    article.specs?.['coupon_code'] ||
+    (article as any).coupon_code
+
+  const handleCopyCoupon = () => {
+    if (couponCode && typeof window !== 'undefined') {
+      navigator.clipboard.writeText(couponCode)
+      setCopiedCoupon(true)
+      setTimeout(() => setCopiedCoupon(false), 2000)
+    }
+  }
 
   const handleCopyLink = () => {
     if (typeof window !== 'undefined') {
@@ -50,17 +66,72 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           {/* Left Hero Card (5 cols) - Borderless per user request */}
           <div className="lg:col-span-5 bg-[#18181c] border-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-xl min-h-[340px] lg:min-h-[420px]">
             <div>
-              {/* Top Tag Badge */}
-              <div className="mb-4">
-                <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-[#24242a] text-zinc-300 border border-white/5">
-                  {article.badge === 'FREEWARE' ? 'FREEWARE' : 'ARTICLE'}
-                </span>
+              {/* Dynamic Badges: MEGA DEAL, COUPON CODE, FLASH SALE, FREEWARE */}
+              <div className="mb-4 flex items-center gap-2">
+                {article.badge === 'MEGA DEAL' ? (
+                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">
+                    🔥 MEGA DEAL
+                  </span>
+                ) : article.badge === 'COUPON CODE' ? (
+                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    🏷️ COUPON CODE
+                  </span>
+                ) : article.badge === 'FLASH SALE' ? (
+                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                    ⚡ FLASH SALE
+                  </span>
+                ) : article.badge === 'FREEWARE' ? (
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-[#24242a] text-zinc-300 border border-white/5">
+                    FREEWARE
+                  </span>
+                ) : (
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-[#24242a] text-zinc-300 border border-white/5">
+                    {article.badge || 'DEAL'}
+                  </span>
+                )}
+
+                {article.deal_regular_price && article.deal_price && article.deal_price !== 'FREE' && (
+                  <span className="text-xs font-bold text-zinc-400">
+                    <span className="line-through text-zinc-500 mr-1.5">{article.deal_regular_price}</span>
+                    <span className="text-[#00FF94] font-extrabold">{article.deal_price}</span>
+                  </span>
+                )}
               </div>
 
               {/* Bold Article Headline */}
               <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-white leading-[1.25] tracking-tight">
                 {article.title}
               </h1>
+
+              {/* Interactive Coupon Code 1-Click Copy Box */}
+              {couponCode && (
+                <div className="mt-5 p-3.5 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-transparent border border-dashed border-amber-500/50 rounded-xl flex items-center justify-between gap-3">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-400">
+                      🏷️ Exclusive Coupon Code
+                    </span>
+                    <span className="font-mono font-extrabold text-base text-white tracking-wider truncate">
+                      {couponCode}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleCopyCoupon}
+                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-black font-extrabold text-xs rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-md"
+                  >
+                    {copiedCoupon ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy Code</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Bottom Author & Date Bar */}
