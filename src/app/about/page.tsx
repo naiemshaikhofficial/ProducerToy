@@ -64,7 +64,7 @@ export default function AboutPage() {
         {/* Full Bleed Wide Hero Banner Graphic */}
         <div className="relative w-full flex items-center justify-center bg-black overflow-hidden">
           <img
-            src="/about-us-banner.png"
+            src="/about-us-banner.webp"
             alt="About Us - Producer Toy"
             className="w-full h-auto object-cover object-center max-h-[540px] sm:max-h-[660px] xl:max-h-[760px]"
             loading="eager"
@@ -239,7 +239,7 @@ export default function AboutPage() {
             <div className="relative z-10 w-full lg:w-[48%] flex items-end justify-center lg:justify-end px-6 sm:px-10 lg:pr-14 pt-4 lg:pt-0">
               <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[430px] aspect-[4/5] flex items-end justify-center">
                 <img
-                  src="/naiem-shaikh-founder.png"
+                  src="/naiem-shaikh-founder.webp"
                   alt="Naiem Shaikh - Founder of Producer Toy"
                   className="w-full h-auto object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)] max-h-[460px] lg:max-h-[500px]"
                   loading="eager"

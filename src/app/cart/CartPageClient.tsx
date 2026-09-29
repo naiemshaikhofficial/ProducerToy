@@ -67,24 +67,6 @@ export function CartPageClient() {
         {/* 1. MOBILE HEADER (< lg) (Exact Screenshot 2 Match: Large & Bold)          */}
         {/* ========================================================================= */}
         <div className="block lg:hidden pb-7 border-b border-[#202020] space-y-4">
-          {/* Top Row: Toywards Balance Link Pill */}
-          <div className="flex items-center justify-start">
-            <Link
-              href="/account?tab=rewards"
-              prefetch={true}
-              className="flex items-center gap-2.5 group cursor-pointer"
-              title="View Toywards Balance"
-            >
-              <div className="flex items-center gap-1.5 text-sm font-semibold text-zinc-300 group-hover:text-white transition-colors">
-                <span>Toywards</span>
-                <ExternalLink className="w-4 h-4 text-zinc-400 group-hover:text-[#FA742B] transition-colors" />
-              </div>
-
-              <div className="bg-[#181818] group-hover:bg-[#222222] border border-[#333333] group-hover:border-[#FA742B]/50 px-4 py-1 rounded-full text-sm font-black text-white transition-all shadow-sm">
-                {currency === 'INR' ? '₹0.00' : '$0.00'}
-              </div>
-            </Link>
-          </div>
 
           {/* Large Bold Title (Exact Screenshot Match) */}
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none">
@@ -100,22 +82,7 @@ export function CartPageClient() {
             My Cart
           </h1>
 
-          {/* Toywards Balance Link Pill */}
-          <Link
-            href="/account?tab=rewards"
-            prefetch={true}
-            className="flex items-center gap-2.5 group cursor-pointer"
-            title="View Toywards Balance"
-          >
-            <div className="flex items-center gap-1.5 text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">
-              <span>Toywards</span>
-              <ExternalLink className="w-3.5 h-3.5 text-zinc-400 group-hover:text-[#FA742B] transition-colors" />
-            </div>
 
-            <div className="bg-[#181818] group-hover:bg-[#222222] border border-[#282828] group-hover:border-[#FA742B]/50 px-3.5 py-1 rounded-full text-sm font-bold text-white transition-all shadow-sm">
-              {currency === 'INR' ? '₹0.00' : '$0.00'}
-            </div>
-          </Link>
         </div>
 
         {/* ========================================================================= */}
@@ -233,12 +200,6 @@ export function CartPageClient() {
                           {formatPrice(item.price_inr, item.price_usd)}
                         </div>
 
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-zinc-300 font-medium">
-                          <ToywardsSparkleIcon size={16} className="text-[#FA742B] shrink-0" />
-                          <span>
-                            Earn <strong className="text-[#FA742B] font-bold">Toywards Rewards</strong>
-                          </span>
-                        </div>
                       </div>
 
                       {/* Actions Row: Gift Icon Button + Move to Wishlist (Screenshot 2 Match) */}
@@ -413,12 +374,6 @@ export function CartPageClient() {
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-2 text-xs text-zinc-300 font-medium">
-                            <ToywardsSparkleIcon size={16} className="text-[#FA742B] shrink-0" />
-                            <span>
-                              Earn <strong className="text-[#FA742B] font-bold">Toywards Rewards</strong>
-                            </span>
-                          </div>
                         </div>
 
                         {/* Bottom Actions Row: Remove, Gift, Move to Wishlist */}
@@ -496,7 +451,7 @@ export function CartPageClient() {
                     </button>
 
                     <p className="text-[11px] text-zinc-500 text-center mt-2.5">
-                      Instant 1-click checkout with PayPal, Cards, UPI, or Toywards credits.
+                      Instant 1-click checkout with PayPal, Cards, and UPI.
                     </p>
                   </div>
 

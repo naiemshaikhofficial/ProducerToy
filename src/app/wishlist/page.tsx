@@ -117,21 +117,7 @@ export default function WishlistPage() {
             My Wishlist
           </h1>
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/store"
-              prefetch={true}
-              className="text-[13px] font-semibold text-zinc-300 hover:text-white flex items-center gap-1.5 transition-colors"
-            >
-              <ToywardsIcon size={16} />
-              <span>Toywards</span>
-              <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
-            </Link>
 
-            <div className="border border-[#2e2e2e] bg-[#181818] rounded-full px-3.5 py-1 text-xs font-bold text-white shadow-sm flex items-center gap-1">
-              <span>{currencySymbol}0.00</span>
-            </div>
-          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -365,13 +351,6 @@ export default function WishlistPage() {
                           </span>
                         </div>
 
-                        {/* Toywards Note */}
-                        {!isFree && (
-                          <div className="flex items-center gap-1.5 text-[11.5px] text-zinc-400 mt-3 font-medium">
-                            <ToywardsIcon size={14} />
-                            <span>Earn Toywards on this purchase</span>
-                          </div>
-                        )}
                       </div>
 
                       {/* Bottom Actions Row */}
