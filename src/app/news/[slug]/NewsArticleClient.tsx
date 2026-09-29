@@ -56,6 +56,26 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   // Format price
   const displayPrice = article.deal_price || (article.category === 'Free VSTs' ? 'FREE' : 'FREE / PROMO')
 
+  // Block competitor/scraper blog links from ever being shown to users
+  const isCompetitorScraper = (url?: string | null) => {
+    if (!url) return true
+    const lower = url.toLowerCase()
+    return (
+      lower.includes('gearnews.com') ||
+      lower.includes('bedroomproducersblog.com') ||
+      lower.includes('rekkerd.org') ||
+      lower.includes('kvraudio.com') ||
+      lower.includes('musictech.com') ||
+      lower.includes('cdm.link') ||
+      lower.includes('news.google.com')
+    )
+  }
+
+  const safeTargetUrl = article.source_url && !isCompetitorScraper(article.source_url)
+    ? article.source_url
+    : '/store'
+  const isStoreLink = safeTargetUrl === '/store' || safeTargetUrl.startsWith('/')
+
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
@@ -214,14 +234,21 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 <span>{copied ? 'Link Copied' : 'Share Story'}</span>
               </button>
 
-              {article.source_url && (
+              {isStoreLink ? (
+                <Link
+                  href="/store"
+                  className="px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
+                >
+                  <span>Explore in Store</span>
+                </Link>
+              ) : (
                 <a
-                  href={article.source_url}
+                  href={safeTargetUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
                 >
-                  <span>Get Official Download</span>
+                  <span>Get Official Deal</span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               )}
@@ -268,23 +295,23 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               </div>
 
               {/* Direct CTA Button */}
-              {article.source_url ? (
-                <a
-                  href={article.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <span>Download Now</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              ) : (
+              {isStoreLink ? (
                 <Link
                   href="/store"
                   className="w-full py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                 >
-                  <span>View in Store</span>
+                  <span>Explore in Store</span>
                 </Link>
+              ) : (
+                <a
+                  href={safeTargetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                >
+                  <span>Get Official Deal</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
               )}
             </div>
 

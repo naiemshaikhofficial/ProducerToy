@@ -7,6 +7,7 @@ export interface RawFeedItem {
   imageUrl?: string
   sourceName: string
   isPrimary?: boolean
+  directDealUrl?: string
 }
 
 export const MUSIC_NEWS_FEEDS = [
@@ -160,15 +161,46 @@ function parseRssItems(xml: string, sourceName: string, isPrimary = false): RawF
       }
     }
 
+    // UPGRADE TO FULL HD: Strip WordPress thumbnail dimension suffixes (-128x71, -300x169, -768x432)
+    if (imageUrl) {
+      imageUrl = imageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+    }
+
+    // Direct merchant / store deal URL extraction (Plugin Boutique, Thomann, Roland, Native Instruments, etc.)
+    let directDealUrl: string | undefined
+    const rawLinks = rawContent.match(/href="([^"]+)"/gi) || []
+    for (const l of rawLinks) {
+      const hrefMatch = l.match(/href="([^"]+)"/i)
+      if (!hrefMatch) continue
+      const href = hrefMatch[1]
+      if (
+        href.includes('pluginboutique.com') ||
+        href.includes('thomann.de') ||
+        href.includes('native-instruments.com') ||
+        href.includes('roland.com') ||
+        href.includes('slatedigital.com') ||
+        href.includes('fabfilter.com') ||
+        href.includes('waves.com') ||
+        href.includes('arturia.com') ||
+        href.includes('celestdsp.com') ||
+        href.includes('soundtoys.com') ||
+        href.includes('izotope.com')
+      ) {
+        directDealUrl = href
+        break
+      }
+    }
+
     items.push({
       title,
-      link,
+      link: directDealUrl || link,
       pubDate,
       creator,
       contentSnippet,
       imageUrl,
       sourceName,
       isPrimary,
+      directDealUrl,
     })
   }
 

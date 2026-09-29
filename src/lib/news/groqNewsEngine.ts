@@ -71,7 +71,7 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           author_role: 'Audio Technology Editor',
           reading_time: rewritten.reading_time || '3 MIN READ',
           source_name: 'ProducerToy',
-          source_url: rewritten.product_url || item.link,
+          source_url: resolveSafeDealUrl(rewritten.product_url, item.directDealUrl, item.link),
           deal_price: rewritten.deal_price || null,
           deal_regular_price: rewritten.deal_regular_price || null,
           published_at: new Date(item.pubDate).toISOString(),
@@ -190,6 +190,41 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
   return null
 }
 
+function resolveSafeDealUrl(productUrl?: string, directDealUrl?: string, itemLink?: string): string {
+  // 1. If explicit productUrl is valid and NOT a scraper blog
+  if (productUrl && isValidMerchantUrl(productUrl)) {
+    return productUrl
+  }
+  // 2. If direct deal URL from HTML exists (e.g. Plugin Boutique, Thomann, Roland, NI)
+  if (directDealUrl && isValidMerchantUrl(directDealUrl)) {
+    return directDealUrl
+  }
+  // 3. If itemLink is NOT a scraper blog, check it
+  if (itemLink && isValidMerchantUrl(itemLink)) {
+    return itemLink
+  }
+  // 4. Default strictly to our own ProducerToy store! NEVER link to a competitor blog!
+  return 'https://producertoy.com/store'
+}
+
+function isValidMerchantUrl(url: string): boolean {
+  if (!url) return false
+  const lower = url.toLowerCase()
+  // Block all scraper blogs
+  if (
+    lower.includes('gearnews.com') ||
+    lower.includes('bedroomproducersblog.com') ||
+    lower.includes('rekkerd.org') ||
+    lower.includes('kvraudio.com') ||
+    lower.includes('musictech.com') ||
+    lower.includes('cdm.link') ||
+    lower.includes('news.google.com')
+  ) {
+    return false
+  }
+  return lower.startsWith('http://') || lower.startsWith('https://')
+}
+
 function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticle {
   const isFree = item.title.toLowerCase().includes('free')
   const isDeal = item.title.toLowerCase().includes('sale') || item.title.toLowerCase().includes('off') || item.title.toLowerCase().includes('deal')
@@ -199,19 +234,12 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
 
   const cleanedSnippet = sanitizeScrapedText(item.contentSnippet || item.title)
 
-  const content = `## Overview
+  // Clean narrative editorial content without any artificial headings or bullet points
+  const content = `${cleanedSnippet}
 
-${cleanedSnippet}
+This audio release brings refined sound design and practical mixing utility directly to music creators. Built with high precision processing, it slots seamlessly into modern DAW production workflows across FL Studio, Ableton Live, Logic Pro, and Studio One.
 
-### Key Highlights & Features
-
-- **Audio Production Excellence:** Engineered for modern music producers, beatmakers, and audio engineers looking to elevate their mixes.
-- **Workflow Integration:** Compatible with major digital audio workstations including FL Studio, Ableton Live, Logic Pro, and Studio One.
-- **Tested & Verified:** Validated for performance and reliability across production environments.
-
-### How to Get It
-
-Head over to the official developer download link to claim this release before the promotion expires.`
+To explore this deal or find more audio production essentials, visit the Producer Toy catalog below.`
 
   return {
     id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -226,7 +254,7 @@ Head over to the official developer download link to claim this release before t
     author_role: 'Audio Technology Editor',
     reading_time: '3 MIN READ',
     source_name: 'ProducerToy',
-    source_url: item.link,
+    source_url: resolveSafeDealUrl(undefined, item.directDealUrl, item.link),
     deal_price: isFree ? 'FREE' : null,
     deal_regular_price: null,
     published_at: new Date(item.pubDate).toISOString(),

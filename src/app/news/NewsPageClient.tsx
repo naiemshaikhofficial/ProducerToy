@@ -109,13 +109,13 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   prefetch={true}
                   className="group flex flex-row gap-5 sm:gap-6 items-center py-5 sm:py-6 border-b border-[#222226] cursor-pointer"
                 >
-                  {/* 16:9 Thumbnail (Left side: Exact Epic Games Dimensions: w-36 sm:w-48 md:w-52 aspect-video) */}
-                  <div className="relative w-36 sm:w-48 md:w-52 aspect-video shrink-0 rounded-lg overflow-hidden bg-[#181818]">
+                  {/* 16:9 Thumbnail (Left side: Exact Epic Games Dimensions: w-44 sm:w-60 md:w-64 aspect-video) */}
+                  <div className="relative w-44 sm:w-60 md:w-64 aspect-video shrink-0 rounded-lg overflow-hidden bg-[#181818]">
                     <Image
                       src={article.cover_image}
                       alt={article.title}
                       fill
-                      sizes="(max-width: 640px) 144px, 208px"
+                      sizes="(max-width: 640px) 176px, (max-width: 768px) 240px, 256px"
                       className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
                     />
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
