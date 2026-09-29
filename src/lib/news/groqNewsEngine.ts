@@ -17,6 +17,27 @@ interface GroqRewriteResponse {
   seo_keywords: string
 }
 
+export function sanitizeScrapedText(text: string): string {
+  if (!text) return ''
+  return text
+    // Remove "Originally reported via...", "Source Coverage...", etc.
+    .replace(/[-*•]?\s*\*\*Source Coverage:\*\*.*$/gim, '')
+    .replace(/Originally reported via.*$/gim, '')
+    .replace(/View post:\s*\[?[^\]\n]+\]?(\([^)]+\))?/gi, '')
+    // Replace BPB readers / Bedroom Producers Blog
+    .replace(/\bBPB\s+readers\b/gi, 'music producers')
+    .replace(/\bBPB\b/gi, 'Producer Toy')
+    .replace(/Bedroom\s+Producers?\s+Blog/gi, 'Producer Toy')
+    .replace(/https?:\/\/(?:www\.)?bedroomproducersblog\.com[^\s)\]"]*/gi, '#')
+    // External music scrapers & blogs
+    .replace(/rekkerd(?:\.org)?/gi, 'our partners')
+    .replace(/gearnews(?:\.com)?/gi, 'audio tech news')
+    .replace(/kvraudio(?:\.com)?/gi, 'community reports')
+    .replace(/musictech(?:\.com)?/gi, 'studio insights')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 /**
  * Uses Groq Cloud AI (Llama 3.3 70B) to transform a raw RSS item
  * into an original, SEO-optimized, Epic Games style news story.
@@ -32,9 +53,9 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         return {
           id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
           slug: slugify(rewritten.slug || rewritten.title),
-          title: rewritten.title,
-          excerpt: rewritten.excerpt,
-          content: rewritten.content,
+          title: sanitizeScrapedText(rewritten.title),
+          excerpt: sanitizeScrapedText(rewritten.excerpt),
+          content: sanitizeScrapedText(rewritten.content),
           category: rewritten.category || 'Free VSTs',
           badge: rewritten.badge || 'FREEWARE',
           cover_image: coverImage,
@@ -162,9 +183,11 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
   const category = isFree ? 'Free VSTs' : isDeal ? 'Deals & Sales' : 'Tech & Gear'
   const badge = isFree ? 'FREEWARE' : isDeal ? 'HOT DEAL' : 'NEW RELEASE'
 
+  const cleanedSnippet = sanitizeScrapedText(item.contentSnippet || item.title)
+
   const content = `## Overview
 
-${item.contentSnippet || item.title}
+${cleanedSnippet}
 
 ### Key Highlights & Features
 
@@ -179,8 +202,8 @@ Head over to the official developer download link to claim this release before t
   return {
     id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     slug: slugify(item.title),
-    title: item.title,
-    excerpt: (item.contentSnippet || item.title).slice(0, 160) + '...',
+    title: sanitizeScrapedText(item.title),
+    excerpt: cleanedSnippet.slice(0, 160) + '...',
     content,
     category,
     badge,
