@@ -13,6 +13,8 @@
 *.log
 *.tmp
 *.temp
+*.db
+*.db-journal
 
 # Environment Variables & Secrets (CRITICAL SECURITY)
 .env

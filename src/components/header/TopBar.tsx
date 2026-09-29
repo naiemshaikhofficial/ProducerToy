@@ -943,24 +943,14 @@ export const TopBar: React.FC<TopBarProps> = ({
             </div>
           ) : null}
 
-          {/* Primary Action Button: On Site Variant shows blue Download button; on Store shows Library / Sign In */}
-          {isSiteVariant ? (
-            <Link
-              href="https://store.producertoy.com"
-              prefetch={true}
-              className="bg-[#0078F2] hover:bg-[#0066d0] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-lg active:scale-95 transition-all shadow-md flex items-center justify-center cursor-pointer tracking-tight"
-            >
-              Download
-            </Link>
-          ) : (
-            <Link
-              href={user ? "/library" : "/auth"}
-              prefetch={true}
-              className="bg-[#202020] hover:bg-[#2a2a2a] text-white hover:text-white border border-[#303030] hover:border-zinc-400 font-bold text-xs sm:text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-sm flex items-center justify-center cursor-pointer uppercase tracking-wider"
-            >
-              {user ? 'Library' : 'Sign In'}
-            </Link>
-          )}
+          {/* Primary Action Button: Dynamic Sign In (if guest) or Library (if logged in) in brand secondary orange */}
+          <Link
+            href={user ? "/library" : "/auth"}
+            prefetch={true}
+            className="bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-md shadow-[#FC6301]/20 flex items-center justify-center cursor-pointer tracking-tight"
+          >
+            {user ? 'Library' : 'Sign In'}
+          </Link>
 
         </div>
 
@@ -976,23 +966,13 @@ export const TopBar: React.FC<TopBarProps> = ({
             </button>
           ) : (
             <div className="flex items-center gap-2.5">
-              {isSiteVariant ? (
-                <Link
-                  href="https://store.producertoy.com"
-                  prefetch={true}
-                  className="bg-[#0078F2] hover:bg-[#0066d0] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
-                >
-                  Download
-                </Link>
-              ) : (
-                <Link
-                  href={user ? "/library" : "/auth"}
-                  prefetch={true}
-                  className="bg-[#202020] hover:bg-[#282828] text-white border border-[#333333] font-bold text-xs px-3 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center uppercase tracking-normal"
-                >
-                  {user ? 'Library' : 'Sign In'}
-                </Link>
-              )}
+              <Link
+                href={user ? "/library" : "/auth"}
+                prefetch={true}
+                className="bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
+              >
+                {user ? 'Library' : 'Sign In'}
+              </Link>
 
               <button
                 onClick={onToggleMobileMenu}

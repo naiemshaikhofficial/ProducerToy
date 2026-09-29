@@ -68,8 +68,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/daw/studio-one`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
     { url: `${baseUrl}/daw/reaper`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
 
-    // Features & Programs
-    { url: `${baseUrl}/features/toywards`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    // News & Media Hub
+    { url: `${baseUrl}/news`, lastModified: new Date(), changeFrequency: 'hourly', priority: 1.0 },
     ...(ENABLE_BRANDS ? [{ url: `${baseUrl}/brands`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.85 }] : []),
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
 
@@ -88,8 +88,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let categoryEntries: MetadataRoute.Sitemap = []
   let brandEntries: MetadataRoute.Sitemap = []
   let blogEntries: MetadataRoute.Sitemap = []
+  let newsEntries: MetadataRoute.Sitemap = []
 
   try {
+    const { getNewsArticles } = await import('@/lib/turso/newsDb')
+    const newsArticles = await getNewsArticles({ limit: 150 })
+
+    if (newsArticles && newsArticles.length > 0) {
+      newsEntries = newsArticles.map((n) => {
+        const sanitizedImg = sanitizeXmlUrl(n.cover_image)
+        return {
+          url: `${baseUrl}/news/${encodeURIComponent(n.slug)}`,
+          lastModified: new Date(n.published_at || new Date()),
+          changeFrequency: 'daily' as const,
+          priority: 0.95,
+          images: sanitizedImg ? [sanitizedImg] : undefined,
+        }
+      })
+    }
+
     // 2. Fetch ALL Active Products, Categories, Subcategories, Brands, and Blogs from Database
     const [productsRes, categoriesRes, subcategoriesRes, brandsRes, blogsRes] = await Promise.all([
       supabase.from('products').select('slug, name, cover_image, updated_at, created_at').eq('is_active', true),
@@ -169,7 +186,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Combine all routes cleanly without duplicates and sanitize all XML entries
-  const allEntries = [...staticRoutes, ...productEntries, ...categoryEntries, ...brandEntries, ...blogEntries]
+  const allEntries = [...staticRoutes, ...newsEntries, ...productEntries, ...categoryEntries, ...brandEntries, ...blogEntries]
   const uniqueUrlsMap = new Map<string, MetadataRoute.Sitemap[number]>()
 
   allEntries.forEach((entry) => {

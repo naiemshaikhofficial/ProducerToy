@@ -33,6 +33,7 @@ interface SubBarProps {
 
 const NAV_LINKS = [
   { label: 'Deals', href: '/store?on_sale=true' },
+  { label: 'News', href: '/news' },
   ...(ENABLE_BRANDS ? [{ label: 'Brands', href: '/manufacturers' }] : []),
   { label: 'Blog', href: '/blog' },
 ]
@@ -40,6 +41,7 @@ const NAV_LINKS = [
 const MOBILE_DISCOVER_OPTIONS = [
   { label: 'Products', href: '/store' },
   { label: 'Deals', href: '/store?on_sale=true' },
+  { label: 'News', href: '/news' },
   ...(ENABLE_BRANDS ? [{ label: 'Brands', href: '/manufacturers' }] : []),
   { label: 'Blog', href: '/blog' },
   { label: 'Free VSTs & Plugins', href: '/free-vst-plugins' },

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@libsql/client": "^0.18.0",
     "@marsidev/react-turnstile": "^1.6.1",
     "@paypal/react-paypal-js": "^10.3.0",
     "@supabase/ssr": "^0.5.2",
