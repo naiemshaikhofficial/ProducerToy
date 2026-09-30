@@ -142,16 +142,33 @@ export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | 
 }
 
 /**
- * Check if an article already exists by source URL or slug
+ * Check if an article already exists by source URL, slug, cover image or publish timestamp
  */
-export async function articleExists(sourceUrl: string, slug: string): Promise<boolean> {
+export async function articleExists(
+  sourceUrl: string,
+  slug: string,
+  extra?: { coverImage?: string; publishedAt?: string }
+): Promise<boolean> {
   await initNewsSchema()
   const client = getTursoClient()
 
   try {
+    const conditions = ['source_url = ?', 'slug = ?']
+    const args: any[] = [sourceUrl, slug]
+
+    if (extra?.coverImage) {
+      conditions.push('cover_image = ?')
+      args.push(extra.coverImage)
+    }
+
+    if (extra?.publishedAt) {
+      conditions.push('published_at = ?')
+      args.push(extra.publishedAt)
+    }
+
     const result = await client.execute({
-      sql: `SELECT 1 FROM news_articles WHERE source_url = ? OR slug = ? LIMIT 1`,
-      args: [sourceUrl, slug],
+      sql: `SELECT 1 FROM news_articles WHERE ${conditions.join(' OR ')} LIMIT 1`,
+      args,
     })
     return result.rows.length > 0
   } catch {

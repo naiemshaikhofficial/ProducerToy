@@ -145,10 +145,11 @@ REQUIREMENTS:
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
    - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
 6. NEVER mention third-party scraper blogs (Bedroom Producers Blog, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
-7. EXACT PRODUCT LINK (TRUSTABLE SOURCE, ZERO FAKE LINKS):
-   - Set "product_url" to the exact official product download/store page on the developer's website (e.g. https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip, Gumroad, or Plugin Boutique product slug).
-   - NEVER use placeholder links like [here](#). NEVER link back to competitor blogs.
-   - Producer Toy must be the most trustworthy, accurate audio software news and deal source on the web.
+7. EXACT DEEP PRODUCT OR DEAL OFFER LINK (NEVER IMAGES OR ROOT DOMAINS):
+   - Set "product_url" to the exact official product download/store/offer landing page (e.g. "https://syncaudio.io/megamorph/", "https://audija.com/oscope/", "https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip", or specific Plugin Boutique product deal page).
+   - In music blogs (BPB, GearNews, Rekkerd), this is consistently placed at the bottom of the article after "More info: [Product Name ($XX)](url)" or "Product page:". Always extract this exact deep product page link.
+   - NEVER use image URLs (e.g. .jpg, .png, ytimg), NEVER link to YouTube, and NEVER link to competitor blogs or empty placeholder anchors.
+   - If a specific product slug exists on the developer's website, always include the deep path (e.g. /megamorph/ or /oscope/), not just the root domain.
 8. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
 
 OUTPUT FORMAT:

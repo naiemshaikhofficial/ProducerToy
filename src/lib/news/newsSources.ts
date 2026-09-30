@@ -103,33 +103,74 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
       return null
     }
 
-    const links = [...text.matchAll(/\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi)].map((m) => m[2])
-
     let bestUrl: string | undefined
     let couponCode: string | undefined
 
-    for (const rawUrl of links) {
-      const cleaned = sanitizeDealUrl(rawUrl)
-      if (!cleaned) continue
+    // 1. HIGHEST PRIORITY: Explicit "More info: [Product Name ($XX)](url)" or "Product page:" pattern
+    const moreInfoMatches = [
+      ...text.matchAll(
+        /(?:\*{0,2}(?:more\s+info|more\s+information|product\s+page|official\s+page|get\s+it\s+here|available\s+at|check\s+out|visit|buy\s+now|download|link)\*{0,2}\s*(?::|—|-)?\s*)\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi
+      ),
+    ]
 
-      // Highest priority: exact Plugin Boutique product slug or deals hub
-      if (cleaned.includes('pluginboutique.com/deals/') || cleaned.includes('pluginboutique.com/product/')) {
-        bestUrl = cleaned
+    for (const match of moreInfoMatches) {
+      const candidateUrl = sanitizeDealUrl(match[2])
+      if (candidateUrl) {
+        bestUrl = candidateUrl
         break
       }
+    }
 
-      // High priority: developer store or official repository
-      if (
-        !bestUrl &&
-        (cleaned.includes('gumroad.com') ||
-          cleaned.includes('github.com') ||
-          cleaned.includes('safari-pedals.com') ||
-          cleaned.includes('celestdsp.com') ||
-          cleaned.includes('leitaudio.com') ||
-          cleaned.includes('abyzor.space') ||
-          !cleaned.includes('pluginboutique.com'))
-      ) {
-        bestUrl = cleaned
+    // 2. SECONDARY SCAN: Search all markdown links, giving precedence to deep product/deal pages
+    if (!bestUrl) {
+      const parsedLinks = [...text.matchAll(/\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi)].map((m) => ({
+        label: m[1].trim(),
+        url: m[2].trim(),
+      }))
+
+      // Score links: deep product pages & price labels get highest score
+      let highestScore = -1
+      for (const item of parsedLinks) {
+        const cleaned = sanitizeDealUrl(item.url)
+        if (!cleaned) continue
+
+        let score = 0
+        const lowerLabel = item.label.toLowerCase()
+        const lowerCleaned = cleaned.toLowerCase()
+
+        // Exact Plugin Boutique product or deal slug
+        if (lowerCleaned.includes('pluginboutique.com/product/') || lowerCleaned.includes('pluginboutique.com/deals/')) {
+          score += 100
+        }
+        // Has price in label e.g. "($79)" or "FREE"
+        if (/\(\s*\$?\d+/.test(item.label) || lowerLabel.includes('free') || lowerLabel.includes('download')) {
+          score += 50
+        }
+        // Deep product slug (has a path beyond root domain like /megamorph/ or /products/...)
+        try {
+          const u = new URL(cleaned)
+          if (u.pathname && u.pathname !== '/' && u.pathname.length > 2) {
+            score += 30
+          }
+        } catch {}
+
+        // Trusted developer/marketplace platforms
+        if (
+          lowerCleaned.includes('gumroad.com') ||
+          lowerCleaned.includes('github.com') ||
+          lowerCleaned.includes('safari-pedals.com') ||
+          lowerCleaned.includes('celestdsp.com') ||
+          lowerCleaned.includes('syncaudio.io') ||
+          lowerCleaned.includes('leitaudio.com') ||
+          lowerCleaned.includes('abyzor.space')
+        ) {
+          score += 25
+        }
+
+        if (score > highestScore) {
+          highestScore = score
+          bestUrl = cleaned
+        }
       }
     }
 
