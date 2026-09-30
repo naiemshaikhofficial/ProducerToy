@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
-  Bookmark,
   Copy,
   Check,
   ExternalLink,
@@ -21,7 +20,6 @@ interface NewsArticleClientProps {
 
 export function NewsArticleClient({ article, relatedArticles }: NewsArticleClientProps) {
   const [copied, setCopied] = useState(false)
-  const [bookmarked, setBookmarked] = useState(false)
   const [copiedCoupon, setCopiedCoupon] = useState(false)
 
   const couponCode =
@@ -117,34 +115,16 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           {/* Left Hero Card (5 cols) - Borderless per user request */}
           <div className="lg:col-span-5 bg-[#18181c] border-0 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-xl min-h-[340px] lg:min-h-[420px]">
             <div>
-              {/* Dynamic Badges: MEGA DEAL, COUPON CODE, FLASH SALE, FREEWARE */}
-              <div className="mb-4 flex items-center gap-2">
-                {article.badge === 'MEGA DEAL' ? (
-                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse">
-                    🔥 MEGA DEAL
-                  </span>
-                ) : article.badge === 'COUPON CODE' ? (
-                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    🏷️ COUPON CODE
-                  </span>
-                ) : article.badge === 'FLASH SALE' ? (
-                  <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                    ⚡ FLASH SALE
-                  </span>
-                ) : article.badge === 'FREEWARE' ? (
-                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-[#24242a] text-zinc-300 border border-white/5">
-                    FREEWARE
-                  </span>
-                ) : (
-                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md bg-[#24242a] text-zinc-300 border border-white/5">
-                    {article.badge || 'DEAL'}
-                  </span>
-                )}
+              {/* Minimalist Theme Badge & Pricing */}
+              <div className="mb-4 flex items-center gap-3">
+                <span className="inline-block text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#24242a] text-zinc-300 border border-white/5">
+                  {article.badge || 'DEAL'}
+                </span>
 
                 {article.deal_regular_price && article.deal_price && article.deal_price !== 'FREE' && (
-                  <span className="text-xs font-bold text-zinc-400">
-                    <span className="line-through text-zinc-500 mr-1.5">{article.deal_regular_price}</span>
-                    <span className="text-[#00FF94] font-extrabold">{article.deal_price}</span>
+                  <span className="text-xs font-semibold text-zinc-400">
+                    <span className="line-through text-zinc-500 mr-2">{article.deal_regular_price}</span>
+                    <span className="text-white font-bold">{article.deal_price}</span>
                   </span>
                 )}
               </div>
@@ -292,28 +272,13 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             <div className="bg-[#18181c] border border-[#26262a] rounded-2xl p-5 shadow-xl flex flex-col gap-5">
               
               {/* Primary Item */}
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex flex-col min-w-0 flex-1">
-                  <span className="font-bold text-sm sm:text-base text-white truncate hover:text-[#FC6301] transition-colors">
-                    {cleanHtmlTitle(article.title)}
-                  </span>
-                  <span className="text-xs sm:text-sm font-semibold text-zinc-400 mt-1">
-                    {displayPrice}
-                  </span>
-                </div>
-
-                {/* Bookmark Button */}
-                <button
-                  onClick={() => setBookmarked(!bookmarked)}
-                  aria-label="Bookmark"
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all cursor-pointer ${
-                    bookmarked
-                      ? 'bg-[#FC6301] border-[#FC6301] text-white'
-                      : 'bg-[#222228] hover:bg-[#2a2a32] border-[#2e2e38] text-zinc-300'
-                  }`}
-                >
-                  <Bookmark className={`w-4 h-4 ${bookmarked ? 'fill-current' : ''}`} />
-                </button>
+              <div className="flex flex-col min-w-0">
+                <span className="font-bold text-sm sm:text-base text-white truncate hover:text-[#FC6301] transition-colors">
+                  {cleanHtmlTitle(article.title)}
+                </span>
+                <span className="text-xs sm:text-sm font-semibold text-zinc-400 mt-1">
+                  {displayPrice}
+                </span>
               </div>
 
               {/* Direct CTA Button */}
