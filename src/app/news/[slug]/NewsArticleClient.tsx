@@ -62,6 +62,14 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     }
     const lower = url.toLowerCase()
     if (
+      /\.(jpg|jpeg|png|webp|gif|svg|avif)(\?.*)?$/i.test(url) ||
+      lower.includes('ytimg.com') ||
+      lower.includes('youtube.com') ||
+      lower.includes('youtu.be')
+    ) {
+      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
+    }
+    if (
       lower.includes('gearnews.com') ||
       lower.includes('bedroomproducersblog.com') ||
       lower.includes('rekkerd.org') ||

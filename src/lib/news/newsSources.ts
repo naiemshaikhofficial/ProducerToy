@@ -40,11 +40,18 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     lower.includes('x.com') ||
     lower.includes('instagram.com') ||
     lower.includes('youtube.com') ||
+    lower.includes('youtu.be') ||
+    lower.includes('ytimg.com') ||
     lower.includes('gravatar.com') ||
     lower.includes('wordpress.org') ||
     lower.includes('w3.org') ||
     lower.includes('schema.org')
   ) {
+    return null
+  }
+
+  // Block any image/media files (.jpg, .jpeg, .png, .webp, .gif, .svg, .avif, etc.)
+  if (/\.(jpg|jpeg|png|webp|gif|svg|avif|bmp|ico|mp4|webm|mp3|wav)(\?.*)?$/i.test(trimmed)) {
     return null
   }
 
