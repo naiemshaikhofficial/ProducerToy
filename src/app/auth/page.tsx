@@ -308,6 +308,7 @@ function AuthForm() {
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setMessage('')
     setAccountAlreadyExists(false)
     if (!email.trim() || !email.includes('@')) {
       setError('Please enter a valid email address.')
@@ -492,6 +493,8 @@ function AuthForm() {
                   setIsEmailSent(false)
                   setMode('signin')
                   setStep('email')
+                  setError('')
+                  setMessage('')
                 }}
                 className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all cursor-pointer"
               >
@@ -500,8 +503,8 @@ function AuthForm() {
             </div>
 
             {message && (
-              <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 w-full animate-in fade-in">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
+                <CheckCircle2 className="w-4 h-4 text-[#FC6301] shrink-0" />
                 <span>{message}</span>
               </div>
             )}
@@ -569,8 +572,8 @@ function AuthForm() {
                 </div>
 
                 {message && (
-                  <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-[#FC6301] shrink-0" />
                     <span>{message}</span>
                   </div>
                 )}
@@ -720,8 +723,8 @@ function AuthForm() {
             )}
 
             {message && (
-              <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 px-4 py-3 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 text-center">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
+                <CheckCircle2 className="w-4 h-4 text-[#FC6301] shrink-0" />
                 <span>{message}</span>
               </div>
             )}
@@ -732,7 +735,7 @@ function AuthForm() {
                 <label className="block text-[12px] font-semibold text-zinc-300">
                   New Password
                 </label>
-                <div className="relative">
+                <div className="relative flex items-center">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -742,12 +745,14 @@ function AuthForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
+                    style={{ paddingLeft: '14px', paddingRight: '44px' }}
+                    className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-white transition-colors cursor-pointer touch-manipulation"
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
+                    className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer touch-manipulation"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -789,7 +794,7 @@ function AuthForm() {
                 <label className="block text-[12px] font-semibold text-zinc-300">
                   Confirm New Password
                 </label>
-                <div className="relative">
+                <div className="relative flex items-center">
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
@@ -799,12 +804,14 @@ function AuthForm() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
+                    style={{ paddingLeft: '14px', paddingRight: '44px' }}
+                    className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-white transition-colors cursor-pointer touch-manipulation"
+                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
+                    className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer touch-manipulation"
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -840,6 +847,7 @@ function AuthForm() {
                     setStep('email')
                   }
                   setError('')
+                  setMessage('')
                   setAccountAlreadyExists(false)
                 }}
                 className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white font-bold transition-colors uppercase tracking-wider cursor-pointer"
@@ -965,8 +973,8 @@ function AuthForm() {
 
             {/* Info / Success Message Pill */}
             {message && (
-              <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 p-3 rounded-xl text-xs flex items-center justify-center gap-2 font-semibold">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
+                <CheckCircle2 className="w-4 h-4 text-[#FC6301] shrink-0" />
                 <span>{message}</span>
               </div>
             )}
@@ -1058,6 +1066,7 @@ function AuthForm() {
                         onClick={() => {
                           setMode('signup')
                           setError('')
+                          setMessage('')
                           setAccountAlreadyExists(false)
                         }}
                         className="text-white hover:underline font-bold transition-colors ml-1 cursor-pointer"
@@ -1073,6 +1082,7 @@ function AuthForm() {
                         onClick={() => {
                           setMode('signin')
                           setError('')
+                          setMessage('')
                           setAccountAlreadyExists(false)
                         }}
                         className="text-white hover:underline font-bold transition-colors ml-1 cursor-pointer"
@@ -1128,7 +1138,7 @@ function AuthForm() {
                     )}
                   </div>
 
-                  <div className="relative">
+                  <div className="relative flex items-center">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
@@ -1138,12 +1148,14 @@ function AuthForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••••••"
-                      className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
+                      style={{ paddingLeft: '14px', paddingRight: '44px' }}
+                      className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-white transition-colors cursor-pointer touch-manipulation"
+                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
+                      className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer touch-manipulation"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1186,7 +1198,7 @@ function AuthForm() {
                     <label className="block text-[12px] font-semibold text-zinc-300">
                       Confirm Password
                     </label>
-                    <div className="relative">
+                    <div className="relative flex items-center">
                       <input
                         type={showConfirmPassword ? 'text' : 'password'}
                         required
@@ -1196,12 +1208,14 @@ function AuthForm() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] pl-3.5 pr-10 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
+                        style={{ paddingLeft: '14px', paddingRight: '44px' }}
+                        className="w-full h-11 bg-[#181818] border border-[#282828] hover:border-[#383838] focus:border-zinc-300 text-white text-[13px] rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm touch-manipulation select-text"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-500 hover:text-white transition-colors cursor-pointer touch-manipulation"
+                        style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}
+                        className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer touch-manipulation"
                         aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                       >
                         {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
