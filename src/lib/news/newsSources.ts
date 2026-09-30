@@ -29,6 +29,7 @@ export function sanitizeDealUrl(url?: string | null): string | null {
   if (
     lower.includes('gearnews.com') ||
     lower.includes('bedroomproducersblog.com') ||
+    lower.includes('audiopluginguy.com') ||
     lower.includes('rekkerd.org') ||
     lower.includes('kvraudio.com') ||
     lower.includes('musictech.com') ||
@@ -192,7 +193,38 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
 }
 
 
-export const MUSIC_NEWS_FEEDS = [
+export const MUSIC_NEWS_FEEDS: Array<{
+  name: string
+  url: string
+  fallbackUrl?: string
+  categoryDefault: string
+  isPrimary: boolean
+}> = [
+  {
+    name: 'Rekkerd (Latest Music News & Deals)',
+    url: 'https://rekkerd.org/feed/',
+    fallbackUrl: 'https://news.google.com/rss/search?q=site:rekkerd.org&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: true,
+  },
+  {
+    name: 'AudioPlugin Guy (Latest News & Deals)',
+    url: 'https://www.audiopluginguy.com/feed/',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: true,
+  },
+  {
+    name: 'Bedroom Producers Blog',
+    url: 'https://bedroomproducersblog.com/feed/',
+    categoryDefault: 'Free VSTs',
+    isPrimary: true,
+  },
+  {
+    name: 'AudioPlugin Guy (Exclusive Deals)',
+    url: 'https://www.audiopluginguy.com/deals/feed/',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: true,
+  },
   {
     name: 'Google News (Audio Brands Deals)',
     url: 'https://news.google.com/rss/search?q=(Native+Instruments+OR+FabFilter+OR+iZotope+OR+Arturia+OR+Soundtoys+OR+Universal+Audio)+AND+(deal+OR+sale+OR+discount+OR+free+OR+vst+OR+coupon)&hl=en-US&gl=US&ceid=US:en',
@@ -202,24 +234,6 @@ export const MUSIC_NEWS_FEEDS = [
   {
     name: 'Google News (Mega VST Deals & Coupons)',
     url: 'https://news.google.com/rss/search?q=(VST+OR+plugin)+AND+(deal+OR+discount+OR+coupon+OR+giveaway+OR+%22price+drop%22)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: false,
-  },
-  {
-    name: 'AudioPlugin Guy (Coupons & Sales)',
-    url: 'https://audiopluginguy.com/feed/',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: false,
-  },
-  {
-    name: 'Bedroom Producers Blog',
-    url: 'https://bedroomproducersblog.com/feed/',
-    categoryDefault: 'Free VSTs',
-    isPrimary: true,
-  },
-  {
-    name: 'Rekkerd Deals',
-    url: 'https://rekkerd.org/category/deals/feed/',
     categoryDefault: 'Deals & Sales',
     isPrimary: false,
   },
@@ -239,14 +253,14 @@ export const MUSIC_NEWS_FEEDS = [
 
 /**
  * Fetch and parse RSS items from music production feeds
- * Prioritizes Bedroom Producers Blog items first
+ * Prioritizes Rekkerd, AudioPlugin Guy, and BPB items first
  */
 export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
   const allItems: RawFeedItem[] = []
 
   for (const feed of MUSIC_NEWS_FEEDS) {
     try {
-      const res = await fetch(feed.url, {
+      let res = await fetch(feed.url, {
         headers: {
           'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -254,6 +268,18 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
         },
         next: { revalidate: 1800 }, // 30 mins
       })
+
+      // If feed returns 403 or error and has a fallback URL, use fallback URL
+      if (!res.ok && feed.fallbackUrl) {
+        res = await fetch(feed.fallbackUrl, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            Accept: 'application/rss+xml, application/xml, text/xml, */*',
+          },
+          next: { revalidate: 1800 },
+        })
+      }
 
       if (!res.ok) {
         console.warn(`[fetchMusicNewsFeedItems] Feed ${feed.name} returned status ${res.status}`)
@@ -264,7 +290,6 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
       const items = parseRssItems(xml, feed.name, feed.isPrimary)
 
       if (feed.isPrimary) {
-        // Prepend BPB items so they are always processed first
         allItems.unshift(...items)
       } else {
         allItems.push(...items)

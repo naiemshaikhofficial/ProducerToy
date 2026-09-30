@@ -48,16 +48,18 @@ export function sanitizeScrapedText(text: string): string {
     .replace(/[-*•]?\s*\*\*Source Coverage:\*\*.*$/gim, '')
     .replace(/Originally reported via.*$/gim, '')
     .replace(/View post:\s*\[?[^\]\n]+\]?(\([^)]+\))?/gi, '')
-    // Replace BPB readers / Bedroom Producers Blog
+    // Replace BPB & AudioPlugin Guy mentions
     .replace(/\bBPB\s+readers\b/gi, 'music producers')
     .replace(/\bBPB\b/gi, 'Producer Toy')
     .replace(/Bedroom\s+Producers?\s+Blog/gi, 'Producer Toy')
-    .replace(/https?:\/\/(?:www\.)?bedroomproducersblog\.com[^\s)\]"]*/gi, '#')
+    .replace(/Audio\s*Plugin\s*Guy/gi, 'Producer Toy')
+    .replace(/https?:\/\/(?:www\.)?(?:bedroomproducersblog\.com|audiopluginguy\.com)[^\s)\]"]*/gi, '#')
     // External music scrapers & blogs
     .replace(/rekkerd(?:\.org)?/gi, 'our partners')
     .replace(/gearnews(?:\.com)?/gi, 'audio tech news')
     .replace(/kvraudio(?:\.com)?/gi, 'community reports')
     .replace(/musictech(?:\.com)?/gi, 'studio insights')
+    .replace(/^(News|Deal|Review):\s*/i, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
@@ -153,7 +155,7 @@ REQUIREMENTS:
    - If it's a 100% free giveaway / freeware: set "badge": "FREEWARE".
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
    - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
-6. NEVER mention third-party scraper blogs (Bedroom Producers Blog, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
+6. NEVER mention third-party blogs or sources (Bedroom Producers Blog, AudioPlugin Guy, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
 7. EXACT DEEP PRODUCT OR DEAL OFFER LINK (NEVER IMAGES OR ROOT DOMAINS):
    - Set "product_url" to the exact official product download/store/offer landing page (e.g. "https://syncaudio.io/megamorph/", "https://audija.com/oscope/", "https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip", or specific Plugin Boutique product deal page).
    - In music blogs (BPB, GearNews, Rekkerd), this is consistently placed at the bottom of the article after "More info: [Product Name ($XX)](url)" or "Product page:". Always extract this exact deep product page link.
