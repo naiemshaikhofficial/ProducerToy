@@ -14,6 +14,7 @@ import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
 import { EpicMostPopular } from '@/components/EpicMostPopular'
 import { EpicTrending } from '@/components/EpicTrending'
+import { HomeBrandSeoSection } from '@/components/home/HomeBrandSeoSection'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
 // 🟢 ZERO-RESOURCE CDN CACHING: Infinite cache (purged on-demand via /api/revalidate webhook).
@@ -21,18 +22,24 @@ import { LocalDataCache } from '@/components/LocalDataCache'
 export const revalidate = false
 
 export const metadata: Metadata = generatePageMetadata({
-  title: 'Producer Toy — Music Production VST Plugins, Samples & Presets',
+  title: 'Producer Toy — Official Store for VST Plugins, Sample Packs & Sounds',
   description:
-    'Download world-class VST plugins, royalty-free sample packs, Serum synth presets, and DAW templates on Producer Toy. The premier marketplace for modern music creators.',
+    'Download premier VST plugins, 100% royalty-free sample packs, synth presets, and DAW templates on Producer Toy (producertoy.com). The official marketplace for modern music creators.',
   path: '/',
   keywords: [
     'Producer Toy',
     'producertoy',
     'producertoy.com',
+    'producer toy official',
+    'producer toy store',
+    'producer toy marketplace',
+    'producer toy vst',
+    'producer toy sample pack',
+    'producer toy sounds',
     'producer toys',
     'producers toy',
     'producers toys',
-    'producer toy store',
+    'producer toy plugins',
     'VST Plugins',
     'Free VST Plugins',
     'Sample Packs',
@@ -96,6 +103,9 @@ export default async function HomePage() {
         <div>
           <EpicTrending products={products} />
         </div>
+
+        {/* 9th Section: Brand Entity Authority, Overview & FAQ (Google Knowledge Graph & AI Overview) */}
+        <HomeBrandSeoSection />
 
       </div>
 

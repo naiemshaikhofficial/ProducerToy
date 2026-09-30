@@ -298,7 +298,14 @@ export function StoreOrganizationJsonLd() {
     '@type': ['Organization', 'OnlineStore'],
     '@id': 'https://producertoy.com/#organization',
     name: 'Producer Toy',
-    alternateName: ['ProducerToy', 'Producer Toy Store', 'producertoy.com'],
+    alternateName: [
+      'ProducerToy',
+      'Producer Toy Store',
+      'producertoy.com',
+      'Producer Toy Marketplace',
+      'Producer Toy VST',
+      'Producer Toy Audio',
+    ],
     url: 'https://producertoy.com',
     logo: {
       '@type': 'ImageObject',
@@ -309,11 +316,28 @@ export function StoreOrganizationJsonLd() {
       caption: 'Producer Toy Logo',
     },
     image: 'https://producertoy.com/Icon.png',
-    description: 'The premier marketplace for modern music creators. Download VST plugins, sample packs, synth presets, and DAW templates on Producer Toy.',
+    description:
+      'The premier digital marketplace for music creators. Download VST plugins, royalty-free sample packs, synth presets, and DAW templates on Producer Toy.',
+    disambiguatingDescription:
+      'Producer Toy is a digital marketplace for music production software, audio plugins, sample packs, and synth presets. It is not a children physical toy store.',
+    slogan: 'Premier Marketplace for Modern Music Creators',
+    knowsAbout: [
+      'Music Production',
+      'Virtual Studio Technology (VST)',
+      'Audio Plugins',
+      'Audio Effects',
+      'Sample Packs',
+      'Synthesizer Presets',
+      'Serum Presets',
+      'Digital Audio Workstations',
+      'Sound Design',
+      'Audio Engineering',
+    ],
     sameAs: [
       'https://twitter.com/producertoy',
       'https://instagram.com/producertoy',
       'https://youtube.com/@producertoy',
+      'https://facebook.com/producertoy',
     ],
   }
 
