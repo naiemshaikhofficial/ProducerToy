@@ -185,17 +185,27 @@ export const Header: React.FC = () => {
           isMobileMenuOpen
             ? 'fixed top-0 left-0 right-0 z-[60] bg-[#121212]'
             : isNewsArticle
-            ? `fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
-                isScrolled
-                  ? 'backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08]'
-                  : 'backdrop-blur-md bg-[#121212]/80 border-b border-white/[0.08]'
-              }`
+            ? 'fixed top-0 left-0 right-0 z-[60] transition-colors duration-300'
             : isSitePage
-            ? 'sticky top-0 z-[60] backdrop-blur-xl bg-[#121212]/90 border-b border-white/[0.08]'
+            ? 'sticky top-0 z-[60] transition-colors duration-300'
             : isShopPage
             ? 'relative z-[60] bg-[#121212]'
             : 'sticky top-0 z-[60] bg-[#121212]'
-        } w-full select-none border-none`}
+        } w-full select-none`}
+        style={
+          !isMobileMenuOpen && (isNewsArticle || isSitePage)
+            ? {
+                backgroundColor: isScrolled
+                  ? 'rgba(18, 18, 18, 0.92)'
+                  : isNewsArticle
+                  ? 'rgba(18, 18, 18, 0.65)'
+                  : 'rgba(18, 18, 18, 0.85)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              }
+            : undefined
+        }
       >
         <TopBar
           currency={currency}
