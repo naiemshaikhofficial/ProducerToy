@@ -1,4 +1,4 @@
-import { RawFeedItem } from './newsSources'
+import { RawFeedItem, sanitizeDealUrl, PLUGIN_BOUTIQUE_AFFILIATE_ID } from './newsSources'
 import { NewsArticle } from '../turso/newsDb'
 import { getArticleCoverImage } from './imageGenerator'
 
@@ -191,38 +191,23 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
 }
 
 function resolveSafeDealUrl(productUrl?: string, directDealUrl?: string, itemLink?: string): string {
-  // 1. If explicit productUrl is valid and NOT a scraper blog
-  if (productUrl && isValidMerchantUrl(productUrl)) {
-    return productUrl
+  // 1. If direct deal URL from HTML exists (Thomann, Plugin Boutique, developer sites, etc.)
+  const cleanDirect = sanitizeDealUrl(directDealUrl)
+  if (cleanDirect) {
+    return cleanDirect
   }
-  // 2. If direct deal URL from HTML exists (e.g. Plugin Boutique, Thomann, Roland, NI)
-  if (directDealUrl && isValidMerchantUrl(directDealUrl)) {
-    return directDealUrl
+  // 2. If explicit productUrl from Groq AI is valid and NOT a scraper blog
+  const cleanProduct = sanitizeDealUrl(productUrl)
+  if (cleanProduct) {
+    return cleanProduct
   }
   // 3. If itemLink is NOT a scraper blog, check it
-  if (itemLink && isValidMerchantUrl(itemLink)) {
-    return itemLink
+  const cleanItem = sanitizeDealUrl(itemLink)
+  if (cleanItem) {
+    return cleanItem
   }
-  // 4. Default strictly to our own ProducerToy store! NEVER link to a competitor blog!
-  return 'https://producertoy.com/store'
-}
-
-function isValidMerchantUrl(url: string): boolean {
-  if (!url) return false
-  const lower = url.toLowerCase()
-  // Block all scraper blogs
-  if (
-    lower.includes('gearnews.com') ||
-    lower.includes('bedroomproducersblog.com') ||
-    lower.includes('rekkerd.org') ||
-    lower.includes('kvraudio.com') ||
-    lower.includes('musictech.com') ||
-    lower.includes('cdm.link') ||
-    lower.includes('news.google.com')
-  ) {
-    return false
-  }
-  return lower.startsWith('http://') || lower.startsWith('https://')
+  // 4. Default fallback: Plugin Boutique Deals with user's affiliate referral ID
+  return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
 }
 
 function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticle {

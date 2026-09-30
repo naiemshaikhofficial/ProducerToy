@@ -10,6 +10,63 @@ export interface RawFeedItem {
   directDealUrl?: string
 }
 
+export const PLUGIN_BOUTIQUE_AFFILIATE_ID = '68affa2b94f43'
+
+/**
+ * Validates deal links: excludes blog scrapers/social media,
+ * preserves developer websites, and attaches user's referral tag to Plugin Boutique product slugs.
+ */
+export function sanitizeDealUrl(url?: string | null): string | null {
+  if (!url || typeof url !== 'string') return null
+  const trimmed = url.trim()
+  const lower = trimmed.toLowerCase()
+
+  if (!lower.startsWith('http://') && !lower.startsWith('https://')) {
+    return null
+  }
+
+  // Block competitor blogs, social media, tracking pixels
+  if (
+    lower.includes('gearnews.com') ||
+    lower.includes('bedroomproducersblog.com') ||
+    lower.includes('rekkerd.org') ||
+    lower.includes('kvraudio.com') ||
+    lower.includes('musictech.com') ||
+    lower.includes('cdm.link') ||
+    lower.includes('news.google.com') ||
+    lower.includes('producertoy.com') ||
+    lower.includes('facebook.com') ||
+    lower.includes('twitter.com') ||
+    lower.includes('x.com') ||
+    lower.includes('instagram.com') ||
+    lower.includes('youtube.com') ||
+    lower.includes('gravatar.com') ||
+    lower.includes('wordpress.org') ||
+    lower.includes('w3.org') ||
+    lower.includes('schema.org')
+  ) {
+    return null
+  }
+
+  // If it's a Plugin Boutique URL, preserve exact product slug and attach/replace user's referral ID
+  if (lower.includes('pluginboutique.com')) {
+    try {
+      const parsed = new URL(trimmed)
+      parsed.searchParams.set('a_aid', PLUGIN_BOUTIQUE_AFFILIATE_ID)
+      return parsed.toString()
+    } catch {
+      if (trimmed.includes('a_aid=')) {
+        return trimmed.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
+      }
+      return trimmed.includes('?')
+        ? `${trimmed}&a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+        : `${trimmed}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+    }
+  }
+
+  return trimmed
+}
+
 export const MUSIC_NEWS_FEEDS = [
   {
     name: 'Google News (Audio Brands Deals)',
@@ -166,27 +223,15 @@ function parseRssItems(xml: string, sourceName: string, isPrimary = false): RawF
       imageUrl = imageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
     }
 
-    // Direct merchant / store deal URL extraction (Plugin Boutique, Thomann, Roland, Native Instruments, etc.)
+    // Direct merchant / store / developer deal URL extraction
     let directDealUrl: string | undefined
-    const rawLinks = rawContent.match(/href="([^"]+)"/gi) || []
+    const rawLinks = (rawContent + ' ' + block).match(/href="([^"#]+)"/gi) || []
     for (const l of rawLinks) {
-      const hrefMatch = l.match(/href="([^"]+)"/i)
+      const hrefMatch = l.match(/href="([^"#]+)"/i)
       if (!hrefMatch) continue
-      const href = hrefMatch[1]
-      if (
-        href.includes('pluginboutique.com') ||
-        href.includes('thomann.de') ||
-        href.includes('native-instruments.com') ||
-        href.includes('roland.com') ||
-        href.includes('slatedigital.com') ||
-        href.includes('fabfilter.com') ||
-        href.includes('waves.com') ||
-        href.includes('arturia.com') ||
-        href.includes('celestdsp.com') ||
-        href.includes('soundtoys.com') ||
-        href.includes('izotope.com')
-      ) {
-        directDealUrl = href
+      const cleaned = sanitizeDealUrl(hrefMatch[1])
+      if (cleaned) {
+        directDealUrl = cleaned
         break
       }
     }

@@ -56,11 +56,15 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   // Format price
   const displayPrice = article.deal_price || (article.category === 'Free VSTs' ? 'FREE' : 'FREE / PROMO')
 
-  // Block competitor/scraper blog links from ever being shown to users
-  const isCompetitorScraper = (url?: string | null) => {
-    if (!url) return true
+  const PB_AFFILIATE_ID = '68affa2b94f43'
+
+  const resolveOfferLink = (url?: string | null): string => {
+    if (!url || url === '/store' || url.includes('producertoy.com/store')) {
+      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
+    }
+    // Block internal scraper blog URLs and send directly to Plugin Boutique Deals
     const lower = url.toLowerCase()
-    return (
+    if (
       lower.includes('gearnews.com') ||
       lower.includes('bedroomproducersblog.com') ||
       lower.includes('rekkerd.org') ||
@@ -68,13 +72,20 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       lower.includes('musictech.com') ||
       lower.includes('cdm.link') ||
       lower.includes('news.google.com')
-    )
+    ) {
+      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
+    }
+    // If it's a Plugin Boutique URL, ensure user's referral tag is attached or replaced
+    if (url.includes('pluginboutique.com')) {
+      if (url.includes('a_aid=')) {
+        return url.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PB_AFFILIATE_ID}`)
+      }
+      return url.includes('?') ? `${url}&a_aid=${PB_AFFILIATE_ID}` : `${url}?a_aid=${PB_AFFILIATE_ID}`
+    }
+    return url
   }
 
-  const safeTargetUrl = article.source_url && !isCompetitorScraper(article.source_url)
-    ? article.source_url
-    : '/store'
-  const isStoreLink = safeTargetUrl === '/store' || safeTargetUrl.startsWith('/')
+  const offerUrl = resolveOfferLink(article.source_url)
 
   const getHighResCoverImage = (url?: string | null): string => {
     if (!url) return '/placeholder.jpg'
@@ -254,24 +265,15 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 <span>{copied ? 'Link Copied' : 'Share Story'}</span>
               </button>
 
-              {isStoreLink ? (
-                <Link
-                  href="/store"
-                  className="px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <span>Explore in Store</span>
-                </Link>
-              ) : (
-                <a
-                  href={safeTargetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <span>Get Official Deal</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              )}
+              <a
+                href={offerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
+              >
+                <span>Get Official Deal</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
             </div>
 
             {/* In-Article Google Ad Slot (Only on News Articles) */}
@@ -293,7 +295,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               <div className="flex items-center justify-between gap-3">
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="font-bold text-sm sm:text-base text-white truncate hover:text-[#FC6301] transition-colors">
-                    {article.title}
+                    {cleanHtmlTitle(article.title)}
                   </span>
                   <span className="text-xs sm:text-sm font-semibold text-zinc-400 mt-1">
                     {displayPrice}
@@ -315,24 +317,15 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               </div>
 
               {/* Direct CTA Button */}
-              {isStoreLink ? (
-                <Link
-                  href="/store"
-                  className="w-full py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <span>Explore in Store</span>
-                </Link>
-              ) : (
-                <a
-                  href={safeTargetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <span>Get Official Deal</span>
-                  <ExternalLink className="w-4 h-4" />
-                </a>
-              )}
+              <a
+                href={offerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+              >
+                <span>Get Official Deal</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
 
             {/* Related Story Card */}
