@@ -64,7 +64,7 @@ export const metadata: Metadata = {
 }
 
 export default async function NewsPage() {
-  const articles = await getNewsArticles({ limit: 40 })
+  const articles = await getNewsArticles({ limit: 100 })
 
   const jsonLd = {
     '@context': 'https://schema.org',

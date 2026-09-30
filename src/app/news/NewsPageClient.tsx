@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Search, X, Sparkles } from 'lucide-react'
 import { NewsArticle } from '@/lib/turso/newsDb'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 
@@ -10,15 +11,103 @@ interface NewsPageClientProps {
   initialArticles: NewsArticle[]
 }
 
+const CATEGORY_TABS = [
+  { id: 'all', label: 'All News' },
+  { id: 'free', label: 'Free Plugins & VSTs', isFree: true },
+  { id: 'deals', label: 'Deals & Discounts' },
+  { id: 'guides', label: 'Guides & Tech' },
+]
+
 export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
+  const [activeCategory, setActiveCategory] = useState<'all' | 'free' | 'deals' | 'guides'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
   const [visibleCount, setVisibleCount] = useState(12)
 
-  // Top 2 featured articles for the Epic Games billboard hero cards
-  const billboardArticles = initialArticles.slice(0, 2)
+  // Sync URL search params on mount (e.g. /news?category=free or /news?free=true)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const cat = params.get('category') || params.get('filter')
+      const isFreeParam = params.get('free') === 'true'
+      const q = params.get('q') || params.get('search')
+
+      if (isFreeParam || (cat && cat.toLowerCase().includes('free'))) {
+        setActiveCategory('free')
+      } else if (cat && cat.toLowerCase().includes('deal')) {
+        setActiveCategory('deals')
+      } else if (cat && (cat.toLowerCase().includes('guide') || cat.toLowerCase().includes('tech'))) {
+        setActiveCategory('guides')
+      }
+
+      if (q) setSearchQuery(q)
+    }
+  }, [])
+
+  // Filtered articles based on active category and live search query
+  const filteredArticles = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim()
+    return initialArticles.filter((article) => {
+      const title = (article.title || '').toLowerCase()
+      const excerpt = (article.excerpt || '').toLowerCase()
+
+      const matchesQuery = !q || title.includes(q) || excerpt.includes(q)
+      if (!matchesQuery) return false
+
+      if (activeCategory === 'free') {
+        return (
+          article.category === 'Free VSTs' ||
+          article.badge === 'FREEWARE' ||
+          /free|freeware|giveaway|100% off|zero cost|gratuit/i.test(article.title) ||
+          /free/i.test(article.deal_price || '')
+        )
+      }
+
+      if (activeCategory === 'deals') {
+        return (
+          article.category === 'Deals & Sales' ||
+          article.badge === 'HOT DEAL' ||
+          article.badge === 'MEGA DEAL' ||
+          article.badge === 'FLASH SALE' ||
+          article.badge === 'COUPON CODE' ||
+          Boolean(article.deal_price)
+        )
+      }
+
+      if (activeCategory === 'guides') {
+        return (
+          article.category === 'Guides' ||
+          article.category === 'Tech & Gear' ||
+          article.badge === 'GUIDE'
+        )
+      }
+
+      return true
+    })
+  }, [initialArticles, activeCategory, searchQuery])
+
+  // Count of free plugins for badge indicator
+  const freePluginsCount = useMemo(() => {
+    return initialArticles.filter(
+      (a) =>
+        a.category === 'Free VSTs' ||
+        a.badge === 'FREEWARE' ||
+        /free|freeware|giveaway/i.test(a.title)
+    ).length
+  }, [initialArticles])
+
+  const isFiltering = activeCategory !== 'all' || Boolean(searchQuery.trim())
+
+  // Top 2 featured billboard hero cards (only when viewing All News without search)
+  const billboardArticles = isFiltering ? [] : filteredArticles.slice(0, 2)
 
   // Remaining articles for the 1:1 Epic Games horizontal feed
-  const feedArticles = initialArticles.slice(2, visibleCount + 2)
-  const hasMore = visibleCount + 2 < initialArticles.length
+  const feedArticles = isFiltering
+    ? filteredArticles.slice(0, visibleCount)
+    : filteredArticles.slice(2, visibleCount + 2)
+
+  const hasMore = isFiltering
+    ? visibleCount < filteredArticles.length
+    : visibleCount + 2 < filteredArticles.length
 
   const formatRelativeDate = (dateStr: string) => {
     try {
@@ -80,6 +169,112 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
             Daily freeware alerts, music plugins, VST deals, and music production tech news curated by Producer Toy.
           </p>
         </div>
+
+        {/* Category Filter Tabs & Quick Search */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8 sm:mb-10 pb-5 border-b border-[#222226]">
+          {/* Filter Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = activeCategory === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveCategory(tab.id as any)
+                    setVisibleCount(12)
+                  }}
+                  className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                    isActive
+                      ? tab.isFree
+                        ? 'bg-[#FC6301] text-white shadow-lg shadow-[#FC6301]/25 font-bold'
+                        : 'bg-white text-black font-bold'
+                      : tab.isFree
+                      ? 'bg-[#FC6301]/10 text-[#FC6301] hover:bg-[#FC6301]/20 border border-[#FC6301]/30 font-semibold'
+                      : 'bg-[#18181b] text-zinc-400 hover:text-white hover:bg-[#232326] border border-white/5'
+                  }`}
+                >
+                  {tab.isFree && <Sparkles className="w-3.5 h-3.5" />}
+                  <span>{tab.label}</span>
+                  {tab.isFree && freePluginsCount > 0 && (
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded-full font-black ${
+                        isActive ? 'bg-black/30 text-white' : 'bg-[#FC6301] text-white'
+                      }`}
+                    >
+                      {freePluginsCount}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Instant Search Bar */}
+          <div className="relative w-full md:w-72">
+            <Search className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setVisibleCount(12)
+              }}
+              placeholder="Search plugins, deals, VSTs..."
+              className="w-full bg-[#18181b] border border-white/10 rounded-xl pl-9 pr-8 py-2 text-xs sm:text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-[#FC6301] transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-white cursor-pointer"
+                title="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Active Filter Headline / Info Bar if filtering */}
+        {isFiltering && (
+          <div className="flex items-center justify-between mb-6 pb-2">
+            <div className="text-xs sm:text-sm text-zinc-300 font-medium flex items-center gap-2">
+              <span>Showing</span>
+              <span className="text-white font-bold">{filteredArticles.length}</span>
+              <span>{activeCategory === 'free' ? 'free plugins & freeware news' : 'articles'}</span>
+              {searchQuery && (
+                <span>
+                  matching &ldquo;<span className="text-[#FC6301]">{searchQuery}</span>&rdquo;
+                </span>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                setActiveCategory('all')
+                setSearchQuery('')
+              }}
+              className="text-xs text-zinc-400 hover:text-[#FC6301] font-semibold transition-colors cursor-pointer"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+
+        {/* Empty State when no articles match search/filter */}
+        {filteredArticles.length === 0 && (
+          <div className="py-16 text-center border border-[#222226] rounded-2xl bg-[#161618] my-8">
+            <p className="text-base text-zinc-300 font-semibold mb-2">No matching news articles found</p>
+            <p className="text-xs text-zinc-500 mb-5">Try checking your spelling or selecting another category.</p>
+            <button
+              onClick={() => {
+                setActiveCategory('all')
+                setSearchQuery('')
+              }}
+              className="px-5 py-2 bg-[#FC6301] text-white text-xs font-bold rounded-xl hover:bg-[#e05800] transition-colors cursor-pointer"
+            >
+              View All News
+            </button>
+          </div>
+        )}
 
         {/* 1:1 Epic Games 2-Billboard Hero Cards (NO BORDERS, STATIC + LIGHT GLOW HIGHLIGHT ON HOVER) */}
         {billboardArticles.length > 0 && (
