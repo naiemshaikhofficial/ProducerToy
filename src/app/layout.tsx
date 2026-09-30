@@ -94,6 +94,7 @@ export const metadata: Metadata = {
   },
   other: {
     'og:logo': 'https://producertoy.com/Icon.png',
+    'google-adsense-account': 'ca-pub-5611678706554607',
   },
   twitter: {
     card: 'summary_large_image',
@@ -132,6 +133,14 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://supabase.co" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        {/* Google AdSense Site Verification Meta Tag */}
+        <meta name="google-adsense-account" content="ca-pub-5611678706554607" />
+        {/* Google AdSense Code Snippet */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5611678706554607"
+          crossOrigin="anonymous"
+        ></script>
         {/* Impact.com Affiliate Tracking & Website Verification Script */}
         <Script
           id="impact-affiliate"
