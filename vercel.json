@@ -3,8 +3,8 @@
   "regions": ["bom1"],
   "crons": [
     {
-      "path": "/api/news/sync",
-      "schedule": "0 */4 * * *"
+      "path": "/api/news/sync?limit=2",
+      "schedule": "0 4 * * *"
     }
   ]
 }

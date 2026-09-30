@@ -18,11 +18,16 @@ async function handleSync(req: Request) {
   try {
     const url = new URL(req.url)
     const secret = url.searchParams.get('secret')
-    const limitParam = parseInt(url.searchParams.get('limit') || '5', 10)
+    const authHeader = req.headers.get('authorization')
+    const limitParam = parseInt(url.searchParams.get('limit') || '2', 10)
 
-    // Optional auth check: if CRON_SECRET is set, verify
-    if (process.env.CRON_SECRET && secret && secret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Optional auth check: if CRON_SECRET is set, verify either query param or Bearer header
+    if (process.env.CRON_SECRET) {
+      const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
+      const providedSecret = secret || bearerSecret
+      if (providedSecret && providedSecret !== process.env.CRON_SECRET) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
     }
 
     const feedItems = await fetchMusicNewsFeedItems()
@@ -30,7 +35,7 @@ async function handleSync(req: Request) {
     let skippedCount = 0
     const processedTitles: string[] = []
 
-    for (const item of feedItems.slice(0, 15)) {
+    for (const item of feedItems) {
       if (processedCount >= limitParam) break
 
       const slug = item.title

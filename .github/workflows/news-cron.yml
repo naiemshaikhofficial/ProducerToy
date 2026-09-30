@@ -1,0 +1,32 @@
+name: ProducerToy News Auto Sync
+
+on:
+  schedule:
+    # Runs every 3 hours (UTC 00:00, 03:00, 06:00, 09:00, 12:00, 15:00, 18:00, 21:00)
+    - cron: '0 */3 * * *'
+  workflow_dispatch: # Allows 1-click manual trigger from GitHub Actions tab
+
+jobs:
+  sync-news:
+    name: Fetch & Sync Latest News
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger ProducerToy News Sync
+        run: |
+          echo "Triggering ProducerToy news sync at $(date -u)..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://producertoy.com/api/news/sync?limit=2" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
+          echo "HTTP Status Code: $HTTP_STATUS"
+          echo "Response Body:"
+          echo "$HTTP_BODY"
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "❌ News sync request failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+          echo "✅ News sync completed successfully!"
