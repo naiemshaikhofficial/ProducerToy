@@ -7,9 +7,7 @@ import {
   Disc3,
   DownloadCloud,
   ChevronDown,
-  ShieldCheck,
   Sparkles,
-  Zap,
 } from 'lucide-react'
 
 const BRAND_FAQS = [
@@ -63,85 +61,87 @@ export function HomeBrandSeoSection() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      {/* Brand Mission & Semantic Authority Card */}
-      <div className="bg-[#161618] border border-white/5 rounded-3xl p-6 sm:p-10 lg:p-12 mb-12 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-between">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FC6301]/10 border border-[#FC6301]/25 text-[#FC6301] text-xs font-bold uppercase tracking-wider mb-4">
-              <Sparkles className="w-3.5 h-3.5" />
-              Official Digital Marketplace
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight mb-4">
-              Producer Toy — Premier Music Production VST Plugins, Samples &amp; Sounds
-            </h2>
-            <p className="text-sm sm:text-base text-zinc-400 leading-relaxed font-normal mb-6">
-              Producer Toy (<span className="text-zinc-200 font-semibold">producertoy.com</span>) is the modern creative headquarters for music producers, beatmakers, and audio engineers. We offer industry-standard virtual instruments (VSTs), analog audio effects, 100% royalty-free sample packs, synth presets, and DAW project templates.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/categories/plugins"
-                className="px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm transition-all shadow-md cursor-pointer"
-              >
-                Browse VST Plugins
-              </Link>
-              <Link
-                href="/categories/sounds"
-                className="px-5 py-2.5 rounded-xl bg-[#222226] hover:bg-[#2c2c32] text-white font-bold text-xs sm:text-sm border border-white/5 transition-all cursor-pointer"
-              >
-                Explore Sample Packs
-              </Link>
-              <Link
-                href="/free-vst-plugins"
-                className="px-5 py-2.5 rounded-xl bg-[#FC6301]/15 hover:bg-[#FC6301]/25 text-[#FC6301] border border-[#FC6301]/30 font-bold text-xs sm:text-sm transition-all cursor-pointer"
-              >
-                Free VST Plugins
-              </Link>
-            </div>
+      {/* Brand Hero & Mission Showcase */}
+      <div className="text-center max-w-4xl mx-auto mb-10 sm:mb-12 px-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FC6301]/10 border border-[#FC6301]/30 text-[#FC6301] text-xs font-bold uppercase tracking-wider mb-4">
+          <Sparkles className="w-3.5 h-3.5" />
+          Official Digital Audio Marketplace
+        </div>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight mb-4">
+          Producer Toy — Premier Audio Plugins &amp; Sound Library
+        </h2>
+        <p className="text-xs sm:text-sm md:text-base text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-6">
+          Producer Toy (<span className="text-zinc-200 font-semibold">producertoy.com</span>) is the modern creative headquarters for music producers, beatmakers, and audio engineers. Discover studio-grade VST plugins, 100% royalty-free sample packs, synth presets, and DAW project templates.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/categories/plugins"
+            className="px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm transition-all shadow-md cursor-pointer"
+          >
+            Browse VST Plugins
+          </Link>
+          <Link
+            href="/categories/sounds"
+            className="px-5 py-2.5 rounded-xl bg-[#202024] hover:bg-[#28282c] text-white font-bold text-xs sm:text-sm border border-white/5 transition-all cursor-pointer"
+          >
+            Explore Sample Packs
+          </Link>
+          <Link
+            href="/free-vst-plugins"
+            className="px-5 py-2.5 rounded-xl bg-[#FC6301]/15 hover:bg-[#FC6301]/25 text-[#FC6301] border border-[#FC6301]/30 font-bold text-xs sm:text-sm transition-all cursor-pointer"
+          >
+            Free VST Plugins
+          </Link>
+        </div>
+      </div>
+
+      {/* 3-Column Balanced Trust Pillars */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14 sm:mb-16">
+        <div className="p-6 rounded-2xl bg-[#161618] border border-white/5 hover:border-white/10 transition-all shadow-lg flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-xl bg-[#FC6301]/10 border border-[#FC6301]/25 flex items-center justify-center text-[#FC6301] mb-4">
+            <Sliders className="w-5 h-5" />
           </div>
+          <div>
+            <h3 className="text-base font-bold text-white mb-1.5">Studio-Grade VSTs</h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Analog tape saturators, surgical equalizers, space reverbs, and synthesizers engineered for flawless DAW integration.
+            </p>
+          </div>
+        </div>
 
-          {/* Key Trust Pillars */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 w-full lg:w-80 shrink-0">
-            <div className="p-4 rounded-2xl bg-[#1c1c20] border border-white/5 flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-[#FC6301]/10 border border-[#FC6301]/25 flex items-center justify-center text-[#FC6301] shrink-0">
-                <Sliders className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-white mb-0.5">Studio-Grade VSTs</div>
-                <div className="text-xs text-zinc-400 leading-snug">Analog saturators, surgical EQs, reverbs &amp; synths.</div>
-              </div>
-            </div>
+        <div className="p-6 rounded-2xl bg-[#161618] border border-white/5 hover:border-white/10 transition-all shadow-lg flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400 mb-4">
+            <Disc3 className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-white mb-1.5">100% Royalty-Free Sounds</h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Studio-recorded drum kits, 808s, and vocal loops with commercial clearance for Spotify, YouTube, and sync licensing.
+            </p>
+          </div>
+        </div>
 
-            <div className="p-4 rounded-2xl bg-[#1c1c20] border border-white/5 flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400 shrink-0">
-                <Disc3 className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-white mb-0.5">100% Royalty-Free</div>
-                <div className="text-xs text-zinc-400 leading-snug">Commercial clearance for Spotify, YouTube &amp; sync.</div>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#1c1c20] border border-white/5 flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shrink-0">
-                <DownloadCloud className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-white mb-0.5">Instant Digital Vault</div>
-                <div className="text-xs text-zinc-400 leading-snug">Instant direct high-speed download &amp; license retrieval.</div>
-              </div>
-            </div>
+        <div className="p-6 rounded-2xl bg-[#161618] border border-white/5 hover:border-white/10 transition-all shadow-lg flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 mb-4">
+            <DownloadCloud className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-white mb-1.5">Instant Digital Vault</h3>
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+              Instant direct high-speed download links, verified license serial keys, and permanent cloud library access.
+            </p>
           </div>
         </div>
       </div>
 
       {/* Brand FAQ Section for Google Entity Disambiguation */}
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-2">
             Frequently Asked Questions About Producer Toy
           </h3>
           <p className="text-xs sm:text-sm text-zinc-400">
-            Learn more about our digital audio workstation plugins, sounds, and licensing.
+            Learn more about our digital audio workstation plugins, sound kits, and licensing.
           </p>
         </div>
 
