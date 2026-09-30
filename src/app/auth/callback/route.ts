@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -6,8 +6,49 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code')
   const next = requestUrl.searchParams.get('next') ?? '/'
 
+  // Resolve canonical origin: check x-forwarded-host / proto for proxies like Vercel & Cloudflare
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto') || 'https'
+  const isLocalEnv = process.env.NODE_ENV === 'development'
+
+  const origin = isLocalEnv
+    ? requestUrl.origin
+    : forwardedHost
+    ? `${forwardedProto}://${forwardedHost}`
+    : requestUrl.origin.replace(/^http:\/\//, 'https://')
+
+  const redirectTarget = next.startsWith('http://') || next.startsWith('https://')
+    ? next
+    : `${origin}${next.startsWith('/') ? next : `/${next}`}`
+
+  const response = NextResponse.redirect(redirectTarget)
+
   if (code) {
-    const supabase = await createClient()
+    const isProdDomain = !isLocalEnv && (forwardedHost?.includes('producertoy.com') || requestUrl.hostname.includes('producertoy.com'))
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://voalgeyexfhfitlyorfl.supabase.co',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_AFTgvwUXdDPCgTny9uDIuQ_NGiDyAJD',
+      {
+        cookies: {
+          getAll() {
+            return request.headers.get('cookie')?.split('; ').map((c) => {
+              const [name, ...v] = c.split('=')
+              return { name, value: v.join('=') }
+            }) || []
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, {
+                ...options,
+                domain: isProdDomain ? '.producertoy.com' : options?.domain,
+              })
+            })
+          },
+        },
+      }
+    )
+
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data?.user) {
@@ -77,15 +118,11 @@ export async function GET(request: Request) {
         console.warn('OAuth callback profile sync note:', syncErr)
       }
 
-      const redirectTarget = next.startsWith('http://') || next.startsWith('https://')
-        ? next
-        : `${requestUrl.origin}${next.startsWith('/') ? next : `/${next}`}`
-
-      return NextResponse.redirect(redirectTarget)
+      return response
     }
   }
 
   return NextResponse.redirect(
-    `${requestUrl.origin}/auth?error=Could%20not%20authenticate%20user`
+    `${origin}/auth?error=Could%20not%20authenticate%20user`
   )
 }

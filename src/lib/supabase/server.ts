@@ -19,7 +19,10 @@ export const createClient = cache(async () => {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                domain: process.env.NODE_ENV === 'production' ? '.producertoy.com' : options?.domain,
+              })
             )
           } catch {
             // Server Component cookie set fallback
