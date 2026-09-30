@@ -65,10 +65,21 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     <div className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
         
-        {/* Exact Epic Games Heading */}
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-6">
-          Producer Toy News
-        </h1>
+        {/* SEO-Optimized Live News Header */}
+        <div className="mb-8 sm:mb-10">
+          <div className="flex items-center gap-2 mb-2.5">
+            <span className="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-[#FC6301]/15 text-[#FC6301] border border-[#FC6301]/30">
+              Live Plugin News
+            </span>
+            <span className="text-zinc-500 text-xs font-semibold">• Updated Daily</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-2.5">
+            Free Plugins &amp; Audio Plugin News
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400 font-normal max-w-2xl leading-relaxed">
+            Daily freeware alerts, music plugins, VST deals, and music production tech news curated by Producer Toy.
+          </p>
+        </div>
 
         {/* 1:1 Epic Games 2-Billboard Hero Cards (NO BORDERS, STATIC + LIGHT GLOW HIGHLIGHT ON HOVER) */}
         {billboardArticles.length > 0 && (
@@ -84,7 +95,8 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#181818] mb-3.5 sm:mb-4">
                   <Image
                     src={getHighResCoverImage(article.cover_image)}
-                    alt={cleanHtmlTitle(article.title)}
+                    alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
+                    title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
@@ -134,7 +146,8 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   <div className="relative w-full sm:w-60 md:w-64 aspect-video shrink-0 rounded-2xl sm:rounded-xl overflow-hidden bg-[#181818]">
                     <Image
                       src={getHighResCoverImage(article.cover_image)}
-                      alt={cleanHtmlTitle(article.title)}
+                      alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
+                      title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 240px, 256px"
                       className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"

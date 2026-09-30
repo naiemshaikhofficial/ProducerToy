@@ -34,6 +34,7 @@ async function handleSync(req: Request) {
     let processedCount = 0
     let skippedCount = 0
     const processedTitles: string[] = []
+    const savedSlugs: string[] = []
 
     for (const item of feedItems) {
       if (processedCount >= limitParam) break
@@ -77,6 +78,23 @@ async function handleSync(req: Request) {
       if (saved) {
         processedCount++
         processedTitles.push(article.title)
+        savedSlugs.push(article.slug)
+      }
+    }
+
+    // Automatically submit new article URLs to IndexNow for instantaneous search engine indexing
+    let indexNowResult: any = null
+    if (savedSlugs.length > 0) {
+      try {
+        const { submitIndexNowUrls } = await import('@/lib/seo/indexing')
+        const urlsToPing = [
+          'https://producertoy.com/news',
+          ...savedSlugs.map((s) => `https://producertoy.com/news/${s}`),
+        ]
+        indexNowResult = await submitIndexNowUrls(urlsToPing)
+        console.log(`[News Sync] Successfully submitted ${urlsToPing.length} URLs to IndexNow`)
+      } catch (indexErr: any) {
+        console.warn('[News Sync] Failed to ping IndexNow:', indexErr?.message || indexErr)
       }
     }
 
@@ -88,6 +106,8 @@ async function handleSync(req: Request) {
       processed: processedCount,
       skipped: skippedCount,
       newArticles: processedTitles,
+      indexedUrls: savedSlugs.length,
+      indexNow: indexNowResult,
       feedCountTotal: feedItems.length,
     })
   } catch (err: any) {

@@ -93,11 +93,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     const { getNewsArticles } = await import('@/lib/turso/newsDb')
-    const newsArticles = await getNewsArticles({ limit: 150 })
+    const newsArticles = await getNewsArticles({ limit: 1000 })
 
     if (newsArticles && newsArticles.length > 0) {
       newsEntries = newsArticles.map((n) => {
-        const sanitizedImg = sanitizeXmlUrl(n.cover_image)
+        const highResImg = (n.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+        const sanitizedImg = sanitizeXmlUrl(highResImg || n.cover_image)
         return {
           url: `${baseUrl}/news/${encodeURIComponent(n.slug)}`,
           lastModified: new Date(n.published_at || new Date()),

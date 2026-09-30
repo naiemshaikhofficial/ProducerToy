@@ -179,7 +179,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
             <img
               src={getHighResCoverImage(article.cover_image)}
-              alt={cleanHtmlTitle(article.title)}
+              alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
+              title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
               className="w-full h-full object-cover"
             />
           </div>
