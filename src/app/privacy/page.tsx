@@ -119,14 +119,63 @@ export default function PrivacyPolicyPage() {
               4. Cookies &amp; Session Management
             </h2>
             <p className="text-zinc-400">
-              We use strictly necessary session cookies to maintain your shopping cart, user session tokens, and currency preferences. We do not use intrusive third-party cross-site trackers. You can disable non-essential cookies via your browser settings at any time.
+              We use strictly necessary session cookies to maintain your shopping cart, user session tokens, and currency preferences. You can configure or disable non-essential cookies via your browser settings at any time.
             </p>
           </section>
 
-          {/* Section 5: Data Subject Rights (DPDP Act & GDPR) */}
+          {/* Section 5: Google AdSense & Third-Party Advertising */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight">
-              5. Your Rights as a Data Principal
+              5. Google AdSense &amp; Third-Party Advertising Disclosures
+            </h2>
+            <p className="text-zinc-400">
+              We partner with third-party advertising vendors, including <strong>Google Inc.</strong> (Google AdSense), to display ads when you browse our website.
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
+              <li>
+                <strong className="text-zinc-200">Advertising Cookies:</strong> Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on your prior visits to Producer Toy and other websites across the Internet.
+              </li>
+              <li>
+                <strong className="text-zinc-200">Personalized Ads:</strong> Google&apos;s use of advertising cookies enables it and its partners to serve relevant advertisements to users based on their navigation history across the web.
+              </li>
+              <li>
+                <strong className="text-zinc-200">Opt-Out Rights:</strong> You may opt out of personalized advertising by visiting{' '}
+                <a
+                  href="https://www.google.com/settings/ads"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FA742B] hover:underline font-semibold"
+                >
+                  Google Ads Settings
+                </a>
+                {' '}or by visiting{' '}
+                <a
+                  href="https://www.aboutads.info/choices/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FA742B] hover:underline font-semibold"
+                >
+                  aboutads.info
+                </a>
+                .
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 6: Affiliate Partnerships & Editorial Transparency */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              6. Affiliate Partnerships &amp; Commercial Transparency
+            </h2>
+            <p className="text-zinc-400">
+              In full compliance with Federal Trade Commission (FTC) guidelines and global consumer transparency rules, Producer Toy participates in affiliate marketing programs (including Plugin Boutique, Impact.com, and partner audio developers). When you click on an external link to an offering developer or merchant and complete a transaction, Producer Toy may receive an affiliate referral fee at zero additional charge to you. Our editorial coverage, product news, and curation remain completely independent.
+            </p>
+          </section>
+
+          {/* Section 7: Data Subject Rights (DPDP Act & GDPR) */}
+          <section className="space-y-3">
+            <h2 className="text-lg font-bold text-white tracking-tight">
+              7. Your Rights as a Data Principal
             </h2>
             <p className="text-zinc-400">Under the DPDP Act 2023 and GDPR, you have the right to:</p>
             <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
@@ -140,7 +189,7 @@ export default function PrivacyPolicyPage() {
           {/* Statutory Grievance & Nodal Officer Details */}
           <section className="space-y-3 pt-6 border-t border-zinc-800/60">
             <h2 className="text-lg font-bold text-white tracking-tight">
-              6. Statutory Grievance Redressal &amp; Nodal Officer (India)
+              8. Statutory Grievance Redressal &amp; Nodal Officer (India)
             </h2>
             <p className="text-zinc-400">
               In accordance with Section 5 of the DPDP Act, 2023 and Rule 3(2) of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021, you may contact our designated Grievance Officer:

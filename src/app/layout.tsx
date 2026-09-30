@@ -136,11 +136,13 @@ export default function RootLayout({
         {/* Google AdSense Site Verification Meta Tag */}
         <meta name="google-adsense-account" content="ca-pub-5611678706554607" />
         {/* Google AdSense Code Snippet */}
-        <script
+        <Script
+          id="google-adsense"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5611678706554607"
           crossOrigin="anonymous"
-        ></script>
+          strategy="afterInteractive"
+        />
         {/* Impact.com Affiliate Tracking & Website Verification Script */}
         <Script
           id="impact-affiliate"
