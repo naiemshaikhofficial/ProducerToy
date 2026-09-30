@@ -40,6 +40,27 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     }
   }
 
+  const getHighResCoverImage = (url?: string | null): string => {
+    if (!url) return '/placeholder.jpg'
+    // Strip WordPress & CMS thumbnail suffixes (-128x71, -150x150, -300x169, -768x432, -1024x576) to always fetch crisp original Full HD master
+    return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  }
+
+  const cleanHtmlTitle = (title?: string | null): string => {
+    if (!title) return ''
+    return title
+      .replace(/&#038;/g, '&')
+      .replace(/&#38;/g, '&')
+      .replace(/&amp;/g, '&')
+      .replace(/&#8217;/g, "'")
+      .replace(/&#8216;/g, "'")
+      .replace(/&#039;/g, "'")
+      .replace(/&#8211;/g, '–')
+      .replace(/&#8212;/g, '—')
+      .replace(/&#8220;/g, '“')
+      .replace(/&#8221;/g, '”')
+  }
+
   return (
     <div className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
@@ -62,8 +83,8 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 {/* 16:9 Clean Thumbnail (Static with Home Page Brightness + Glow Highlight on Hover) */}
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#181818] mb-3.5 sm:mb-4">
                   <Image
-                    src={article.cover_image}
-                    alt={article.title}
+                    src={getHighResCoverImage(article.cover_image)}
+                    alt={cleanHtmlTitle(article.title)}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
@@ -80,7 +101,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
                 {/* Article Headline */}
                 <h2 className="text-base sm:text-lg lg:text-xl font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug mb-2 line-clamp-2">
-                  {article.title}
+                  {cleanHtmlTitle(article.title)}
                 </h2>
 
                 {/* Excerpt */}
@@ -112,8 +133,8 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   {/* 16:9 Thumbnail (Left side: Exact Epic Games Dimensions: w-44 sm:w-60 md:w-64 aspect-video) */}
                   <div className="relative w-44 sm:w-60 md:w-64 aspect-video shrink-0 rounded-lg overflow-hidden bg-[#181818]">
                     <Image
-                      src={article.cover_image}
-                      alt={article.title}
+                      src={getHighResCoverImage(article.cover_image)}
+                      alt={cleanHtmlTitle(article.title)}
                       fill
                       sizes="(max-width: 640px) 176px, (max-width: 768px) 240px, 256px"
                       className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
@@ -130,7 +151,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
                     {/* Title (Bold white, hover light) */}
                     <h3 className="text-sm sm:text-base lg:text-[16px] font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug line-clamp-2 mb-2">
-                      {article.title}
+                      {cleanHtmlTitle(article.title)}
                     </h3>
 
                     {/* Read more Link */}

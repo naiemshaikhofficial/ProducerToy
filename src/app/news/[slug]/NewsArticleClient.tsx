@@ -76,6 +76,26 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     : '/store'
   const isStoreLink = safeTargetUrl === '/store' || safeTargetUrl.startsWith('/')
 
+  const getHighResCoverImage = (url?: string | null): string => {
+    if (!url) return '/placeholder.jpg'
+    return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  }
+
+  const cleanHtmlTitle = (title?: string | null): string => {
+    if (!title) return ''
+    return title
+      .replace(/&#038;/g, '&')
+      .replace(/&#38;/g, '&')
+      .replace(/&amp;/g, '&')
+      .replace(/&#8217;/g, "'")
+      .replace(/&#8216;/g, "'")
+      .replace(/&#039;/g, "'")
+      .replace(/&#8211;/g, '–')
+      .replace(/&#8212;/g, '—')
+      .replace(/&#8220;/g, '“')
+      .replace(/&#8221;/g, '”')
+  }
+
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
@@ -120,7 +140,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
               {/* Bold Article Headline */}
               <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-white leading-[1.25] tracking-tight">
-                {article.title}
+                {cleanHtmlTitle(article.title)}
               </h1>
 
               {/* Interactive Coupon Code 1-Click Copy Box */}
@@ -171,8 +191,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           {/* Right Hero Picture (7 cols) - Borderless per user request */}
           <div className="lg:col-span-7 relative aspect-video lg:aspect-auto rounded-2xl overflow-hidden bg-[#18181c] border-0 shadow-xl min-h-[340px] lg:min-h-[420px]">
             <Image
-              src={article.cover_image}
-              alt={article.title}
+              src={getHighResCoverImage(article.cover_image)}
+              alt={cleanHtmlTitle(article.title)}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 60vw"
@@ -191,7 +211,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         {/* Sub-Headline Bar matching Epic Games screenshot */}
         <div className="text-sm sm:text-base mb-8 leading-relaxed flex flex-wrap items-center gap-2 font-medium border-b border-[#202024] pb-5">
           <span className="text-[#FC6301] font-bold">
-            {article.title}
+            {cleanHtmlTitle(article.title)}
           </span>
           <span className="text-zinc-500 font-bold">|</span>
           <span className="text-white font-bold">

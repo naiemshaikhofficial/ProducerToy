@@ -21,10 +21,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const title = `${article.title} | Producer Toy`
+  const highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  const cleanTitle = (article.title || '')
+    .replace(/&#038;/g, '&')
+    .replace(/&#38;/g, '&')
+    .replace(/&amp;/g, '&')
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8211;/g, '–')
+
+  const title = `${cleanTitle} | Producer Toy`
   const description =
     article.excerpt ||
-    `Read the latest on ${article.title}. Curated music production news, free VST plugins, and audio tech.`
+    `Read the latest on ${cleanTitle}. Curated music production news, free VST plugins, and audio tech.`
 
   return {
     title,
@@ -50,10 +59,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       authors: [article.author_name],
       images: [
         {
-          url: article.cover_image,
+          url: highResImage,
           width: 1200,
           height: 675,
-          alt: article.title,
+          alt: cleanTitle,
         },
       ],
     },
@@ -61,7 +70,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title,
       description,
-      images: [article.cover_image],
+      images: [highResImage],
     },
   }
 }
