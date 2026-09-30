@@ -338,7 +338,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 </Link>
 
                 <Link
-                  href="/blog"
+                  href="/news"
                   prefetch={true}
                   onClick={onClose}
                   className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"

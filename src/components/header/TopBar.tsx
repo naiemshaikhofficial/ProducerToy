@@ -577,7 +577,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               </Link>
 
               <Link
-                href="/blog"
+                href="/news"
                 prefetch={true}
                 className="hover:text-white transition-colors"
               >
