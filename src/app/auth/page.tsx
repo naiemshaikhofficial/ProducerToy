@@ -114,9 +114,11 @@ function AuthForm() {
 
   // Resend confirmation email
   const handleResendConfirmation = async () => {
-    if (!email.trim()) return
+    if (!email.trim() || resetCountdown > 0 || resendingEmail) return
     try {
       setResendingEmail(true)
+      setError('')
+      setMessage('')
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: email.trim(),
@@ -125,8 +127,8 @@ function AuthForm() {
         },
       })
       if (error) throw error
-      setMessage('Confirmation link sent! Please check your email inbox.')
-      setError('')
+      setMessage('Confirmation link resent! Please check your email inbox.')
+      setResetCountdown(60)
       setEmailNotConfirmed(false)
     } catch (err: any) {
       setError(err.message || 'Failed to resend confirmation email.')
@@ -381,6 +383,7 @@ function AuthForm() {
         }
 
         setIsEmailSent(true)
+        setResetCountdown(60)
       } else {
         const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -496,14 +499,37 @@ function AuthForm() {
               </button>
             </div>
 
+            {message && (
+              <div className="bg-emerald-950/50 border border-emerald-800 text-emerald-300 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 w-full animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{message}</span>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-[#ff4053] text-black font-extrabold p-3 rounded-xl text-xs text-center w-full animate-in fade-in">
+                <span>{error}</span>
+              </div>
+            )}
+
             <p className="text-xs text-zinc-500 pt-2">
               Didn't receive it?{' '}
               <button
                 type="button"
-                onClick={handleAuthSubmit}
-                className="text-white underline font-semibold hover:text-zinc-200 transition-colors cursor-pointer"
+                onClick={handleResendConfirmation}
+                disabled={resetCountdown > 0 || resendingEmail}
+                className="text-white underline font-semibold hover:text-zinc-200 transition-colors disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed cursor-pointer touch-manipulation inline-flex items-center gap-1.5"
               >
-                Resend email
+                {resendingEmail ? (
+                  <>
+                    <ButtonSpinner size={12} variant="light" />
+                    <span>Sending link...</span>
+                  </>
+                ) : resetCountdown > 0 ? (
+                  `Resend in ${resetCountdown}s`
+                ) : (
+                  'Resend email'
+                )}
               </button>
             </p>
           </div>
