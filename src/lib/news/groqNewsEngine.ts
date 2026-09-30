@@ -80,8 +80,17 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           specs['Coupon Code'] = detectedCoupon
         }
 
+        // Generate deterministic ID so subsequent runs update instead of duplicating
+        const canonicalKey = (item.directDealUrl || item.link || item.title).toLowerCase().trim()
+        let hash = 0
+        for (let i = 0; i < canonicalKey.length; i++) {
+          hash = (hash << 5) - hash + canonicalKey.charCodeAt(i)
+          hash |= 0
+        }
+        const deterministicId = `news_${Math.abs(hash).toString(36)}`
+
         return {
-          id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          id: deterministicId,
           slug: slugify(rewritten.slug || rewritten.title),
           title: sanitizeScrapedText(rewritten.title),
           excerpt: sanitizeScrapedText(rewritten.excerpt),
@@ -264,8 +273,16 @@ This audio release brings refined sound design and practical mixing utility dire
 
 To explore this deal or find more audio production essentials, visit the Producer Toy catalog below.`
 
+  const canonicalKey = (item.directDealUrl || item.link || item.title).toLowerCase().trim()
+  let hash = 0
+  for (let i = 0; i < canonicalKey.length; i++) {
+    hash = (hash << 5) - hash + canonicalKey.charCodeAt(i)
+    hash |= 0
+  }
+  const deterministicId = `news_${Math.abs(hash).toString(36)}`
+
   return {
-    id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    id: deterministicId,
     slug: slugify(item.title),
     title: sanitizeScrapedText(item.title),
     excerpt: cleanedSnippet.slice(0, 160) + '...',

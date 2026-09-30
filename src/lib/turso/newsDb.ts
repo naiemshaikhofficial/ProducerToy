@@ -141,30 +141,85 @@ export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | 
   }
 }
 
+export interface ArticleExistsOptions {
+  sourceUrl?: string
+  slug?: string
+  feedLink?: string
+  directDealUrl?: string
+  coverImage?: string
+  publishedAt?: string
+  title?: string
+}
+
 /**
- * Check if an article already exists by source URL, slug, cover image or publish timestamp
+ * Check if an article already exists by source URL, deal URL, slug, cover image or title keywords
  */
 export async function articleExists(
-  sourceUrl: string,
-  slug: string,
-  extra?: { coverImage?: string; publishedAt?: string }
+  optionsOrUrl: string | ArticleExistsOptions,
+  legacySlug?: string,
+  legacyExtra?: { coverImage?: string; publishedAt?: string }
 ): Promise<boolean> {
   await initNewsSchema()
   const client = getTursoClient()
 
   try {
-    const conditions = ['source_url = ?', 'slug = ?']
-    const args: any[] = [sourceUrl, slug]
+    const opts: ArticleExistsOptions = typeof optionsOrUrl === 'string'
+      ? {
+          sourceUrl: optionsOrUrl,
+          slug: legacySlug,
+          coverImage: legacyExtra?.coverImage,
+          publishedAt: legacyExtra?.publishedAt,
+        }
+      : optionsOrUrl
 
-    if (extra?.coverImage) {
+    const conditions: string[] = []
+    const args: any[] = []
+
+    // 1. Check exact URLs (feed link, direct deal URL, source URL)
+    const urlsToCheck = [opts.sourceUrl, opts.directDealUrl, opts.feedLink].filter(Boolean) as string[]
+    for (const u of urlsToCheck) {
+      conditions.push('source_url = ?')
+      args.push(u)
+
+      // Match normalized hostname + pathname to catch query param differences
+      try {
+        const parsed = new URL(u)
+        const cleanPath = `${parsed.hostname}${parsed.pathname}`.replace(/\/+$/, '')
+        if (cleanPath && cleanPath.length > 8 && !cleanPath.includes('bedroomproducersblog.com') && !cleanPath.includes('producertoy.com')) {
+          conditions.push('source_url LIKE ?')
+          args.push(`%${cleanPath}%`)
+        }
+      } catch {}
+    }
+
+    // 2. Check exact slug
+    if (opts.slug) {
+      conditions.push('slug = ?')
+      args.push(opts.slug)
+    }
+
+    // 3. Check cover image (if external URL, e.g. from original publisher upload)
+    if (opts.coverImage && !opts.coverImage.includes('pollinations.ai') && opts.coverImage.startsWith('http')) {
       conditions.push('cover_image = ?')
-      args.push(extra.coverImage)
+      args.push(opts.coverImage)
     }
 
-    if (extra?.publishedAt) {
-      conditions.push('published_at = ?')
-      args.push(extra.publishedAt)
+    // 4. Check core product title match (e.g. "Pizza Bagel Plugins Schmear", "Airwindows ConsoleX3")
+    if (opts.title) {
+      const words = opts.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length >= 4 && !['free', 'plugin', 'plugins', 'vsts', 'vst', 'audio', 'deals', 'deal', 'with', 'from', 'every', 'down', 'giveaway', 'drop', 'drops', 'release', 'releases', 'sale', 'massive'].includes(w))
+      
+      if (words.length >= 2) {
+        const pattern = `%${words.slice(0, 2).join('%')}%`
+        conditions.push('LOWER(title) LIKE ?')
+        args.push(pattern)
+      }
     }
+
+    if (conditions.length === 0) return false
 
     const result = await client.execute({
       sql: `SELECT 1 FROM news_articles WHERE ${conditions.join(' OR ')} LIMIT 1`,

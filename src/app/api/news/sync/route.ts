@@ -44,13 +44,7 @@ async function handleSync(req: Request) {
         .replace(/(^-|-$)+/g, '')
         .slice(0, 90)
 
-      const alreadyExists = await articleExists(item.link, slug)
-      if (alreadyExists) {
-        skippedCount++
-        continue
-      }
-
-      // Automatically extract direct developer/merchant deal URL & coupon code
+      // Automatically extract direct developer/merchant deal URL & coupon code first
       if (!item.directDealUrl) {
         const dealInfo = await extractDirectDealInfo(item.link)
         if (dealInfo?.bestUrl) {
@@ -59,6 +53,21 @@ async function handleSync(req: Request) {
         if (dealInfo?.couponCode && !(item as any).couponCode) {
           (item as any).couponCode = dealInfo.couponCode
         }
+      }
+
+      // Check deduplication across source URL, direct product URL, image URL, and title
+      const alreadyExists = await articleExists({
+        feedLink: item.link,
+        directDealUrl: item.directDealUrl,
+        sourceUrl: item.directDealUrl || item.link,
+        coverImage: item.imageUrl,
+        title: item.title,
+        slug,
+      })
+
+      if (alreadyExists) {
+        skippedCount++
+        continue
       }
 
       // Rewrite with Groq AI Llama 3.3 & save to Turso
