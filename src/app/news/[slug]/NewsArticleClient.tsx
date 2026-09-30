@@ -281,6 +281,23 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 </span>
               </div>
 
+              {/* Coupon Code Box if present */}
+              {couponCode && (
+                <div className="bg-[#222228] border border-white/10 rounded-xl p-3 flex items-center justify-between gap-2">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Coupon Code</span>
+                    <span className="text-sm font-mono font-extrabold text-white tracking-wider truncate">{couponCode}</span>
+                  </div>
+                  <button
+                    onClick={handleCopyCoupon}
+                    className="px-3 py-1.5 bg-[#2a2a34] hover:bg-[#343440] text-xs font-bold text-white rounded-lg border border-white/10 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                  >
+                    {copiedCoupon ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedCoupon ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+              )}
+
               {/* Direct CTA Button */}
               <a
                 href={offerUrl}

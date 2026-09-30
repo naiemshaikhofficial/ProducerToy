@@ -6,8 +6,117 @@ interface BlogContentRendererProps {
   content: string
 }
 
+function formatInline(text: string): string {
+  return text
+    // **bold**
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+    // *italic*
+    .replace(/\*([^*]+)\*/g, '<em class="text-zinc-200 italic">$1</em>')
+    // [text](url) - remove # dummy links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
+      if (url === '#' || url.startsWith('javascript:')) return linkText
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-medium">${linkText}</a>`
+    })
+    // `code`
+    .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
+}
+
+export function parseMarkdownToHtml(raw: string): string {
+  if (!raw) return ''
+
+  // If already full HTML with paragraphs and no raw hashes, return as is
+  if (/<p[\s>]/i.test(raw) && !raw.includes('###') && !raw.includes('##')) {
+    return raw
+  }
+
+  let text = raw
+    // 1. Decode common HTML entities
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8212;/g, '—')
+    .replace(/&#038;/g, '&')
+    .replace(/&amp;/g, '&')
+    .replace(/&#228;/g, 'ä')
+    .replace(/&#246;/g, 'ö')
+    .replace(/&#252;/g, 'ü')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    // 2. Strip scraper boilerplate
+    .replace(/\[\.\.\.?\]/gi, '')
+    .replace(/\[\.\.\./gi, '')
+    .replace(/\.\.\./gi, '')
+    .replace(/###?\s*Key Highlights\s*&?\s*Features[\s\S]*?(?=###?|##|$)/gi, '')
+    .replace(/###?\s*How to Get It[\s\S]*?(?=###?|##|$)/gi, '')
+    .replace(/\[here\]\([^)]*\)/gi, '')
+    .replace(/\[here\]/gi, '')
+    .replace(/Head over to the official developer link[^.\n]*\./gi, '')
+    .trim()
+
+  // 3. Ensure headings have newlines preceding them
+  text = text.replace(/([^\n])\s*(#{2,4}\s+)/g, '$1\n\n$2')
+
+  // 4. Split into blocks
+  const blocks = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)
+  const htmlBlocks: string[] = []
+
+  for (const block of blocks) {
+    // Heading 2 (## Heading)
+    if (/^##\s+(.+)$/m.test(block)) {
+      const title = block.replace(/^##\s+/, '').trim()
+      if (/^overview$/i.test(title)) continue
+      htmlBlocks.push(`<h2>${formatInline(title)}</h2>`)
+      continue
+    }
+
+    // Heading 3 (### Heading)
+    if (/^###\s+(.+)$/m.test(block)) {
+      const title = block.replace(/^###\s+/, '').trim()
+      htmlBlocks.push(`<h3>${formatInline(title)}</h3>`)
+      continue
+    }
+
+    // Heading 4 (#### Heading)
+    if (/^####\s+(.+)$/m.test(block)) {
+      const title = block.replace(/^####\s+/, '').trim()
+      htmlBlocks.push(`<h4>${formatInline(title)}</h4>`)
+      continue
+    }
+
+    // Ordered list (1. item)
+    if (/^\d+\.\s+/m.test(block)) {
+      const lines = block.split('\n').filter(l => l.trim().length > 0)
+      const listItems = lines.map(line => {
+        const itemText = line.replace(/^\d+\.\s+/, '').trim()
+        return `<li>${formatInline(itemText)}</li>`
+      }).join('')
+      htmlBlocks.push(`<ol class="list-decimal pl-6 my-4 space-y-2 text-zinc-300">${listItems}</ol>`)
+      continue
+    }
+
+    // Unordered List (- item or * item)
+    if (/^[-*•]\s+/m.test(block)) {
+      const lines = block.split('\n').filter(l => l.trim().length > 0)
+      const listItems = lines.map(line => {
+        const itemText = line.replace(/^[-*•]\s+/, '').trim()
+        return `<li>${formatInline(itemText)}</li>`
+      }).join('')
+      htmlBlocks.push(`<ul>${listItems}</ul>`)
+      continue
+    }
+
+    // Regular Paragraph
+    htmlBlocks.push(`<p>${formatInline(block.replace(/\n/g, ' '))}</p>`)
+  }
+
+  return htmlBlocks.join('\n')
+}
+
 export function BlogContentRenderer({ content }: BlogContentRendererProps) {
   if (!content) return null
+  const htmlContent = parseMarkdownToHtml(content)
 
   return (
     <div className="blog-content prose prose-invert max-w-none">
@@ -314,7 +423,7 @@ export function BlogContentRenderer({ content }: BlogContentRendererProps) {
         }
       `}</style>
       
-      <div dangerouslySetInnerHTML={{ __html: content }} />
+      <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </div>
   )
 }

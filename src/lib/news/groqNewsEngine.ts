@@ -20,15 +20,30 @@ interface GroqRewriteResponse {
 export function sanitizeScrapedText(text: string): string {
   if (!text) return ''
   return text
+    // Decode HTML entities
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/&#8211;/g, '–')
+    .replace(/&#8212;/g, '—')
+    .replace(/&#038;/g, '&')
+    .replace(/&amp;/g, '&')
+    .replace(/&#228;/g, 'ä')
+    .replace(/&#246;/g, 'ö')
+    .replace(/&#252;/g, 'ü')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
     // Remove ellipses and snippet cutoffs
     .replace(/\[\.\.\.?\]/gi, '')
     .replace(/\[\.\.\./gi, '')
     .replace(/\.\.\./gi, '')
     // Remove generic boilerplate sections like "How to Get It" or placeholder links
-    .replace(/###?\s*How to Get It[\s\S]*?(?=##|$)/gi, '')
-    .replace(/###?\s*Key Highlights & Features[\s\S]*?(?=##|$)/gi, '')
-    .replace(/\[here\]\([^)]*\)/gi, 'the official developer site')
+    .replace(/###?\s*How to Get It[\s\S]*?(?=###?|##|$)/gi, '')
+    .replace(/###?\s*Key Highlights\s*&?\s*Features[\s\S]*?(?=###?|##|$)/gi, '')
+    .replace(/\[here\]\([^)]*\)/gi, '')
     .replace(/\[here\]/gi, '')
+    .replace(/Head over to the official developer link[^.\n]*\./gi, '')
     .replace(/[-*•]?\s*\*\*Source Coverage:\*\*.*$/gim, '')
     .replace(/Originally reported via.*$/gim, '')
     .replace(/View post:\s*\[?[^\]\n]+\]?(\([^)]+\))?/gi, '')
@@ -102,9 +117,9 @@ Content Snippet: ${item.contentSnippet}
 
     REQUIREMENTS:
 1. Optimize for Google #1 ranking with high-intent keywords (free VST plugins, DAW deals, mixing plugins, synthesizers, coupon codes).
-2. Format the "content" in clean Markdown with headings (##, ###), bullet points, sound design insights, and step-by-step instructions on how to claim/install.
+2. Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture, ### Analog Saturation Circuit, ### How to Claim with Coupon Code). Never output a single run-on wall of text. Separate concepts into clean, digestible paragraphs.
 3. If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Waves, Arturia, Soundtoys, Universal Audio, Plugin Alliance), prominently feature the brand name and the discount in the title.
-4. COUPON CODE DETECTION: If any coupon code, promo code, or voucher code is mentioned (e.g. 'PB50', 'SUMMER2026', etc.), extract it explicitly into the "coupon_code" field and inside "specs" as "Coupon Code".
+4. COUPON CODE DETECTION: If any coupon code, promo code, or voucher code is mentioned (e.g. 'BPB100OFF', 'SUMMER2026', etc.), extract it explicitly into the "coupon_code" field and inside "specs" as "Coupon Code".
 5. MEGA DEAL & BADGE CLASSIFICATION:
    - If discount is 70%+, 80%+, 90%+, price drop, or record-low: set "badge": "MEGA DEAL".
    - If a coupon code is required: set "badge": "COUPON CODE".
@@ -112,7 +127,8 @@ Content Snippet: ${item.contentSnippet}
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
    - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
 6. NEVER mention third-party scraper blogs (Bedroom Producers Blog, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
-7. Extract or construct the official developer product download/promo link ("product_url"), such as the developer's official domain (e.g. https://celestdsp.com/drum-spice-promo/ or official product landing page).
+7. Extract or construct the official developer product download/promo link ("product_url"), such as the developer's official domain (e.g. https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip or official product landing page).
+8. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object without markdown code blocks, matching this exact schema:
