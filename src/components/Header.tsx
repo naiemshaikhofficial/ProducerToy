@@ -175,19 +175,27 @@ export const Header: React.FC = () => {
     pathname === '/free-vst-plugins' ||
     pathname === '/free') && !isSitePage
 
+  const isNewsArticle = Boolean(pathname?.startsWith('/news/') && pathname !== '/news')
+
   return (
     <>
-      {/* Tier 1 Top Header Bar - Always sticky on site pages as requested */}
+      {/* Tier 1 Top Header Bar - Seamless and transparent on news article pages matching Epic Games */}
       <div
         className={`${
           isMobileMenuOpen
-            ? 'fixed top-0 left-0 right-0 z-[60]'
+            ? 'fixed top-0 left-0 right-0 z-[60] bg-[#121212]'
+            : isNewsArticle
+            ? `fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
+                isScrolled
+                  ? 'backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08]'
+                  : 'bg-transparent border-b border-transparent'
+              }`
             : isSitePage
-            ? 'sticky top-0 z-[60] backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08]'
+            ? 'sticky top-0 z-[60] backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08] bg-[#121212]'
             : isShopPage
-            ? 'relative z-[60]'
-            : 'sticky top-0 z-[60]'
-        } w-full bg-[#121212] select-none border-none`}
+            ? 'relative z-[60] bg-[#121212]'
+            : 'sticky top-0 z-[60] bg-[#121212]'
+        } w-full select-none border-none`}
       >
         <TopBar
           currency={currency}

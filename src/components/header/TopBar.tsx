@@ -204,33 +204,27 @@ export const TopBar: React.FC<TopBarProps> = ({
   const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
 
   return (
-    <div className="w-full bg-[#121212] border-none">
+    <div className="w-full bg-transparent border-none">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] sm:h-[72px] lg:h-[76px] flex items-center justify-between">
 
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
         <div className="flex items-center relative">
-          {/* Logo with Ecosystem Dropdown - Smoothly collapses on mobile when menu opens */}
+          {/* Logo - Clean shield logo matching Epic Games, always visible, NO dropdown arrow */}
           <div
             ref={ecosystemMenuRef}
-            onMouseEnter={handleMouseEnterEcosystem}
-            onMouseLeave={handleMouseLeaveEcosystem}
-            className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${isMobileMenuOpen
-              ? 'w-0 opacity-0 -translate-x-3 pointer-events-none overflow-hidden md:w-auto md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-6 lg:md:mr-7'
-              : 'opacity-100 translate-x-0 overflow-visible mr-6 lg:mr-7'
-              }`}
+            className="relative flex items-center mr-4 sm:mr-6 lg:mr-7"
           >
-            <button
-              type="button"
+            <Link
+              href="/"
+              prefetch={true}
               onClick={() => {
-                setIsEcosystemOpen(!isEcosystemOpen)
-                setIsDistributeOpen(false)
+                if (isMobileMenuOpen) onToggleMobileMenu()
               }}
-              className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
-              aria-label="Producer Toy Ecosystem Menu"
+              className="flex items-center hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
+              aria-label="Producer Toy Home"
             >
               <LogoIcon size={34} />
-              <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
-            </button>
+            </Link>
 
             {/* Desktop Ecosystem Mega Dropdown */}
             {isEcosystemOpen && (

@@ -105,56 +105,83 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white relative overflow-hidden">
-      {/* 1:1 Epic Games Atmospheric Background Art Glow */}
-      <div className="absolute top-0 inset-x-0 h-[480px] sm:h-[620px] overflow-hidden -z-10 pointer-events-none select-none">
-        <Image
+      {/* 1:1 Epic Games Sharp Atmospheric Product Background: Full clarity at top behind transparent fixed header, smoothly dissolves down into pure #121212 */}
+      <div
+        className="absolute top-0 left-0 right-0 w-full overflow-hidden z-0 pointer-events-none select-none"
+        style={{ height: '620px' }}
+      >
+        <img
           src={getHighResCoverImage(article.cover_image)}
           alt=""
-          fill
-          priority
-          className="object-cover object-top filter blur-3xl opacity-25 scale-110"
+          className="w-full h-full object-cover object-top opacity-100"
+          style={{
+            maskImage:
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-[#121212]/80 to-[#121212]" />
+        {/* Dark atmospheric tint overlay so header items, title, and excerpt are 100% sharp and readable on any background */}
+        <div className="absolute inset-0 bg-black/40" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 240px, #121212 560px)',
+          }}
+        />
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14 pb-12 sm:pb-20">
+      {/* Main Page Content Layer */}
+      <div className="relative z-10 px-4 sm:px-6 pt-24 sm:pt-32 lg:pt-38 pb-16 sm:pb-24">
         
-        {/* 1:1 Epic Games Top Meta Row: Pill + Date */}
-        <div className="flex items-center gap-3.5 mb-5">
-          <span className="px-3 py-1 rounded-md bg-[#242426]/90 backdrop-blur-md text-zinc-300 text-xs font-bold uppercase tracking-wider border border-white/5">
-            {article.category || 'News'}
-          </span>
-          <span className="text-zinc-400 text-xs sm:text-sm font-medium">
-            {formattedDate}
-          </span>
+        {/* 1:1 Epic Games Centered Header Block: Title + Description in the middle of page */}
+        <div
+          className="w-full mx-auto"
+          style={{ maxWidth: '820px', marginLeft: 'auto', marginRight: 'auto' }}
+        >
+          {/* Top Meta Row: Category Pill + Date */}
+          <div className="flex items-center gap-3.5 mb-4 sm:mb-5">
+            <span className="px-3 py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5">
+              {article.category || 'News'}
+            </span>
+            <span className="text-zinc-400 text-xs sm:text-sm font-medium">
+              {formattedDate}
+            </span>
+          </div>
+
+          {/* 1:1 Epic Games Headline */}
+          <h1 className="text-2xl sm:text-4xl lg:text-[46px] font-black text-white leading-[1.12] tracking-tight mb-5 sm:mb-6">
+            {cleanHtmlTitle(article.title)}
+          </h1>
+
+          {/* Short Description / Excerpt below Title */}
+          {article.excerpt && (
+            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal mb-10 sm:mb-14">
+              {article.excerpt}
+            </p>
+          )}
         </div>
 
-        {/* 1:1 Epic Games Giant Clean Headline */}
-        <h1 className="text-3xl sm:text-5xl lg:text-[46px] font-black text-white leading-[1.12] tracking-tight mb-6 max-w-4xl">
-          {cleanHtmlTitle(article.title)}
-        </h1>
-
-        {/* Sub-headline / Excerpt Lead Paragraph */}
-        {article.excerpt && (
-          <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal mb-8 sm:mb-12 max-w-3xl">
-            {article.excerpt}
-          </p>
-        )}
-
-        {/* Full-Bleed 16:9 Hero Artwork matching Epic Games */}
-        <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-2xl mb-12 sm:mb-16 border border-white/10">
-          <Image
-            src={getHighResCoverImage(article.cover_image)}
-            alt={cleanHtmlTitle(article.title)}
-            fill
-            priority
-            sizes="(max-width: 1200px) 100vw, 1200px"
-            className="object-cover"
-          />
+        {/* 1:1 Epic Games Hero Image Banner: Website-wide (max-w-[1280px]), NO white border */}
+        <div
+          className="w-full mx-auto mb-12 sm:mb-16"
+          style={{ maxWidth: '1280px', marginLeft: 'auto', marginRight: 'auto' }}
+        >
+          <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
+            <img
+              src={getHighResCoverImage(article.cover_image)}
+              alt={cleanHtmlTitle(article.title)}
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
 
-        {/* Centered Editorial Reading Body */}
-        <div className="max-w-3xl mx-auto px-0 sm:px-2">
+        {/* Story Reading Column: Clean 820px width matching Headline */}
+        <div
+          className="w-full mx-auto"
+          style={{ maxWidth: '820px', marginLeft: 'auto', marginRight: 'auto' }}
+        >
           {/* Prominent 1-Click Copy Coupon Box inside story if coupon exists */}
           {couponCode && (
             <div className="mb-8 p-4 sm:p-5 bg-[#18181c] border border-[#FC6301]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
@@ -272,49 +299,54 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               </button>
             </div>
           </div>
+        </div>
 
-          {/* More Stories Grid matching Epic Games */}
-          {relatedArticles.length > 0 && (
-            <div className="mt-14 pt-10 border-t border-white/10">
-              <h4 className="text-lg sm:text-xl font-bold text-white mb-6">
-                Related Stories
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {relatedArticles.slice(0, 3).map((rel) => (
-                  <Link
-                    key={rel.slug}
-                    href={`/news/${rel.slug}`}
-                    prefetch={true}
-                    className="group flex flex-col gap-2.5 cursor-pointer"
-                  >
-                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#181818] border border-white/5">
-                      <Image
-                        src={getHighResCoverImage(rel.cover_image)}
-                        alt={cleanHtmlTitle(rel.title)}
-                        fill
-                        sizes="(max-width: 640px) 100vw, 33vw"
-                        className="object-cover group-hover:brightness-110 transition-all duration-200"
-                      />
-                    </div>
-                    <span className="text-[11px] font-semibold text-zinc-400 uppercase">
-                      {rel.category || 'News'}
-                    </span>
-                    <h5 className="text-sm font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 leading-snug">
-                      {cleanHtmlTitle(rel.title)}
-                    </h5>
-                  </Link>
-                ))}
-              </div>
+        {/* More Stories Grid matching Epic Games (Wider 1280px container) */}
+        {relatedArticles.length > 0 && (
+          <div
+            className="w-full mx-auto mt-16 sm:mt-24 pt-12 border-t border-white/10"
+            style={{ maxWidth: '1280px', marginLeft: 'auto', marginRight: 'auto' }}
+          >
+            <h4 className="text-xl sm:text-2xl font-bold text-white mb-6">
+              Related Stories
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {relatedArticles.slice(0, 3).map((rel) => (
+                <Link
+                  key={rel.slug}
+                  href={`/news/${rel.slug}`}
+                  prefetch={true}
+                  className="group flex flex-col gap-2.5 cursor-pointer"
+                >
+                  <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#181818] border border-white/5">
+                    <Image
+                      src={getHighResCoverImage(rel.cover_image)}
+                      alt={cleanHtmlTitle(rel.title)}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      className="object-cover group-hover:scale-105 group-hover:brightness-110 transition-all duration-300"
+                    />
+                  </div>
+                  <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                    {rel.category || 'News'}
+                  </span>
+                  <h5 className="text-sm font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 leading-snug">
+                    {cleanHtmlTitle(rel.title)}
+                  </h5>
+                </Link>
+              ))}
             </div>
-          )}
-
-          {/* Bottom Copyright & Disclaimer matching Screenshot 3 & 4 */}
-          <div className="mt-16 pt-8 border-t border-white/5 text-center text-xs text-zinc-500 font-normal leading-relaxed">
-            <p>
-              © 2026 Producer Toy Editorial &amp; respective rights holders. All brand names, logos, and product trademarks are the property of their respective developers.
-            </p>
           </div>
+        )}
 
+        {/* Bottom Copyright & Disclaimer matching Epic Games */}
+        <div
+          className="w-full mx-auto mt-16 pt-8 border-t border-white/5 text-center text-xs text-zinc-500 font-normal leading-relaxed"
+          style={{ maxWidth: '820px', marginLeft: 'auto', marginRight: 'auto' }}
+        >
+          <p>
+            © 2026 Producer Toy Editorial &amp; respective rights holders. All brand names, logos, and product trademarks are the property of their respective developers.
+          </p>
         </div>
 
       </div>

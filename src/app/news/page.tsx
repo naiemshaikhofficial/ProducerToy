@@ -2,7 +2,8 @@ import { Metadata } from 'next'
 import { getNewsArticles } from '@/lib/turso/newsDb'
 import { NewsPageClient } from './NewsPageClient'
 
-export const revalidate = 900 // 15 mins ISR
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: 'Music Production News, Free VST Plugins & Audio Deals | Producer Toy',

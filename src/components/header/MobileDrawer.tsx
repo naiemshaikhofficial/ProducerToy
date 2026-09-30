@@ -412,16 +412,6 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   )}
                 </div>
 
-                <div className="pt-2">
-                  <Link
-                    href="https://store.producertoy.com"
-                    prefetch={true}
-                    onClick={onClose}
-                    className="w-full py-3 rounded-xl bg-[#0078F2] hover:bg-[#0066d0] text-white text-center font-bold text-sm block shadow-md"
-                  >
-                    Download
-                  </Link>
-                </div>
               </div>
             ) : (
               <div className="flex flex-col space-y-4">
@@ -607,17 +597,19 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               )}
             </div>
 
-            {/* Bottom Orange Action Button: Sign In (if not logged in) or Library (if logged in) */}
-            <div className="mt-auto pt-6 border-t border-[#202020]">
-              <Link
-                href={user ? "/library" : "/auth"}
-                prefetch={true}
-                onClick={onClose}
-                className="bg-[#FC6301] hover:bg-[#e05700] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
-              >
-                {user ? 'Library' : 'Sign In'}
-              </Link>
-            </div>
+            {/* Bottom Orange Action Button: Only on Store, hidden on Site pages matching Epic Games */}
+            {!isSiteVariant && (
+              <div className="mt-auto pt-6 border-t border-[#202020]">
+                <Link
+                  href={user ? "/library" : "/auth"}
+                  prefetch={true}
+                  onClick={onClose}
+                  className="bg-[#FC6301] hover:bg-[#e05700] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
+                >
+                  {user ? 'Library' : 'Sign In'}
+                </Link>
+              </div>
+            )}
           </>
         )}
 

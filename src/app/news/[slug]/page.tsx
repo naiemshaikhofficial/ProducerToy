@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import { getNewsArticleBySlug, getRelatedNews } from '@/lib/turso/newsDb'
 import { NewsArticleClient } from './NewsArticleClient'
 
-export const revalidate = 900 // 15 mins ISR
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 interface PageProps {
   params: Promise<{
