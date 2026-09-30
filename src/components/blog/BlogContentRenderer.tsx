@@ -55,39 +55,54 @@ export function parseMarkdownToHtml(raw: string): string {
     .replace(/Head over to the official developer link[^.\n]*\./gi, '')
     .trim()
 
-  // 3. Ensure headings have newlines preceding them
-  text = text.replace(/([^\n])\s*(#{2,4}\s+)/g, '$1\n\n$2')
+  // 3. Ensure headings have clean block separation before and after
+  text = text
+    .replace(/([^\n])\s*(#{2,4}\s+)/g, '$1\n\n$2')
+    .replace(/(#{2,4}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
 
   // 4. Split into blocks
   const blocks = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)
   const htmlBlocks: string[] = []
 
   for (const block of blocks) {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean)
+    const firstLine = lines[0] || ''
+    const remainingLines = lines.slice(1).join(' ')
+
     // Heading 2 (## Heading)
-    if (/^##\s+(.+)$/m.test(block)) {
-      const title = block.replace(/^##\s+/, '').trim()
-      if (/^overview$/i.test(title)) continue
-      htmlBlocks.push(`<h2>${formatInline(title)}</h2>`)
+    if (/^##\s+/.test(firstLine)) {
+      const title = firstLine.replace(/^##\s+/, '').trim()
+      if (!/^overview$/i.test(title)) {
+        htmlBlocks.push(`<h2>${formatInline(title)}</h2>`)
+      }
+      if (remainingLines) {
+        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+      }
       continue
     }
 
     // Heading 3 (### Heading)
-    if (/^###\s+(.+)$/m.test(block)) {
-      const title = block.replace(/^###\s+/, '').trim()
+    if (/^###\s+/.test(firstLine)) {
+      const title = firstLine.replace(/^###\s+/, '').trim()
       htmlBlocks.push(`<h3>${formatInline(title)}</h3>`)
+      if (remainingLines) {
+        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+      }
       continue
     }
 
     // Heading 4 (#### Heading)
-    if (/^####\s+(.+)$/m.test(block)) {
-      const title = block.replace(/^####\s+/, '').trim()
+    if (/^####\s+/.test(firstLine)) {
+      const title = firstLine.replace(/^####\s+/, '').trim()
       htmlBlocks.push(`<h4>${formatInline(title)}</h4>`)
+      if (remainingLines) {
+        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+      }
       continue
     }
 
     // Ordered list (1. item)
-    if (/^\d+\.\s+/m.test(block)) {
-      const lines = block.split('\n').filter(l => l.trim().length > 0)
+    if (/^\d+\.\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
         const itemText = line.replace(/^\d+\.\s+/, '').trim()
         return `<li>${formatInline(itemText)}</li>`
@@ -97,8 +112,7 @@ export function parseMarkdownToHtml(raw: string): string {
     }
 
     // Unordered List (- item or * item)
-    if (/^[-*•]\s+/m.test(block)) {
-      const lines = block.split('\n').filter(l => l.trim().length > 0)
+    if (/^[-*•]\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
         const itemText = line.replace(/^[-*•]\s+/, '').trim()
         return `<li>${formatInline(itemText)}</li>`

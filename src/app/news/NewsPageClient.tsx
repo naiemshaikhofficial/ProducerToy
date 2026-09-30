@@ -128,34 +128,40 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 <Link
                   href={`/news/${article.slug}`}
                   prefetch={true}
-                  className="group flex flex-row gap-5 sm:gap-6 items-center py-5 sm:py-6 border-b border-[#222226] cursor-pointer"
+                  className="group flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center py-6 border-b border-[#222226] cursor-pointer"
                 >
-                  {/* 16:9 Thumbnail (Left side: Exact Epic Games Dimensions: w-44 sm:w-60 md:w-64 aspect-video) */}
-                  <div className="relative w-44 sm:w-60 md:w-64 aspect-video shrink-0 rounded-lg overflow-hidden bg-[#181818]">
+                  {/* 16:9 Thumbnail (Mobile: Full width with rounded corners & News pill | Desktop: w-60/w-64) */}
+                  <div className="relative w-full sm:w-60 md:w-64 aspect-video shrink-0 rounded-2xl sm:rounded-xl overflow-hidden bg-[#181818]">
                     <Image
                       src={getHighResCoverImage(article.cover_image)}
                       alt={cleanHtmlTitle(article.title)}
                       fill
-                      sizes="(max-width: 640px) 176px, (max-width: 768px) 240px, 256px"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 240px, 256px"
                       className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
                     />
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+                    
+                    {/* Mobile Only Category Pill on image (1:1 Epic Games mobile screenshot) */}
+                    <div className="sm:hidden absolute bottom-3 left-3 px-2.5 py-1 rounded bg-black/80 backdrop-blur-md text-xs font-semibold text-white">
+                      {article.category || 'News'}
+                    </div>
                   </div>
 
                   {/* Content Details: Meta Date + Bold Title + Read more (Exact Epic Games Layout) */}
-                  <div className="flex flex-col justify-center min-w-0 flex-1">
-                    {/* Category / Date Stamp matching Epic: e.g. "FREE VSTS | 4D AGO" */}
-                    <div className="text-[11px] sm:text-xs font-semibold uppercase text-zinc-400 tracking-wider mb-1.5">
-                      {article.category ? `${article.category.toUpperCase()} | ` : ''}{formatRelativeDate(article.published_at)}
+                  <div className="flex flex-col justify-center min-w-0 flex-1 w-full">
+                    {/* Category / Date Stamp matching Epic */}
+                    <div className="text-xs font-semibold uppercase text-zinc-400 tracking-wider mb-1.5">
+                      <span className="hidden sm:inline">{article.category ? `${article.category.toUpperCase()} | ` : ''}</span>
+                      {formatRelativeDate(article.published_at)}
                     </div>
 
                     {/* Title (Bold white, hover light) */}
-                    <h3 className="text-sm sm:text-base lg:text-[16px] font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug line-clamp-2 mb-2">
+                    <h3 className="text-lg sm:text-base lg:text-[17px] font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug line-clamp-2 mb-2">
                       {cleanHtmlTitle(article.title)}
                     </h3>
 
                     {/* Read more Link */}
-                    <div>
+                    <div className="hidden sm:block">
                       <span className="text-xs font-semibold text-zinc-300 group-hover:underline">
                         Read more
                       </span>

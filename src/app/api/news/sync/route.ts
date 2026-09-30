@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { fetchMusicNewsFeedItems } from '@/lib/news/newsSources'
+import { fetchMusicNewsFeedItems, extractDirectDealInfo } from '@/lib/news/newsSources'
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { articleExists, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
 
@@ -48,6 +48,17 @@ async function handleSync(req: Request) {
       if (alreadyExists) {
         skippedCount++
         continue
+      }
+
+      // Automatically extract direct developer/merchant deal URL & coupon code
+      if (!item.directDealUrl) {
+        const dealInfo = await extractDirectDealInfo(item.link)
+        if (dealInfo?.bestUrl) {
+          item.directDealUrl = dealInfo.bestUrl
+        }
+        if (dealInfo?.couponCode && !(item as any).couponCode) {
+          (item as any).couponCode = dealInfo.couponCode
+        }
       }
 
       // Rewrite with Groq AI Llama 3.3 & save to Turso

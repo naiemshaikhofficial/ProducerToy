@@ -137,8 +137,10 @@ export const Header: React.FC = () => {
     setCurrency(currency === 'INR' ? 'USD' : 'INR')
   }
 
-  // Determine if current route is a site/corporate page (About, Support, FAQ, Distribute, Legal, etc.)
+  // Determine if current route is a site/corporate page (News, About, Support, FAQ, Distribute, Legal, etc.)
   const isSitePage =
+    pathname === '/news' ||
+    pathname?.startsWith('/news') ||
     pathname === '/about' ||
     pathname?.startsWith('/about') ||
     pathname === '/support' ||

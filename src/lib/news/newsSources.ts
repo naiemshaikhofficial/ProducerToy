@@ -18,7 +18,7 @@ export const PLUGIN_BOUTIQUE_AFFILIATE_ID = '68affa2b94f43'
  */
 export function sanitizeDealUrl(url?: string | null): string | null {
   if (!url || typeof url !== 'string') return null
-  const trimmed = url.trim()
+  const trimmed = url.trim().replace(/&amp;/g, '&')
   const lower = trimmed.toLowerCase()
 
   if (!lower.startsWith('http://') && !lower.startsWith('https://')) {
@@ -66,6 +66,83 @@ export function sanitizeDealUrl(url?: string | null): string | null {
 
   return trimmed
 }
+
+/**
+ * Extracts the exact outbound product/deal URL and any promo/coupon code from an article web page.
+ * Uses reader proxy with timeout to reliably parse through Cloudflare blocks.
+ */
+export async function extractDirectDealInfo(articleUrl: string): Promise<{
+  bestUrl?: string
+  couponCode?: string
+} | null> {
+  if (!articleUrl || typeof articleUrl !== 'string') return null
+
+  try {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 4500)
+
+    const jinaUrl = `https://r.jina.ai/${articleUrl}`
+    const res = await fetch(jinaUrl, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'text/plain',
+      },
+    })
+    clearTimeout(timeout)
+
+    if (!res.ok) return null
+    const text = await res.text()
+    if (text.includes('Security Verification') || text.includes('error 403')) {
+      return null
+    }
+
+    const links = [...text.matchAll(/\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/gi)].map((m) => m[2])
+
+    let bestUrl: string | undefined
+    let couponCode: string | undefined
+
+    for (const rawUrl of links) {
+      const cleaned = sanitizeDealUrl(rawUrl)
+      if (!cleaned) continue
+
+      // Highest priority: exact Plugin Boutique product slug or deals hub
+      if (cleaned.includes('pluginboutique.com/deals/') || cleaned.includes('pluginboutique.com/product/')) {
+        bestUrl = cleaned
+        break
+      }
+
+      // High priority: developer store or official repository
+      if (
+        !bestUrl &&
+        (cleaned.includes('gumroad.com') ||
+          cleaned.includes('github.com') ||
+          cleaned.includes('safari-pedals.com') ||
+          cleaned.includes('celestdsp.com') ||
+          cleaned.includes('leitaudio.com') ||
+          cleaned.includes('abyzor.space') ||
+          !cleaned.includes('pluginboutique.com'))
+      ) {
+        bestUrl = cleaned
+      }
+    }
+
+    // Extract coupon code if present in article text (e.g. BPB100OFF, SAVE50, etc.)
+    const couponMatch = text.match(
+      /(?:coupon|promo|voucher)\s*(?:code)?\s*(?:is|:)?\s*[\*\"\'\`]?([A-Z0-9_-]{4,20})[\*\"\'\`]?/i
+    )
+    if (
+      couponMatch &&
+      !['FREE', 'DEAL', 'SALE', 'CODE', 'REQUIRED', 'NONE', 'APPLY'].includes(couponMatch[1].toUpperCase())
+    ) {
+      couponCode = couponMatch[1].toUpperCase()
+    }
+
+    return { bestUrl, couponCode }
+  } catch {
+    return null
+  }
+}
+
 
 export const MUSIC_NEWS_FEEDS = [
   {

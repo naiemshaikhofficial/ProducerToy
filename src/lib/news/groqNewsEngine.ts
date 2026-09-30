@@ -12,6 +12,7 @@ interface GroqRewriteResponse {
   reading_time: string
   deal_price?: string
   deal_regular_price?: string
+  coupon_code?: string
   product_url?: string
   specs: Record<string, string>
   seo_keywords: string
@@ -73,6 +74,12 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
     try {
       const rewritten = await callGroqLlama(item, apiKey)
       if (rewritten) {
+        const detectedCoupon = rewritten.coupon_code || (item as any).couponCode || null
+        const specs = rewritten.specs || {}
+        if (detectedCoupon && !specs['Coupon Code']) {
+          specs['Coupon Code'] = detectedCoupon
+        }
+
         return {
           id: `news_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
           slug: slugify(rewritten.slug || rewritten.title),
@@ -80,7 +87,7 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           excerpt: sanitizeScrapedText(rewritten.excerpt),
           content: sanitizeScrapedText(rewritten.content),
           category: rewritten.category || 'Free VSTs',
-          badge: rewritten.badge || 'FREEWARE',
+          badge: detectedCoupon ? 'COUPON CODE' : rewritten.badge || 'FREEWARE',
           cover_image: coverImage,
           author_name: 'ProducerToy Editorial',
           author_role: 'Audio Technology Editor',
@@ -92,7 +99,7 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           published_at: new Date(item.pubDate).toISOString(),
           created_at: new Date().toISOString(),
           is_featured: item.isPrimary ? 1 : 0,
-          specs: rewritten.specs || {},
+          specs,
           related_products: [],
           seo_keywords: rewritten.seo_keywords || '',
         }
@@ -107,6 +114,9 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
 }
 
 async function callGroqLlama(item: RawFeedItem, apiKey: string): Promise<GroqRewriteResponse | null> {
+  const directUrlNote = item.directDealUrl ? `Direct Official Product / Deal URL: ${item.directDealUrl}` : ''
+  const detectedCouponNote = (item as any).couponCode ? `Detected Promo / Coupon Code: ${(item as any).couponCode}` : ''
+
   const prompt = `You are the lead editor for Producer Toy (the premier digital audio workstation store for music producers, beatmakers, and audio engineers).
 Rewrite the following audio news item from "${item.sourceName}" into a high-authority, original, engaging news article for music producers.
 
@@ -114,20 +124,31 @@ ORIGINAL SOURCE:
 Title: ${item.title}
 Link: ${item.link}
 Content Snippet: ${item.contentSnippet}
+${directUrlNote}
+${detectedCouponNote}
 
-    REQUIREMENTS:
+REQUIREMENTS:
 1. Optimize for Google #1 ranking with high-intent keywords (free VST plugins, DAW deals, mixing plugins, synthesizers, coupon codes).
 2. Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture, ### Analog Saturation Circuit, ### How to Claim with Coupon Code). Never output a single run-on wall of text. Separate concepts into clean, digestible paragraphs.
 3. If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Waves, Arturia, Soundtoys, Universal Audio, Plugin Alliance), prominently feature the brand name and the discount in the title.
-4. COUPON CODE DETECTION: If any coupon code, promo code, or voucher code is mentioned (e.g. 'BPB100OFF', 'SUMMER2026', etc.), extract it explicitly into the "coupon_code" field and inside "specs" as "Coupon Code".
+4. COUPON CODE DETECTION & NARRATIVE:
+   - If any coupon code, promo code, or voucher code is mentioned in the source or detected above (e.g. 'BPB100OFF', 'SUMMER90'):
+     a) Set "coupon_code" to the exact code.
+     b) Set "badge": "COUPON CODE".
+     c) Add "Coupon Code": code inside "specs".
+     d) In the article narrative, include a clear section explaining step-by-step how users enter this coupon code at checkout to drop the price (for example, dropping from $49.00 to $0.00 / FREE).
+   - If no coupon code is required, leave "coupon_code" empty. Do NOT invent fake coupon codes.
 5. MEGA DEAL & BADGE CLASSIFICATION:
-   - If discount is 70%+, 80%+, 90%+, price drop, or record-low: set "badge": "MEGA DEAL".
    - If a coupon code is required: set "badge": "COUPON CODE".
+   - If discount is 70%+, 80%+, 90%+, price drop, or record-low: set "badge": "MEGA DEAL".
    - If it's a 100% free giveaway / freeware: set "badge": "FREEWARE".
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
    - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
 6. NEVER mention third-party scraper blogs (Bedroom Producers Blog, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
-7. Extract or construct the official developer product download/promo link ("product_url"), such as the developer's official domain (e.g. https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip or official product landing page).
+7. EXACT PRODUCT LINK (TRUSTABLE SOURCE, ZERO FAKE LINKS):
+   - Set "product_url" to the exact official product download/store page on the developer's website (e.g. https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip, Gumroad, or Plugin Boutique product slug).
+   - NEVER use placeholder links like [here](#). NEVER link back to competitor blogs.
+   - Producer Toy must be the most trustworthy, accurate audio software news and deal source on the web.
 8. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
 
 OUTPUT FORMAT:
