@@ -179,7 +179,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      {/* Tier 1 Top Header Bar - Seamless and transparent on news article pages matching Epic Games */}
+      {/* Tier 1 Top Header Bar - Blackish transparent on news article pages matching Epic Games */}
       <div
         className={`${
           isMobileMenuOpen
@@ -188,10 +188,10 @@ export const Header: React.FC = () => {
             ? `fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
                 isScrolled
                   ? 'backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08]'
-                  : 'bg-transparent border-b border-transparent'
+                  : 'backdrop-blur-md bg-[#121212]/80 border-b border-white/[0.08]'
               }`
             : isSitePage
-            ? 'sticky top-0 z-[60] backdrop-blur-xl bg-[#121212]/95 border-b border-white/[0.08] bg-[#121212]'
+            ? 'sticky top-0 z-[60] backdrop-blur-xl bg-[#121212]/90 border-b border-white/[0.08]'
             : isShopPage
             ? 'relative z-[60] bg-[#121212]'
             : 'sticky top-0 z-[60] bg-[#121212]'

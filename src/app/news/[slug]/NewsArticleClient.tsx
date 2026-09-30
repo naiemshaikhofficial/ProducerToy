@@ -121,13 +121,13 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
           }}
         />
-        {/* Dark atmospheric tint overlay so header items, title, and excerpt are 100% sharp and readable on any background */}
-        <div className="absolute inset-0 bg-black/40" />
+        {/* Subtle atmospheric tint overlay allowing the header's blackish transparent bar to shine cleanly matching Epic Games */}
+        <div className="absolute inset-0 bg-black/15" />
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 240px, #121212 560px)',
+              'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 220px, #121212 560px)',
           }}
         />
       </div>
