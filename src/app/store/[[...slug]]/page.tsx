@@ -123,9 +123,15 @@ export async function generateMetadata({ params, searchParams }: StorePageProps)
   let path = '/store'
 
   if (rawSlug) {
-    const formattedCategory = rawSlug.charAt(0).toUpperCase() + rawSlug.slice(1).replace(/-/g, ' ')
-    title = `${formattedCategory} Store — Music Production Tools`
-    description = `Download top-rated ${formattedCategory} for FL Studio, Ableton Live, Logic Pro, and more on Producer Toy.`
+    const metaHeader = generateStoreHeaderMeta({
+      selectedCategorySlug: rawSlug,
+      selectedSubCategorySlug: slug?.[1] || cat || '',
+      isFree,
+      isDeals,
+      searchQuery: q,
+    })
+    title = `${metaHeader.title} Store — Music Production Tools`
+    description = metaHeader.description || `Download top-rated ${metaHeader.title} for FL Studio, Ableton Live, Logic Pro, and more on Producer Toy.`
     path = `/store/${rawSlug}`
   }
 
@@ -343,8 +349,8 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       />
 
       <CollectionPageJsonLd
-        title={selectedBrand ? `${selectedBrand.name} Plugins & Sounds` : categorySlug ? `${categorySlug} Store` : 'Producer Toy Store'}
-        description={`Explore premier ${categorySlug || 'music production'} products on Producer Toy.`}
+        title={selectedBrand ? `${selectedBrand.name} Plugins & Sounds` : title ? `${title} Store` : 'Producer Toy Store'}
+        description={`Explore premier ${title || categorySlug || 'music production'} products on Producer Toy.`}
         url={`https://producertoy.com/store${categorySlug ? `/${categorySlug}` : ''}`}
         items={products.map((p) => ({
           name: p.name,
