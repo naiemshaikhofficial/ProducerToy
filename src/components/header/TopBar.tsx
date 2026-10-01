@@ -216,8 +216,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             onMouseLeave={handleMouseLeaveEcosystem}
             className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isMobileMenuOpen
-                ? 'max-w-0 opacity-0 -translate-x-6 pointer-events-none overflow-hidden mr-0 md:max-w-none md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
-                : 'max-w-[80px] opacity-100 translate-x-0 overflow-visible mr-6 sm:mr-7 md:mr-8'
+                ? 'w-0 min-w-0 max-w-0 opacity-0 -translate-x-12 pointer-events-none overflow-hidden mr-0 md:w-auto md:min-w-0 md:max-w-none md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
+                : 'w-[34px] min-w-[34px] md:w-auto md:min-w-0 opacity-100 translate-x-0 overflow-visible mr-3.5 sm:mr-4 md:mr-8'
             }`}
           >
             <button
@@ -226,11 +226,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                 setIsEcosystemOpen(!isEcosystemOpen)
                 setIsDistributeOpen(false)
               }}
-              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
+              className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
               aria-label="Producer Toy Ecosystem Menu"
             >
               <LogoIcon size={34} />
-              <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
+              <ChevronDown className={`hidden md:block w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
             </button>
 
             {/* Desktop Ecosystem Mega Dropdown */}
