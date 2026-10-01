@@ -204,7 +204,6 @@ export const Header: React.FC = () => {
                   : 'rgba(18, 18, 18, 0.85)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
               }
             : undefined
         }
