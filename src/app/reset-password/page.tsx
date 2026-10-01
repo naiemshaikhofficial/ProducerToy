@@ -62,7 +62,7 @@ function ResetPasswordForm() {
         return
       }
 
-      // 2. Check for PKCE Authorization Code in query params
+      // 2. Check for PKCE Authorization Code in query params (from email link)
       const code = searchParams.get('code')
       if (code) {
         try {
@@ -81,26 +81,12 @@ function ResetPasswordForm() {
         }
       }
 
-      // 3. Check for existing active session
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-          if (isMounted) {
-            setHasValidSession(true)
-            setIsVerifyingSession(false)
-          }
-          return
-        }
-      } catch (err) {
-        console.warn('Session check note:', err)
-      }
-
-      // 4. Check URL hash for implicit recovery tokens (#access_token=...&type=recovery)
+      // 3. Check URL hash for implicit recovery tokens (#access_token=...&type=recovery)
       if (typeof window !== 'undefined' && window.location.hash) {
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
         const type = hashParams.get('type')
         const accessToken = hashParams.get('access_token')
-        if (type === 'recovery' || accessToken) {
+        if (type === 'recovery' || (accessToken && type === 'recovery')) {
           if (isMounted) {
             setHasValidSession(true)
             setIsVerifyingSession(false)
@@ -109,7 +95,7 @@ function ResetPasswordForm() {
         }
       }
 
-      // 5. Short buffer for Supabase background auth state event to arrive
+      // 4. Short buffer for Supabase background recovery event; if none, deny access
       const timer = setTimeout(() => {
         if (isMounted) {
           setIsVerifyingSession(false)
@@ -121,9 +107,9 @@ function ResetPasswordForm() {
 
     verifyRecoveryState()
 
-    // 6. Listen for Auth State Changes (PASSWORD_RECOVERY / SIGNED_IN)
+    // 5. Listen strictly for verified PASSWORD_RECOVERY Auth State Changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+      if (event === 'PASSWORD_RECOVERY') {
         if (isMounted) {
           setHasValidSession(true)
           setIsVerifyingSession(false)
@@ -302,15 +288,11 @@ function ResetPasswordForm() {
         ) : (
           /* CREATE NEW PASSWORD FORM (ACTIVE RECOVERY SESSION) */
           <div className="space-y-5 animate-in fade-in">
-            {/* Header with Logo, Lock Icon, Title & Description */}
+            {/* Header with Logo, Title & Description */}
             <div className="flex flex-col items-center text-center space-y-3">
               <Link href="/" prefetch={true} className="hover:opacity-80 transition-opacity">
                 <LogoIcon size={48} />
               </Link>
-
-              <div className="w-12 h-12 rounded-full bg-[#202020] border border-[#2e2e2e] flex items-center justify-center">
-                <Lock className="w-6 h-6 text-zinc-300" />
-              </div>
 
               <h1 className="text-2xl font-extrabold text-white tracking-tight">
                 Create New Password
