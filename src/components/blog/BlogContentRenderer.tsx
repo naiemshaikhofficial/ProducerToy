@@ -13,12 +13,21 @@ function sanitizeLinkUrl(url: string): string {
   let clean = url.trim()
 
   // Ensure Plugin Boutique URLs always use Producer Toy's affiliate referral tag
+  // and strip out competitor tracking params (data, data1, data2, utm_*, etc.)
   if (clean.toLowerCase().includes('pluginboutique.com')) {
     try {
       const parsed = new URL(clean)
+      Array.from(parsed.searchParams.keys()).forEach(key => {
+        if (key !== 'a_aid') {
+          if (/^data\d*$/i.test(key) || /^utm_/i.test(key) || key.toLowerCase() === 'affiliate') {
+            parsed.searchParams.delete(key)
+          }
+        }
+      })
       parsed.searchParams.set('a_aid', PB_AFFILIATE_ID)
       return parsed.toString()
     } catch {
+      clean = clean.replace(/[?&]data\d*=[^&]*/gi, '')
       if (clean.includes('a_aid=')) {
         return clean.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PB_AFFILIATE_ID}`)
       }
@@ -146,10 +155,9 @@ export function parseMarkdownToHtml(raw: string): string {
       const alt = imgMatch[1] || 'Audio Plugin Software'
       const imgUrl = imgMatch[2]
       htmlBlocks.push(`
-        <figure class="my-8 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-2xl">
-          <img src="${imgUrl}" alt="${alt}" loading="lazy" class="w-full h-auto object-cover max-h-[520px]" />
-          ${alt ? `<figcaption class="text-center text-xs text-zinc-400 py-2.5 px-4 bg-[#141416] border-t border-white/5">${alt}</figcaption>` : ''}
-        </figure>
+        <div class="my-8 rounded-2xl overflow-hidden">
+          <img src="${imgUrl}" alt="${alt}" loading="lazy" class="w-full h-auto object-cover rounded-2xl select-none" />
+        </div>
       `)
       if (remainingLines) {
         htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
@@ -162,7 +170,7 @@ export function parseMarkdownToHtml(raw: string): string {
     if (ytMatch) {
       const videoId = ytMatch[1]
       htmlBlocks.push(`
-        <div class="my-8 aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">
+        <div class="my-8 aspect-video w-full rounded-2xl overflow-hidden bg-black">
           <iframe src="https://www.youtube-nocookie.com/embed/${videoId}" title="YouTube video player" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
       `)
@@ -193,7 +201,7 @@ export function parseMarkdownToHtml(raw: string): string {
     let paragraphContent = block.replace(/\n/g, ' ')
     // If inline markdown image exists inside a paragraph
     paragraphContent = paragraphContent.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, (m, alt, url) => {
-      return `<figure class="my-6 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-2xl"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover max-h-[500px]" />${alt ? `<figcaption class="text-center text-xs text-zinc-400 py-2 px-4 bg-[#141416] border-t border-white/5">${alt}</figcaption>` : ''}</figure>`
+      return `<div class="my-6 rounded-2xl overflow-hidden"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover rounded-2xl select-none" /></div>`
     })
 
     htmlBlocks.push(`<p>${formatInline(paragraphContent)}</p>`)

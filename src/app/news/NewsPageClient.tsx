@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NewsArticle } from '@/lib/turso/newsDb'
-import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 
 interface NewsPageClientProps {
   initialArticles: NewsArticle[]
@@ -13,30 +12,20 @@ interface NewsPageClientProps {
 export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   const [visibleCount, setVisibleCount] = useState(12)
 
-  // Top 2 featured billboard hero cards
-  const billboardArticles = initialArticles.slice(0, 2)
+  // 1 Featured Hero Article (Matching Screenshot 1)
+  const featuredArticle = initialArticles[0]
 
-  // Remaining articles for the 1:1 Epic Games horizontal feed
-  const feedArticles = initialArticles.slice(2, visibleCount + 2)
-  const hasMore = visibleCount + 2 < initialArticles.length
+  // All other cards in 3-column Grid (Matching Screenshot 2 - "sare cards")
+  const gridArticles = initialArticles.slice(1, visibleCount + 1)
+  const hasMore = visibleCount + 1 < initialArticles.length
 
-  const formatRelativeDate = (dateStr: string) => {
+  const formatEpicDate = (dateStr: string) => {
     try {
       const d = new Date(dateStr)
-      const now = new Date()
-      const diffMs = now.getTime() - d.getTime()
-      const diffHrs = Math.floor(diffMs / (1000 * 60 * 60))
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-
-      if (diffHrs < 1) return 'JUST NOW'
-      if (diffHrs < 24) return `${diffHrs}H AGO`
-      if (diffDays === 1) return 'YESTERDAY'
-      if (diffDays < 7) return `${diffDays}D AGO`
-      if (diffDays < 30) return `${Math.floor(diffDays / 7)}W AGO`
-      if (diffDays < 365) return `${Math.floor(diffDays / 30)}MO AGO`
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()
+      if (isNaN(d.getTime())) return 'Recently'
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     } catch {
-      return 'RECENT'
+      return 'Recently'
     }
   }
 
@@ -63,126 +52,115 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
   return (
     <div className="w-full bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-6 sm:py-10">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12">
         
-        {/* 1:1 Epic Games 2-Billboard Hero Cards (NO BORDERS, STATIC + LIGHT GLOW HIGHLIGHT ON HOVER) */}
-        {billboardArticles.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 mb-12 sm:mb-16">
-            {billboardArticles.map((article, idx) => (
+        {/* Featured Hero Story (1:1 with Screenshot 1) */}
+        {featuredArticle && (
+          <div className="mb-14 sm:mb-20">
+            <Link
+              href={`/news/${featuredArticle.slug}`}
+              prefetch={true}
+              className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center cursor-pointer"
+            >
+              {/* Left Column: 16:9 Image with product-image ambient glow behind it matching Epic */}
+              <div className="lg:col-span-7 relative">
+                {/* Ambient Glow: Mirror of the product image with blur matching Epic Games */}
+                <div className="absolute -inset-3 sm:-inset-6 overflow-hidden rounded-[36px] -z-10 pointer-events-none opacity-55 group-hover:opacity-80 transition-opacity duration-300">
+                  <Image
+                    src={getHighResCoverImage(featuredArticle.cover_image)}
+                    alt=""
+                    fill
+                    className="object-cover blur-3xl scale-125"
+                    aria-hidden="true"
+                  />
+                </div>
+                
+                <div className="relative aspect-video w-full rounded-2xl sm:rounded-[24px] overflow-hidden bg-[#18181c]">
+                  <Image
+                    src={getHighResCoverImage(featuredArticle.cover_image)}
+                    alt={`${cleanHtmlTitle(featuredArticle.title)} - Free Plugin & Audio News - Producer Toy`}
+                    title={`${cleanHtmlTitle(featuredArticle.title)} - Producer Toy`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 60vw"
+                    className="object-cover group-hover:scale-[1.01] transition-transform duration-300 ease-out"
+                    priority
+                  />
+                  {/* Category Pill in bottom-left */}
+                  <div className="absolute bottom-4 left-4 px-3.5 py-1 rounded bg-black/75 backdrop-blur-md text-xs font-semibold text-white tracking-wide">
+                    {featuredArticle.category || 'News'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Date + Headline + Read more */}
+              <div className="lg:col-span-5 flex flex-col justify-center">
+                <div className="text-sm font-medium text-zinc-400 mb-3 tracking-wide">
+                  {formatEpicDate(featuredArticle.published_at)}
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-[38px] font-black text-white leading-[1.18] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
+                  {cleanHtmlTitle(featuredArticle.title)}
+                </h1>
+                {featuredArticle.excerpt && (
+                  <p className="text-sm sm:text-base text-zinc-400 line-clamp-2 leading-relaxed mb-6">
+                    {featuredArticle.excerpt}
+                  </p>
+                )}
+                <div>
+                  <span className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
+                    Read more
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </div>
+        )}
+
+        {/* 3-Column Card Grid (1:1 with Screenshot 2 - "sare cards bhi") */}
+        {gridArticles.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 mb-14">
+            {gridArticles.map((article, idx) => (
               <Link
                 key={article.id || idx}
                 href={`/news/${article.slug}`}
                 prefetch={true}
-                className="group flex flex-col cursor-pointer border-0"
+                className="group flex flex-col bg-[#202024] hover:bg-[#28282e] rounded-2xl p-3.5 sm:p-4 border-0 transition-all duration-200 cursor-pointer shadow-lg"
               >
-                {/* 16:9 Clean Thumbnail (Static with Home Page Brightness + Glow Highlight on Hover) */}
-                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#181818] mb-3.5 sm:mb-4">
+                {/* 16:9 Inset Image with rounded corners */}
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
                   <Image
                     src={getHighResCoverImage(article.cover_image)}
                     alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
                     title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
-                    priority={idx === 0}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-[1.02] transition-transform duration-300 ease-out"
                   />
-                  {/* Subtle Light Glow Overlay matching Homepage */}
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+                  {/* Category Pill in bottom-left */}
+                  <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded bg-black/75 backdrop-blur-md text-[11px] font-semibold text-white tracking-wide">
+                    {article.category || 'News'}
+                  </div>
                 </div>
 
-                {/* Date stamp */}
-                <div className="text-[11px] sm:text-xs font-semibold uppercase text-zinc-400 tracking-wider mb-2">
-                  {formatRelativeDate(article.published_at)}
-                </div>
-
-                {/* Article Headline */}
-                <h2 className="text-base sm:text-lg lg:text-xl font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug mb-2 line-clamp-2">
-                  {cleanHtmlTitle(article.title)}
-                </h2>
-
-                {/* Excerpt */}
-                <p className="text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed mb-3">
-                  {article.excerpt}
-                </p>
-
-                {/* Read more Link */}
-                <div className="mt-auto">
-                  <span className="text-xs sm:text-sm font-semibold text-white group-hover:underline">
-                    Read more
-                  </span>
+                {/* Card Text Content */}
+                <div className="pt-3.5 pb-1 flex flex-col flex-1">
+                  <div className="text-xs font-medium text-zinc-400 mb-1.5">
+                    {formatEpicDate(article.published_at)}
+                  </div>
+                  <h2 className="text-base sm:text-[17px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
+                    {cleanHtmlTitle(article.title)}
+                  </h2>
                 </div>
               </Link>
             ))}
           </div>
         )}
 
-        {/* 1:1 Exact Epic Games Horizontal Feed (Matching User Screenshot) */}
-        {feedArticles.length > 0 && (
-          <div className="border-t border-[#26262a] pt-1">
-            {feedArticles.map((article, idx) => (
-              <React.Fragment key={article.id || idx}>
-                <Link
-                  href={`/news/${article.slug}`}
-                  prefetch={true}
-                  className="group flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center py-6 border-b border-[#222226] cursor-pointer"
-                >
-                  {/* 16:9 Thumbnail (Mobile: Full width with rounded corners & News pill | Desktop: w-60/w-64) */}
-                  <div className="relative w-full sm:w-60 md:w-64 aspect-video shrink-0 rounded-2xl sm:rounded-xl overflow-hidden bg-[#181818]">
-                    <Image
-                      src={getHighResCoverImage(article.cover_image)}
-                      alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
-                      title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 240px, 256px"
-                      className="object-cover group-hover:brightness-110 transition-all duration-200 ease-out"
-                    />
-                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-                    
-                    {/* Mobile Only Category Pill on image (1:1 Epic Games mobile screenshot) */}
-                    <div className="sm:hidden absolute bottom-3 left-3 px-2.5 py-1 rounded bg-black/80 backdrop-blur-md text-xs font-semibold text-white">
-                      {article.category || 'News'}
-                    </div>
-                  </div>
-
-                  {/* Content Details: Meta Date + Bold Title + Read more (Exact Epic Games Layout) */}
-                  <div className="flex flex-col justify-center min-w-0 flex-1 w-full">
-                    {/* Category / Date Stamp matching Epic */}
-                    <div className="text-xs font-semibold uppercase text-zinc-400 tracking-wider mb-1.5">
-                      <span className="hidden sm:inline">{article.category ? `${article.category.toUpperCase()} | ` : ''}</span>
-                      {formatRelativeDate(article.published_at)}
-                    </div>
-
-                    {/* Title (Bold white, hover light) */}
-                    <h3 className="text-lg sm:text-base lg:text-[17px] font-bold text-white group-hover:text-zinc-300 transition-colors leading-snug line-clamp-2 mb-2">
-                      {cleanHtmlTitle(article.title)}
-                    </h3>
-
-                    {/* Read more Link */}
-                    <div className="hidden sm:block">
-                      <span className="text-xs font-semibold text-zinc-300 group-hover:underline">
-                        Read more
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-
-                {/* Optional in-feed Google Ad after 4th item if configured */}
-                {idx === 3 && (
-                  <div className="border-b border-[#222226]">
-                    <NewsGoogleAd slot="news_feed_inline" />
-                  </div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        )}
-
         {/* Load More Button */}
         {hasMore && (
-          <div className="text-center pt-4 pb-6 sm:pb-8">
+          <div className="text-center pt-2 pb-8">
             <button
-              onClick={() => setVisibleCount((prev) => prev + 8)}
-              className="px-8 py-3 bg-[#202020] hover:bg-[#282828] text-white font-bold text-xs sm:text-sm rounded-xl border border-[#333333] hover:border-zinc-400 active:scale-95 transition-all shadow-md cursor-pointer"
+              onClick={() => setVisibleCount((prev) => prev + 9)}
+              className="px-8 py-3 bg-[#202024] hover:bg-[#28282e] text-white font-bold text-xs sm:text-sm rounded-xl border-0 active:scale-95 transition-all shadow-md cursor-pointer"
             >
               Load More
             </button>

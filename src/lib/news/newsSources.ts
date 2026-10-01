@@ -60,15 +60,23 @@ export function sanitizeDealUrl(url?: string | null): string | null {
   if (lower.includes('pluginboutique.com')) {
     try {
       const parsed = new URL(trimmed)
+      Array.from(parsed.searchParams.keys()).forEach(key => {
+        if (key !== 'a_aid') {
+          if (/^data\d*$/i.test(key) || /^utm_/i.test(key) || key.toLowerCase() === 'affiliate') {
+            parsed.searchParams.delete(key)
+          }
+        }
+      })
       parsed.searchParams.set('a_aid', PLUGIN_BOUTIQUE_AFFILIATE_ID)
       return parsed.toString()
     } catch {
-      if (trimmed.includes('a_aid=')) {
-        return trimmed.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
+      let clean = trimmed.replace(/[?&]data\d*=[^&]*/gi, '')
+      if (clean.includes('a_aid=')) {
+        return clean.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
       }
-      return trimmed.includes('?')
-        ? `${trimmed}&a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
-        : `${trimmed}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+      return clean.includes('?')
+        ? `${clean}&a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+        : `${clean}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
     }
   }
 

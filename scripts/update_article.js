@@ -14,103 +14,76 @@ envContent.split('\n').forEach(line => {
 const slug = 'roland-native-instruments-slate-digital-3-strong-plugin-deals-for-digital-synthesis-fm-sou';
 
 const newContent = `
-## Overview of This Week's 3 Standout Plugin Deals
+Roland brought the JD-800 back this week, that digital cult synth from 1991 that even future Spectrasonics founder Eric Persing had a hand in building. Alongside it, Native Instruments FM8, the successor to the legendary Yamaha DX series, is currently slashed down to just €9.91, a price that makes you look twice. Rounding things out is Slate Digital MetaTune, a pitch corrector that handles both invisible correction and full-on robo vocal effects, for €73.88.
 
-Plugin Boutique is running limited-time discount promotions on three legendary software instruments and mixing processors: the digital classic **Roland JD-800**, the deep FM synthesizer **Native Instruments FM8**, and the cutting-edge modern vocal processor **Slate Digital MetaTune**.
-
-Whether you produce synthwave, modern EDM, pop, trap, or cinematic film scores, each of these tools offers exceptional studio capabilities at a fraction of their regular retail prices.
+Three completely different production tools that together cover vintage digital synthesis, pristine FM sound design, and modern radio-ready vocal tuning at massive discounts.
 
 ---
 
-## 1. Roland JD-800: Vintage '90s Digital Synthesis (Now 54% Off)
+## 1. Roland JD-800: Now 54% Off
 
 ![Roland JD-800 Vintage Digital Synthesizer GUI](https://cdn.gearnews.com/wp-content/uploads/2021/10/roland-jd-800-1024x565.jpg)
 
-The **Roland JD-800** defined the electronic sound palette of the 1990s. While most synthesizers of that era relied on confusing nested menus and single data sliders, Roland equipped the original hardware with dozens of dedicated faders for complete, hands-on sound shaping.
+Roland launched the JD-800 as a standalone plugin for the synth’s 30th anniversary, after the classic had previously only been available as a Model Expansion for Zenology. The 1991 synth ran on linear arithmetic synthesis, the same technology behind the famous Roland D-50, and Eric Persing, who later founded Spectrasonics, was a key part of its development.
 
-This authentic software recreation brings that exact tactile workflow and unmistakable glassy digital bite to modern digital audio workstations. Built on advanced waveform modeling with original multi-effects including distortion, phaser, chorus, delay, and rotary speaker simulations, it delivers soaring lead sounds, icy digital pads, and hard-hitting arpeggiated sequences.
+Every patch runs up to four independent voices, each with selectable D-50-style waveforms, a resonant multimode filter, three multi-stage envelope generators, and two LFOs. Roland didn’t lean on simple samples for the emulation. Instead they combined the original waveform data with advanced modeling techniques. The effects section got a real expansion too, with seven freely reorderable effects including distortion, enhancer, spectrum EQ, phaser, chorus, and a triple-tap delay, plus a master EQ. All 64 original hardware presets are included, alongside 64 new patches built for a more current sound.
 
 https://www.youtube.com/watch?v=4K3p3pbqMB8
 
-Originally priced at €215.11, the Roland JD-800 is currently on sale at Plugin Boutique for **€98.00** (54% off) through October 12, 2026. Available in 64-bit VST3, AU, and AAX formats for macOS and Windows.
+In practice, the Roland JD-800 is a natural fit for those glassy, shimmering digital tones that defined ’90s productions from 808 State to Underworld. Splitting all four voices individually across the keyboard opens up complex layer and split configurations that would be genuinely tough to pull off with the original hardware.
 
-[Get Roland JD-800 Deal (€98.00 at Plugin Boutique)](https://www.pluginboutique.com/product/1-Instruments/4-Synth/8227-Roland-JD-800?a_aid=68affa2b94f43)
+Through September 30, 2026, grab the Roland JD-800 on Plugin Boutique for **€68.43** instead of €151.13 with 54% off.
+
+[Get Roland JD-800 Deal (€68.43 at Plugin Boutique)](https://www.pluginboutique.com/product/1-Instruments/4-Synth/15315-JD-800?a_aid=68affa2b94f43)
 
 ---
 
-## 2. Native Instruments FM8: Iconic FM Synthesis Powerhouse (Now 90% Off)
+## 2. Native Instruments FM8: Now 90% Off
 
 ![Native Instruments FM8 Frequency Modulation Synthesizer GUI](https://cdn.gearnews.com/wp-content/uploads/2022/08/NI-FM8-synth-1024x565.jpg)
 
-Frequency modulation synthesis has a reputation for being mathematically intimidating, but **Native Instruments FM8** revolutionized FM by packaging its 6-operator engine into a brilliantly visual frequency matrix.
+Native Instruments released FM8 as the successor to the celebrated FM7, and in the process pushed well past what classic Yamaha DX-style FM synthesis could do. Instead of sticking to the fixed algorithms the DX7 and its relatives forced on you, FM8 gives you a fully open modulation matrix with six operators, plus distortion and filter operators that go beyond traditional FM architecture entirely.
 
-FM8 easily imports legacy Yamaha DX7 patches and expands into modern territory with complex morphing envelopes, dual multi-mode filters, an expansive effects rack, and an intelligent graphical arpeggiator. From punchy metallic basslines and crisp bells to evolving dystopian soundscapes, FM8 remains a staple in top-tier studios worldwide.
+The Easy Edit page gives you an accessible way into what’s normally a pretty intimidating type of synthesis, since complex parameters get controlled automatically through simple knobs. A graphical sound morphing feature lets you blend between four presets sitting at the corners of a vector-style interface, which is great for evolving, organic sounds. Twelve solid effects, including phaser, flanger, tube amp, and overdrive, round out the signal. Over 1,200 factory presets plus the ability to import classic DX and TX sysex patches make FM8 worth a look even if you’re coming from the original hardware.
 
 https://www.youtube.com/watch?v=eNwRJXpNrsc
 
-For a strictly limited time, Native Instruments FM8 is marked down by an astonishing **90%**, dropping from €99.00 down to just **€9.91** at Plugin Boutique.
+At home in the studio, FM8 covers a genuinely massive sonic range, from those signature bell-like electric pianos and DX basses to complex, evolving pads and percussive textures. The arpeggiator, running up to 32 steps, works essentially like its own step sequencer and opens up rhythmic options that go way beyond a typical arpeggio pattern.
 
-[Get Native Instruments FM8 Deal (€9.91 at Plugin Boutique)](https://www.pluginboutique.com/product/1-Instruments/4-Synth/43-FM8?a_aid=68affa2b94f43)
+Through September 30, 2026, grab Native Instruments FM8 on Plugin Boutique for **€9.91** instead of €105.91 with 90% off.
+
+[Get Native Instruments FM8 Deal (€9.91 at Plugin Boutique)](https://www.pluginboutique.com/product/1-Instruments/4-Synth/8001-FM8?a_aid=68affa2b94f43)
 
 ---
 
-## 3. Slate Digital MetaTune: Seamless Modern Vocal Pitch Correction (Now 50% Off)
+## 3. Slate Digital MetaTune: Now 50% Off
 
 ![Slate Digital MetaTune Vocal Pitch Corrector GUI](https://cdn.gearnews.com/wp-content/uploads/2021/10/slate-digital-metatune-01.jpg)
 
-Rounding out this week's highlights is **Slate Digital MetaTune**, engineered for ultra-fast, clean vocal pitch tracking with zero artifacting.
+Slate Digital built MetaTune as a real-time pitch corrector meant to handle two very different jobs at once: subtle, invisible correction and loud, obvious tuning effects. The plugin is designed for monophonic sources like vocals or solo instruments, though the Groups feature lets you apply it across multiple tracks at the same time.
 
-Whether you need transparent micro-intonation correction for lead acoustic vocals or instantaneous robotic tuning for modern trap and hyperpop, MetaTune's ultra-fast note detection engine delivers radio-ready results without tedious piano-roll micro-editing.
+Negative Speed produces ultrafast, robotic corrections that go well beyond anything a standard pitch corrector offers. The Note Stabilizer keeps unwanted pitch flutter in check, even at the most extreme settings. HeatMaps show incoming and outgoing pitch in real time, which makes landing on the right note a lot easier without needing deep scale or chord knowledge. A built-in doubler delivers wide, thickened vocal sounds right inside the same plugin, no extra instance required.
 
 https://www.youtube.com/watch?v=qFUqnSUIxvE
 
-### Key Innovations in MetaTune:
-* **Negative Speed:** Produces hard-tuned robotic vocal effects that push past traditional speed limits with ultra-clean transitions.
-* **Note Stabilizer:** Intelligently ignores natural vibrato and breath fluctuations to prevent annoying pitch flutter.
-* **Real-time HeatMaps:** Clearly visualizes incoming pitch against the target key and scale.
-* **Built-in Vocal Doubler:** Thickens lead vocal lines with rich stereo spread directly inside the plugin.
+In practice, MetaTune works just as well for quiet live correction as it does for the hard, obviously tuned vocal sounds all over pop, trap, and dance productions right now. The Groups function lets you control several MetaTune instances at once, which saves real time on productions with dense vocal stacks.
 
-Through October 1, 2026, grab Slate Digital MetaTune on Plugin Boutique for **€73.88** instead of €147.76 (50% off).
+Through October 1, 2026, grab Slate Digital MetaTune on Plugin Boutique for **€73.88** instead of €147.76 with 50% off.
 
-[Get Slate Digital MetaTune Deal (€73.88 at Plugin Boutique)](https://www.pluginboutique.com/product/2-Effects/54-Vocal/8141-MetaTune?a_aid=68affa2b94f43)
+[Get Slate Digital MetaTune Deal (€73.88 at Plugin Boutique)](https://www.pluginboutique.com/product/2-Effects/54-Vocal-Processing/15799-MetaTune?a_aid=68affa2b94f43)
 `.trim();
 
 async function run() {
-  const clients = [];
+  const client = createClient({
+    url: env.TURSO_DATABASE_URL,
+    authToken: env.TURSO_AUTH_TOKEN
+  });
 
-  // Turso Cloud client
-  if (env.TURSO_DATABASE_URL && env.TURSO_AUTH_TOKEN) {
-    clients.push({
-      name: 'Turso Cloud',
-      client: createClient({
-        url: env.TURSO_DATABASE_URL,
-        authToken: env.TURSO_AUTH_TOKEN
-      })
-    });
-  }
-
-  // Local SQLite client
-  const localDb = path.resolve(__dirname, '../data_news.db');
-  if (fs.existsSync(localDb)) {
-    clients.push({
-      name: 'Local data_news.db',
-      client: createClient({
-        url: 'file:' + localDb
-      })
-    });
-  }
-
-  for (const { name, client } of clients) {
-    try {
-      const res = await client.execute({
-        sql: 'UPDATE news_articles SET content = ? WHERE slug = ?',
-        args: [newContent, slug]
-      });
-      console.log(`[${name}] Updated news_articles. Rows affected:`, res.rowsAffected);
-    } catch (err) {
-      console.error(`[${name}] Error:`, err.message);
-    }
-  }
+  const res = await client.execute({
+    sql: 'UPDATE news_articles SET content = ? WHERE slug = ?',
+    args: [newContent, slug]
+  });
+  console.log('Updated news_articles rows affected:', res.rowsAffected);
 }
 
 run();

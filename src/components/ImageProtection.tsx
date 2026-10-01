@@ -4,37 +4,29 @@ import { useEffect } from 'react'
 
 export function ImageProtection() {
   useEffect(() => {
-    // Completely bypass image protection on localhost and local development
-    if (
-      process.env.NODE_ENV === 'development' ||
-      typeof window !== 'undefined' && (
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname.startsWith('192.168.') ||
-        window.location.hostname.endsWith('.local')
-      )
-    ) {
-      return
-    }
-
     const handleDragStart = (e: DragEvent) => {
       const target = e.target as HTMLElement
       if (!target) return
 
-      const isImage = target.tagName === 'IMG' || target.tagName === 'SVG' || target.closest('img') || target.closest('picture')
-      
+      const isImage =
+        target.tagName === 'IMG' ||
+        target.tagName === 'SVG' ||
+        target.tagName === 'PICTURE' ||
+        Boolean(target.closest('img')) ||
+        Boolean(target.closest('picture'))
+
       if (isImage) {
-        // Find if image is inside a product link or anchor tag
+        // Resolve slug URL: parent link or current page URL
         const anchor = target.closest('a') as HTMLAnchorElement | null
-        if (anchor && anchor.href) {
-          // Transfer the product URL link instead of the raw image file
-          if (e.dataTransfer) {
-            e.dataTransfer.setData('text/uri-list', anchor.href)
-            e.dataTransfer.setData('text/plain', anchor.href)
-            e.dataTransfer.effectAllowed = 'copyLink'
-          }
+        const targetHref = anchor?.href || (typeof window !== 'undefined' ? window.location.href : '')
+
+        if (targetHref && e.dataTransfer) {
+          // Transfer ONLY the page/product/article slug link, never the raw image asset
+          e.dataTransfer.clearData()
+          e.dataTransfer.setData('text/uri-list', targetHref)
+          e.dataTransfer.setData('text/plain', targetHref)
+          e.dataTransfer.effectAllowed = 'copyLink'
         } else {
-          // Prevent raw image dragging when not in a link
           e.preventDefault()
         }
       }
@@ -42,17 +34,24 @@ export function ImageProtection() {
 
     const handleContextMenu = (e: MouseEvent) => {
       const target = e.target as HTMLElement
-      if (target && (target.tagName === 'IMG' || target.tagName === 'SVG' || target.closest('img') || target.closest('picture'))) {
+      if (
+        target &&
+        (target.tagName === 'IMG' ||
+          target.tagName === 'SVG' ||
+          target.tagName === 'PICTURE' ||
+          Boolean(target.closest('img')) ||
+          Boolean(target.closest('picture')))
+      ) {
         e.preventDefault()
       }
     }
 
-    document.addEventListener('dragstart', handleDragStart)
-    document.addEventListener('contextmenu', handleContextMenu)
+    document.addEventListener('dragstart', handleDragStart, true)
+    document.addEventListener('contextmenu', handleContextMenu, true)
 
     return () => {
-      document.removeEventListener('dragstart', handleDragStart)
-      document.removeEventListener('contextmenu', handleContextMenu)
+      document.removeEventListener('dragstart', handleDragStart, true)
+      document.removeEventListener('contextmenu', handleContextMenu, true)
     }
   }, [])
 

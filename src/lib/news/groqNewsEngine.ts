@@ -48,16 +48,24 @@ export function sanitizeScrapedText(text: string): string {
     .replace(/Bedroom\s+Producers?\s+Blog/gi, 'Producer Toy')
     .replace(/Audio\s*Plugin\s*Guy/gi, 'Producer Toy')
     .replace(/https?:\/\/(?:www\.)?(?:bedroomproducersblog\.com|audiopluginguy\.com)[^\s)\]"]*/gi, '#')
-    // Ensure all Plugin Boutique URLs use Producer Toy's affiliate referral ID
+    // Ensure all Plugin Boutique URLs use Producer Toy's affiliate referral ID and remove all competitor tracking
     .replace(/https?:\/\/(?:www\.)?pluginboutique\.com\/[^\s)\]"]+/gi, (matchedUrl) => {
       try {
         const u = new URL(matchedUrl)
+        Array.from(u.searchParams.keys()).forEach(key => {
+          if (key !== 'a_aid') {
+            if (/^data\d*$/i.test(key) || /^utm_/i.test(key) || key.toLowerCase() === 'affiliate') {
+              u.searchParams.delete(key)
+            }
+          }
+        })
         u.searchParams.set('a_aid', PLUGIN_BOUTIQUE_AFFILIATE_ID)
         return u.toString()
       } catch {
-        return matchedUrl.includes('a_aid=')
-          ? matchedUrl.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
-          : `${matchedUrl}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+        let clean = matchedUrl.replace(/[?&]data\d*=[^&]*/gi, '')
+        return clean.includes('a_aid=')
+          ? clean.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
+          : `${clean}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
       }
     })
     // External music scrapers & blogs
