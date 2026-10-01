@@ -210,6 +210,110 @@ const BEST_OF_CONFIGS: Record<string, BestOfConfig> = {
       },
     ],
   },
+  'free-guitar-vst-plugins': {
+    slug: 'free-guitar-vst-plugins',
+    title: 'Best Free Guitar VST Plugins (2026) — Ample Sound Guitar & Acoustic Guitars',
+    headline: 'Best Free Guitar VST Plugins & Ample Sound Acoustic Guitars',
+    metaTitle: 'Best Free Guitar VST Plugins (2026) — Ample Sound Guitar & Virtual Guitars',
+    description:
+      'Download Ample Sound Guitar Lite and the best free acoustic & electric guitar VST plugins. Realistic Martin acoustic strumming, picking & solos for FL Studio, Ableton & Logic Pro.',
+    introText:
+      'Finding realistic virtual guitar instruments without spending hundreds of dollars can be tough. From the legendary Ample Guitar M Lite II by Ample Sound to sampled electric guitars, here is the definitive ranking of the best free guitar VST plugins for FL Studio, Ableton Live, and Logic Pro.',
+    keywords: [
+      'ample sound guitar',
+      'ample guitar free download',
+      'ample sound guitar vst',
+      'ample guitar m lite ii',
+      'best free guitar vst',
+      'free acoustic guitar vst',
+      'guitar vst free download',
+      'electric guitar vst free',
+      'free guitar plugin fl studio',
+      'producer toy guitar',
+    ],
+    tags: ['guitar', 'ample-sound', 'acoustic-guitar', 'virtual-instrument', 'instruments', 'free-vst'],
+    faqs: [
+      {
+        question: 'What is the best free acoustic guitar VST plugin?',
+        answer:
+          'Ample Guitar M Lite II by Ample Sound is widely considered the undisputed best free acoustic guitar VST. It models a Martin D-41 acoustic guitar with realistic pick/finger articulations and an interactive strumming engine.',
+      },
+      {
+        question: 'Is Ample Sound Guitar Lite really 100% free?',
+        answer:
+          'Yes, Ample Guitar M Lite II is a completely free freeware version provided by Ample Sound. It requires no activation key or dongle and works in all major 64-bit DAWs.',
+      },
+      {
+        question: 'How do I get realistic guitar strumming with virtual guitar plugins?',
+        answer:
+          'Use Ample Sound built-in Strummer mode, which allows you to trigger realistic upstrokes, downstrokes, palm mutes, and custom chord voicings with simple MIDI notes.',
+      },
+    ],
+  },
+  'free-piano-vst-plugins': {
+    slug: 'free-piano-vst-plugins',
+    title: 'Best Free Piano VST Plugins (2026) — Grand Pianos & Electric Keys',
+    headline: 'Best Free Piano VST Plugins & Realistic Keyboards',
+    metaTitle: 'Best Free Piano VST Plugins (2026) — Realistic Grand Pianos & Keys',
+    description:
+      'Download the best free piano VST plugins. Realistic concert grand pianos, vintage Rhodes electric pianos, and lush upright pianos for FL Studio & Ableton.',
+    introText:
+      'A great piano plugin is the centerpiece of countless ballads, beats, and compositions. Here is our tested selection of the best free piano VST plugins, from concert grands to vintage electric Rhodes.',
+    keywords: [
+      'free piano vst',
+      'best free piano plugin',
+      'grand piano vst free',
+      'free keys vst',
+      'spitfire labs soft piano',
+      'keyzone classic free download',
+      'fl studio free piano',
+    ],
+    tags: ['piano', 'keys', 'grand-piano', 'rhodes', 'virtual-instrument', 'instruments', 'free-vst'],
+    faqs: [
+      {
+        question: 'What is the best free realistic grand piano VST?',
+        answer:
+          'Spitfire Audio LABS Soft Piano and Keyzone Classic are widely regarded as the two finest free piano plugins, offering lush dynamic velocity layers and cinematic tone.',
+      },
+      {
+        question: 'Do free piano plugins work with MIDI keyboards?',
+        answer:
+          'Yes, all free piano plugins on Producer Toy support full velocity sensitivity, sustain pedals, and pitch/mod wheels from standard USB MIDI keyboards.',
+      },
+    ],
+  },
+  'free-synth-vst-plugins': {
+    slug: 'free-synth-vst-plugins',
+    title: 'Best Free Synth VST Plugins (2026) — Vital, Wavetable & Analog Synths',
+    headline: 'Best Free Synthesizer VST Plugins & Sound Generators',
+    metaTitle: 'Best Free Synth VST Plugins (2026) — Vital & Free Wavetable Synths',
+    description:
+      'Download Vital and the best free synthesizer VST plugins. Create massive 808s, soaring leads, lush pads, and modular patches for FL Studio & Ableton.',
+    introText:
+      'Synthesizers drive modern electronic, hip-hop, and pop music. Discover the most powerful free synth VST plugins that rival $200 commercial synthesizers in sound quality, modulation, and preset versatility.',
+    keywords: [
+      'free synth vst',
+      'vital synth free download',
+      'best free synthesizer plugin',
+      'free wavetable synth',
+      'surge xt free download',
+      'dexed fm synth free',
+      'analog synth vst free',
+    ],
+    tags: ['synth', 'vital', 'synthesizer', 'wavetable', 'presets', 'virtual-instrument', 'free-vst'],
+    faqs: [
+      {
+        question: 'Is Vital synth completely free?',
+        answer:
+          'Yes! Vital offers a 100% free version with full spectral warping engine, 3 wavetable oscillators, 2 filters, and limitless modulation capabilities.',
+      },
+      {
+        question: 'Can free synths open Serum presets?',
+        answer:
+          'While Vital cannot directly read native .fxp Serum presets, you can easily import any Serum wavetable (.wav format) directly into Vital’s wavetable editor.',
+      },
+    ],
+  },
 }
 
 export async function generateMetadata({
@@ -316,11 +420,10 @@ export default async function BestOfRoundupPage({
               key={item.slug}
               href={`/best/${item.slug}`}
               prefetch={true}
-              className={`text-xs font-semibold px-3.5 py-1.5 rounded-xl border whitespace-nowrap transition-colors ${
-                item.slug === config.slug
+              className={`text-xs font-semibold px-3.5 py-1.5 rounded-xl border whitespace-nowrap transition-colors ${item.slug === config.slug
                   ? 'bg-white text-black border-white'
                   : 'bg-[#181818] hover:bg-[#222222] text-zinc-300 hover:text-white border-[#2c2c2c]'
-              }`}
+                }`}
             >
               {item.title.replace(' (2026)', '')}
             </Link>
@@ -349,7 +452,7 @@ export default async function BestOfRoundupPage({
                 className="bg-[#141414] hover:bg-[#181818] border border-[#262626] hover:border-[#383838] rounded-2xl p-5 sm:p-6 transition-all shadow-xl space-y-4"
               >
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                  
+
                   {/* Left: Product Artwork (Rank Badge Overlay) */}
                   <div className="md:col-span-4 relative aspect-[16/10] rounded-xl overflow-hidden bg-[#0c0c0c] border border-[#222222]">
                     <div className="absolute top-2 left-2 z-10 bg-black/80 backdrop-blur-md text-white font-black text-xs px-2.5 py-1 rounded-lg border border-white/20">

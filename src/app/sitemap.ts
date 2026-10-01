@@ -59,6 +59,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/best/free-delay-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
     { url: `${baseUrl}/best/free-eq-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
     { url: `${baseUrl}/best/free-trap-drum-kits-808`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-guitar-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-piano-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
+    { url: `${baseUrl}/best/free-synth-vst-plugins`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.98 },
 
     // Dedicated DAW Landing Hubs
     { url: `${baseUrl}/daw/fl-studio`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
