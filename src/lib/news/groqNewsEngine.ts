@@ -1,6 +1,6 @@
 import { RawFeedItem, sanitizeDealUrl, PLUGIN_BOUTIQUE_AFFILIATE_ID } from './newsSources'
 import { NewsArticle } from '../turso/newsDb'
-import { getArticleCoverImage } from './imageGenerator'
+import { getArticleCoverImage, resolveProductBannerImage } from './imageGenerator'
 
 interface GroqRewriteResponse {
   title: string
@@ -84,7 +84,11 @@ export function sanitizeScrapedText(text: string): string {
  */
 export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticle> {
   const apiKey = process.env.GROQ_API_KEY?.trim()
-  const coverImage = getArticleCoverImage(item.title, 'Audio News', item.imageUrl)
+  const coverImage = await resolveProductBannerImage(
+    item.title,
+    item.imageUrl,
+    item.directDealUrl || item.link
+  )
 
   if (apiKey) {
     try {

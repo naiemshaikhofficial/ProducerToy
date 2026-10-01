@@ -73,6 +73,18 @@ async function handleSync(req: Request) {
 
       // Rewrite with Groq AI Llama 3.3 & save to Turso
       const article = await rewriteNewsWithGroq(item)
+
+      // Strict Quality Gate: Future articles MUST have a valid, non-empty, non-placeholder image
+      if (
+        !article.cover_image ||
+        article.cover_image.includes('placeholder') ||
+        article.cover_image.includes('photo-1598488035139-bdbb2231ce04')
+      ) {
+        console.warn(`[News Sync] Skipping article without valid image: "${article.title}"`)
+        skippedCount++
+        continue
+      }
+
       const saved = await saveNewsArticle(article)
 
       if (saved) {
