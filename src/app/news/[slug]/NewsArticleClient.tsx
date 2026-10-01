@@ -259,89 +259,17 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             <NewsGoogleAd slot="news_article_inline" />
           </div>
 
-          {/* If multi-product roundup or multiple deals inside article, hide single offering card */}
-          {isMultiDeal ? (
-            <div className="my-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-zinc-400">
-              <span>Author: <strong className="text-zinc-200 font-semibold">{article.author_name}</strong></span>
-              <button
-                onClick={handleCopyLink}
-                className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors cursor-pointer"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? 'Link Copied' : 'Share Story'}</span>
-              </button>
-            </div>
-          ) : (
-            <div className="my-10 p-6 sm:p-8 bg-[#18181c] rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col gap-5">
-              <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#FC6301] block mb-1">
-                  Official Offering
-                </span>
-                <h3 className="text-lg sm:text-2xl font-bold text-white leading-snug">
-                  {cleanHtmlTitle(article.title)}
-                </h3>
-                <div className="flex items-center gap-3 mt-2.5">
-                  {article.deal_regular_price && (
-                    <span className="line-through text-zinc-500 font-semibold text-sm">
-                      {article.deal_regular_price}
-                    </span>
-                  )}
-                  <span className="text-lg sm:text-xl font-black text-white">
-                    {displayPrice}
-                  </span>
-                  {article.badge && (
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#24242a] text-zinc-300">
-                      {article.badge}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Interactive Coupon Code 1-Click Box if available */}
-              {couponCode && (
-                <div className="p-3.5 bg-[#202026] rounded-xl flex items-center justify-between gap-3">
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">
-                      Coupon Code
-                    </span>
-                    <span className="text-sm sm:text-base font-mono font-black text-white tracking-wider truncate">
-                      {couponCode}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleCopyCoupon}
-                    className="px-4 py-2 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-lg active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-                  >
-                    {copiedCoupon ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedCoupon ? 'Copied' : 'Copy Code'}</span>
-                  </button>
-                </div>
-              )}
-
-              {/* Direct CTA Button */}
-              <a
-                href={offerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-4 bg-[#FC6301] hover:bg-[#e05800] text-white font-extrabold text-sm sm:text-base rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-              >
-                <span>Get Official Deal</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-
-              {/* Action Bar: Share & Copy Link */}
-              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-xs text-zinc-400">
-                <span>Author: {article.author_name}</span>
-                <button
-                  onClick={handleCopyLink}
-                  className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors cursor-pointer"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Link Copied' : 'Share Story'}</span>
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Article Footer Bar: Author & Share */}
+          <div className="my-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-zinc-400">
+            <span>Author: <strong className="text-zinc-200 font-semibold">{article.author_name}</strong></span>
+            <button
+              onClick={handleCopyLink}
+              className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+              <span>{copied ? 'Link Copied' : 'Share Story'}</span>
+            </button>
+          </div>
         </div>
 
         {/* More Stories Grid matching Epic Games (Wider 1280px container) */}

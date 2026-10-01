@@ -157,9 +157,17 @@ ${directUrlNote}
 ${detectedCouponNote}
 
 REQUIREMENTS:
-1. Optimize for Google #1 ranking with high-intent keywords (free VST plugins, DAW deals, mixing plugins, synthesizers, coupon codes).
-2. Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture, ### Analog Saturation Circuit, ### How to Claim with Coupon Code). Never output a single run-on wall of text. Separate concepts into clean, digestible paragraphs.
-3. If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Waves, Arturia, Soundtoys, Universal Audio, Plugin Alliance), prominently feature the brand name and the discount in the title.
+1. OPTIMIZE FOR GOOGLE #1 RANKING (HIGH-INTENT SEO):
+   - Write titles that match what active music producers and audio engineers search for on Google: e.g. "[Brand] [Product] [Category/Feature] Deal: [X]% Off ($[Price] VST)".
+   - NEVER use repetitive, spammy formulas like "Record Low Price on Industry Standard Audio Plugin" on multiple products! Every title must be unique, high-intent, and specific to the actual plugin.
+   - Target top ranking search keywords: free VST plugins, synth VST deals, vocal compressor plugins, audio plugin sales, coupon codes, and 2026 DAW essentials.
+2. ACCURATE PRICING & ZERO DATA FABRICATION:
+   - Always extract and display the REAL prices and discount percentages from the source (for example, if a synth drops from $99 to $10, state $10.00 and 89% OFF).
+   - NEVER invent or hallucinate arbitrary prices (e.g. inventing "$39.99" when the actual deal is "$10.00"). If a price is unspecified, leave deal_price null or write "Special Offer".
+3. FORMATTING & TECHNICAL PROSE:
+   - Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture & FM Engine, ### Optical Compression & Transient Response, ### Compatibility & System Specs). Never output a single run-on wall of text.
+   - Cover real DSP architecture, circuit modeling, sound character, and DAW workflows (Ableton Live, FL Studio, Logic Pro, Studio One).
+4. If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Universal Audio, Arturia, Soundtoys, Slate Digital, Softube, Klevgrand), prominently feature the brand name, product name, and format in the title and excerpt.
 4. COUPON CODE DETECTION & NARRATIVE:
    - If any coupon code, promo code, or voucher code is mentioned in the source or detected above (e.g. 'BPB100OFF', 'SUMMER90'):
      a) Set "coupon_code" to the exact code.

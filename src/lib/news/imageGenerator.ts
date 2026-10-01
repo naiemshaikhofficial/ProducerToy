@@ -80,7 +80,14 @@ export async function resolveProductBannerImage(
         const searchHtml = await searchRes.text()
         const prodLinks = [...new Set([...searchHtml.matchAll(/href=["'](\/product\/[^"']+)["']/gi)].map(m => m[1]))]
 
-        // Inspect top product page for high-res screenshots
+        // Inspect top product page for authentic product screenshots
+        const PB_GIFT_BANNER_HASHES = [
+          '8703u6x0lrzyjlnucnb396u4m6qb', // Melodyne 5 Essential
+          'tvs4y0670451blh7j6l511bu5xkp', // StereoSavage 2 Elements
+          '9c1dgrwexwywq4u6fmiohx0cp4j5', // ChordAXE Lite
+          '6q6mdbwd6rrypcnclj408wlnof78', // Gorilla Drive
+        ]
+
         for (const pl of prodLinks.slice(0, 2)) {
           try {
             const pRes = await fetch('https://www.pluginboutique.com' + pl, {
@@ -92,13 +99,23 @@ export async function resolveProductBannerImage(
             })
             if (pRes.ok) {
               const pHtml = await pRes.text()
+
+              // 1. Highest priority: Image explicitly labeled alt="Main Image" or matching product title
+              const mainImgMatch =
+                pHtml.match(/<img[^>]+alt=["']Main Image["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
+                pHtml.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["']Main Image["']/i)
+
+              if (mainImgMatch && !PB_GIFT_BANNER_HASHES.some(h => mainImgMatch[1].includes(h))) {
+                return mainImgMatch[1]
+              }
+
               const pageBanners = [
                 ...new Set(
                   [...pHtml.matchAll(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/gi)].map(m => m[0])
                 ),
-              ]
+              ].filter(b => !PB_GIFT_BANNER_HASHES.some(h => b.includes(h)))
 
-              // Find the highest resolution image (> 70KB, skip audio/mpeg)
+              // Find the highest resolution image (> 30KB, skip audio/mpeg & gifts)
               let bestBanner: string | null = null
               let maxLen = 0
 
@@ -108,7 +125,7 @@ export async function resolveProductBannerImage(
                   const ct = bRes.headers.get('content-type') || ''
                   if (!ct.startsWith('image/')) continue // Skip audio files
                   const len = parseInt(bRes.headers.get('content-length') || '0', 10)
-                  if (len > 60000 && len > maxLen) {
+                  if (len > 30000 && len > maxLen) {
                     maxLen = len
                     bestBanner = b
                   }
@@ -124,7 +141,7 @@ export async function resolveProductBannerImage(
 
         // If product page didn't yield a high-res banner, check search results for banner
         const bannerMatch = searchHtml.match(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/i)
-        if (bannerMatch) {
+        if (bannerMatch && !PB_GIFT_BANNER_HASHES.some(h => bannerMatch[0].includes(h))) {
           return bannerMatch[0]
         }
       }

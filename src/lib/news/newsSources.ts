@@ -62,21 +62,14 @@ export function sanitizeDealUrl(url?: string | null): string | null {
       const parsed = new URL(trimmed)
       Array.from(parsed.searchParams.keys()).forEach(key => {
         if (key !== 'a_aid') {
-          if (/^data\d*$/i.test(key) || /^utm_/i.test(key) || key.toLowerCase() === 'affiliate') {
-            parsed.searchParams.delete(key)
-          }
+          parsed.searchParams.delete(key)
         }
       })
       parsed.searchParams.set('a_aid', PLUGIN_BOUTIQUE_AFFILIATE_ID)
       return parsed.toString()
     } catch {
-      let clean = trimmed.replace(/[?&]data\d*=[^&]*/gi, '')
-      if (clean.includes('a_aid=')) {
-        return clean.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
-      }
-      return clean.includes('?')
-        ? `${clean}&a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
-        : `${clean}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+      let clean = trimmed.replace(/[?&].*$/gi, '')
+      return `${clean}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
     }
   }
 
@@ -302,24 +295,63 @@ export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
     while ((match = topDealsRegex.exec(text)) !== null) {
       const imageUrl = match[1].trim()
       const productName = cleanText(match[2].trim())
-      const pbSearchUrl = `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(productName)}&a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+      const exactProductUrl = await resolvePluginBoutiqueProductUrl(productName)
 
       items.push({
-        title: `${productName} on Sale (Record Low Deal)`,
-        link: pbSearchUrl,
+        title: `${productName} on Sale (Exclusive Deal)`,
+        link: exactProductUrl,
         pubDate: new Date().toUTCString(),
         creator: 'Plugin Deals',
-        contentSnippet: `${productName} is currently on sale at a record low price. Grab it at Plugin Boutique with official discounts.`,
+        contentSnippet: `${productName} is currently on sale at an exceptional discount. Official release with lifetime licensing and instant download.`,
         imageUrl,
         sourceName: 'PluginDeals',
         isPrimary: true,
-        directDealUrl: pbSearchUrl,
+        directDealUrl: exactProductUrl,
       })
     }
   } catch (err) {
     console.warn('[fetchPluginDealsFeedItems] Error fetching PluginDeals:', err)
   }
   return items
+}
+
+/**
+ * Searches Plugin Boutique and extracts the exact product URL slug (/product/...)
+ * with Producer Toy's affiliate referral ID attached.
+ */
+export async function resolvePluginBoutiqueProductUrl(productName: string): Promise<string> {
+  try {
+    const cleanQuery = productName
+      .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
+      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle)\b/gi, ' ')
+      .replace(/[^a-zA-Z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 45)
+
+    if (cleanQuery.length >= 3) {
+      const searchRes = await fetch(
+        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(cleanQuery)}`,
+        {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          },
+          signal: AbortSignal.timeout(4500),
+        }
+      )
+      if (searchRes.ok) {
+        const html = await searchRes.text()
+        const prodMatch = html.match(/href=["'](\/product\/[^"']+)["']/i)
+        if (prodMatch) {
+          return `https://www.pluginboutique.com${prodMatch[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+        }
+      }
+    }
+  } catch {}
+
+  // Fallback: direct deals section with referral
+  return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
 }
 
 /**
