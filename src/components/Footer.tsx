@@ -26,8 +26,8 @@ export function Footer() {
   }
 
   return (
-    <footer className={`w-full bg-[#141414] text-white border-none select-none font-sans ${pathname === '/support' ? 'mt-0' : 'mt-28 sm:mt-36'}`}>
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 sm:pt-20 sm:pb-28">
+    <footer className={`w-full bg-[#141414] text-white border-none select-none font-sans ${pathname === '/support' ? 'mt-0' : 'mt-10 sm:mt-14'}`}>
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20">
         
         {/* Main Grid with Consistent Vertical Dividers */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-8 pb-14 sm:pb-18 border-b border-[#26262b]">
