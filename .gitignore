@@ -31,6 +31,8 @@ scripts/*.py
 public/ChatGPT Image*.png
 *.tsbuildinfo
 /scratch/
+AGENTS.md
+CLAUDE.md
 
 # Operating System Files
 .DS_Store

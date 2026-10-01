@@ -155,41 +155,27 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
   return (
     <div className="w-full bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 pb-12 sm:pb-16">
         
         {/* Featured Hero Story (1:1 with Epic Games Screenshot) */}
         {featuredArticle && (
-          <div className="mb-12 sm:mb-16">
+          <div className="mb-10 sm:mb-12">
             <Link
               href={`/news/${featuredArticle.slug}`}
               prefetch={true}
               className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center cursor-pointer"
             >
-              {/* Left Column: 16:9 Image with 1:1 Epic Games Warm Ambient Glow */}
+              {/* Left Column: 16:9 Image with 1:1 Epic Games Subtle Ambient Glow */}
               <div className="lg:col-span-7 relative isolate">
-                {/* 1:1 Epic Games Ambient Glow: Unclipped, soft atmospheric golden-amber bloom + cover image backlight */}
+                {/* 1:1 Epic Games Ambient Glow: Contained, soft atmospheric halo directly behind the card, never bleeding into the grid below */}
                 <div
-                  className="absolute -inset-8 sm:-inset-14 -z-10 pointer-events-none select-none opacity-85 sm:opacity-95 group-hover:opacity-100 transition-opacity duration-500"
+                  className="absolute -inset-3 sm:-inset-5 -z-10 pointer-events-none select-none opacity-30 group-hover:opacity-40 transition-opacity duration-300"
                   aria-hidden="true"
                 >
-                  {/* Signature Epic Golden/Amber Atmosphere Diffuse Blob */}
-                  <div
-                    className="w-full h-full rounded-full"
-                    style={{
-                      background: 'radial-gradient(ellipse 75% 65% at 50% 45%, rgba(251, 191, 36, 0.45) 0%, rgba(249, 115, 22, 0.28) 38%, rgba(234, 88, 12, 0.1) 65%, transparent 80%)',
-                      filter: 'blur(60px)',
-                      transform: 'scale(1.15)',
-                    }}
-                  />
-                  {/* Cover Image Color Reflection */}
                   <img
                     src={getHighResCoverImage(featuredArticle.cover_image)}
                     alt=""
-                    className="absolute inset-0 w-full h-full object-cover rounded-3xl opacity-60 mix-blend-screen"
-                    style={{
-                      filter: 'blur(75px) saturate(2) brightness(1.25)',
-                      transform: 'scale(1.08)',
-                    }}
+                    className="w-full h-full object-cover rounded-3xl filter blur-xl sm:blur-2xl scale-100"
                   />
                 </div>
                 

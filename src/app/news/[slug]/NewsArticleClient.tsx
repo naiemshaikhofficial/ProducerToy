@@ -150,13 +150,13 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
           }}
         />
-        {/* Subtle atmospheric tint overlay allowing the header's blackish transparent bar to shine cleanly matching Epic Games */}
-        <div className="absolute inset-0 bg-black/15" />
+        {/* Rich dark atmospheric tint overlay: Ensures all text is 100% crystal clear and high-contrast, even when the cover image is pure white or brightly colored */}
+        <div className="absolute inset-0 bg-[#121212]/75 backdrop-blur-[3px]" />
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 220px, #121212 560px)',
+              'linear-gradient(to bottom, rgba(18,18,18,0.75) 0%, rgba(18,18,18,0.92) 200px, #121212 520px)',
           }}
         />
       </div>
@@ -171,22 +171,22 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         >
           {/* Top Meta Row: Category Pill + Date */}
           <div className="flex items-center gap-3.5 mb-4 sm:mb-5">
-            <span className="px-3 py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5">
+            <span className="px-3 py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5 shadow-sm">
               {article.category || 'News'}
             </span>
-            <span className="text-zinc-400 text-xs sm:text-sm font-medium">
+            <span className="text-zinc-400 text-xs sm:text-sm font-medium drop-shadow-sm">
               {formattedDate}
             </span>
           </div>
 
           {/* 1:1 Epic Games Headline */}
-          <h1 className="text-2xl sm:text-4xl lg:text-[46px] font-black text-white leading-[1.12] tracking-tight mb-5 sm:mb-6">
+          <h1 className="text-2xl sm:text-4xl lg:text-[46px] font-black text-white leading-[1.12] tracking-tight mb-5 sm:mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
             {cleanHtmlTitle(article.title)}
           </h1>
 
           {/* Short Description / Excerpt below Title */}
           {article.excerpt && (
-            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal mb-10 sm:mb-14">
+            <p className="text-base sm:text-lg text-zinc-200 leading-relaxed font-normal mb-10 sm:mb-14 drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)]">
               {article.excerpt}
             </p>
           )}
