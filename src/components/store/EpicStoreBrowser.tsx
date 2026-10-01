@@ -138,9 +138,20 @@ export function EpicStoreBrowser({
     activePriceTier ? activePriceTier.split(',') : isDealsActive ? ['discounted'] : isFreeActive ? ['free'] : []
   )
 
+  const normalizedCategoryType = useMemo(() => {
+    if (!activeCategorySlug) return null
+    const lower = activeCategorySlug.toLowerCase()
+    if (['sounds', 'sample-pack', 'sample-packs', 'samples'].includes(lower)) return 'sounds'
+    if (['plugins', 'vst', 'vst-plugins', 'vst-plugin', 'effects', 'instruments'].includes(lower)) return 'plugins'
+    if (['presets', 'preset'].includes(lower)) return 'presets'
+    if (['templates', 'template'].includes(lower)) return 'templates'
+    if (['bundles', 'bundle'].includes(lower)) return 'bundles'
+    return null
+  }, [activeCategorySlug])
+
   const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>(
-    activeCategorySlug && ['plugins', 'sounds', 'presets', 'templates', 'bundles'].includes(activeCategorySlug)
-      ? [activeCategorySlug]
+    normalizedCategoryType
+      ? [normalizedCategoryType]
       : isBundlesActive
       ? ['bundles']
       : []
@@ -256,14 +267,26 @@ export function EpicStoreBrowser({
       if (selectedProductTypes.length > 0) {
         const typeMap: Record<string, string> = {
           plugins: 'plugin',
+          plugin: 'plugin',
           sounds: 'sample_pack',
+          sample_pack: 'sample_pack',
+          'sample-pack': 'sample_pack',
+          'sample-packs': 'sample_pack',
           presets: 'preset',
+          preset: 'preset',
           templates: 'template',
+          template: 'template',
           bundles: 'bundle',
+          bundle: 'bundle',
         }
         const matchesType = selectedProductTypes.some((typeSlug) => {
           const expected = typeMap[typeSlug] || typeSlug
-          return p.product_type === expected || p.category_slugs?.includes(typeSlug)
+          return (
+            p.product_type === expected ||
+            (expected === 'sample_pack' && (p.product_type === 'sample_pack' || p.product_type === 'sample-pack')) ||
+            (expected === 'plugin' && (p.product_type === 'plugin' || p.product_type === 'vst')) ||
+            p.category_slugs?.some((c) => c.toLowerCase().includes(typeSlug))
+          )
         })
         if (!matchesType) return false
       }

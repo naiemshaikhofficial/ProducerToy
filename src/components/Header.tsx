@@ -161,6 +161,8 @@ export const Header: React.FC = () => {
   const isShopPage =
     (pathname === '/' ||
     pathname === '/store' ||
+    pathname?.startsWith('/store') ||
+    pathname?.startsWith('/best') ||
     pathname === '/cart' ||
     pathname === '/gifts' ||
     pathname === '/wishlist' ||

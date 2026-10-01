@@ -209,22 +209,29 @@ export const TopBar: React.FC<TopBarProps> = ({
 
         {/* Left Section: Clean Shield Logo + STORE Name + Support + Distribute (Exact 1:1 Epic Games Store Layout) */}
         <div className="flex items-center relative">
-          {/* Logo - Clean shield logo matching Epic Games, always visible, NO dropdown arrow */}
+          {/* Logo with Ecosystem Dropdown - Smoothly collapses on mobile when menu opens */}
           <div
             ref={ecosystemMenuRef}
-            className="relative flex items-center mr-4 sm:mr-6 lg:mr-7"
+            onMouseEnter={handleMouseEnterEcosystem}
+            onMouseLeave={handleMouseLeaveEcosystem}
+            className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+              isMobileMenuOpen
+                ? 'max-w-0 opacity-0 -translate-x-6 pointer-events-none overflow-hidden mr-0 md:max-w-none md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
+                : 'max-w-[80px] opacity-100 translate-x-0 overflow-visible mr-6 sm:mr-7 md:mr-8'
+            }`}
           >
-            <Link
-              href="/"
-              prefetch={true}
+            <button
+              type="button"
               onClick={() => {
-                if (isMobileMenuOpen) onToggleMobileMenu()
+                setIsEcosystemOpen(!isEcosystemOpen)
+                setIsDistributeOpen(false)
               }}
-              className="flex items-center hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
-              aria-label="Producer Toy Home"
+              className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
+              aria-label="Producer Toy Ecosystem Menu"
             >
               <LogoIcon size={34} />
-            </Link>
+              <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
+            </button>
 
             {/* Desktop Ecosystem Mega Dropdown */}
             {isEcosystemOpen && (
@@ -559,180 +566,84 @@ export const TopBar: React.FC<TopBarProps> = ({
             )}
           </div>
 
-          {/* Site Navigation (Epic Games 1:1 match) vs Store Navigation */}
-          {isSiteVariant ? (
-            <div className="hidden md:flex items-center gap-6 lg:gap-7 text-[15px] font-medium text-zinc-300">
-              <Link
-                href="https://store.producertoy.com"
-                prefetch={true}
-                className="hover:text-white transition-colors"
-              >
-                Store
-              </Link>
+          {/* STORE Brand Title - Smoothly slides to corner on mobile when logo exits */}
+          <Link
+            href="/"
+            prefetch={true}
+            className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none flex-shrink-0"
+          >
+            STORE
+          </Link>
 
-              <Link
-                href="/news"
-                prefetch={true}
-                className="hover:text-white transition-colors"
-              >
-                News
-              </Link>
+          <Link
+            href="/support"
+            prefetch={true}
+            className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors ml-6 lg:ml-8"
+          >
+            Support
+          </Link>
 
-              <Link
-                href="/support"
-                prefetch={true}
-                className="hover:text-white transition-colors"
-              >
-                FAQ
-              </Link>
+          {/* Distribute Dropdown with Hover */}
+          <div
+            className="relative hidden lg:block ml-6 lg:ml-8"
+            ref={distributeMenuRef}
+            onMouseEnter={handleMouseEnterDistribute}
+            onMouseLeave={handleMouseLeaveDistribute}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setIsDistributeOpen(!isDistributeOpen)
+                setIsEcosystemOpen(false)
+              }}
+              className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${isDistributeOpen
+                ? 'bg-white/[0.08] text-white border border-white/20'
+                : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                }`}
+              aria-label="Distribute Menu"
+            >
+              <span>Distribute</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDistributeOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
+            </button>
 
-              <Link
-                href="/support"
-                prefetch={true}
-                className="hover:text-white transition-colors"
-              >
-                Help
-              </Link>
-
-              {/* About ProducerToy Dropdown */}
-              <div
-                className="relative"
-                ref={aboutMenuRef}
-                onMouseEnter={handleMouseEnterAbout}
-                onMouseLeave={handleMouseLeaveAbout}
-              >
-                <button
-                  type="button"
-                  onClick={() => setIsAboutOpen(!isAboutOpen)}
-                  className={`flex items-center gap-1.5 cursor-pointer transition-colors py-1.5 ${
-                    isAboutOpen ? 'text-white' : 'text-zinc-300 hover:text-white'
-                  }`}
-                  aria-label="About Producer Toy Menu"
+            {/* Distribute Dropdown Menu */}
+            {isDistributeOpen && (
+              <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
+                <Link
+                  href="/distribute"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                 >
-                  <span>About Producer Toy</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isAboutOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
-                </button>
-
-                {isAboutOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-[220px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
-                    <Link
-                      href="/about"
-                      prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
-                    >
-                      About Us
-                    </Link>
-                    <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
-                    >
-                      Distribute
-                    </Link>
-                    <Link
-                      href="/licensing"
-                      prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
-                    >
-                      Licensing
-                    </Link>
-                    <Link
-                      href="/contact"
-                      prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left"
-                    >
-                      Contact &amp; Grievance
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* STORE Brand Title - Smoothly slides to corner on mobile */}
-              <Link
-                href="/"
-                prefetch={true}
-                className="text-white font-bold text-[19px] sm:text-[21px] lg:text-[22px] tracking-wide uppercase font-sans hover:text-zinc-200 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] leading-none select-none flex-shrink-0 ml-2 sm:ml-0"
-              >
-                STORE
-              </Link>
-
-              <Link
-                href="/support"
-                prefetch={true}
-                className="hidden md:block text-zinc-300 hover:text-white text-[15px] font-medium transition-colors ml-6 lg:ml-8"
-              >
-                Support
-              </Link>
-
-              {/* Distribute Dropdown with Hover */}
-              <div
-                className="relative hidden lg:block ml-6 lg:ml-8"
-                ref={distributeMenuRef}
-                onMouseEnter={handleMouseEnterDistribute}
-                onMouseLeave={handleMouseLeaveDistribute}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsDistributeOpen(!isDistributeOpen)
-                    setIsEcosystemOpen(false)
-                  }}
-                  className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${isDistributeOpen
-                    ? 'bg-white/[0.08] text-white border border-white/20'
-                    : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
-                    }`}
-                  aria-label="Distribute Menu"
+                  Distribute on Producer Toy
+                </Link>
+                <Link
+                  href="/contact?topic=creator"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                 >
-                  <span>Distribute</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isDistributeOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
-                </button>
-
-                {/* Distribute Dropdown Menu */}
-                {isDistributeOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
-                    <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                    >
-                      Distribute on Producer Toy
-                    </Link>
-                    <Link
-                      href="/contact?topic=creator"
-                      prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                    >
-                      Developer Forums
-                    </Link>
-                    <Link
-                      href="/licensing"
-                      prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                    >
-                      Documentation
-                    </Link>
-                    <Link
-                      href="/blog"
-                      prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                    >
-                      Learning
-                    </Link>
-                  </div>
-                )}
+                  Developer Forums
+                </Link>
+                <Link
+                  href="/licensing"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                >
+                  Documentation
+                </Link>
+                <Link
+                  href="/blog"
+                  prefetch={true}
+                  onClick={() => setIsDistributeOpen(false)}
+                  className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                >
+                  Learning
+                </Link>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Right Section Desktop (Exact 1:1 PC Screenshot Match) */}

@@ -64,8 +64,8 @@ export function ProductJsonLd({
     priceInr !== undefined && priceInr !== null
       ? Number(priceInr)
       : isFree || numericPriceUsd === 0
-      ? 0
-      : Math.round(numericPriceUsd * 85)
+        ? 0
+        : Math.round(numericPriceUsd * 85)
 
   const formattedPriceUsd = isFree || numericPriceUsd === 0 ? '0.00' : numericPriceUsd.toFixed(2)
   const formattedPriceInr = isFree || numericPriceInr === 0 ? '0.00' : numericPriceInr.toFixed(2)
@@ -299,6 +299,7 @@ export function StoreOrganizationJsonLd() {
     '@id': 'https://producertoy.com/#organization',
     name: 'Producer Toy',
     alternateName: [
+      'Producer Toy',
       'ProducerToy',
       'Producer Toy Store',
       'producertoy.com',

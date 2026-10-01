@@ -128,11 +128,19 @@ export const CORE_STORE_METADATA: Record<string, StoreHeaderMeta> = {
     description: 'Polyphonic soft synths, wavetable instruments, and vintage analog modeling synthesizers.',
   },
   'sounds': {
-    title: 'Sounds & Sample Packs',
-    description: 'Royalty-free sample packs, 808 sub basses, trap drum kits, melody loops, and vocal stems with instant download.',
+    title: 'Sample Packs & Sounds',
+    description: '100% royalty-free sample packs, 808 sub basses, trap drum kits, melody loops, and vocal stems with instant download.',
+  },
+  'sample-pack': {
+    title: 'Sample Packs & Sounds',
+    description: '100% royalty-free sample packs, drum one-shots, melodic loops, and sound libraries for music producers.',
   },
   'sample-packs': {
-    title: 'Royalty-Free Sample Packs',
+    title: 'Sample Packs & Sounds',
+    description: '100% royalty-free sample packs, drum one-shots, melodic loops, and sound libraries for music producers.',
+  },
+  'samples': {
+    title: 'Sample Packs & Sounds',
     description: '100% royalty-free sample packs, drum one-shots, melodic loops, and sound libraries for music producers.',
   },
   'presets': {
@@ -398,16 +406,30 @@ export function generateStoreHeaderMeta(options: StoreMetaOptions): StoreHeaderM
     const formattedName = formatAudioTitle(activeSubjectSlug)
     const lower = activeSubjectSlug.toLowerCase()
 
-    if (lower.includes('synth') || lower.includes('instrument') || lower.includes('piano') || lower.includes('guitar') || lower.includes('bass') || lower.includes('drum-machine')) {
+    if (lower === 'sample-pack' || lower === 'sample-packs' || lower === 'sounds' || lower === 'samples') {
       return {
-        title: `${formattedName} Virtual Instruments`,
+        title: 'Sample Packs & Sounds',
+        description: '100% royalty-free sample packs, one-shots, and audio loops ready for instant DAW drag-and-drop.',
+      }
+    }
+
+    if (lower.includes('synth') || lower.includes('instrument') || lower.includes('piano') || lower.includes('guitar') || lower.includes('bass') || lower.includes('drum-machine')) {
+      const cleanTitle = formattedName.toLowerCase().includes('instrument')
+        ? formattedName
+        : `${formattedName} Virtual Instruments`
+      return {
+        title: cleanTitle,
         description: `Discover top-rated ${formattedName.toLowerCase()} virtual instruments, sampled sound engines, and playable software plugins on Producer Toy.`,
       }
     }
 
     if (lower.includes('sample') || lower.includes('pack') || lower.includes('drum') || lower.includes('808') || lower.includes('loop') || lower.includes('stem') || lower.includes('vocal')) {
+      let cleanTitle = `${formattedName} Sample Packs & Sounds`
+      if (lower.includes('sample pack') || lower.includes('sample-pack')) {
+        cleanTitle = `${formattedName} & Sounds`
+      }
       return {
-        title: `${formattedName} Sample Packs & Sounds`,
+        title: cleanTitle,
         description: `100% royalty-free ${formattedName.toLowerCase()} sample packs, one-shots, and audio loops ready for instant DAW drag-and-drop.`,
       }
     }
