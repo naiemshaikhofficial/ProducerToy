@@ -61,6 +61,12 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     (article.title?.includes(',') && ctaLinksCount >= 1) ||
     /deals|roundup|plugins on sale|best deals|top deals|3 strong|4 strong|5 strong/i.test(article.title || '')
 
+  // Check if article already contains an explicit CTA action button inside its markdown content
+  const hasInlineCta = Boolean(
+    article.content &&
+    /\[(get|claim|grab|download|buy|save|view|redeem|official)[^\]]*\]\(/i.test(article.content)
+  )
+
   const PB_AFFILIATE_ID = '68affa2b94f43'
 
   const resolveOfferLink = (url?: string | null): string => {
@@ -253,6 +259,25 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           <div className="prose prose-invert max-w-none text-[#d4d4d8] leading-[1.85] text-base sm:text-[17px] font-normal">
             <BlogContentRenderer content={article.content} />
           </div>
+
+          {/* Guaranteed Deal CTA Button: Always displays at bottom of every article that has an offer URL if not already linked inline */}
+          {!hasInlineCta && offerUrl && (
+            <div className="my-9 flex justify-center w-full clear-both">
+              <a
+                href={offerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline text-center group"
+              >
+                <span>
+                  {article.category === 'Free VSTs' || article.deal_price === '$0' || article.title?.toLowerCase().includes('free')
+                    ? 'Download Free Plugin'
+                    : 'Get Official Deal'}
+                </span>
+                <ExternalLink className="w-4 h-4 text-white shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              </a>
+            </div>
+          )}
 
           {/* Dedicated In-Article Google Ad Slot */}
           <div className="my-10">

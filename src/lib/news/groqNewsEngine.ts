@@ -109,12 +109,20 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         }
         const deterministicId = `news_${Math.abs(hash).toString(36)}`
 
+        const safeSourceUrl = resolveSafeDealUrl(rewritten.product_url, item.directDealUrl, item.link)
+        let finalContent = sanitizeScrapedText(rewritten.content)
+        if (!finalContent.includes('](') && safeSourceUrl) {
+          const isFree = rewritten.category === 'Free VSTs' || rewritten.deal_price === '$0' || rewritten.title.toLowerCase().includes('free')
+          const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
+          finalContent += `\n\n[${ctaLabel}](${safeSourceUrl})`
+        }
+
         return {
           id: deterministicId,
           slug: slugify(rewritten.slug || rewritten.title),
           title: sanitizeScrapedText(rewritten.title),
           excerpt: sanitizeScrapedText(rewritten.excerpt),
-          content: sanitizeScrapedText(rewritten.content),
+          content: finalContent,
           category: rewritten.category || 'Free VSTs',
           badge: detectedCoupon ? 'COUPON CODE' : rewritten.badge || 'FREEWARE',
           cover_image: coverImage,
@@ -122,7 +130,7 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           author_role: 'Audio Technology Editor',
           reading_time: rewritten.reading_time || '3 MIN READ',
           source_name: 'ProducerToy',
-          source_url: resolveSafeDealUrl(rewritten.product_url, item.directDealUrl, item.link),
+          source_url: safeSourceUrl,
           deal_price: rewritten.deal_price || null,
           deal_regular_price: rewritten.deal_regular_price || null,
           published_at: new Date(item.pubDate).toISOString(),
@@ -299,12 +307,17 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
 
   const cleanedSnippet = sanitizeScrapedText(item.contentSnippet || item.title)
 
+  const safeSourceUrl = resolveSafeDealUrl(undefined, item.directDealUrl, item.link)
+
   // Clean narrative editorial content without any artificial headings or bullet points
+  const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
   const content = `${cleanedSnippet}
 
 This audio release brings refined sound design and practical mixing utility directly to music creators. Built with high precision processing, it slots seamlessly into modern DAW production workflows across FL Studio, Ableton Live, Logic Pro, and Studio One.
 
-To explore this deal or find more audio production essentials, visit the Producer Toy catalog below.`
+To explore this deal or find more audio production essentials, visit the Producer Toy catalog below.
+
+[${ctaLabel}](${safeSourceUrl})`
 
   const canonicalKey = (item.directDealUrl || item.link || item.title).toLowerCase().trim()
   let hash = 0
@@ -327,7 +340,7 @@ To explore this deal or find more audio production essentials, visit the Produce
     author_role: 'Audio Technology Editor',
     reading_time: '3 MIN READ',
     source_name: 'ProducerToy',
-    source_url: resolveSafeDealUrl(undefined, item.directDealUrl, item.link),
+    source_url: safeSourceUrl,
     deal_price: isFree ? 'FREE' : null,
     deal_regular_price: null,
     published_at: new Date(item.pubDate).toISOString(),
