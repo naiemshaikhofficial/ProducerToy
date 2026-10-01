@@ -19,19 +19,14 @@ function sanitizeLinkUrl(url: string): string {
       const parsed = new URL(clean)
       Array.from(parsed.searchParams.keys()).forEach(key => {
         if (key !== 'a_aid') {
-          if (/^data\d*$/i.test(key) || /^utm_/i.test(key) || key.toLowerCase() === 'affiliate') {
-            parsed.searchParams.delete(key)
-          }
+          parsed.searchParams.delete(key)
         }
       })
       parsed.searchParams.set('a_aid', PB_AFFILIATE_ID)
       return parsed.toString()
     } catch {
-      clean = clean.replace(/[?&]data\d*=[^&]*/gi, '')
-      if (clean.includes('a_aid=')) {
-        return clean.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PB_AFFILIATE_ID}`)
-      }
-      return clean.includes('?') ? `${clean}&a_aid=${PB_AFFILIATE_ID}` : `${clean}?a_aid=${PB_AFFILIATE_ID}`
+      let cleanUrl = clean.replace(/[?&].*$/gi, '')
+      return `${cleanUrl}?a_aid=${PB_AFFILIATE_ID}`
     }
   }
 
@@ -100,9 +95,9 @@ export function parseMarkdownToHtml(raw: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
     // 2. Strip scraper boilerplate and third-party retailer mentions (Plugin Boutique, etc.)
-    .replace(/\b(?:on|at|from)\s+Plugin\s*Boutique\b/gi, 'now')
-    .replace(/\bPlugin\s*Boutique's\b/gi, 'The official')
-    .replace(/\bPlugin\s*Boutique\b/gi, 'Producer Toy Deals')
+    .replace(/\b(?:on|at|from)\s+Plugin\s*Boutique(?!\.com)\b/gi, 'now')
+    .replace(/\bPlugin\s*Boutique's(?!\.com)\b/gi, 'The official')
+    .replace(/\bPlugin\s*Boutique(?!\.com)\b/gi, 'Producer Toy')
     .replace(/\[\.\.\.?\]/gi, '')
     .replace(/\[\.\.\./gi, '')
     .replace(/\.\.\./gi, '')
