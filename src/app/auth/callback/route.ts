@@ -4,7 +4,14 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') ?? '/'
+  const type = requestUrl.searchParams.get('type')
+  let next = requestUrl.searchParams.get('next')
+
+  if (!next) {
+    next = type === 'recovery' ? '/reset-password' : '/'
+  } else if (next.includes('mode=reset') || type === 'recovery') {
+    next = '/reset-password'
+  }
 
   // Resolve canonical origin: check x-forwarded-host / proto for proxies like Vercel & Cloudflare
   const forwardedHost = request.headers.get('x-forwarded-host')

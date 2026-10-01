@@ -83,8 +83,9 @@ function AuthForm() {
   useEffect(() => {
     const modeParam = searchParams.get('mode')
     if (modeParam === 'reset') {
-      setMode('reset')
-      setStep('details')
+      const hash = typeof window !== 'undefined' ? window.location.hash || '' : ''
+      router.replace(`/reset-password${hash}`)
+      return
     }
 
     // Catch hash fragments (Supabase sends recovery token in hash)
@@ -92,25 +93,23 @@ function AuthForm() {
       const hashParams = new URLSearchParams(window.location.hash.substring(1))
       const type = hashParams.get('type')
       if (type === 'recovery') {
-        setMode('reset')
-        setStep('details')
+        window.location.replace(`/reset-password${window.location.hash}`)
+        return
       }
     }
 
     // Subscribe to auth state changes (handles recovery link click)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
-        setMode('reset')
-        setStep('details')
-        setError('')
-        setMessage('')
+        const hash = typeof window !== 'undefined' ? window.location.hash || '' : ''
+        window.location.replace(`/reset-password${hash}`)
       }
     })
 
     return () => {
       subscription.unsubscribe()
     }
-  }, [searchParams, supabase])
+  }, [searchParams, supabase, router])
 
   // Resend confirmation email
   const handleResendConfirmation = async () => {
@@ -159,7 +158,7 @@ function AuthForm() {
       }
 
       // 2. Request password reset email from Supabase
-      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth?mode=reset')}`
+      const callbackUrl = `${window.location.origin}/reset-password`
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: callbackUrl,
       })
@@ -186,7 +185,7 @@ function AuthForm() {
     try {
       setLoading(true)
       setError('')
-      const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent('/auth?mode=reset')}`
+      const callbackUrl = `${window.location.origin}/reset-password`
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: callbackUrl,
       })
