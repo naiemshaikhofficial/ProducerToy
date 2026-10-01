@@ -64,14 +64,19 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
             >
               {/* Left Column: 16:9 Image with product-image ambient glow behind it matching Epic */}
               <div className="lg:col-span-7 relative">
-                {/* Ambient Glow: Mirror of the product image with blur matching Epic Games */}
-                <div className="absolute -inset-3 sm:-inset-6 overflow-hidden rounded-[36px] -z-10 pointer-events-none opacity-55 group-hover:opacity-80 transition-opacity duration-300">
-                  <Image
+                {/* 1:1 Epic Games Ambient Glow: Unclipped, feather-soft atmospheric glow mirroring the cover image */}
+                <div
+                  className="absolute -inset-6 sm:-inset-14 -z-10 pointer-events-none opacity-70 sm:opacity-85 group-hover:opacity-100 transition-opacity duration-500"
+                  aria-hidden="true"
+                >
+                  <img
                     src={getHighResCoverImage(featuredArticle.cover_image)}
                     alt=""
-                    fill
-                    className="object-cover blur-3xl scale-125"
-                    aria-hidden="true"
+                    className="w-full h-full object-cover rounded-3xl"
+                    style={{
+                      filter: 'blur(75px) saturate(1.8) brightness(1.15)',
+                      transform: 'scale(1.12)',
+                    }}
                   />
                 </div>
                 
