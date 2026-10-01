@@ -631,10 +631,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsAboutOpen(!isAboutOpen)}
-                  className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-2.5 py-1.5 rounded-lg ${
+                  className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-colors ${
                     isAboutOpen
-                      ? 'bg-white/[0.08] text-white border border-white/20'
-                      : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
+                      ? 'text-white'
+                      : 'text-zinc-300 hover:text-white'
                   }`}
                   aria-label="About Menu"
                 >
@@ -712,10 +712,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                     setIsDistributeOpen(!isDistributeOpen)
                     setIsEcosystemOpen(false)
                   }}
-                  className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-all px-3 py-1.5 rounded-lg ${isDistributeOpen
-                    ? 'bg-white/[0.08] text-white border border-white/20'
-                    : 'text-zinc-300 hover:text-white hover:bg-white/[0.04] border border-transparent'
-                    }`}
+                  className={`flex items-center gap-1.5 text-[15px] font-medium cursor-pointer transition-colors ${
+                    isDistributeOpen
+                      ? 'text-white'
+                      : 'text-zinc-300 hover:text-white'
+                  }`}
                   aria-label="Distribute Menu"
                 >
                   <span>Distribute</span>
