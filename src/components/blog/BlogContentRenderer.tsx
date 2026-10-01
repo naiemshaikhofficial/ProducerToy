@@ -48,7 +48,7 @@ function formatInline(text: string): string {
         linkText.toLowerCase().includes('$')
 
       if (isCtaButton) {
-        return `<span class="inline-block my-2.5 mr-2"><a href="${url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md hover:shadow-[#FC6301]/25 active:scale-95 no-underline"><span>${linkText}</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></span>`
+        return `<span class="inline-block my-2.5 mr-2"><a href="${url}" target="_blank" rel="noopener noreferrer" class="deal-cta-btn inline-flex items-center gap-2 px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md hover:shadow-[#FC6301]/25 active:scale-95 no-underline"><span class="text-white">${linkText}</span><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></span>`
       }
 
       return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${linkText}</a>`
@@ -101,6 +101,12 @@ export function parseMarkdownToHtml(raw: string): string {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean)
     const firstLine = lines[0] || ''
     const remainingLines = lines.slice(1).join(' ')
+
+    // Horizontal Rule (--- or *** or ___ or multiple dashes)
+    if (/^(?:-{3,}|\*{3,}|_{3,})$/.test(firstLine.trim())) {
+      htmlBlocks.push('<hr class="my-10 border-0 h-px bg-white/10" />')
+      continue
+    }
 
     // Heading 2 (## Heading)
     if (/^##\s+/.test(firstLine)) {
@@ -266,6 +272,16 @@ export function BlogContentRenderer({ content }: BlogContentRendererProps) {
 
         .blog-content a:hover {
           color: #ff9153;
+        }
+
+        .blog-content a.deal-cta-btn,
+        .blog-content .deal-cta-btn,
+        .blog-content a.deal-cta-btn span,
+        .blog-content .deal-cta-btn span,
+        .blog-content a.deal-cta-btn:hover,
+        .blog-content .deal-cta-btn:hover {
+          color: #ffffff !important;
+          text-decoration: none !important;
         }
 
         .blog-content ul {
