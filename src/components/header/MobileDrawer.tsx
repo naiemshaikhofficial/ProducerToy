@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   ChevronDown,
   ChevronRight,
@@ -17,7 +18,9 @@ import {
   Bookmark,
   HelpCircle,
   ExternalLink,
-  ShoppingCart
+  ShoppingCart,
+  Search,
+  X
 } from 'lucide-react'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
 import { useCurrency } from '@/context/CurrencyContext'
@@ -45,9 +48,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   onSignOut,
   isSiteVariant = false,
 }) => {
+  const router = useRouter()
   const { region, setRegion, regions } = useCurrency()
   const { unopenedCount } = useGifts()
   const [activeView, setActiveView] = useState<'menu' | 'account'>('menu')
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false)
   const [isMobileRegionOpen, setIsMobileRegionOpen] = useState(false)
   const [isMobileFreeOpen, setIsMobileFreeOpen] = useState(false)
@@ -57,6 +63,14 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const { categories: freeCategories } = useFreeCategories()
 
   if (!isOpen) return null
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/store?q=${encodeURIComponent(searchQuery.trim())}`)
+      onClose()
+    }
+  }
 
   const toggleAccordion = (catKey: CategoryKey) => {
     setMobileExpandedCat(mobileExpandedCat === catKey ? null : catKey)
@@ -255,69 +269,193 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           /* VIEW 2: MAIN MENU VIEW (Exact Screenshot 2 Match with Corner Initial)     */
           /* ========================================================================= */
           <>
-            {/* Top Controls Row (Only when logged in): Globe Currency Toggle + Profile Initial Icon */}
-            {user && (
-              <div className="flex items-center justify-end gap-3.5">
-                {/* Globe Currency Toggle with Dropdown */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
-                    className="px-2.5 py-1 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer bg-[#1c1c1c] border border-[#2c2c2c] rounded-lg"
-                    title="Select Region & Currency"
-                  >
-                    <span className="text-[14px]">{region?.flag || '🇮🇳'}</span>
-                    <Globe className="w-3.5 h-3.5 text-zinc-400" />
-                    <span>{currency}</span>
-                    <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isMobileRegionOpen ? 'rotate-180 text-white' : ''}`} />
-                  </button>
-
-                  {isMobileRegionOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
-                      <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                        Select Region
-                      </div>
-                      <div className="max-h-[220px] overflow-y-auto">
-                        {regions.map((r) => {
-                          const isSelected = region?.id === r.id
-                          return (
-                            <button
-                              key={r.id}
-                              type="button"
-                              onClick={() => {
-                                setRegion(r.id)
-                                setIsMobileRegionOpen(false)
-                              }}
-                              className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${isSelected
-                                ? 'bg-[#262626] text-white font-bold'
-                                : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                                }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span>{r.flag}</span>
-                                <span className="truncate">{r.name}</span>
-                              </div>
-                              <span className="text-[10px] text-zinc-400 font-mono">
-                                {r.currency} ({r.symbol})
-                              </span>
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Corner Profile Button (Tapping opens Account View, Screenshot 5) */}
+            {/* Top Controls Row: Site Variant (Search on Left, Globe + Profile on Right) vs Store Variant */}
+            {isSiteVariant ? (
+              <div className="flex items-center justify-between gap-3.5">
+                {/* Search Toggle Button */}
                 <button
                   type="button"
-                  onClick={() => setActiveView('account')}
-                  className="w-9 h-9 rounded-full bg-[#2a2a2a] hover:bg-[#383838] text-white text-xs font-bold flex items-center justify-center border border-zinc-700 shadow-sm active:scale-95 transition-all cursor-pointer"
-                  title={`Open Account (${displayName})`}
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  className="p-1.5 -ml-1 text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                  title="Search"
+                  aria-label="Toggle Search"
                 >
-                  {initialLetter}
+                  <Search className="w-5 h-5 text-zinc-300 hover:text-white" />
                 </button>
+
+                {/* Right: Globe Currency Toggle + Profile / ProducerToy Button */}
+                <div className="flex items-center gap-3.5">
+                  {/* Globe Currency Toggle with Dropdown */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
+                      className="p-1.5 text-zinc-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+                      title="Select Region & Currency"
+                      aria-label="Select Region and Currency"
+                    >
+                      <Globe className="w-5 h-5 text-zinc-300 hover:text-white" />
+                    </button>
+
+                    {isMobileRegionOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
+                        <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                          Select Region
+                        </div>
+                        <div className="max-h-[220px] overflow-y-auto">
+                          {regions.map((r) => {
+                            const isSelected = region?.id === r.id
+                            return (
+                              <button
+                                key={r.id}
+                                type="button"
+                                onClick={() => {
+                                  setRegion(r.id)
+                                  setIsMobileRegionOpen(false)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[#262626] text-white font-bold'
+                                    : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span>{r.flag}</span>
+                                  <span className="truncate">{r.name}</span>
+                                </div>
+                                <span className="text-[10px] text-zinc-400 font-mono">
+                                  {r.currency} ({r.symbol})
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Profile Avatar / ProducerToy Pill */}
+                  {user ? (
+                    <button
+                      type="button"
+                      onClick={() => setActiveView('account')}
+                      className="flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+                      title={`Open Account (${displayName})`}
+                    >
+                      <div className="w-7 h-7 rounded-full bg-[#2a2a2a] text-white text-xs font-bold flex items-center justify-center border border-zinc-700 shadow-sm flex-shrink-0">
+                        {initialLetter}
+                      </div>
+                      <span className="text-[14px] font-medium text-white truncate max-w-[120px]">
+                        {displayName || 'ProducerToy'}
+                      </span>
+                    </button>
+                  ) : (
+                    <Link
+                      href="/auth"
+                      prefetch={true}
+                      onClick={onClose}
+                      className="flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+                      title="Sign In"
+                    >
+                      <div className="w-7 h-7 rounded-full bg-[#2a2a2a] text-white text-xs font-bold flex items-center justify-center border border-zinc-700 shadow-sm flex-shrink-0">
+                        P
+                      </div>
+                      <span className="text-[14px] font-medium text-white">
+                        ProducerToy
+                      </span>
+                    </Link>
+                  )}
+                </div>
               </div>
+            ) : (
+              /* Existing Store Variant Top Controls Row (Preserved 100%) */
+              user && (
+                <div className="flex items-center justify-end gap-3.5">
+                  {/* Globe Currency Toggle with Dropdown */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
+                      className="px-2.5 py-1 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer bg-[#1c1c1c] border border-[#2c2c2c] rounded-lg"
+                      title="Select Region & Currency"
+                    >
+                      <span className="text-[14px]">{region?.flag || '🇮🇳'}</span>
+                      <Globe className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>{currency}</span>
+                      <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isMobileRegionOpen ? 'rotate-180 text-white' : ''}`} />
+                    </button>
+
+                    {isMobileRegionOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
+                        <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                          Select Region
+                        </div>
+                        <div className="max-h-[220px] overflow-y-auto">
+                          {regions.map((r) => {
+                            const isSelected = region?.id === r.id
+                            return (
+                              <button
+                                key={r.id}
+                                type="button"
+                                onClick={() => {
+                                  setRegion(r.id)
+                                  setIsMobileRegionOpen(false)
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${isSelected
+                                  ? 'bg-[#262626] text-white font-bold'
+                                  : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span>{r.flag}</span>
+                                  <span className="truncate">{r.name}</span>
+                                </div>
+                                <span className="text-[10px] text-zinc-400 font-mono">
+                                  {r.currency} ({r.symbol})
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Corner Profile Button (Tapping opens Account View, Screenshot 5) */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveView('account')}
+                    className="w-9 h-9 rounded-full bg-[#2a2a2a] hover:bg-[#383838] text-white text-xs font-bold flex items-center justify-center border border-zinc-700 shadow-sm active:scale-95 transition-all cursor-pointer"
+                    title={`Open Account (${displayName})`}
+                  >
+                    {initialLetter}
+                  </button>
+                </div>
+              )
+            )}
+
+            {/* Expandable Mobile Search Bar (Only when toggled in Site Variant) */}
+            {isSiteVariant && isSearchOpen && (
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center animate-in fade-in duration-150">
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search ProducerToy..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                  className="w-full bg-[#1c1c1f] border border-white/10 rounded-xl pl-10 pr-9 py-2.5 text-sm text-white placeholder-zinc-400 focus:outline-none focus:border-[#FC6301]"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 text-zinc-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </form>
             )}
 
             {/* Big Bold "Menu" Header (Exact Epic Games Screenshot Match) */}
@@ -329,7 +467,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             {isSiteVariant ? (
               <div className="flex flex-col space-y-4">
                 <Link
-                  href="https://store.producertoy.com"
+                  href="/"
                   prefetch={true}
                   onClick={onClose}
                   className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
@@ -347,7 +485,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 </Link>
 
                 <Link
-                  href="/support"
+                  href="/faq"
                   prefetch={true}
                   onClick={onClose}
                   className="text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 block"
@@ -364,15 +502,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   Help
                 </Link>
 
-                {/* About ProducerToy Accordion */}
+                {/* About ProducerToy Accordion with ChevronRight */}
                 <div className="border-b border-[#202020] pb-2">
                   <button
                     type="button"
                     onClick={() => setIsMobileAboutOpen(!isMobileAboutOpen)}
                     className="w-full text-[17px] font-medium text-zinc-200 hover:text-white transition-colors py-1 flex items-center justify-between cursor-pointer"
                   >
-                    <span>About Producer Toy</span>
-                    <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileAboutOpen ? 'rotate-180 text-white' : ''}`} />
+                    <span>About Us</span>
+                    <ChevronRight className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileAboutOpen ? 'rotate-90 text-white' : ''}`} />
                   </button>
                   {isMobileAboutOpen && (
                     <div className="pl-3 py-2 flex flex-col gap-1.5 bg-[#18181c] rounded-xl my-1.5 animate-in fade-in duration-150">
@@ -550,66 +688,66 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               </div>
             )}
 
-            {/* Categories Accordion Section */}
-            <div className="mt-4 pt-5 border-t border-[#202020]">
-              <button
-                type="button"
-                onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                className="w-full flex items-center justify-between py-2 text-base font-bold text-white hover:text-zinc-300 transition-colors"
-              >
-                <span>Categories</span>
-                <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isCategoriesOpen && (
-                <div className="flex flex-col gap-1 mt-2 pl-2 animate-in fade-in duration-150">
-                  {(Object.keys(categoryData) as CategoryKey[]).map((key) => {
-                    const cat = categoryData[key]
-                    const isExpanded = mobileExpandedCat === key
-                    return (
-                      <div key={key} className="border-b border-[#202020] pb-2">
-                        <button
-                          onClick={() => toggleAccordion(key)}
-                          className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
-                        >
-                          <span>{cat.label}</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-zinc-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        </button>
-                        {isExpanded && (
-                          <div className="pl-3 py-1 flex flex-col gap-1.5 bg-[#181818] rounded-md my-1">
-                            {cat.items.map((item, idx) => (
-                              <Link
-                                key={idx}
-                                href={item.slug === '' ? `/store/${cat.slug}` : `/store/${cat.slug}/${item.slug}`}
-                                prefetch={true}
-                                onClick={onClose}
-                                className="text-xs text-zinc-400 hover:text-white py-1 block"
-                              >
-                                {item.name}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Orange Action Button: Only on Store, hidden on Site pages matching Epic Games */}
+            {/* Categories Accordion Section: Only on Store Variant, hidden on Site Variant (Screenshot 1) */}
             {!isSiteVariant && (
-              <div className="mt-auto pt-6 border-t border-[#202020]">
-                <Link
-                  href={user ? "/library" : "/auth"}
-                  prefetch={true}
-                  onClick={onClose}
-                  className="bg-[#FC6301] hover:bg-[#e05700] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
+              <div className="mt-4 pt-5 border-t border-[#202020]">
+                <button
+                  type="button"
+                  onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                  className="w-full flex items-center justify-between py-2 text-base font-bold text-white hover:text-zinc-300 transition-colors"
                 >
-                  {user ? 'Library' : 'Sign In'}
-                </Link>
+                  <span>Categories</span>
+                  <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isCategoriesOpen && (
+                  <div className="flex flex-col gap-1 mt-2 pl-2 animate-in fade-in duration-150">
+                    {(Object.keys(categoryData) as CategoryKey[]).map((key) => {
+                      const cat = categoryData[key]
+                      const isExpanded = mobileExpandedCat === key
+                      return (
+                        <div key={key} className="border-b border-[#202020] pb-2">
+                          <button
+                            onClick={() => toggleAccordion(key)}
+                            className="w-full flex items-center justify-between py-2 text-sm font-semibold text-zinc-300 hover:text-white transition-colors"
+                          >
+                            <span>{cat.label}</span>
+                            <ChevronDown className={`w-3.5 h-3.5 text-zinc-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                          </button>
+                          {isExpanded && (
+                            <div className="pl-3 py-1 flex flex-col gap-1.5 bg-[#181818] rounded-md my-1">
+                              {cat.items.map((item, idx) => (
+                                <Link
+                                  key={idx}
+                                  href={item.slug === '' ? `/store/${cat.slug}` : `/store/${cat.slug}/${item.slug}`}
+                                  prefetch={true}
+                                  onClick={onClose}
+                                  className="text-xs text-zinc-400 hover:text-white py-1 block"
+                                >
+                                  {item.name}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )}
+
+            {/* Bottom Orange Action Button: Pinned to bottom of drawer */}
+            <div className="mt-auto pt-6 border-t border-[#202020]">
+              <Link
+                href={user ? "/library" : "/auth"}
+                prefetch={true}
+                onClick={onClose}
+                className="bg-[#FC6301] hover:bg-[#e05800] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
+              >
+                {user ? 'Library' : 'Sign In'}
+              </Link>
+            </div>
           </>
         )}
 
