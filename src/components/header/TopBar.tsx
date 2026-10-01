@@ -229,6 +229,8 @@ export const TopBar: React.FC<TopBarProps> = ({
             className={`relative flex items-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               isMobileMenuOpen
                 ? 'w-0 min-w-0 max-w-0 opacity-0 -translate-x-16 pointer-events-none overflow-hidden mr-0 md:w-auto md:min-w-0 md:max-w-none md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
+                : isSiteVariant
+                ? 'w-[54px] min-w-[54px] md:w-auto md:min-w-0 opacity-100 translate-x-0 overflow-visible mr-3 sm:mr-4 md:mr-5'
                 : 'w-[54px] min-w-[54px] md:w-auto md:min-w-0 opacity-100 translate-x-0 overflow-visible mr-4 sm:mr-5 md:mr-8'
             }`}
           >
@@ -580,7 +582,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
           {/* Left Navigation: Site Variant (News/FAQ/Help/About/Blog) vs Main Store */}
           {isSiteVariant ? (
-            <div className="hidden md:flex items-center gap-6 lg:gap-8 ml-6 lg:ml-8">
+            <div className="hidden md:flex items-center gap-5 lg:gap-6 ml-0">
               <Link
                 href="/"
                 prefetch={true}
