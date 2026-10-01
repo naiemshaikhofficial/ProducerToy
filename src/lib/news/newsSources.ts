@@ -260,11 +260,82 @@ export const MUSIC_NEWS_FEEDS: Array<{
 ]
 
 /**
+ * Fetches and parses deals from PluginDeals.net via reader proxy.
+ * Replaces competitor affiliate tags with ProducerToy's Plugin Boutique affiliate tag (68affa2b94f43).
+ */
+export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
+  const items: RawFeedItem[] = []
+  try {
+    const res = await fetch('https://r.jina.ai/https://plugindeals.net/', {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+      next: { revalidate: 1800 },
+    })
+    if (!res.ok) return items
+    const text = await res.text()
+
+    // 1. Ending Soon Deals
+    const bulletRegex = /\*\s+\*\*\[([^\]]+)\]\(([^)]+)\)\*\*([^\n]*)/g
+    let match: RegExpExecArray | null
+    while ((match = bulletRegex.exec(text)) !== null) {
+      const title = cleanText(match[1].trim())
+      const rawUrl = match[2].trim()
+      const expiry = match[3].replace(/_Expiry:\s*/i, '').replace(/_/g, '').trim()
+      const cleanUrl = sanitizeDealUrl(rawUrl) || rawUrl
+
+      items.push({
+        title,
+        link: cleanUrl,
+        pubDate: new Date().toUTCString(),
+        creator: 'Plugin Deals',
+        contentSnippet: `${title}. Expiry: ${expiry || 'Limited time'}. Available with verified discounts.`,
+        sourceName: 'PluginDeals',
+        isPrimary: true,
+        directDealUrl: cleanUrl,
+      })
+    }
+
+    // 2. Top Record Low Products
+    const topDealsRegex = /\[!\[[^\]]*\]\((https:\/\/plugindeals\.net\/deal-graphics\/[^)]+)\)\]\([^)]+\)\s*([^\n\r]+)/g
+    while ((match = topDealsRegex.exec(text)) !== null) {
+      const imageUrl = match[1].trim()
+      const productName = cleanText(match[2].trim())
+      const pbSearchUrl = `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(productName)}&a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+
+      items.push({
+        title: `${productName} on Sale (Record Low Deal)`,
+        link: pbSearchUrl,
+        pubDate: new Date().toUTCString(),
+        creator: 'Plugin Deals',
+        contentSnippet: `${productName} is currently on sale at a record low price. Grab it at Plugin Boutique with official discounts.`,
+        imageUrl,
+        sourceName: 'PluginDeals',
+        isPrimary: true,
+        directDealUrl: pbSearchUrl,
+      })
+    }
+  } catch (err) {
+    console.warn('[fetchPluginDealsFeedItems] Error fetching PluginDeals:', err)
+  }
+  return items
+}
+
+/**
  * Fetch and parse RSS items from music production feeds
- * Prioritizes Rekkerd, AudioPlugin Guy, and BPB items first
+ * Prioritizes PluginDeals, Rekkerd, AudioPlugin Guy, and BPB items first
  */
 export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
   const allItems: RawFeedItem[] = []
+
+  // 1. Fetch PluginDeals.net items with verified referral replacement
+  try {
+    const pdItems = await fetchPluginDealsFeedItems()
+    allItems.push(...pdItems)
+  } catch (err) {
+    console.warn('[fetchMusicNewsFeedItems] Error in PluginDeals fetch:', err)
+  }
 
   for (const feed of MUSIC_NEWS_FEEDS) {
     try {

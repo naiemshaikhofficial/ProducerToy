@@ -9,15 +9,118 @@ interface NewsPageClientProps {
   initialArticles: NewsArticle[]
 }
 
+const TOP_AUDIO_BRANDS = [
+  'UNIVERSAL AUDIO',
+  'NATIVE INSTRUMENTS',
+  'ROLAND',
+  'SLATE DIGITAL',
+  'FABFILTER',
+  'SOUNDTOYS',
+  'IZOTOPE',
+  'ARTURIA',
+  'SOFTUBE',
+  'KLEVGRAND',
+  'EXCITE AUDIO',
+  'EASTWEST',
+  'REVEAL SOUND',
+  'XLN AUDIO',
+  'BRAINWORX',
+  'SOLID STATE LOGIC',
+  'SSL',
+  'WAVES',
+  'TRACKTION',
+  'EVENTIDE',
+]
+
+/**
+ * Intelligent Hero Selection:
+ * 1. Priority 1: Sponsored / Partner product if active
+ * 2. Priority 2: Highest Deal Power Score (Sabse tagda brand deal offer analyzed via top brands, discount %, and badges)
+ */
+export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | undefined {
+  if (!articles || articles.length === 0) return undefined
+
+  // Priority 1: Sponsored or Partner article
+  const sponsored = articles.find(
+    (a) =>
+      (a as any).is_sponsored === 1 ||
+      a.badge?.toUpperCase().includes('SPONSORED') ||
+      a.badge?.toUpperCase().includes('PARTNER') ||
+      Boolean(a.specs?.['Sponsored']) ||
+      Boolean(a.specs?.['Partner'])
+  )
+  if (sponsored) return sponsored
+
+  // Priority 2: Sabse tagda brand deal offer
+  let bestArticle = articles[0]
+  let maxScore = -1
+
+  for (const article of articles) {
+    let score = 0
+    const upperTitle = (article.title || '').toUpperCase()
+    const upperBadge = (article.badge || '').toUpperCase()
+    const brandInSpecs = (article.specs?.['Brand'] || '').toUpperCase()
+
+    // 1. Top Tier Audio Brand (+45 points)
+    const hasTopBrand = TOP_AUDIO_BRANDS.some(
+      (b) => upperTitle.includes(b) || brandInSpecs.includes(b)
+    )
+    if (hasTopBrand) score += 45
+
+    // 2. Deal Badge Weight
+    if (upperBadge.includes('MEGA DEAL') || upperBadge.includes('RECORD LOW')) {
+      score += 35
+    } else if (upperBadge.includes('HOT DEAL') || upperBadge.includes('FLASH SALE')) {
+      score += 25
+    } else if (upperBadge.includes('COUPON CODE')) {
+      score += 20
+    } else if (upperBadge.includes('FREEWARE')) {
+      score += 10
+    }
+
+    // 3. Discount Percentage extraction (e.g. 90% OFF -> +30 points)
+    const discountMatch = upperTitle.match(/(\d{2})%\s*OFF/i)
+    if (discountMatch) {
+      const discountNum = parseInt(discountMatch[1], 10)
+      if (discountNum >= 80) score += 30
+      else if (discountNum >= 50) score += 20
+      else if (discountNum >= 30) score += 10
+    }
+
+    // 4. Explicit is_featured flag (+15 points)
+    if (article.is_featured === 1) {
+      score += 15
+    }
+
+    // 5. Freshness / Recency Bonus (within last 7 days +15 points)
+    try {
+      const pubTime = new Date(article.published_at).getTime()
+      const now = Date.now()
+      const daysOld = (now - pubTime) / (1000 * 60 * 60 * 24)
+      if (daysOld < 3) score += 15
+      else if (daysOld < 7) score += 10
+      else if (daysOld < 14) score += 5
+    } catch {}
+
+    if (score > maxScore) {
+      maxScore = score
+      bestArticle = article
+    }
+  }
+
+  return bestArticle
+}
+
 export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   const [visibleCount, setVisibleCount] = useState(12)
 
-  // 1 Featured Hero Article (Matching Screenshot 1)
-  const featuredArticle = initialArticles[0]
+  // 1 Featured Hero Article (Priority: Sponsored -> Sabse Tagda Brand Deal)
+  const featuredArticle = getTopFeaturedArticle(initialArticles)
 
-  // All other cards in 3-column Grid (Matching Screenshot 2 - "sare cards")
-  const gridArticles = initialArticles.slice(1, visibleCount + 1)
-  const hasMore = visibleCount + 1 < initialArticles.length
+  // All other cards in 3-column Grid (Excluding the featured hero so it never duplicates)
+  const remainingArticles = initialArticles.filter((a) => a.id !== featuredArticle?.id)
+  const gridArticles = remainingArticles.slice(0, visibleCount)
+  const hasMore = visibleCount < remainingArticles.length
 
   const formatEpicDate = (dateStr: string) => {
     try {
@@ -99,8 +202,17 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
               {/* Right Column: Date + Headline + Read more */}
               <div className="lg:col-span-5 flex flex-col justify-center">
-                <div className="text-sm font-medium text-zinc-400 mb-3 tracking-wide">
-                  {formatEpicDate(featuredArticle.published_at)}
+                <div className="flex items-center gap-3 text-sm font-medium text-zinc-400 mb-3 tracking-wide">
+                  {featuredArticle.badge && (
+                    <span className={`px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase tracking-wider ${
+                      featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/30'
+                    }`}>
+                      {featuredArticle.badge}
+                    </span>
+                  )}
+                  <span>{formatEpicDate(featuredArticle.published_at)}</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-[38px] font-black text-white leading-[1.18] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
                   {cleanHtmlTitle(featuredArticle.title)}
