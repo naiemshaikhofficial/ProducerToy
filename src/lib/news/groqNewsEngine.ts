@@ -169,7 +169,7 @@ REQUIREMENTS:
    - If it's a 100% free giveaway / freeware: set "badge": "FREEWARE".
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
    - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
-6. NEVER mention third-party blogs or sources (Bedroom Producers Blog, AudioPlugin Guy, Rekkerd, KVR, Gearnews). Write strictly as the Producer Toy official editorial newsroom.
+6. NEVER mention third-party blogs, sources, or third-party stores (Bedroom Producers Blog, AudioPlugin Guy, Rekkerd, KVR, Gearnews, Plugin Boutique). Write strictly as the Producer Toy official editorial newsroom. Do NOT say "on Plugin Boutique" or "at Plugin Boutique" - write "now", "today", or "official deal".
 7. EXACT DEEP PRODUCT OR DEAL OFFER LINK (NEVER IMAGES OR ROOT DOMAINS):
    - Set "product_url" to the exact official product download/store/offer landing page (e.g. "https://syncaudio.io/megamorph/", "https://audija.com/oscope/", "https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip", or specific Plugin Boutique product deal page).
    - In music blogs (BPB, GearNews, Rekkerd), this is consistently placed at the bottom of the article after "More info: [Product Name ($XX)](url)" or "Product page:". Always extract this exact deep product page link.
@@ -178,7 +178,7 @@ REQUIREMENTS:
 8. MULTI-PLUGIN DEALS & ROUNDUPS:
    - If this article covers MULTIPLE plugins or deals (e.g. Roland JD-800, Native Instruments FM8, Slate Digital MetaTune):
      a) Give EACH plugin its own dedicated ### section with in-depth features, discounts, and pricing.
-     b) For EACH plugin, include its direct deal link right under its section, formatted as a clear action button: e.g. [Get Roland JD-800 Deal (€68.43 at Plugin Boutique)](url).
+     b) For EACH plugin, include its direct deal link right under its section, formatted as a clear action button: e.g. [Get Roland JD-800 Deal (€68.43)](url). NEVER include retailer names like "at Plugin Boutique" in the button label.
      c) NEVER omit any plugin or only provide one link when multiple are featured! Every single featured product must have its own deal link and pricing details.
 9. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
 

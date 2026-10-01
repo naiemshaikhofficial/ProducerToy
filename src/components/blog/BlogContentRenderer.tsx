@@ -49,18 +49,28 @@ function formatInline(text: string): string {
       const url = sanitizeLinkUrl(rawUrl)
       if (url === '#') return linkText
 
-      const isCtaButton =
-        /^(get|claim|grab|download|buy|save|view)\b/i.test(linkText) ||
-        linkText.toLowerCase().includes('deal') ||
-        linkText.toLowerCase().includes('% off') ||
-        linkText.toLowerCase().includes('€') ||
-        linkText.toLowerCase().includes('$')
+      // Clean Plugin Boutique mentions from button label
+      let cleanLinkText = linkText
+        .replace(/\s*(?:at|on|from)\s+Plugin\s*Boutique\s*/gi, '')
+        .replace(/\bPlugin\s*Boutique\b/gi, '')
+        .trim()
 
-      if (isCtaButton) {
-        return `<span class="inline-block my-2.5 mr-2"><a href="${url}" target="_blank" rel="noopener noreferrer" class="deal-cta-btn inline-flex items-center gap-2 px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md hover:shadow-[#FC6301]/25 active:scale-95 no-underline"><span class="text-white">${linkText}</span><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></span>`
+      if (!cleanLinkText || cleanLinkText === '()' || cleanLinkText === '') {
+        cleanLinkText = 'Get Deal'
       }
 
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${linkText}</a>`
+      const isCtaButton =
+        /^(get|claim|grab|download|buy|save|view)\b/i.test(cleanLinkText) ||
+        cleanLinkText.toLowerCase().includes('deal') ||
+        cleanLinkText.toLowerCase().includes('% off') ||
+        cleanLinkText.toLowerCase().includes('€') ||
+        cleanLinkText.toLowerCase().includes('$')
+
+      if (isCtaButton) {
+        return `<div class="deal-cta-wrapper my-7 flex justify-center w-full clear-both"><a href="${url}" target="_blank" rel="noopener noreferrer" class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></div>`
+      }
+
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
     })
     // `code`
     .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
@@ -89,7 +99,10 @@ export function parseMarkdownToHtml(raw: string): string {
     .replace(/&#252;/g, 'ü')
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
-    // 2. Strip scraper boilerplate but preserve deal links
+    // 2. Strip scraper boilerplate and third-party retailer mentions (Plugin Boutique, etc.)
+    .replace(/\b(?:on|at|from)\s+Plugin\s*Boutique\b/gi, 'now')
+    .replace(/\bPlugin\s*Boutique's\b/gi, 'The official')
+    .replace(/\bPlugin\s*Boutique\b/gi, 'Producer Toy Deals')
     .replace(/\[\.\.\.?\]/gi, '')
     .replace(/\[\.\.\./gi, '')
     .replace(/\.\.\./gi, '')
@@ -205,6 +218,12 @@ export function parseMarkdownToHtml(raw: string): string {
     // Remove any accidental leading stray hashes in a paragraph
     paragraphContent = paragraphContent.replace(/^#+\s+/, '')
 
+    // If paragraph is a standalone CTA button link
+    if (/^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/.test(paragraphContent)) {
+      htmlBlocks.push(formatInline(paragraphContent))
+      continue
+    }
+
     // If inline markdown image exists inside a paragraph
     paragraphContent = paragraphContent.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, (m, alt, url) => {
       return `<div class="my-6 rounded-2xl overflow-hidden"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover rounded-2xl select-none" /></div>`
@@ -288,6 +307,16 @@ export function BlogContentRenderer({ content }: BlogContentRendererProps) {
           color: #ff9153;
         }
 
+        .blog-content .deal-cta-wrapper {
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          width: 100% !important;
+          margin: 2rem auto !important;
+          text-align: center !important;
+          clear: both !important;
+        }
+
         .blog-content a.deal-cta-btn,
         .blog-content .deal-cta-btn,
         .blog-content a.deal-cta-btn span,
@@ -296,6 +325,9 @@ export function BlogContentRenderer({ content }: BlogContentRendererProps) {
         .blog-content .deal-cta-btn:hover {
           color: #ffffff !important;
           text-decoration: none !important;
+          margin-left: auto !important;
+          margin-right: auto !important;
+          text-align: center !important;
         }
 
         .blog-content ul {
