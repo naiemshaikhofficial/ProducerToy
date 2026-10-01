@@ -69,9 +69,9 @@ function formatInline(text: string): string {
 export function parseMarkdownToHtml(raw: string): string {
   if (!raw) return ''
 
-  // If already full HTML with paragraphs and no raw hashes, return as is
+  // If already full HTML with paragraphs and no raw hashes, return as is (stripping any accidental empty/hash paragraphs)
   if (/<p[\s>]/i.test(raw) && !raw.includes('###') && !raw.includes('##')) {
-    return raw
+    return raw.replace(/<p>\s*#+\s*<\/p>/gi, '')
   }
 
   let text = raw
@@ -97,12 +97,15 @@ export function parseMarkdownToHtml(raw: string): string {
     .replace(/###?\s*How to Get It[\s\S]*?(?=###?|##|$)/gi, '')
     .trim()
 
-  // 3. Ensure headings have clean block separation before and after
-  text = text
-    .replace(/([^\n])\s*(#{2,4}\s+)/g, '$1\n\n$2')
-    .replace(/(#{2,4}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
+  // 3. Erase any lines that are solely hashes or markdown debris
+  text = text.replace(/^[ \t]*#+[ \t]*$/gm, '')
 
-  // 4. Split into blocks
+  // 4. Ensure headings have clean block separation before and after (exclude '#' from prefix)
+  text = text
+    .replace(/([^\n#])\s*(#{1,6}\s+)/g, '$1\n\n$2')
+    .replace(/(#{1,6}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
+
+  // 5. Split into blocks
   const blocks = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)
   const htmlBlocks: string[] = []
 
@@ -111,38 +114,34 @@ export function parseMarkdownToHtml(raw: string): string {
     const firstLine = lines[0] || ''
     const remainingLines = lines.slice(1).join(' ')
 
+    // Ignore stray hash symbols or markdown debris
+    if (/^#+$/.test(firstLine.trim())) {
+      if (remainingLines && !/^#+$/.test(remainingLines.trim())) {
+        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+      }
+      continue
+    }
+
     // Horizontal Rule (--- or *** or ___ or multiple dashes)
     if (/^(?:-{3,}|\*{3,}|_{3,})$/.test(firstLine.trim())) {
       htmlBlocks.push('<hr class="my-10 border-0 h-px bg-white/10" />')
       continue
     }
 
-    // Heading 2 (## Heading)
-    if (/^##\s+/.test(firstLine)) {
-      const title = firstLine.replace(/^##\s+/, '').trim()
-      if (!/^overview$/i.test(title)) {
-        htmlBlocks.push(`<h2>${formatInline(title)}</h2>`)
+    // Universal Headings (H1 through H6)
+    const headingMatch = firstLine.match(/^(#{1,6})\s*(.+)$/)
+    if (headingMatch) {
+      const level = headingMatch[1].length
+      const title = headingMatch[2].replace(/^#+\s*/, '').replace(/\s*#+$/, '').trim()
+      if (level <= 2) {
+        if (!/^overview$/i.test(title)) {
+          htmlBlocks.push(`<h2>${formatInline(title)}</h2>`)
+        }
+      } else if (level === 3) {
+        htmlBlocks.push(`<h3>${formatInline(title)}</h3>`)
+      } else {
+        htmlBlocks.push(`<h4>${formatInline(title)}</h4>`)
       }
-      if (remainingLines) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
-      }
-      continue
-    }
-
-    // Heading 3 (### Heading)
-    if (/^###\s+/.test(firstLine)) {
-      const title = firstLine.replace(/^###\s+/, '').trim()
-      htmlBlocks.push(`<h3>${formatInline(title)}</h3>`)
-      if (remainingLines) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
-      }
-      continue
-    }
-
-    // Heading 4 (#### Heading)
-    if (/^####\s+/.test(firstLine)) {
-      const title = firstLine.replace(/^####\s+/, '').trim()
-      htmlBlocks.push(`<h4>${formatInline(title)}</h4>`)
       if (remainingLines) {
         htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
       }
@@ -198,7 +197,14 @@ export function parseMarkdownToHtml(raw: string): string {
     }
 
     // Regular Paragraph with inline formatting and image check
-    let paragraphContent = block.replace(/\n/g, ' ')
+    let paragraphContent = block.replace(/\n/g, ' ').trim()
+    if (!paragraphContent || /^#+$/.test(paragraphContent)) {
+      continue
+    }
+
+    // Remove any accidental leading stray hashes in a paragraph
+    paragraphContent = paragraphContent.replace(/^#+\s+/, '')
+
     // If inline markdown image exists inside a paragraph
     paragraphContent = paragraphContent.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, (m, alt, url) => {
       return `<div class="my-6 rounded-2xl overflow-hidden"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover rounded-2xl select-none" /></div>`
