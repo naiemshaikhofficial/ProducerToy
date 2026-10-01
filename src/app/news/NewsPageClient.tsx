@@ -155,35 +155,45 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
   return (
     <div className="w-full bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12">
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         
-        {/* Featured Hero Story (1:1 with Screenshot 1) */}
+        {/* Featured Hero Story (1:1 with Epic Games Screenshot) */}
         {featuredArticle && (
-          <div className="mb-14 sm:mb-20">
+          <div className="mb-12 sm:mb-16">
             <Link
               href={`/news/${featuredArticle.slug}`}
               prefetch={true}
-              className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center cursor-pointer"
+              className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center cursor-pointer"
             >
-              {/* Left Column: 16:9 Image with product-image ambient glow behind it matching Epic */}
-              <div className="lg:col-span-7 relative">
-                {/* 1:1 Epic Games Ambient Glow: Unclipped, feather-soft atmospheric glow mirroring the cover image */}
+              {/* Left Column: 16:9 Image with 1:1 Epic Games Warm Ambient Glow */}
+              <div className="lg:col-span-7 relative isolate">
+                {/* 1:1 Epic Games Ambient Glow: Unclipped, soft atmospheric golden-amber bloom + cover image backlight */}
                 <div
-                  className="absolute -inset-6 sm:-inset-14 -z-10 pointer-events-none opacity-70 sm:opacity-85 group-hover:opacity-100 transition-opacity duration-500"
+                  className="absolute -inset-8 sm:-inset-14 -z-10 pointer-events-none select-none opacity-85 sm:opacity-95 group-hover:opacity-100 transition-opacity duration-500"
                   aria-hidden="true"
                 >
+                  {/* Signature Epic Golden/Amber Atmosphere Diffuse Blob */}
+                  <div
+                    className="w-full h-full rounded-full"
+                    style={{
+                      background: 'radial-gradient(ellipse 75% 65% at 50% 45%, rgba(251, 191, 36, 0.45) 0%, rgba(249, 115, 22, 0.28) 38%, rgba(234, 88, 12, 0.1) 65%, transparent 80%)',
+                      filter: 'blur(60px)',
+                      transform: 'scale(1.15)',
+                    }}
+                  />
+                  {/* Cover Image Color Reflection */}
                   <img
                     src={getHighResCoverImage(featuredArticle.cover_image)}
                     alt=""
-                    className="w-full h-full object-cover rounded-3xl"
+                    className="absolute inset-0 w-full h-full object-cover rounded-3xl opacity-60 mix-blend-screen"
                     style={{
-                      filter: 'blur(75px) saturate(1.8) brightness(1.15)',
-                      transform: 'scale(1.12)',
+                      filter: 'blur(75px) saturate(2) brightness(1.25)',
+                      transform: 'scale(1.08)',
                     }}
                   />
                 </div>
                 
-                <div className="relative aspect-video w-full rounded-2xl sm:rounded-[24px] overflow-hidden bg-[#18181c]">
+                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#18181c] shadow-2xl">
                   <Image
                     src={getHighResCoverImage(featuredArticle.cover_image)}
                     alt={`${cleanHtmlTitle(featuredArticle.title)} - Free Plugin & Audio News - Producer Toy`}
@@ -194,17 +204,17 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     priority
                   />
                   {/* Category Pill in bottom-left */}
-                  <div className="absolute bottom-4 left-4 px-3.5 py-1 rounded bg-black/75 backdrop-blur-md text-xs font-semibold text-white tracking-wide">
+                  <div className="absolute bottom-3.5 left-3.5 px-3 py-0.5 rounded bg-black/75 backdrop-blur-md text-[11px] font-semibold text-white tracking-wide">
                     {featuredArticle.category || 'News'}
                   </div>
                 </div>
               </div>
 
-              {/* Right Column: Date + Headline + Read more */}
+              {/* Right Column: Date + Headline + Read more (Matching Epic Games Screenshot) */}
               <div className="lg:col-span-5 flex flex-col justify-center">
-                <div className="flex items-center gap-3 text-sm font-medium text-zinc-400 mb-3 tracking-wide">
+                <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-300 mb-2.5 tracking-wide">
                   {featuredArticle.badge && (
-                    <span className={`px-2.5 py-0.5 rounded text-[11px] font-extrabold uppercase tracking-wider ${
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
                       featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                         : 'bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/30'
@@ -214,16 +224,11 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   )}
                   <span>{formatEpicDate(featuredArticle.published_at)}</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-[38px] font-black text-white leading-[1.18] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
+                <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-white leading-[1.2] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
                   {cleanHtmlTitle(featuredArticle.title)}
                 </h1>
-                {featuredArticle.excerpt && (
-                  <p className="text-sm sm:text-base text-zinc-400 line-clamp-2 leading-relaxed mb-6">
-                    {featuredArticle.excerpt}
-                  </p>
-                )}
                 <div>
-                  <span className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
+                  <span className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
                     Read more
                   </span>
                 </div>
@@ -232,15 +237,15 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
           </div>
         )}
 
-        {/* 3-Column Card Grid (1:1 with Screenshot 2 - "sare cards bhi") */}
+        {/* 3-Column Card Grid (1:1 with Epic Games - Compact, Sleek Cards) */}
         {gridArticles.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 mb-14">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-14">
             {gridArticles.map((article, idx) => (
               <Link
                 key={article.id || idx}
                 href={`/news/${article.slug}`}
                 prefetch={true}
-                className="group flex flex-col bg-[#202024] hover:bg-[#28282e] rounded-2xl p-3.5 sm:p-4 border-0 transition-all duration-200 cursor-pointer shadow-lg"
+                className="group flex flex-col bg-[#1a1a1e] hover:bg-[#222228] rounded-2xl p-2.5 sm:p-3 border-0 transition-all duration-200 cursor-pointer shadow-md"
               >
                 {/* 16:9 Inset Image with rounded corners */}
                 <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
@@ -253,17 +258,17 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     className="object-cover group-hover:scale-[1.02] transition-transform duration-300 ease-out"
                   />
                   {/* Category Pill in bottom-left */}
-                  <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded bg-black/75 backdrop-blur-md text-[11px] font-semibold text-white tracking-wide">
+                  <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] font-semibold text-white tracking-wide">
                     {article.category || 'News'}
                   </div>
                 </div>
 
-                {/* Card Text Content */}
-                <div className="pt-3.5 pb-1 flex flex-col flex-1">
-                  <div className="text-xs font-medium text-zinc-400 mb-1.5">
+                {/* Card Text Content (Compact typography matching Epic) */}
+                <div className="pt-2.5 pb-1 px-1 flex flex-col flex-1">
+                  <div className="text-[11px] font-medium text-zinc-400 mb-1">
                     {formatEpicDate(article.published_at)}
                   </div>
-                  <h2 className="text-base sm:text-[17px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
+                  <h2 className="text-[14px] sm:text-[14.5px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
                     {cleanHtmlTitle(article.title)}
                   </h2>
                 </div>
@@ -277,7 +282,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
           <div className="text-center pt-2 pb-8">
             <button
               onClick={() => setVisibleCount((prev) => prev + 9)}
-              className="px-8 py-3 bg-[#202024] hover:bg-[#28282e] text-white font-bold text-xs sm:text-sm rounded-xl border-0 active:scale-95 transition-all shadow-md cursor-pointer"
+              className="px-8 py-3 bg-[#1a1a1e] hover:bg-[#222228] text-white font-bold text-xs sm:text-sm rounded-xl border-0 active:scale-95 transition-all shadow-md cursor-pointer"
             >
               Load More
             </button>
