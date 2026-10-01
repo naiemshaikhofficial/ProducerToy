@@ -6,16 +6,52 @@ interface BlogContentRendererProps {
   content: string
 }
 
+const PB_AFFILIATE_ID = '68affa2b94f43'
+
+function sanitizeLinkUrl(url: string): string {
+  if (!url || url === '#' || url.startsWith('javascript:')) return '#'
+  let clean = url.trim()
+
+  // Ensure Plugin Boutique URLs always use Producer Toy's affiliate referral tag
+  if (clean.toLowerCase().includes('pluginboutique.com')) {
+    try {
+      const parsed = new URL(clean)
+      parsed.searchParams.set('a_aid', PB_AFFILIATE_ID)
+      return parsed.toString()
+    } catch {
+      if (clean.includes('a_aid=')) {
+        return clean.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PB_AFFILIATE_ID}`)
+      }
+      return clean.includes('?') ? `${clean}&a_aid=${PB_AFFILIATE_ID}` : `${clean}?a_aid=${PB_AFFILIATE_ID}`
+    }
+  }
+
+  return clean
+}
+
 function formatInline(text: string): string {
   return text
     // **bold**
     .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
     // *italic*
     .replace(/\*([^*]+)\*/g, '<em class="text-zinc-200 italic">$1</em>')
-    // [text](url) - remove # dummy links
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
-      if (url === '#' || url.startsWith('javascript:')) return linkText
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-medium">${linkText}</a>`
+    // [text](url) - Convert markdown links and style CTA deal buttons
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, rawUrl) => {
+      const url = sanitizeLinkUrl(rawUrl)
+      if (url === '#') return linkText
+
+      const isCtaButton =
+        /^(get|claim|grab|download|buy|save|view)\b/i.test(linkText) ||
+        linkText.toLowerCase().includes('deal') ||
+        linkText.toLowerCase().includes('% off') ||
+        linkText.toLowerCase().includes('€') ||
+        linkText.toLowerCase().includes('$')
+
+      if (isCtaButton) {
+        return `<span class="inline-block my-2.5 mr-2"><a href="${url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md hover:shadow-[#FC6301]/25 active:scale-95 no-underline"><span>${linkText}</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></span>`
+      }
+
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${linkText}</a>`
     })
     // `code`
     .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
@@ -44,15 +80,12 @@ export function parseMarkdownToHtml(raw: string): string {
     .replace(/&#252;/g, 'ü')
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
-    // 2. Strip scraper boilerplate
+    // 2. Strip scraper boilerplate but preserve deal links
     .replace(/\[\.\.\.?\]/gi, '')
     .replace(/\[\.\.\./gi, '')
     .replace(/\.\.\./gi, '')
     .replace(/###?\s*Key Highlights\s*&?\s*Features[\s\S]*?(?=###?|##|$)/gi, '')
     .replace(/###?\s*How to Get It[\s\S]*?(?=###?|##|$)/gi, '')
-    .replace(/\[here\]\([^)]*\)/gi, '')
-    .replace(/\[here\]/gi, '')
-    .replace(/Head over to the official developer link[^.\n]*\./gi, '')
     .trim()
 
   // 3. Ensure headings have clean block separation before and after
@@ -101,6 +134,35 @@ export function parseMarkdownToHtml(raw: string): string {
       continue
     }
 
+    // Markdown Images ![alt](url)
+    const imgMatch = firstLine.match(/^!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/)
+    if (imgMatch) {
+      const alt = imgMatch[1] || 'Audio Plugin Software'
+      const imgUrl = imgMatch[2]
+      htmlBlocks.push(`
+        <figure class="my-8 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-2xl">
+          <img src="${imgUrl}" alt="${alt}" loading="lazy" class="w-full h-auto object-cover max-h-[520px]" />
+          ${alt ? `<figcaption class="text-center text-xs text-zinc-400 py-2.5 px-4 bg-[#141416] border-t border-white/5">${alt}</figcaption>` : ''}
+        </figure>
+      `)
+      if (remainingLines) {
+        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+      }
+      continue
+    }
+
+    // YouTube Video Embed (e.g. https://www.youtube.com/watch?v=... or https://youtu.be/...)
+    const ytMatch = block.match(/^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[^\s)]*)?$/)
+    if (ytMatch) {
+      const videoId = ytMatch[1]
+      htmlBlocks.push(`
+        <div class="my-8 aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">
+          <iframe src="https://www.youtube-nocookie.com/embed/${videoId}" title="YouTube video player" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+      `)
+      continue
+    }
+
     // Ordered list (1. item)
     if (/^\d+\.\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
@@ -121,8 +183,14 @@ export function parseMarkdownToHtml(raw: string): string {
       continue
     }
 
-    // Regular Paragraph
-    htmlBlocks.push(`<p>${formatInline(block.replace(/\n/g, ' '))}</p>`)
+    // Regular Paragraph with inline formatting and image check
+    let paragraphContent = block.replace(/\n/g, ' ')
+    // If inline markdown image exists inside a paragraph
+    paragraphContent = paragraphContent.replace(/!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g, (m, alt, url) => {
+      return `<figure class="my-6 rounded-2xl overflow-hidden bg-[#181818] border border-white/10 shadow-2xl"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover max-h-[500px]" />${alt ? `<figcaption class="text-center text-xs text-zinc-400 py-2 px-4 bg-[#141416] border-t border-white/5">${alt}</figcaption>` : ''}</figure>`
+    })
+
+    htmlBlocks.push(`<p>${formatInline(paragraphContent)}</p>`)
   }
 
   return htmlBlocks.join('\n')

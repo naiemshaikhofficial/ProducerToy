@@ -42,18 +42,24 @@ export function sanitizeScrapedText(text: string): string {
     // Remove generic boilerplate sections like "How to Get It" or placeholder links
     .replace(/###?\s*How to Get It[\s\S]*?(?=###?|##|$)/gi, '')
     .replace(/###?\s*Key Highlights\s*&?\s*Features[\s\S]*?(?=###?|##|$)/gi, '')
-    .replace(/\[here\]\([^)]*\)/gi, '')
-    .replace(/\[here\]/gi, '')
-    .replace(/Head over to the official developer link[^.\n]*\./gi, '')
-    .replace(/[-*•]?\s*\*\*Source Coverage:\*\*.*$/gim, '')
-    .replace(/Originally reported via.*$/gim, '')
-    .replace(/View post:\s*\[?[^\]\n]+\]?(\([^)]+\))?/gi, '')
     // Replace BPB & AudioPlugin Guy mentions
     .replace(/\bBPB\s+readers\b/gi, 'music producers')
     .replace(/\bBPB\b/gi, 'Producer Toy')
     .replace(/Bedroom\s+Producers?\s+Blog/gi, 'Producer Toy')
     .replace(/Audio\s*Plugin\s*Guy/gi, 'Producer Toy')
     .replace(/https?:\/\/(?:www\.)?(?:bedroomproducersblog\.com|audiopluginguy\.com)[^\s)\]"]*/gi, '#')
+    // Ensure all Plugin Boutique URLs use Producer Toy's affiliate referral ID
+    .replace(/https?:\/\/(?:www\.)?pluginboutique\.com\/[^\s)\]"]+/gi, (matchedUrl) => {
+      try {
+        const u = new URL(matchedUrl)
+        u.searchParams.set('a_aid', PLUGIN_BOUTIQUE_AFFILIATE_ID)
+        return u.toString()
+      } catch {
+        return matchedUrl.includes('a_aid=')
+          ? matchedUrl.replace(/a_aid=[a-zA-Z0-9_-]+/g, `a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`)
+          : `${matchedUrl}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+      }
+    })
     // External music scrapers & blogs
     .replace(/rekkerd(?:\.org)?/gi, 'our partners')
     .replace(/gearnews(?:\.com)?/gi, 'audio tech news')
@@ -161,7 +167,12 @@ REQUIREMENTS:
    - In music blogs (BPB, GearNews, Rekkerd), this is consistently placed at the bottom of the article after "More info: [Product Name ($XX)](url)" or "Product page:". Always extract this exact deep product page link.
    - NEVER use image URLs (e.g. .jpg, .png, ytimg), NEVER link to YouTube, and NEVER link to competitor blogs or empty placeholder anchors.
    - If a specific product slug exists on the developer's website, always include the deep path (e.g. /megamorph/ or /oscope/), not just the root domain.
-8. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
+8. MULTI-PLUGIN DEALS & ROUNDUPS:
+   - If this article covers MULTIPLE plugins or deals (e.g. Roland JD-800, Native Instruments FM8, Slate Digital MetaTune):
+     a) Give EACH plugin its own dedicated ### section with in-depth features, discounts, and pricing.
+     b) For EACH plugin, include its direct deal link right under its section, formatted as a clear action button: e.g. [Get Roland JD-800 Deal (€68.43 at Plugin Boutique)](url).
+     c) NEVER omit any plugin or only provide one link when multiple are featured! Every single featured product must have its own deal link and pricing details.
+9. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object without markdown code blocks, matching this exact schema:
