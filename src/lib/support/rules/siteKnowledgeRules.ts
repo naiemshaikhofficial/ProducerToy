@@ -1,68 +1,111 @@
 /**
- * Detailed Knowledge Base for About Us, Frequently Asked Questions (FAQ), and News & Deals Desk
+ * Detailed Master Knowledge Base for Support Bot:
+ * - All Pages & Sitemap Navigation
+ * - Complete Product Catalog & Categories
+ * - Audio Tech News & Deals Desk
+ * - Step-by-Step Installation Guides (VST3, AU, AAX, Sample Packs, Serum/Vital Presets, MIDI, Serial Activation)
  */
 export function getSiteKnowledgeRules(): string {
-  return `DETAILED SITE KNOWLEDGE & PLATFORM AWARENESS (ABOUT US, FAQ & NEWS DESK):
+  return `MASTER SITE KNOWLEDGE & TECHNICAL INSTALLATION MANUAL:
 
-1. ABOUT PRODUCER TOY (/about):
-   - What is Producer Toy: Producer Toy (producertoy.com) is a modern, creator-first digital audio marketplace where producers, beatmakers, audio engineers, and sound designers discover and purchase VST plugins, virtual instruments, sample packs, synth presets, and DAW tools.
-   - Founder & Creative Director: Founded by music producer and creative director Naiem Shaikh. Naiem built Producer Toy to solve the frustration of fragmented manufacturer portals, cumbersome serial key recovery, and clunky legacy audio sites by engineering one centralized, modern library for music creators worldwide.
-   - Core Mission: Built from the ground up to empower music creators of all levels—from bedroom producers crafting their first 808s to commercial mixing engineers finishing chart-topping records—with instantaneous software access and curated sound design.
-   - 4 Core Pillars:
-     1. Instant Digital Fulfillment: Direct, automated access to serial keys, official installer links, and tax invoices in the user's Library immediately upon checkout.
-     2. Exclusive Free Gifts: Complimentary VST plugins, sound kits, and preset expansions included with eligible purchases at zero extra cost.
-     3. DAW Agnostic Architecture: 100% verified compatibility across FL Studio, Ableton Live, Logic Pro, Cubase, Studio One, Reaper, and Bitwig.
-     4. Centralized Creator Library: One unified account at /library so users never need to juggle dozens of separate manufacturer logins.
-   - Sister Platform: SamplesWala (sampleswala.com) is Producer Toy's sister platform founded by the same team, dedicated to Indian, Bollywood, and Desi traditional instruments (Tabla, Dholak, Harmonium, Bansuri) and FL templates in INR (₹).
+1. COMPLETE SITEMAP & ALL PAGES ROUTING GUIDE:
+   - Storefront & Discovery:
+     - /store: Main catalog browsing, multi-faceted filtering (price, categories, manufacturer, on sale, format).
+     - /categories/instruments: Virtual instruments, synthesizers (wavetable, analog modeled, FM), samplers, and romplers.
+     - /categories/effects: Audio FX, mixing and mastering plugins (EQ, compression, reverb, delay, saturation, vocal pitch correction).
+     - /store/sounds & /categories/sounds: Royalty-free sample packs, drum kits, 808s, vocal chops, and melody loops.
+     - /categories/studio-tools: Utility plugins, loudness meters (LUFS), spectrum analyzers, and audio routers.
+     - /categories/bundles: Discounted bundles, developer suites, and mega collection deals (up to 80% off).
+     - /free-vst-plugins & /free: 100% free VST software plugins and complimentary sound packs.
+     - /gifts: Complimentary gifts and bonus plugins claimable on eligible checkout purchases.
+     - /manufacturers & /brands: Directory of 200+ world-class audio plugin manufacturers (FabFilter, Arturia, Universal Audio, Native Instruments, Slate Digital, etc.).
+   - Editorial, News & Guides:
+     - /news: Breaking audio plugin news, flash deal alerts, time-limited discount expiry countdowns, and developer giveaways.
+     - /blog: Music production tutorials, mixing masterclasses, 808 bass tuning guides, and sound design articles.
+   - User Account & Personal Fulfillment:
+     - /library: The creator's personal digital locker containing all purchased software, instant serial keys, direct cloud CDN download mirrors, and version updates.
+     - /wishlist: Bookmarked items with automatic price drop alerts when products go on sale.
+     - /cart & /checkout: Multi-currency checkout processing USD, EUR, GBP, and INR (via Razorpay, Stripe, PayPal, Cashfree).
+     - /auth & /reset-password: User authentication, magic link sign-in, and password recovery.
+   - Creator Distribution & Business:
+     - /distribute: Developer publishing portal where audio developers and sound designers distribute products with 70% to 88% revenue share.
+     - /licensing & /eula: Commercial rights, 100% royalty-free terms, and end-user license agreements.
+   - Company & Support:
+     - /about: Producer Toy story, founded by music producer & creative director Naiem Shaikh, company mission, core pillars, and sister company SamplesWala (sampleswala.com).
+     - /faq: Frequently Asked Questions covering selling, orders, wishlist, free gifts, licenses, refunds, and DAW troubleshooting.
+     - /support: Official 24/7 help desk, raise support ticket (/support?tab=raise-ticket), and track ticket status (/support?tab=track-ticket).
+     - /contact: Official inquiry and grievance officer contact.
+     - /terms, /privacy, /refund-policy, /purchase-policy: Legal and buyer protection policies.
 
-2. FREQUENTLY ASKED QUESTIONS & KNOWLEDGE BASE (/faq):
-   - Working & Selling With Producer Toy (/distribute):
-     - Audio developers, DSP programmers, sound designers, and sample labels can distribute their virtual instruments, effect plugins, and soundbanks to producers across 100+ countries.
-     - Revenue Split: Creators retain 70% to 80% net revenue split on digital sales with automated bi-weekly payouts and zero upfront listing fees.
-     - Features: Automated serial key generation, high-speed multi-region CDN cloud downloads, and copy-protection delivery.
-     - Affiliate Partner Program: Music educators, YouTubers, and reviewers earn competitive commissions on referred sales with a 30-day cookie window and real-time conversion dashboard. Inquiries via /contact.
-   - Orders, Wishlist & Free Gifts:
-     - Wishlist: Accessible via the bookmark icon in the top header or directly at /wishlist. Automatically tracks saved products and alerts creators when prices drop or items go on flash sale.
-     - Order Confirmation: Generated instantly upon payment; confirmation email sent with transaction ID and direct library link.
-     - Tax Invoices: Official invoices including GST / VAT and seller registration details are generated upon checkout or can be retrieved by providing an order number.
-     - Free Gift Promotion: Eligible purchases unlock free bonus plugins or sample packs claimable on the checkout screen or at /gifts.
-   - Licenses & Cloud Downloads:
-     - All digital licenses are perpetual lifetime activations unless explicitly marked as a subscription or rent-to-own.
-     - Re-downloading: Users can re-download their purchased plugins, sample packs, and serial codes anytime without fees directly from their Library (/library).
-   - Refunds & Buyer Protection Guarantee:
-     - Because digital products, serial keys, and sound libraries are unlocked instantly and cannot be un-downloaded, standard change-of-mind refunds follow manufacturer policies.
-     - Defective Key & Corrupted File Guarantee: Producer Toy provides 100% replacement or technical resolution for any verified defective serial keys, broken installers, or corrupted download archives reported within 14 days of purchase.
-   - Account & Verification:
-     - Account Login: Users can log in using email/password or passwordless magic link at /auth.
-     - Password Recovery: Available at /reset-password.
-     - Guest Order Linking: If a user checks out as a guest, their purchases automatically attach to their account once they create an account or sign in with that same email address.
-   - DAW Setup & Technical Troubleshooting:
-     - FL Studio Plugin Rescan:
-       1. Open FL Studio and go to Options > Manage Plugins.
-       2. In Plugin Scan Settings, enable both "Rescan previously verified plugins" and "Rescan plugins with errors".
-       3. Verify that your VST3 search path includes C:\\Program Files\\Common Files\\VST3 (Windows) or /Library/Audio/Plug-Ins/VST3 (macOS).
-       4. Click "Find installed plugins".
-     - Ableton Live Plugin Rescan:
-       1. Open Ableton Live Preferences (Ctrl+, on Windows, Cmd+, on macOS).
-       2. Go to the "Plug-Ins" tab and ensure "Use VST3 Plug-In System Folders" is set to ON.
-       3. Hold down the Alt/Option key while clicking the "Rescan" button to force a complete deep scan of all system folders.
-     - Logic Pro AU Manager & Gatekeeper:
-       1. In Logic Pro, navigate to Settings > Plug-in Manager.
-       2. Locate the unverified plugin, select it, and click "Reset & Rescan Selection".
-       3. If macOS Gatekeeper blocks the AU component ("cannot be opened because developer cannot be verified"), open macOS System Settings > Privacy & Security and click "Open Anyway".
-     - Apple Silicon (M1/M2/M3/M4) & macOS Sequoia / Sonoma:
-       1. All modern software on Producer Toy runs natively on Apple Silicon ARM64 architecture with ultra-low latency.
-       2. Older legacy x86 VST plugins can be run in your DAW by launching the DAW with "Open using Rosetta" enabled in the Finder application info.
+2. STEP-BY-STEP INSTALLATION & ACTIVATION GUIDES (HOW TO INSTALL):
+   Producers frequently ask how to install plugins, samples, and presets. Always provide clear, numbered step-by-step instructions:
 
-3. AUDIO PLUGIN NEWS & DEALS DESK (/news):
-   - What the News Desk Is: The official editorial and news hub of Producer Toy (/news), delivering daily breaking audio tech news, time-limited VST discounts, developer sales, freebie alerts, hardware announcements, and mixing tutorials.
-   - Real-Time Deal Tracking & Expirations:
-     - Deals published on the News Desk feature live deal expiration countdowns and real-time status badges: "Active", "Ending Soon", or "Expired".
-     - When a deal expires on manufacturer or partner sites, the article clearly informs producers that the deal has ended, while suggesting active alternative deals.
-   - Category Coverage:
-     - Deals & Discounts: Major price cuts on synthesizers, compressors, reverbs, mastering suites, and vocal processors.
-     - Free VST Plugins: Verified 100% free plugin alerts, temporary giveaways, and freeware gems.
-     - Sound Kits & Preset Packs: Serum presets, Vital soundbanks, 808 packs, and cinematic sample pack drops.
-     - Industry & Tech Announcements: Major DAW updates (FL Studio, Ableton Live, Logic Pro), Apple OS compatibility notices, and new DSP innovations.
-   - Seamless Store Integration: News articles link directly to featured plugins, discount codes, manufacturer brand pages (/manufacturers), and store deals (/store?on_sale=true).`
+   A. HOW TO INSTALL VST3 & VST2 PLUGINS ON WINDOWS (PC):
+      1. Download the installer archive (.zip, .exe, or .msi) from your Producer Toy Library (/library).
+      2. If inside a .zip file, right-click and select "Extract All".
+      3. Run the installer (.exe) as Administrator.
+      4. Standard Default Installation Folders (DO NOT CHANGE THESE):
+         - VST3 Plugins: C:\\Program Files\\Common Files\\VST3\\ (Official VST3 standard directory).
+         - 64-bit VST2 Plugins: C:\\Program Files\\VSTPlugins\\ or C:\\Program Files\\Steinberg\\VstPlugins\\
+      5. Open your DAW (FL Studio, Ableton Live, Studio One, Reaper, Cubase) and run a plugin rescan.
+      6. Enter your license serial key from /library upon launching the plugin.
+
+   B. HOW TO INSTALL VST3 & AU (AUDIO UNITS) ON macOS (APPLE SILICON & INTEL):
+      1. Download the macOS installer (.dmg or .pkg) from your Library (/library).
+      2. Double-click the .dmg or .pkg and follow the onscreen installer prompts.
+      3. If provided with standalone plugin files:
+         - Move .vst3 files to: /Library/Audio/Plug-Ins/VST3/
+         - Move .component (AU) files to: /Library/Audio/Plug-Ins/Components/
+      4. Bypassing macOS Gatekeeper Security ("Developer cannot be verified" or "Blocked from opening"):
+         - Step 1: Open macOS System Settings > Privacy & Security.
+         - Step 2: Scroll down to the "Security" section.
+         - Step 3: Look for the notification stating the plugin was blocked, and click "Open Anyway".
+         - Step 4: Reopen your DAW and re-scan plugins.
+
+   C. HOW TO INSTALL & LOAD SAMPLE PACKS, DRUM KITS & WAV LOOPS:
+      1. Download the sample pack .zip from /library.
+      2. Extract the .zip file to your dedicated audio samples hard drive (e.g. D:\\Samples\\ or ~/Music/Samples/).
+      3. Adding to DAW Browser:
+         - In FL Studio: Go to Options > File Settings. In "Browser extra search folders", click an empty folder icon, select your sample pack folder, and click OK. The pack will instantly appear in the left browser tree!
+         - In Ableton Live: In the left sidebar under "Places", click "Add Folder..." and select your unzipped sample folder.
+         - In Logic Pro: Open the File Browser (press F) or drag WAV audio files directly into the timeline.
+         - In Studio One / Cubase: Open the right Browser panel, go to Files, and drag the sample folder into your favorites.
+
+   D. HOW TO INSTALL SYNTH PRESETS (SERUM, VITAL, MASSIVE, SYLENTH1):
+      1. Xfer Serum Presets (.fxp, .wav tables, .wav noises):
+         - Step 1: Open Serum inside your DAW.
+         - Step 2: Click the "Menu" button (top right) and choose "Show Serum Presets Folder".
+         - Step 3: Open the "Presets" folder (or "Tables" / "Noises").
+         - Step 4: Paste your unzipped preset pack into the "User" subfolder.
+         - Step 5: In Serum, click Menu > "Rescan folders on disk". Your new presets appear instantly in the preset browser!
+      2. Matt Tytel Vital Presets (.vital, .vitalbank):
+         - Step 1: Open Vital.
+         - Step 2: Click the three-line hamburger menu (top right) and click "Import Bank" (if .vitalbank) or "Open User Folder".
+         - Step 3: Place .vital preset files into the "Presets" directory.
+      3. Native Instruments Massive:
+         - Copy presets into Documents\\Native Instruments\\Massive\\Sounds\\.
+         - In Massive, go to File > Options > Browser > click "Rebuild DB".
+      4. LennarDigital Sylenth1:
+         - Open Sylenth1 > Click "Menu" > "Load Bank" (.fxb) or "Load Preset" (.fxp).
+
+   E. HOW TO INSTALL MIDI KITS & CHORD PACKS (.mid):
+      1. Unzip the MIDI package.
+      2. Drag and drop any .mid file directly onto an Instrument track, Piano Roll, or MIDI channel in any DAW. All notes, velocities, and chords render immediately.
+
+   F. HOW TO ACTIVATE SERIAL KEYS:
+      1. Go to your personal Library (/library) on Producer Toy and copy your unique Serial Key.
+      2. Load the plugin on an audio or MIDI track in your DAW.
+      3. Click the "Activate", "Register", or Gear/Key icon in the plugin interface.
+      4. Paste your Serial Key and associated account email address. Click "Authorize" or "Activate".
+      5. If the product uses a developer license manager (iLok, Native Access, Arturia Software Center, Waves Central, Universal Audio Connect): open that manager, click "Add Serial" or "Register Product", paste the key, and install.
+
+3. PRODUCT CATALOG EXPERTISE:
+   - Formats available: VST, VST3, AU (Audio Units for Mac), AAX (Pro Tools), CLAP, Standalone software, WAV (24-bit / 44.1kHz - 96kHz lossless), MIDI, and Synth Presets.
+   - Compatibility: 100% royalty-free for commercial music releases, Spotify streaming, TV, film, radio, and gaming sync.
+   - Pricing: All digital store prices in USD ($) with automatic INR (₹) conversion for Indian producers via UPI, NetBanking, and RuPay.
+
+4. AUDIO PLUGIN NEWS & DEALS DESK KNOWLEDGE (/news):
+   - Daily Coverage: Real-time reporting on audio plugin sales, flash discounts, developer promotions, freebie alerts, hardware announcements, and DAW updates.
+   - Real-time Expiry Status: Articles feature live countdowns with "Active", "Ending Soon", and "Expired" deal badges.
+   - Verified Hot Deals: Direct links to featured deals, developer sales (e.g. Slate Digital MetaTune, Analog Legends GROOVE, Aubit Sound Awake, Moog Moogerfooger giveaways), and instant checkout perks.`
 }
