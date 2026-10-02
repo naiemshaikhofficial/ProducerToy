@@ -7,26 +7,13 @@ import {
   ChevronDown,
   ArrowRight,
   ShieldCheck,
-  DownloadCloud,
-  Headphones,
-  Sliders,
-  Music2,
-  Cpu,
-  Layers,
   Award,
-  Zap,
-  CheckCircle2,
-  Gift,
-  HelpCircle,
+  Sliders,
+  Layers,
   Key,
   ShoppingBag,
-  FileText,
   UserCheck,
-  RefreshCw,
-  Sparkles,
-  ExternalLink,
-  Laptop,
-  Check
+  HelpCircle,
 } from 'lucide-react'
 
 export interface FAQItem {
@@ -324,514 +311,193 @@ export function FaqPageClient() {
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none">
-      
-      {/* ========================================================================= */}
-      {/* 1. HERO BANNER WITH DEEP BOTTOM OPACITY DISSOLVE (EXACT 1:1 WITH ABOUT US) */}
-      {/* ========================================================================= */}
-      <section className="relative w-full overflow-hidden bg-[#121212]">
-        {/* Full Bleed Wide Hero Banner Graphic */}
-        <div className="relative w-full flex items-center justify-center bg-black overflow-hidden">
-          <picture className="w-full flex items-center justify-center">
+      <div className="w-full max-w-[960px] mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16 sm:pb-24 space-y-8 sm:space-y-10">
+        
+        {/* Sleek, Framed Mascot Banner */}
+        <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[3/1] max-h-[220px] sm:max-h-[280px] flex items-center justify-center shadow-2xl">
+          <picture className="w-full h-full flex items-center justify-center">
             <source srcSet="/neon-faq-mascot-banner.webp" type="image/webp" />
             <img
               src="/Neon FAQ Mascot Banner.png"
-              alt="Frequently Asked Questions - Producer Toy"
-              className="w-full h-auto object-cover object-center max-h-[540px] sm:max-h-[660px] xl:max-h-[760px]"
+              alt="Producer Toy FAQ Banner"
+              className="w-full h-full object-cover object-center"
               loading="eager"
             />
           </picture>
-
-          {/* Precise Bottom Opacity Dissolve Gradient: Starts strictly BELOW the Mascot & Header */}
-          <div className="absolute inset-x-0 bottom-0 h-20 sm:h-28 md:h-36 bg-gradient-to-t from-[#121212] via-[#121212]/90 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-10 sm:h-16 bg-gradient-to-t from-[#121212] to-transparent pointer-events-none" />
-
-          {/* Subtle side feathering on ultra-wide screens */}
-          <div className="absolute inset-y-0 left-0 w-8 sm:w-16 bg-gradient-to-r from-[#121212]/50 to-transparent pointer-events-none" />
-          <div className="absolute inset-y-0 right-0 w-8 sm:w-16 bg-gradient-to-l from-[#121212]/50 to-transparent pointer-events-none" />
         </div>
 
-        {/* Hero Narrative & Search Area (Matching About Us Max Width & Typography) */}
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-14 sm:pb-20 relative z-10">
-          <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.06] border border-white/10 text-xs font-semibold uppercase tracking-wider text-zinc-300">
-              <HelpCircle className="w-3.5 h-3.5 text-zinc-400" />
-              <span>FREQUENTLY ASKED QUESTIONS &amp; KNOWLEDGE BASE</span>
-            </div>
+        {/* Minimal Hero Header */}
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+            Frequently Asked Questions
+          </h1>
+          <p className="text-sm sm:text-base text-zinc-400 font-normal">
+            Quick answers to common questions about orders, licenses, DAW setup, and selling.
+          </p>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.12] text-white">
-              Everything you need to know about Producer Toy
-            </h1>
-
-            <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal">
-              Find instant, clear answers to common questions about digital orders, license key retrieval, DAW setup, seller distribution, free gifts, and our buyer protection guarantee.
-            </p>
-
-            {/* Interactive Real-Time Search Bar */}
-            <div className="relative pt-2 max-w-2xl">
-              <div className="relative flex items-center">
-                <Search className="w-5 h-5 absolute left-4 text-zinc-400 pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search questions, licenses, FL Studio, Ableton, refunds, selling..."
-                  className="w-full bg-[#1e1e24] hover:bg-[#23232a] focus:bg-[#23232a] border border-white/10 focus:border-white text-white text-sm sm:text-base rounded-xl pl-12 pr-10 py-3.5 outline-none transition-all placeholder:text-zinc-500 shadow-lg"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3.5 text-xs text-zinc-400 hover:text-white px-2 py-1 rounded bg-white/10 transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons (1:1 with About Us Hero) */}
-            <div className="pt-2 flex flex-wrap items-center gap-4">
-              <Link
-                href="/support?tab=raise-ticket"
-                prefetch={true}
-                className="px-7 py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-sm rounded-xl transition-colors tracking-wide active:scale-95 flex items-center gap-2 cursor-pointer shadow-md"
-              >
-                <span>SUBMIT A TICKET</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-
-              <Link
-                href="/library"
-                prefetch={true}
-                className="px-7 py-3.5 bg-[#202024] hover:bg-[#28282e] text-zinc-200 hover:text-white border border-white/10 font-bold text-sm rounded-xl transition-colors tracking-wide active:scale-95 flex items-center gap-2 cursor-pointer"
-              >
-                <Key className="w-4 h-4 text-zinc-400" />
-                <span>MY LIBRARY &amp; LICENSES</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content Area - Aligned exactly with Homepage & About Us max-w-[1440px] */}
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pb-16 space-y-16 sm:space-y-20">
-
-        {/* ========================================================================= */}
-        {/* 2. THREE MINIMALISTIC FEATURE CARDS (HOMEPAGE & ABOUT PAGE THEME MATCH)   */}
-        {/* ========================================================================= */}
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
-            
-            {/* Card 1: Instant Fulfillment */}
-            <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
-              <div className="space-y-3.5">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <DownloadCloud className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Instant Fulfillment</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed font-normal">
-                  Zero waiting. Your serial keys, cloud download mirrors, and verified invoices are unlocked immediately in your personal library upon checkout.
-                </p>
-              </div>
-              <Link
-                href="/library"
-                prefetch={true}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:text-zinc-300 transition-colors pt-2"
-              >
-                <span>Access Your Library</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Card 2: Developer & Affiliate Program */}
-            <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
-              <div className="space-y-3.5">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <Award className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Sell &amp; Distribute</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed font-normal">
-                  Are you an audio developer or sound label? Sell directly to thousands of music makers with 70–80% revenue share and automated licensing.
-                </p>
-              </div>
-              <Link
-                href="/distribute"
-                prefetch={true}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:text-zinc-300 transition-colors pt-2"
-              >
-                <span>Join as Developer</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Card 3: 24/7 Audio Engineering Support */}
-            <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
-              <div className="space-y-3.5">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <Headphones className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Audio Tech Help Desk</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed font-normal">
-                  DAW crashes, missing VST3 folders, or activation errors? Our specialized audio engineering team is ready to troubleshoot and get you producing.
-                </p>
-              </div>
-              <Link
-                href="/support"
-                prefetch={true}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:text-zinc-300 transition-colors pt-2"
-              >
-                <span>Visit Help Center</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* 3. CATEGORY PILLS & MAIN FAQ ACCORDIONS                                  */}
-        {/* ========================================================================= */}
-        <section className="space-y-6">
-          
-          {/* Section Header with Category Tabs */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-white/[0.06]">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                Browse Answers by Category
-              </h2>
-              <p className="text-sm text-zinc-400 pt-1">
-                Showing {filteredFaqs.length} {filteredFaqs.length === 1 ? 'question' : 'questions'}
-                {searchQuery ? ` matching "${searchQuery}"` : ''}
-              </p>
-            </div>
-
-            {/* Expand / Collapse Controls */}
-            <div className="flex items-center gap-3 text-xs font-semibold">
-              <button
-                onClick={expandAll}
-                className="px-3 py-1.5 rounded-lg bg-[#202024] hover:bg-[#28282e] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-              >
-                Expand All
-              </button>
-              <button
-                onClick={collapseAll}
-                className="px-3 py-1.5 rounded-lg bg-[#202024] hover:bg-[#28282e] text-zinc-300 hover:text-white transition-colors cursor-pointer"
-              >
-                Collapse All
-              </button>
-            </div>
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
-            {CATEGORIES.map((cat) => {
-              const Icon = cat.icon
-              const isActive = activeCategory === cat.id
-              return (
+          {/* Minimalist Search Bar */}
+          <div className="relative pt-2 max-w-xl mx-auto">
+            <div className="relative flex items-center">
+              <Search className="w-4 h-4 absolute left-3.5 text-zinc-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search questions or keywords..."
+                className="w-full bg-[#18181c] hover:bg-[#1c1c22] focus:bg-[#1c1c22] border border-white/10 focus:border-white text-white text-sm rounded-xl pl-10 pr-9 py-2.5 outline-none transition-all placeholder:text-zinc-500"
+              />
+              {searchQuery && (
                 <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-white text-black shadow-md'
-                      : 'bg-[#1e1e24] hover:bg-[#25252c] text-zinc-300 hover:text-white border border-white/[0.06]'
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 text-xs text-zinc-400 hover:text-white px-1.5 py-0.5 rounded bg-white/10 transition-colors"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Minimal Category Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+          {CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat.id
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-white text-black font-semibold'
+                    : 'bg-[#18181c] text-zinc-400 hover:text-white hover:bg-[#202024] border border-white/[0.06]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Expand / Collapse & Question Count */}
+        <div className="flex items-center justify-between text-xs text-zinc-400 px-1 border-b border-white/[0.06] pb-3">
+          <span>
+            {filteredFaqs.length} {filteredFaqs.length === 1 ? 'question' : 'questions'}
+            {searchQuery ? ` matching "${searchQuery}"` : ''}
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={expandAll}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Expand All
+            </button>
+            <span className="text-zinc-600">•</span>
+            <button
+              onClick={collapseAll}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Collapse All
+            </button>
+          </div>
+        </div>
+
+        {/* FAQ Accordions */}
+        {filteredFaqs.length === 0 ? (
+          <div className="border border-white/[0.06] bg-[#16161a] rounded-xl p-8 text-center space-y-3">
+            <p className="text-sm text-zinc-400">
+              No answers found matching &quot;{searchQuery}&quot;.
+            </p>
+            <Link
+              href="/support?tab=raise-ticket"
+              className="inline-flex items-center gap-1.5 text-xs text-white underline underline-offset-4 hover:text-zinc-300"
+            >
+              <span>Submit a support ticket</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {filteredFaqs.map((faq) => {
+              const isOpen = openIds.has(faq.id)
+              return (
+                <div
+                  key={faq.id}
+                  className={`rounded-xl border transition-colors ${
+                    isOpen
+                      ? 'bg-[#18181c] border-white/15'
+                      : 'bg-[#151518] hover:bg-[#18181c] border-white/[0.06]'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{cat.label}</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleOpen(faq.id)}
+                    className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-3 cursor-pointer"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="text-sm sm:text-base font-semibold text-white tracking-tight leading-snug">
+                      {faq.question}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200 ${
+                        isOpen ? 'rotate-180 text-white' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-4 sm:px-5 pb-4 pt-1 space-y-3 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-white/[0.05]">
+                      <p className="pt-2 font-normal text-zinc-300">{faq.answer}</p>
+
+                      {faq.details && faq.details.length > 0 && (
+                        <ul className="space-y-1.5 pt-1 pl-1">
+                          {faq.details.map((detail, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-zinc-400 text-xs sm:text-sm">
+                              <span className="text-zinc-500 mt-0.5">•</span>
+                              <span>{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {faq.linkUrl && faq.linkText && (
+                        <div className="pt-1">
+                          <Link
+                            href={faq.linkUrl}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-white hover:text-zinc-300 underline underline-offset-4"
+                          >
+                            <span>{faq.linkText}</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               )
             })}
           </div>
+        )}
 
-          {/* Accordion FAQ List */}
-          {filteredFaqs.length === 0 ? (
-            <div className="bg-[#18181c] border border-white/[0.08] rounded-2xl p-12 text-center space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 text-zinc-400 mx-auto flex items-center justify-center">
-                <Search className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">No matching answers found</h3>
-              <p className="text-sm text-zinc-400 max-w-md mx-auto">
-                We could not find any FAQ matching &quot;{searchQuery}&quot;. Feel free to raise a ticket with our 24/7 technical team.
-              </p>
-              <div className="pt-2">
-                <Link
-                  href="/support?tab=raise-ticket"
-                  prefetch={true}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-black font-bold text-xs sm:text-sm hover:bg-zinc-200 transition-colors"
-                >
-                  <span>Submit Support Ticket</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3 pt-2">
-              {filteredFaqs.map((faq) => {
-                const isOpen = openIds.has(faq.id)
-                return (
-                  <div
-                    key={faq.id}
-                    className={`rounded-2xl border transition-all duration-200 ${
-                      isOpen
-                        ? 'bg-[#1a1a20] border-white/15 shadow-lg'
-                        : 'bg-[#18181c] hover:bg-[#1e1e24] border-white/[0.06]'
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => toggleOpen(faq.id)}
-                      className="w-full p-5 sm:p-6 text-left flex items-start justify-between gap-4 cursor-pointer"
-                      aria-expanded={isOpen}
-                    >
-                      <span className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
-                        {faq.question}
-                      </span>
-                      <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
-                          isOpen ? 'bg-white/10 text-white rotate-180' : 'bg-white/5 text-zinc-400'
-                        }`}
-                      >
-                        <ChevronDown className="w-4 h-4" />
-                      </div>
-                    </button>
-
-                    {isOpen && (
-                      <div className="px-5 sm:px-6 pb-6 pt-0 space-y-4 text-zinc-300 text-sm sm:text-base leading-relaxed border-t border-white/[0.06]">
-                        <p className="pt-4 font-normal text-zinc-300">
-                          {faq.answer}
-                        </p>
-
-                        {/* Bullet Details if any */}
-                        {faq.details && faq.details.length > 0 && (
-                          <ul className="space-y-2 pt-1">
-                            {faq.details.map((detail, idx) => (
-                              <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-400">
-                                <CheckCircle2 className="w-4 h-4 text-white/90 shrink-0 mt-0.5" />
-                                <span>{detail}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-
-                        {/* Link Action */}
-                        {faq.linkUrl && faq.linkText && (
-                          <div className="pt-2">
-                            <Link
-                              href={faq.linkUrl}
-                              prefetch={true}
-                              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-zinc-300 underline underline-offset-4 decoration-white/30 transition-colors"
-                            >
-                              <span>{faq.linkText}</span>
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </Link>
-                          </div>
-                        )}
-
-                        {/* Tags */}
-                        <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                          {faq.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-[11px] font-medium text-zinc-500 bg-white/[0.04] px-2.5 py-0.5 rounded-md"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-
-        </section>
-
-        {/* ========================================================================= */}
-        {/* 4. SUPPORT SPOTLIGHT BILLBOARD (1:1 FOUNDER BILLBOARD STYLE FROM ABOUT US) */}
-        {/* ========================================================================= */}
-        <section className="w-full">
-          <div className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/[0.08] bg-[#1a1a1e] flex flex-col lg:flex-row items-center justify-between select-none shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
-            
-            {/* Background Studio Ambience & Pure Monochrome Atmosphere */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#18181c] to-[#141418] pointer-events-none" />
-            <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-white/[0.03] blur-[120px] pointer-events-none" />
-
-            {/* Left Column: Support Desk Narrative */}
-            <div className="relative z-10 p-6 sm:p-10 lg:p-14 max-w-2xl space-y-4 sm:space-y-5 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.06] border border-white/10 text-xs font-semibold uppercase tracking-wider text-zinc-300">
-                <Headphones className="w-3.5 h-3.5 text-zinc-400" />
-                <span>24/7 DEDICATED SUPPORT DESK</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-tight">
-                Still have questions? We’re always here to assist.
-              </h2>
-
-              <p className="text-sm sm:text-base text-zinc-300 leading-relaxed font-normal">
-                Whether you need help activating a serial key, troubleshooting plugin latency in your DAW, or checking order verification status, our dedicated audio support team is at your service.
-              </p>
-
-              <p className="text-sm sm:text-base text-zinc-400 leading-relaxed font-normal">
-                Submit a ticket with your order ID or system details, and receive prompt, knowledgeable assistance from experienced audio engineers.
-              </p>
-
-              <div className="pt-2 flex flex-wrap items-center gap-3.5">
-                <Link
-                  href="/support?tab=raise-ticket"
-                  prefetch={true}
-                  className="inline-flex items-center justify-center min-w-[150px] sm:min-w-[175px] h-[44px] bg-white hover:bg-zinc-200 text-black font-bold text-sm rounded-lg active:scale-95 transition-colors cursor-pointer"
-                >
-                  Raise Support Ticket
-                </Link>
-
-                <Link
-                  href="/support?tab=track-ticket"
-                  prefetch={true}
-                  className="inline-flex items-center justify-center px-6 h-[44px] bg-[#202024] hover:bg-[#28282e] text-zinc-200 hover:text-white border border-white/10 font-bold text-sm rounded-lg active:scale-95 transition-colors cursor-pointer"
-                >
-                  Track Existing Ticket
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Column: Founder Cutout Image / Support Visual */}
-            <div className="relative z-10 w-full lg:w-[48%] flex items-end justify-center lg:justify-end px-6 sm:px-10 lg:pr-14 pt-4 lg:pt-0">
-              <div className="relative w-full max-w-[340px] sm:max-w-[400px] lg:max-w-[430px] aspect-[4/5] flex items-end justify-center">
-                <img
-                  src="/naiem-shaikh-founder.webp"
-                  alt="Naiem Shaikh - Founder of Producer Toy"
-                  className="w-full h-auto object-contain object-bottom drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)] max-h-[460px] lg:max-h-[500px]"
-                  loading="eager"
-                />
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* 5. DISCOVER WHAT'S INSIDE (CATEGORIES & CATALOG)                           */}
-        {/* ========================================================================= */}
-        <section className="space-y-8">
-          <div className="space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Discover the Producer Toy Catalog
-            </h2>
-            <p className="text-sm sm:text-base text-zinc-400 max-w-xl">
-              From analog modeled synths to pristine drum sample collections, browse everything you need to finish your next record.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            
-            <Link
-              href="/categories/instruments"
-              prefetch={true}
-              className="p-5 rounded-xl bg-[#202020] hover:bg-[#252528] border border-white/[0.06] hover:border-white/15 transition-colors text-center space-y-2.5 group flex flex-col items-center justify-center"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-zinc-300 group-hover:text-white transition-colors flex items-center justify-center">
-                <Music2 className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-white">Instruments</h4>
-              <p className="text-[11px] text-zinc-400">Synths &amp; Romplers</p>
-            </Link>
-
-            <Link
-              href="/categories/effects"
-              prefetch={true}
-              className="p-5 rounded-xl bg-[#202020] hover:bg-[#252528] border border-white/[0.06] hover:border-white/15 transition-colors text-center space-y-2.5 group flex flex-col items-center justify-center"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-zinc-300 group-hover:text-white transition-colors flex items-center justify-center">
-                <Cpu className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-white">Effects</h4>
-              <p className="text-[11px] text-zinc-400">Reverb, Delay, EQ</p>
-            </Link>
-
-            <Link
-              href="/store/sounds"
-              prefetch={true}
-              className="p-5 rounded-xl bg-[#202020] hover:bg-[#252528] border border-white/[0.06] hover:border-white/15 transition-colors text-center space-y-2.5 group flex flex-col items-center justify-center"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-zinc-300 group-hover:text-white transition-colors flex items-center justify-center">
-                <Layers className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-white">Sounds</h4>
-              <p className="text-[11px] text-zinc-400">Samples &amp; Loops</p>
-            </Link>
-
-            <Link
-              href="/categories/studio-tools"
-              prefetch={true}
-              className="p-5 rounded-xl bg-[#202020] hover:bg-[#252528] border border-white/[0.06] hover:border-white/15 transition-colors text-center space-y-2.5 group flex flex-col items-center justify-center"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-zinc-300 group-hover:text-white transition-colors flex items-center justify-center">
-                <Sliders className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-white">Studio Tools</h4>
-              <p className="text-[11px] text-zinc-400">Meters &amp; Utility</p>
-            </Link>
-
-            <Link
-              href="/categories/bundles"
-              prefetch={true}
-              className="p-5 rounded-xl bg-[#202020] hover:bg-[#252528] border border-white/[0.06] hover:border-white/15 transition-colors text-center space-y-2.5 group flex flex-col items-center justify-center"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-zinc-300 group-hover:text-white transition-colors flex items-center justify-center">
-                <Gift className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-white">Bundles</h4>
-              <p className="text-[11px] text-zinc-400">Save Up to 80%</p>
-            </Link>
-
-            <Link
-              href="/free-vst-plugins"
-              prefetch={true}
-              className="p-5 rounded-xl bg-[#202020] hover:bg-[#252528] border border-white/[0.06] text-white flex items-center justify-center group flex-col space-y-2.5 text-center"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                <Zap className="w-5 h-5" />
-              </div>
-              <h4 className="font-bold text-sm text-white">100% Free</h4>
-              <p className="text-[11px] text-zinc-400">Zero Cost Tools</p>
-            </Link>
-
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* 6. BOTTOM CTA (HOMEPAGE & ABOUT PAGE MATCHING MINIMALISTIC BUTTONS)       */}
-        {/* ========================================================================= */}
-        <section className="pt-2 pb-2 text-center space-y-5">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-            Ready to elevate your sound?
-          </h2>
-          <p className="text-zinc-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-            Join thousands of music makers discovering fresh tools, free gifts, and sample packs every day on Producer Toy.
+        {/* Minimalistic Simple Help Strip */}
+        <div className="pt-6 sm:pt-8 text-center border-t border-white/[0.06] space-y-3">
+          <p className="text-xs sm:text-sm text-zinc-400">
+            Still can’t find what you’re looking for?
           </p>
-
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-3">
             <Link
-              href="/store"
-              prefetch={true}
-              className="px-8 py-3.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-sm rounded-xl transition-colors active:scale-95 flex items-center gap-2 cursor-pointer shadow-md"
+              href="/support?tab=raise-ticket"
+              className="px-4 py-2 bg-white hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer"
             >
-              <span>Explore All Producer Toys</span>
-              <ArrowRight className="w-4 h-4" />
+              Submit a Ticket
             </Link>
-
             <Link
               href="/support"
-              prefetch={true}
-              className="px-8 py-3.5 bg-[#202024] hover:bg-[#28282e] text-zinc-300 hover:text-white border border-white/10 font-bold text-sm rounded-xl transition-colors active:scale-95 flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 bg-[#18181c] hover:bg-[#202024] text-zinc-300 hover:text-white border border-white/10 text-xs sm:text-sm rounded-lg transition-colors cursor-pointer"
             >
-              <Headphones className="w-4 h-4" />
-              <span>Contact Support Desk</span>
+              Help Desk
             </Link>
           </div>
-        </section>
+        </div>
 
       </div>
     </div>
