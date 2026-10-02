@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -27,6 +27,28 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   const expiryInfo = detectDealExpiry(article)
   const isExpired = expiryInfo.isExpired
   const expiryTimeline = expiryInfo.expiryTimeline
+
+  // Prevent duplicate CTA buttons: check if content already contains an inline deal button
+  const hasInlineCta = useMemo(() => {
+    if (!article.content) return false
+    const linkMatches = article.content.match(/\[([^\]]+)\]\(([^)]*)\)/g) || []
+    for (const match of linkMatches) {
+      const textMatch = match.match(/\[([^\]]+)\]/)
+      if (textMatch) {
+        const text = textMatch[1].trim()
+        if (
+          /^(get|claim|grab|download|buy|save|view|explore|redeem|official)\b/i.test(text) ||
+          text.toLowerCase().includes('deal') ||
+          text.toLowerCase().includes('% off') ||
+          text.toLowerCase().includes('€') ||
+          text.toLowerCase().includes('$')
+        ) {
+          return true
+        }
+      }
+    }
+    return /deal-cta-btn|deal-cta-wrapper/i.test(article.content)
+  }, [article.content])
 
   const couponCode =
     article.specs?.['Coupon Code'] ||
@@ -67,12 +89,6 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     ctaLinksCount > 1 ||
     (article.title?.includes(',') && ctaLinksCount >= 1) ||
     /deals|roundup|plugins on sale|best deals|top deals|3 strong|4 strong|5 strong/i.test(article.title || '')
-
-  // Check if article already contains an explicit CTA action button inside its markdown content
-  const hasInlineCta = Boolean(
-    article.content &&
-    /\[(get|claim|grab|download|buy|save|view|redeem|official)[^\]]*\]\(/i.test(article.content)
-  )
 
   const PB_AFFILIATE_ID = '68affa2b94f43'
 
@@ -310,8 +326,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             />
           </div>
 
-          {/* Guaranteed Deal CTA Button: Always displays at bottom of every deal article */}
-          {offerUrl && (
+          {/* Guaranteed Deal CTA Button: Displays at bottom ONLY if the article content does not already include an inline deal button */}
+          {offerUrl && !hasInlineCta && (
             <div className="my-10 flex flex-col items-center justify-center w-full clear-both">
               <a
                 href={offerUrl}
