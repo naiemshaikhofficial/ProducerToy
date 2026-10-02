@@ -331,12 +331,15 @@ export function FaqPageClient() {
       <section className="relative w-full overflow-hidden bg-[#121212]">
         {/* Full Bleed Wide Hero Banner Graphic */}
         <div className="relative w-full flex items-center justify-center bg-black overflow-hidden">
-          <img
-            src="/about-us-banner.webp"
-            alt="Frequently Asked Questions - Producer Toy"
-            className="w-full h-auto object-cover object-center max-h-[540px] sm:max-h-[660px] xl:max-h-[760px]"
-            loading="eager"
-          />
+          <picture className="w-full flex items-center justify-center">
+            <source srcSet="/neon-faq-mascot-banner.webp" type="image/webp" />
+            <img
+              src="/Neon FAQ Mascot Banner.png"
+              alt="Frequently Asked Questions - Producer Toy"
+              className="w-full h-auto object-cover object-center max-h-[540px] sm:max-h-[660px] xl:max-h-[760px]"
+              loading="eager"
+            />
+          </picture>
 
           {/* Precise Bottom Opacity Dissolve Gradient: Starts strictly BELOW the Mascot & Header */}
           <div className="absolute inset-x-0 bottom-0 h-20 sm:h-28 md:h-36 bg-gradient-to-t from-[#121212] via-[#121212]/90 to-transparent pointer-events-none" />
@@ -351,7 +354,7 @@ export function FaqPageClient() {
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-14 sm:pb-20 relative z-10">
           <div className="max-w-3xl space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.06] border border-white/10 text-xs font-semibold uppercase tracking-wider text-zinc-300">
-              <HelpCircle className="w-3.5 h-3.5 text-[#FC6301]" />
+              <HelpCircle className="w-3.5 h-3.5 text-zinc-400" />
               <span>FREQUENTLY ASKED QUESTIONS &amp; KNOWLEDGE BASE</span>
             </div>
 
@@ -372,7 +375,7 @@ export function FaqPageClient() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search questions, licenses, FL Studio, Ableton, refunds, selling..."
-                  className="w-full bg-[#1e1e24] hover:bg-[#23232a] focus:bg-[#23232a] border border-white/10 focus:border-[#FC6301] text-white text-sm sm:text-base rounded-xl pl-12 pr-10 py-3.5 outline-none transition-all placeholder:text-zinc-500 shadow-lg"
+                  className="w-full bg-[#1e1e24] hover:bg-[#23232a] focus:bg-[#23232a] border border-white/10 focus:border-white text-white text-sm sm:text-base rounded-xl pl-12 pr-10 py-3.5 outline-none transition-all placeholder:text-zinc-500 shadow-lg"
                 />
                 {searchQuery && (
                   <button
@@ -422,7 +425,7 @@ export function FaqPageClient() {
             <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
               <div className="space-y-3.5">
                 <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <DownloadCloud className="w-5 h-5 text-[#FC6301]" />
+                  <DownloadCloud className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight">Instant Fulfillment</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed font-normal">
@@ -443,7 +446,7 @@ export function FaqPageClient() {
             <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
               <div className="space-y-3.5">
                 <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <Award className="w-5 h-5 text-amber-400" />
+                  <Award className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight">Sell &amp; Distribute</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed font-normal">
@@ -464,7 +467,7 @@ export function FaqPageClient() {
             <div className="bg-[#202020] hover:bg-[#242428] border border-white/[0.06] hover:border-white/15 rounded-2xl p-7 space-y-5 transition-colors flex flex-col justify-between">
               <div className="space-y-3.5">
                 <div className="w-10 h-10 rounded-xl bg-white/[0.06] text-white flex items-center justify-center">
-                  <Headphones className="w-5 h-5 text-emerald-400" />
+                  <Headphones className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight">Audio Tech Help Desk</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed font-normal">
@@ -585,7 +588,7 @@ export function FaqPageClient() {
                       </span>
                       <div
                         className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-200 ${
-                          isOpen ? 'bg-[#FC6301]/20 text-[#FC6301] rotate-180' : 'bg-white/5 text-zinc-400'
+                          isOpen ? 'bg-white/10 text-white rotate-180' : 'bg-white/5 text-zinc-400'
                         }`}
                       >
                         <ChevronDown className="w-4 h-4" />
@@ -616,7 +619,7 @@ export function FaqPageClient() {
                             <Link
                               href={faq.linkUrl}
                               prefetch={true}
-                              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#FC6301] hover:text-[#ff7824] transition-colors"
+                              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-white hover:text-zinc-300 underline underline-offset-4 decoration-white/30 transition-colors"
                             >
                               <span>{faq.linkText}</span>
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -651,15 +654,14 @@ export function FaqPageClient() {
         <section className="w-full">
           <div className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/[0.08] bg-[#1a1a1e] flex flex-col lg:flex-row items-center justify-between select-none shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
             
-            {/* Background Studio Ambience & Neon Glow */}
+            {/* Background Studio Ambience & Pure Monochrome Atmosphere */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#18181c] to-[#141418] pointer-events-none" />
-            <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-[#FC6301]/10 blur-[100px] pointer-events-none" />
-            <div className="absolute left-1/3 bottom-0 w-80 h-80 rounded-full bg-blue-500/5 blur-[90px] pointer-events-none" />
+            <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-white/[0.03] blur-[120px] pointer-events-none" />
 
             {/* Left Column: Support Desk Narrative */}
             <div className="relative z-10 p-6 sm:p-10 lg:p-14 max-w-2xl space-y-4 sm:space-y-5 text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.06] border border-white/10 text-xs font-semibold uppercase tracking-wider text-zinc-300">
-                <Headphones className="w-3.5 h-3.5 text-[#FC6301]" />
+                <Headphones className="w-3.5 h-3.5 text-zinc-400" />
                 <span>24/7 DEDICATED SUPPORT DESK</span>
               </div>
 

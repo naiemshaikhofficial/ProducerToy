@@ -193,10 +193,9 @@ export default function AboutPage() {
         <section className="w-full">
           <div className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/[0.08] bg-[#1a1a1e] flex flex-col lg:flex-row items-center justify-between select-none shadow-[0_20px_60px_rgba(0,0,0,0.7)]">
             
-            {/* Background Studio Ambience & Neon Glow */}
+            {/* Background Studio Ambience & Pure Monochrome Atmosphere */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#121212] via-[#18181c] to-[#141418] pointer-events-none" />
-            <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-[#FC6301]/10 blur-[100px] pointer-events-none" />
-            <div className="absolute left-1/3 bottom-0 w-80 h-80 rounded-full bg-blue-500/5 blur-[90px] pointer-events-none" />
+            <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full bg-white/[0.03] blur-[120px] pointer-events-none" />
 
             {/* Left Column: Founder Story & Narrative */}
             <div className="relative z-10 p-6 sm:p-10 lg:p-14 max-w-2xl space-y-4 sm:space-y-5 text-left">
