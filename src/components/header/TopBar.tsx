@@ -89,6 +89,42 @@ export const TopBar: React.FC<TopBarProps> = ({
     }
   }
 
+  const handleDropdownNavigate = (e: React.MouseEvent, href: string) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) {
+      return
+    }
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (ecosystemTimeoutRef.current) {
+      clearTimeout(ecosystemTimeoutRef.current)
+      ecosystemTimeoutRef.current = null
+    }
+    if (distributeTimeoutRef.current) {
+      clearTimeout(distributeTimeoutRef.current)
+      distributeTimeoutRef.current = null
+    }
+    if (aboutTimeoutRef.current) {
+      clearTimeout(aboutTimeoutRef.current)
+      aboutTimeoutRef.current = null
+    }
+
+    router.push(href)
+    setIsEcosystemOpen(false)
+    setIsDistributeOpen(false)
+    setIsAboutOpen(false)
+    setIsAccountMenuOpen(false)
+  }
+
+  // Automatically close any open popover or drawer when the route changes
+  useEffect(() => {
+    setIsEcosystemOpen(false)
+    setIsDistributeOpen(false)
+    setIsAboutOpen(false)
+    setIsAccountMenuOpen(false)
+    setIsGlobeMenuOpen(false)
+  }, [pathname])
+
   const handleMouseEnterAbout = () => {
     if (aboutTimeoutRef.current) {
       clearTimeout(aboutTimeoutRef.current)
@@ -250,7 +286,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             {/* Desktop Ecosystem Mega Dropdown */}
             {isEcosystemOpen && (
               <div
-                className="hidden md:grid absolute left-0 top-full mt-2.5 w-[570px] max-w-[calc(100vw-32px)] bg-[#141416]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.03)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid-cols-[220px_1fr] gap-6 text-left select-none pointer-events-auto"
+                className="hidden md:grid absolute left-0 top-full mt-2.5 w-[570px] max-w-[calc(100vw-32px)] bg-[#141416]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.03)] p-6 z-[100] animate-in fade-in zoom-in-95 duration-150 grid-cols-[220px_1fr] gap-6 text-left select-none pointer-events-auto before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3"
               >
                 {/* Column 1: Play & Discover */}
                 <div className="space-y-6">
@@ -261,7 +297,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store/sounds"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store/sounds')}
                         className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <Music2 className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -271,7 +307,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store/vst-plugins"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store/vst-plugins')}
                         className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <Cpu className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -281,7 +317,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store/presets"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store/presets')}
                         className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <Sparkles className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -297,7 +333,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store')}
                         className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-semibold bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.08] text-white shadow-sm transition-all whitespace-nowrap w-full"
                       >
                         <ShoppingBag className="w-4 h-4 text-white flex-shrink-0" />
@@ -307,14 +343,14 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store?price=free"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store?price=free')}
                         className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                       >
                         <div className="flex items-center gap-2.5">
-                          <Gift className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
+                          <Gift className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                           <span>Free Producer Toys</span>
                         </div>
-                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FC6301]/20 text-[#FC6301]">
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
                           Free
                         </span>
                       </Link>
@@ -329,17 +365,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/distribute"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
-                      <Upload className="w-4 h-4 text-[#FC6301] flex-shrink-0" />
+                      <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
                       <span>Distribute on Producer Toy</span>
                     </Link>
 
                     <Link
                       href="/account"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/account')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Users className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -349,7 +385,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/distribute"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Radio className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -359,7 +395,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/contact?topic=creator"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/contact?topic=creator')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <MessageSquare className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -369,7 +405,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/licensing"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/licensing')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <ShieldCheck className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -379,7 +415,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/blog"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/blog')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -389,7 +425,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/support"
                       prefetch={true}
-                      onClick={() => setIsEcosystemOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/support')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -439,7 +475,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store/sounds"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store/sounds')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Music2 className="w-5 h-5 text-white flex-shrink-0" />
@@ -449,7 +485,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store/vst-plugins"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store/vst-plugins')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Cpu className="w-5 h-5 text-white flex-shrink-0" />
@@ -459,7 +495,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store/presets"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store/presets')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Sparkles className="w-5 h-5 text-white flex-shrink-0" />
@@ -475,7 +511,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <ShoppingBag className="w-5 h-5 text-white flex-shrink-0" />
@@ -485,14 +521,14 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/store?price=free"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/store?price=free')}
                         className="flex items-center justify-between py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <div className="flex items-center gap-3.5">
-                          <Gift className="w-5 h-5 text-[#FC6301] flex-shrink-0" />
+                          <Gift className="w-5 h-5 text-zinc-400 flex-shrink-0" />
                           <span>Free Producer Toys</span>
                         </div>
-                        <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-[#FC6301]/20 text-[#FC6301]">
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
                           Free
                         </span>
                       </Link>
@@ -506,17 +542,17 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/distribute"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/distribute')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
-                        <Upload className="w-5 h-5 text-[#FC6301] flex-shrink-0" />
+                        <Upload className="w-5 h-5 text-zinc-400 flex-shrink-0" />
                         <span>Distribute on Producer Toy</span>
                       </Link>
 
                       <Link
                         href="/account"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/account')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Users className="w-5 h-5 text-white flex-shrink-0" />
@@ -526,7 +562,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/distribute"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/distribute')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Radio className="w-5 h-5 text-white flex-shrink-0" />
@@ -536,7 +572,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/contact?topic=creator"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/contact?topic=creator')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <MessageSquare className="w-5 h-5 text-white flex-shrink-0" />
@@ -546,7 +582,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/licensing"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/licensing')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <ShieldCheck className="w-5 h-5 text-white flex-shrink-0" />
@@ -556,7 +592,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/blog"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/blog')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <BookOpen className="w-5 h-5 text-white flex-shrink-0" />
@@ -566,7 +602,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       <Link
                         href="/support"
                         prefetch={true}
-                        onClick={() => setIsEcosystemOpen(false)}
+                        onClick={(e) => handleDropdownNavigate(e, '/support')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <HelpCircle className="w-5 h-5 text-white flex-shrink-0" />
@@ -643,11 +679,11 @@ export const TopBar: React.FC<TopBarProps> = ({
                 </button>
 
                 {isAboutOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-[220px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
+                  <div className="absolute left-0 top-full mt-2 w-[220px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3">
                     <Link
                       href="/about"
                       prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/about')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       About Us
@@ -655,7 +691,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/distribute"
                       prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Distribute
@@ -663,7 +699,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/licensing"
                       prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/licensing')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Licensing
@@ -671,7 +707,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/contact"
                       prefetch={true}
-                      onClick={() => setIsAboutOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/contact')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Contact &amp; Grievance
@@ -725,11 +761,11 @@ export const TopBar: React.FC<TopBarProps> = ({
 
                 {/* Distribute Dropdown Menu */}
                 {isDistributeOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none">
+                  <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3">
                     <Link
                       href="/distribute"
                       prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Distribute on Producer Toy
@@ -737,7 +773,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/contact?topic=creator"
                       prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/contact?topic=creator')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Developer Forums
@@ -745,7 +781,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/licensing"
                       prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/licensing')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Documentation
@@ -753,7 +789,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/blog"
                       prefetch={true}
-                      onClick={() => setIsDistributeOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/blog')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Learning
@@ -879,7 +915,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/library"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/library')}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <Trophy className="w-4 h-4 text-zinc-400" />
@@ -890,7 +926,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/account?tab=rewards"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/account?tab=rewards')}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <ToywardsIcon size={16} />
@@ -902,7 +938,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/gifts"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/gifts')}
                       className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <div className="flex items-center gap-3">
@@ -920,7 +956,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/store?on_sale=true"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/store?on_sale=true')}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <Tag className="w-4 h-4 text-zinc-400" />
@@ -930,7 +966,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/account?tab=redeem"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/account?tab=redeem')}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <Key className="w-4 h-4 text-zinc-400" />
@@ -940,7 +976,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/wishlist"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/wishlist')}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <Bookmark className="w-4 h-4 text-zinc-400" />
@@ -950,7 +986,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/support"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/support')}
                       className="flex items-center gap-3 px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <HelpCircle className="w-4 h-4 text-zinc-400" />
@@ -963,7 +999,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <Link
                       href="/account"
                       prefetch={true}
-                      onClick={() => setIsAccountMenuOpen(false)}
+                      onClick={(e) => handleDropdownNavigate(e, '/account')}
                       className="flex items-center justify-between px-3 py-2 text-[13px] text-zinc-300 hover:text-white hover:bg-[#222222] rounded-lg transition-colors"
                     >
                       <div className="flex items-center gap-3">
