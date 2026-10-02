@@ -11,6 +11,7 @@ import {
   Clock,
 } from 'lucide-react'
 import { NewsArticle } from '@/lib/turso/newsDb'
+import { generateThemedCoverPrompt } from '@/lib/news/topicDeduplication'
 import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
@@ -141,6 +142,18 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
   const offerUrl = resolveOfferLink(article.source_url)
 
+  const EXCLUDED_BANNER_PATTERNS = [
+    '62597tdwpbuqa4wb3ytyr780r83o', // Academy Award plaque banner
+    '8703u6x0lrzyjlnucnb396u4m6qb', // Melodyne gift
+    'tvs4y0670451blh7j6l511bu5xkp',
+    '9c1dgrwexwywq4u6fmiohx0cp4j5',
+    '6q6mdbwd6rrypcnclj408wlnof78',
+    '2ep2agbp9vny6vj9diyozlnb89ih',
+    'dewmln806vd6wz4nk36dvawze3rc',
+    'rkm6y6yradsul5g58j58q8ludc4r',
+    'os8m6mahsfku7pzwoym0d2g90i6c',
+  ]
+
   const getHighResCoverImage = (url?: string | null, title?: string): string => {
     if (
       !url ||
@@ -150,10 +163,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       url.includes('news.google.com') ||
       url.includes('bedroomproducersblog.com') ||
       url.includes('ujam.com/fileadmin') ||
-      url.includes('placeholder')
+      url.includes('placeholder') ||
+      EXCLUDED_BANNER_PATTERNS.some((pat) => url.includes(pat))
     ) {
-      const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
-      const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
+      const prompt = generateThemedCoverPrompt(title)
       return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1920&height=1080&nologo=true`
     }
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
@@ -179,7 +192,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   }
 
   const fallbackPrompt = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${(article.title || 'audio plugin').slice(0, 80)}`
+    generateThemedCoverPrompt(article.title)
   )}?width=1920&height=1080&nologo=true`
 
   return (

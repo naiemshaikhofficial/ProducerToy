@@ -4,7 +4,10 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NewsArticle } from '@/lib/turso/newsDb'
-import { deduplicateArticlesByTopic } from '@/lib/news/topicDeduplication'
+import {
+  deduplicateArticlesByTopic,
+  generateThemedCoverPrompt,
+} from '@/lib/news/topicDeduplication'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
 interface NewsPageClientProps {
@@ -113,6 +116,18 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
   return bestArticle
 }
 
+const EXCLUDED_BANNER_PATTERNS = [
+  '62597tdwpbuqa4wb3ytyr780r83o', // Academy Award plaque banner
+  '8703u6x0lrzyjlnucnb396u4m6qb', // Melodyne gift
+  'tvs4y0670451blh7j6l511bu5xkp',
+  '9c1dgrwexwywq4u6fmiohx0cp4j5',
+  '6q6mdbwd6rrypcnclj408wlnof78',
+  '2ep2agbp9vny6vj9diyozlnb89ih',
+  'dewmln806vd6wz4nk36dvawze3rc',
+  'rkm6y6yradsul5g58j58q8ludc4r',
+  'os8m6mahsfku7pzwoym0d2g90i6c',
+]
+
 function NewsCardImage({
   src,
   alt,
@@ -133,8 +148,9 @@ function NewsCardImage({
   const [imgSrc, setImgSrc] = useState(src)
   const [hasError, setHasError] = useState(false)
 
+  const prompt = generateThemedCoverPrompt(title)
   const fallback = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${(title || 'audio plugin').slice(0, 80)}`
+    prompt
   )}?width=1200&height=675&nologo=true`
 
   return (
@@ -192,10 +208,10 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
       url.includes('news.google.com') ||
       url.includes('bedroomproducersblog.com') ||
       url.includes('ujam.com/fileadmin') ||
-      url.includes('placeholder')
+      url.includes('placeholder') ||
+      EXCLUDED_BANNER_PATTERNS.some((pat) => url.includes(pat))
     ) {
-      const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
-      const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
+      const prompt = generateThemedCoverPrompt(title)
       return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true`
     }
     // Strip WordPress & CMS thumbnail suffixes (-128x71, -150x150, -300x169, -768x432, -1024x576) to always fetch crisp original Full HD master
@@ -203,8 +219,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   }
 
   const getFallbackCoverImage = (title?: string): string => {
-    const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
-    const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
+    const prompt = generateThemedCoverPrompt(title)
     return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true`
   }
 

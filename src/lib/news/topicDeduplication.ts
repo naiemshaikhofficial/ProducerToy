@@ -166,3 +166,47 @@ export function deduplicateArticlesByTopic<T extends MinimalArticle>(articles: T
   }
   return result
 }
+
+export function generateThemedCoverPrompt(title?: string | null): string {
+  const clean = (title || 'music production vst audio plugin')
+    .replace(/&#?[a-z0-9]+;/gi, ' ')
+    .replace(/[^a-zA-Z0-9\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const lower = clean.toLowerCase()
+
+  if (
+    lower.includes('free vst') ||
+    lower.includes('free plugin') ||
+    lower.includes('freeware') ||
+    lower.includes('essential list') ||
+    lower.includes('best free')
+  ) {
+    return `futuristic music production studio audio workstation with glowing synthesizer rack, mixing console, and audio vst plugin interfaces on screens, professional music technology editorial visual for "${clean.slice(0, 65)}", 8k render, modern neon amber studio lighting`
+  }
+  if (lower.includes('kontakt') || lower.includes('library') || lower.includes('sample')) {
+    return `high end virtual instrument sampler workstation with sound library rack, orchestral and synth sample visualizer on studio display, audio software header for "${clean.slice(0, 65)}", 8k render`
+  }
+  if (lower.includes('vocal') || lower.includes('pitch') || lower.includes('autotune') || lower.includes('tune')) {
+    return `modern vocal production recording studio with studio microphone, vocal waveform visualizer, audio pitch correction plugin interface on monitor, neon lighting 8k render for "${clean.slice(0, 65)}"`
+  }
+  if (
+    lower.includes('synth') ||
+    lower.includes('synthesizer') ||
+    lower.includes('wavetable') ||
+    lower.includes('fm8') ||
+    lower.includes('massive')
+  ) {
+    return `sleek modular analog synthesizer workstation with patch cables, illuminated oscilloscopes, and wavetable displays, professional audio tech editorial header for "${clean.slice(0, 65)}", 8k render, cinematic ambient lighting`
+  }
+  if (lower.includes('guitar') || lower.includes('amp') || lower.includes('pedal') || lower.includes('distortion')) {
+    return `boutique tube amplifier guitar pedals and virtual audio effect plugin interface in high-end sound studio, 8k render for "${clean.slice(0, 65)}"`
+  }
+  if (lower.includes('drum') || lower.includes('beat') || lower.includes('percussion') || lower.includes('808')) {
+    return `modern drum machine groovebox sequencer with glowing velocity pads and dynamic beat visualizer, music production gear 8k render for "${clean.slice(0, 65)}"`
+  }
+  if (lower.includes('mixing') || lower.includes('mastering') || lower.includes('compressor') || lower.includes('eq') || lower.includes('reverb')) {
+    return `mastering studio console with analog VU meters, stereo mastering equalizer and compressor interfaces, pristine studio acoustics, 8k render for "${clean.slice(0, 65)}"`
+  }
+  return `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${clean.slice(0, 75)}`
+}
