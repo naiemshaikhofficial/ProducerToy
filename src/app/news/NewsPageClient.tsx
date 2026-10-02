@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NewsArticle } from '@/lib/turso/newsDb'
+import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
 interface NewsPageClientProps {
   initialArticles: NewsArticle[]
@@ -212,6 +213,11 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-white leading-[1.2] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
                   {cleanHtmlTitle(featuredArticle.title)}
+                  {detectDealExpiry(featuredArticle).isExpired && (
+                    <span className="ml-2 text-zinc-400 font-bold text-lg sm:text-2xl tracking-normal inline-block align-baseline select-none">
+                      [Expired]
+                    </span>
+                  )}
                 </h1>
                 <div>
                   <span className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
@@ -256,6 +262,11 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   </div>
                   <h2 className="text-[14px] sm:text-[14.5px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
                     {cleanHtmlTitle(article.title)}
+                    {detectDealExpiry(article).isExpired && (
+                      <span className="ml-1.5 text-zinc-400 font-bold text-xs sm:text-sm tracking-normal inline-block align-baseline select-none">
+                        [Expired]
+                      </span>
+                    )}
                   </h2>
                 </div>
               </Link>

@@ -16,6 +16,7 @@ export interface NewsArticle {
   source_url: string
   deal_price?: string | null
   deal_regular_price?: string | null
+  deal_expires_at?: string | null
   published_at: string
   created_at: string
   is_featured: number
@@ -336,6 +337,9 @@ function parseArticleRow(row: any): NewsArticle {
     source_url: String(row.source_url || ''),
     deal_price: row.deal_price ? String(row.deal_price) : null,
     deal_regular_price: row.deal_regular_price ? String(row.deal_regular_price) : null,
+    deal_expires_at: row.deal_expires_at
+      ? String(row.deal_expires_at)
+      : (specs?.['Valid Until'] || specs?.['Expiry Date'] || specs?.['Expires'] || null),
     published_at: String(row.published_at || new Date().toISOString()),
     created_at: String(row.created_at || new Date().toISOString()),
     is_featured: Number(row.is_featured || 0),

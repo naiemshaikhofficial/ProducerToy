@@ -54,6 +54,9 @@ async function handleSync(req: Request) {
         if (dealInfo?.couponCode && !(item as any).couponCode) {
           (item as any).couponCode = dealInfo.couponCode
         }
+        if (dealInfo?.expiryTimeline && !(item as any).expiryTimeline) {
+          (item as any).expiryTimeline = dealInfo.expiryTimeline
+        }
       }
 
       // Check deduplication across source URL, direct product URL, image URL, and title

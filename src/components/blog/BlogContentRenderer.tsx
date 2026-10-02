@@ -4,6 +4,8 @@ import React from 'react'
 
 interface BlogContentRendererProps {
   content: string
+  isExpired?: boolean
+  expiryTimeline?: string | null
 }
 
 const PB_AFFILIATE_ID = '68affa2b94f43'
@@ -33,7 +35,7 @@ function sanitizeLinkUrl(url: string): string {
   return clean
 }
 
-function formatInline(text: string): string {
+function formatInline(text: string, isExpired?: boolean, expiryTimeline?: string | null): string {
   return text
     // **bold**
     .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
@@ -62,7 +64,13 @@ function formatInline(text: string): string {
         cleanLinkText.toLowerCase().includes('$')
 
       if (isCtaButton) {
-        return `<div class="deal-cta-wrapper my-7 flex justify-center w-full clear-both"><a href="${url}" target="_blank" rel="noopener noreferrer" class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a></div>`
+        const subtext = isExpired
+          ? `<span class="deal-expired-subtext mt-1.5 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide block">Expired</span>`
+          : expiryTimeline
+          ? `<span class="deal-timeline-subtext mt-1.5 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide block">${expiryTimeline}</span>`
+          : ''
+
+        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" target="_blank" rel="noopener noreferrer" class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
       }
 
       return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
@@ -71,7 +79,7 @@ function formatInline(text: string): string {
     .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
 }
 
-export function parseMarkdownToHtml(raw: string): string {
+export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTimeline?: string | null): string {
   if (!raw) return ''
 
   // If already full HTML with paragraphs and no raw hashes, return as is (stripping any accidental empty/hash paragraphs)
@@ -125,7 +133,7 @@ export function parseMarkdownToHtml(raw: string): string {
     // Ignore stray hash symbols or markdown debris
     if (/^#+$/.test(firstLine.trim())) {
       if (remainingLines && !/^#+$/.test(remainingLines.trim())) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline)}</p>`)
       }
       continue
     }
@@ -143,15 +151,15 @@ export function parseMarkdownToHtml(raw: string): string {
       const title = headingMatch[2].replace(/^#+\s*/, '').replace(/\s*#+$/, '').trim()
       if (level <= 2) {
         if (!/^overview$/i.test(title)) {
-          htmlBlocks.push(`<h2>${formatInline(title)}</h2>`)
+          htmlBlocks.push(`<h2>${formatInline(title, isExpired, expiryTimeline)}</h2>`)
         }
       } else if (level === 3) {
-        htmlBlocks.push(`<h3>${formatInline(title)}</h3>`)
+        htmlBlocks.push(`<h3>${formatInline(title, isExpired, expiryTimeline)}</h3>`)
       } else {
-        htmlBlocks.push(`<h4>${formatInline(title)}</h4>`)
+        htmlBlocks.push(`<h4>${formatInline(title, isExpired, expiryTimeline)}</h4>`)
       }
       if (remainingLines) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline)}</p>`)
       }
       continue
     }
@@ -167,7 +175,7 @@ export function parseMarkdownToHtml(raw: string): string {
         </div>
       `)
       if (remainingLines) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines)}</p>`)
+        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline)}</p>`)
       }
       continue
     }
@@ -188,7 +196,7 @@ export function parseMarkdownToHtml(raw: string): string {
     if (/^\d+\.\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
         const itemText = line.replace(/^\d+\.\s+/, '').trim()
-        return `<li>${formatInline(itemText)}</li>`
+        return `<li>${formatInline(itemText, isExpired, expiryTimeline)}</li>`
       }).join('')
       htmlBlocks.push(`<ol class="list-decimal pl-6 my-4 space-y-2 text-zinc-300">${listItems}</ol>`)
       continue
@@ -198,7 +206,7 @@ export function parseMarkdownToHtml(raw: string): string {
     if (/^[-*•]\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
         const itemText = line.replace(/^[-*•]\s+/, '').trim()
-        return `<li>${formatInline(itemText)}</li>`
+        return `<li>${formatInline(itemText, isExpired, expiryTimeline)}</li>`
       }).join('')
       htmlBlocks.push(`<ul>${listItems}</ul>`)
       continue
@@ -215,7 +223,7 @@ export function parseMarkdownToHtml(raw: string): string {
 
     // If paragraph is a standalone CTA button link
     if (/^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/.test(paragraphContent)) {
-      htmlBlocks.push(formatInline(paragraphContent))
+      htmlBlocks.push(formatInline(paragraphContent, isExpired, expiryTimeline))
       continue
     }
 
@@ -224,15 +232,15 @@ export function parseMarkdownToHtml(raw: string): string {
       return `<div class="my-6 rounded-2xl overflow-hidden"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover rounded-2xl select-none" /></div>`
     })
 
-    htmlBlocks.push(`<p>${formatInline(paragraphContent)}</p>`)
+    htmlBlocks.push(`<p>${formatInline(paragraphContent, isExpired, expiryTimeline)}</p>`)
   }
 
   return htmlBlocks.join('\n')
 }
 
-export function BlogContentRenderer({ content }: BlogContentRendererProps) {
+export function BlogContentRenderer({ content, isExpired, expiryTimeline }: BlogContentRendererProps) {
   if (!content) return null
-  const htmlContent = parseMarkdownToHtml(content)
+  const htmlContent = parseMarkdownToHtml(content, isExpired, expiryTimeline)
 
   return (
     <div className="blog-content prose prose-invert max-w-none">
@@ -304,6 +312,7 @@ export function BlogContentRenderer({ content }: BlogContentRendererProps) {
 
         .blog-content .deal-cta-wrapper {
           display: flex !important;
+          flex-direction: column !important;
           justify-content: center !important;
           align-items: center !important;
           width: 100% !important;
@@ -323,6 +332,18 @@ export function BlogContentRenderer({ content }: BlogContentRendererProps) {
           margin-left: auto !important;
           margin-right: auto !important;
           text-align: center !important;
+        }
+
+        .blog-content .deal-expired-subtext,
+        .blog-content .deal-timeline-subtext {
+          color: #a1a1aa !important;
+          font-size: 0.8125rem !important;
+          font-weight: 500 !important;
+          letter-spacing: 0.025em !important;
+          margin-top: 0.5rem !important;
+          text-align: center !important;
+          display: block !important;
+          text-decoration: none !important;
         }
 
         .blog-content ul {

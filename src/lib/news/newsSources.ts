@@ -83,6 +83,7 @@ export function sanitizeDealUrl(url?: string | null): string | null {
 export async function extractDirectDealInfo(articleUrl: string): Promise<{
   bestUrl?: string
   couponCode?: string
+  expiryTimeline?: string
 } | null> {
   if (!articleUrl || typeof articleUrl !== 'string') return null
 
@@ -187,7 +188,16 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
       couponCode = couponMatch[1].toUpperCase()
     }
 
-    return { bestUrl, couponCode }
+    // Extract expiry timeline if present in page text (e.g. "40% off until Nov 01", "until November 1", "sale ends Oct 31")
+    let expiryTimeline: string | undefined
+    const expiryMatch = text.match(
+      /(?:\d{1,2}%\s+off\s+until|\buntil|\bends\s+on|\bsale\s+ends|\bdeal\s+ends|\bvalid\s+until|\bvalid\s+through)\s+([a-zA-Z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s*\d{4})?|\d{1,2}(?:st|nd|rd|th)?\s+[a-zA-Z]+(?:,?\s*\d{4})?)/i
+    )
+    if (expiryMatch) {
+      expiryTimeline = expiryMatch[0].trim()
+    }
+
+    return { bestUrl, couponCode, expiryTimeline }
   } catch {
     return null
   }

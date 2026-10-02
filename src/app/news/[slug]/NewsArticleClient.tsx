@@ -8,10 +8,12 @@ import {
   Check,
   ExternalLink,
   Tag,
+  Clock,
 } from 'lucide-react'
 import { NewsArticle } from '@/lib/turso/newsDb'
 import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
+import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
 interface NewsArticleClientProps {
   article: NewsArticle
@@ -21,6 +23,10 @@ interface NewsArticleClientProps {
 export function NewsArticleClient({ article, relatedArticles }: NewsArticleClientProps) {
   const [copied, setCopied] = useState(false)
   const [copiedCoupon, setCopiedCoupon] = useState(false)
+
+  const expiryInfo = detectDealExpiry(article)
+  const isExpired = expiryInfo.isExpired
+  const expiryTimeline = expiryInfo.expiryTimeline
 
   const couponCode =
     article.specs?.['Coupon Code'] ||
@@ -175,19 +181,34 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           className="w-full mx-auto"
           style={{ maxWidth: '820px', marginLeft: 'auto', marginRight: 'auto' }}
         >
-          {/* Top Meta Row: Category Pill + Date */}
-          <div className="flex items-center gap-3.5 mb-4 sm:mb-5">
+          {/* Top Meta Row: Category Pill + Date + Expiry Status */}
+          <div className="flex flex-wrap items-center gap-3 mb-4 sm:mb-5">
             <span className="px-3 py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5 shadow-sm">
               {article.category || 'News'}
             </span>
             <span className="text-zinc-400 text-xs sm:text-sm font-medium drop-shadow-sm">
               {formattedDate}
             </span>
+            {isExpired ? (
+              <span className="px-2.5 py-0.5 rounded-md bg-white/5 text-zinc-400 text-xs font-semibold tracking-wide border border-white/10">
+                Expired
+              </span>
+            ) : expiryTimeline ? (
+              <span className="px-2.5 py-0.5 rounded-md bg-white/5 text-zinc-300 text-xs font-semibold tracking-wide border border-white/10 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                {expiryTimeline}
+              </span>
+            ) : null}
           </div>
 
           {/* 1:1 Epic Games Headline */}
           <h1 className="text-2xl sm:text-4xl lg:text-[46px] font-black text-white leading-[1.12] tracking-tight mb-5 sm:mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
             {cleanHtmlTitle(article.title)}
+            {isExpired && (
+              <span className="ml-2.5 sm:ml-3.5 text-zinc-400 font-bold text-lg sm:text-2xl lg:text-3xl tracking-normal inline-block align-baseline select-none">
+                [Expired]
+              </span>
+            )}
           </h1>
 
           {/* Short Description / Excerpt below Title */}
@@ -257,12 +278,16 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
           {/* Main Story Content */}
           <div className="prose prose-invert max-w-none text-[#d4d4d8] leading-[1.85] text-base sm:text-[17px] font-normal">
-            <BlogContentRenderer content={article.content} />
+            <BlogContentRenderer
+              content={article.content}
+              isExpired={isExpired}
+              expiryTimeline={expiryTimeline}
+            />
           </div>
 
           {/* Guaranteed Deal CTA Button: Always displays at bottom of every article that has an offer URL if not already linked inline */}
           {!hasInlineCta && offerUrl && (
-            <div className="my-9 flex justify-center w-full clear-both">
+            <div className="my-9 flex flex-col items-center justify-center w-full clear-both">
               <a
                 href={offerUrl}
                 target="_blank"
@@ -276,6 +301,15 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 </span>
                 <ExternalLink className="w-4 h-4 text-white shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </a>
+              {isExpired ? (
+                <span className="mt-2 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide">
+                  Expired
+                </span>
+              ) : expiryTimeline ? (
+                <span className="mt-2 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide">
+                  {expiryTimeline}
+                </span>
+              ) : null}
             </div>
           )}
 
@@ -328,6 +362,11 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                   </span>
                   <h5 className="text-sm font-bold text-white group-hover:text-zinc-300 transition-colors line-clamp-2 leading-snug">
                     {cleanHtmlTitle(rel.title)}
+                    {detectDealExpiry(rel).isExpired && (
+                      <span className="ml-1.5 text-zinc-400 font-bold text-xs tracking-normal inline-block align-baseline">
+                        [Expired]
+                      </span>
+                    )}
                   </h5>
                 </Link>
               ))}

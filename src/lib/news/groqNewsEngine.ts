@@ -1,6 +1,7 @@
 import { RawFeedItem, sanitizeDealUrl, PLUGIN_BOUTIQUE_AFFILIATE_ID } from './newsSources'
 import { NewsArticle } from '../turso/newsDb'
 import { getArticleCoverImage, resolveProductBannerImage } from './imageGenerator'
+import { detectDealExpiry } from './dealExpiry'
 
 interface GroqRewriteResponse {
   title: string
@@ -13,6 +14,7 @@ interface GroqRewriteResponse {
   deal_price?: string
   deal_regular_price?: string
   coupon_code?: string
+  expiry_date?: string
   product_url?: string
   specs: Record<string, string>
   seo_keywords: string
@@ -98,6 +100,21 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         const specs = rewritten.specs || {}
         if (detectedCoupon && !specs['Coupon Code']) {
           specs['Coupon Code'] = detectedCoupon
+        }
+
+        // Deal Expiry / Validity Timeline detection
+        const detectedExpiry = rewritten.expiry_date || (item as any).expiryTimeline || null
+        if (detectedExpiry && !specs['Valid Until'] && !specs['Expiry Date']) {
+          specs['Valid Until'] = detectedExpiry
+        } else if (!specs['Valid Until'] && !specs['Expiry Date']) {
+          const autoDetect = detectDealExpiry({
+            title: rewritten.title || item.title,
+            content: rewritten.content || item.contentSnippet,
+            published_at: item.pubDate,
+          })
+          if (autoDetect.expiryTimeline) {
+            specs['Valid Until'] = autoDetect.expiryTimeline
+          }
         }
 
         // Generate deterministic ID so subsequent runs update instead of duplicating
@@ -201,6 +218,11 @@ REQUIREMENTS:
      b) For EACH plugin, include its direct deal link right under its section, formatted as a clear action button: e.g. [Get Roland JD-800 Deal (€68.43)](url). NEVER include retailer names like "at Plugin Boutique" in the button label.
      c) NEVER omit any plugin or only provide one link when multiple are featured! Every single featured product must have its own deal link and pricing details.
 9. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
+10. DEAL EXPIRY & VALIDITY TIMELINE:
+   - If the source mentions an end date, expiration date, or limited-time sale deadline (e.g. "40% off until Nov 01", "sale ends Oct 31", "until November 1", "runs through Nov 1st"):
+     a) Set "expiry_date": "Nov 01" (or the exact timeline).
+     b) Add "Valid Until": "Nov 01" (or exact timeline) inside "specs".
+   - If no deadline or expiry date is mentioned, leave "expiry_date" empty.
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object without markdown code blocks, matching this exact schema:
@@ -212,6 +234,7 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
   "category": "Deals & Sales",
   "badge": "MEGA DEAL",
   "coupon_code": "SUMMER90",
+  "expiry_date": "Nov 01",
   "reading_time": "3 MIN READ",
   "deal_price": "$19",
   "deal_regular_price": "$199",
@@ -220,6 +243,7 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
     "Brand": "Native Instruments",
     "Discount": "90% OFF",
     "Coupon Code": "SUMMER90",
+    "Valid Until": "Nov 01",
     "Format": "VST3, AU, AAX",
     "Compatibility": "Windows & macOS (Apple Silicon native)",
     "Price": "$19 (Regular $199)"
@@ -350,6 +374,10 @@ To explore this deal or find more audio production essentials, visit the Produce
       Category: category,
       License: 'Official Freeware / Release',
       Status: 'Active',
+      ...((): Record<string, string> => {
+        const auto = (item as any).expiryTimeline || detectDealExpiry({ title: item.title, content: cleanedSnippet, published_at: item.pubDate }).expiryTimeline
+        return auto ? { 'Valid Until': auto } : {}
+      })(),
     },
     related_products: [],
     seo_keywords: 'music production, vst plugins, sample packs, audio news',
