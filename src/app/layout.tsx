@@ -123,7 +123,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark bg-[#121212] text-white">
+    <html lang="en" className="dark bg-[#121212] text-white" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="512x512" href="/Icon.png" />
@@ -152,7 +152,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-[#121212] text-white min-h-screen flex flex-col font-sans antialiased">
+      <body
+        className="bg-[#121212] text-white min-h-screen flex flex-col font-sans antialiased"
+        suppressHydrationWarning
+      >
         <StoreOrganizationJsonLd />
         <WebSiteJsonLd />
         <AuthProvider>

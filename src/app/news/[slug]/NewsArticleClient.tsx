@@ -55,6 +55,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     month: 'long',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'UTC',
   })
 
   // Format price
