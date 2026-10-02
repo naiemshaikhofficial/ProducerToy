@@ -54,6 +54,14 @@ export function isForbiddenCoverImageUrl(url?: string | null): boolean {
     return true
   }
 
+  // Block hotlink-protected, anti-leech, or known 404 domains
+  if (
+    lower.includes('bedroomproducersblog.com') ||
+    lower.includes('ujam.com/fileadmin')
+  ) {
+    return true
+  }
+
   // Block excluded gift banners & headshots
   if (PB_EXCLUDED_BANNER_HASHES.some(h => lower.includes(h))) {
     return true

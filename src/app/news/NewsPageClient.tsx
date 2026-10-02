@@ -113,6 +113,49 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
   return bestArticle
 }
 
+function NewsCardImage({
+  src,
+  alt,
+  title,
+  fill,
+  priority,
+  sizes,
+  className,
+}: {
+  src: string
+  alt: string
+  title: string
+  fill?: boolean
+  priority?: boolean
+  sizes?: string
+  className?: string
+}) {
+  const [imgSrc, setImgSrc] = useState(src)
+  const [hasError, setHasError] = useState(false)
+
+  const fallback = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+    `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${(title || 'audio plugin').slice(0, 80)}`
+  )}?width=1200&height=675&nologo=true`
+
+  return (
+    <Image
+      src={hasError ? fallback : imgSrc}
+      alt={alt}
+      title={title}
+      fill={fill}
+      priority={priority}
+      sizes={sizes}
+      className={className}
+      onError={() => {
+        if (!hasError) {
+          setHasError(true)
+          setImgSrc(fallback)
+        }
+      }}
+    />
+  )
+}
+
 export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   const [visibleCount, setVisibleCount] = useState(12)
 
@@ -147,6 +190,8 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||
       url.includes('news.google.com') ||
+      url.includes('bedroomproducersblog.com') ||
+      url.includes('ujam.com/fileadmin') ||
       url.includes('placeholder')
     ) {
       const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
@@ -155,6 +200,12 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     }
     // Strip WordPress & CMS thumbnail suffixes (-128x71, -150x150, -300x169, -768x432, -1024x576) to always fetch crisp original Full HD master
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  }
+
+  const getFallbackCoverImage = (title?: string): string => {
+    const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
+    const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
+    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true`
   }
 
   const cleanHtmlTitle = (title?: string | null): string => {
@@ -199,7 +250,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 </div>
 
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#18181c] shadow-2xl">
-                  <Image
+                  <NewsCardImage
                     src={getHighResCoverImage(featuredArticle.cover_image, featuredArticle.title)}
                     alt={`${cleanHtmlTitle(featuredArticle.title)} - Free Plugin & Audio News - Producer Toy`}
                     title={`${cleanHtmlTitle(featuredArticle.title)} - Producer Toy`}
@@ -276,7 +327,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 >
                   {/* 16:9 Inset Image with rounded corners */}
                   <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
-                    <Image
+                    <NewsCardImage
                       src={getHighResCoverImage(article.cover_image, article.title)}
                       alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
                       title={`${cleanHtmlTitle(article.title)} - Producer Toy`}

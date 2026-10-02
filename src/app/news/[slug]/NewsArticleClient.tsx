@@ -132,6 +132,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||
       url.includes('news.google.com') ||
+      url.includes('bedroomproducersblog.com') ||
+      url.includes('ujam.com/fileadmin') ||
       url.includes('placeholder')
     ) {
       const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
@@ -140,6 +142,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     }
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
+
+  const initialCover = getHighResCoverImage(article.cover_image, article.title)
+  const [coverSrc, setCoverSrc] = useState(initialCover)
+  const [bgCoverSrc, setBgCoverSrc] = useState(initialCover)
 
   const cleanHtmlTitle = (title?: string | null): string => {
     if (!title) return ''
@@ -156,6 +162,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       .replace(/&#8221;/g, '”')
   }
 
+  const fallbackPrompt = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+    `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${(article.title || 'audio plugin').slice(0, 80)}`
+  )}?width=1920&height=1080&nologo=true`
+
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white relative overflow-hidden">
       {/* 1:1 Epic Games Sharp Atmospheric Product Background: Full clarity at top behind transparent fixed header, smoothly dissolves down into pure #121212 */}
@@ -164,7 +174,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         style={{ height: '620px' }}
       >
         <img
-          src={getHighResCoverImage(article.cover_image, article.title)}
+          src={bgCoverSrc}
+          onError={() => setBgCoverSrc(fallbackPrompt)}
           alt=""
           className="w-full h-full object-cover object-top opacity-100"
           style={{
@@ -238,7 +249,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         >
           <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
             <img
-              src={getHighResCoverImage(article.cover_image, article.title)}
+              src={coverSrc}
+              onError={() => setCoverSrc(fallbackPrompt)}
               alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
               title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
               className="w-full h-full object-cover"
