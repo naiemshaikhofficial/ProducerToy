@@ -294,12 +294,13 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               content={article.content}
               isExpired={isExpired}
               expiryTimeline={expiryTimeline}
+              fallbackDealUrl={offerUrl}
             />
           </div>
 
-          {/* Guaranteed Deal CTA Button: Always displays at bottom of every article that has an offer URL if not already linked inline */}
-          {!hasInlineCta && offerUrl && (
-            <div className="my-9 flex flex-col items-center justify-center w-full clear-both">
+          {/* Guaranteed Deal CTA Button: Always displays at bottom of every deal article */}
+          {offerUrl && (
+            <div className="my-10 flex flex-col items-center justify-center w-full clear-both">
               <a
                 href={offerUrl}
                 target="_blank"

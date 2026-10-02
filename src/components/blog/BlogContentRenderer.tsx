@@ -6,6 +6,7 @@ interface BlogContentRendererProps {
   content: string
   isExpired?: boolean
   expiryTimeline?: string | null
+  fallbackDealUrl?: string | null
 }
 
 const PB_AFFILIATE_ID = '68affa2b94f43'
@@ -35,16 +36,28 @@ function sanitizeLinkUrl(url: string): string {
   return clean
 }
 
-function formatInline(text: string, isExpired?: boolean, expiryTimeline?: string | null): string {
+function formatInline(
+  text: string,
+  isExpired?: boolean,
+  expiryTimeline?: string | null,
+  fallbackDealUrl?: string | null
+): string {
+  const defaultAffiliateUrl =
+    fallbackDealUrl && fallbackDealUrl !== '#' && fallbackDealUrl.length > 5
+      ? sanitizeLinkUrl(fallbackDealUrl)
+      : `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
+
   return text
     // **bold**
     .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
     // *italic*
     .replace(/\*([^*]+)\*/g, '<em class="text-zinc-200 italic">$1</em>')
     // [text](url) - Convert markdown links and style CTA deal buttons
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, rawUrl) => {
-      const url = sanitizeLinkUrl(rawUrl)
-      if (url === '#') return linkText
+    .replace(/\[([^\]]+)\]\(([^)]*)\)/g, (match, linkText, rawUrl) => {
+      let url = sanitizeLinkUrl(rawUrl)
+      if (url === '#' || !url || url.length < 3) {
+        url = defaultAffiliateUrl
+      }
 
       // Clean Plugin Boutique mentions from button label
       let cleanLinkText = linkText
@@ -57,7 +70,7 @@ function formatInline(text: string, isExpired?: boolean, expiryTimeline?: string
       }
 
       const isCtaButton =
-        /^(get|claim|grab|download|buy|save|view)\b/i.test(cleanLinkText) ||
+        /^(get|claim|grab|download|buy|save|view|explore|redeem|official)\b/i.test(cleanLinkText) ||
         cleanLinkText.toLowerCase().includes('deal') ||
         cleanLinkText.toLowerCase().includes('% off') ||
         cleanLinkText.toLowerCase().includes('€') ||
@@ -79,7 +92,12 @@ function formatInline(text: string, isExpired?: boolean, expiryTimeline?: string
     .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
 }
 
-export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTimeline?: string | null): string {
+export function parseMarkdownToHtml(
+  raw: string,
+  isExpired?: boolean,
+  expiryTimeline?: string | null,
+  fallbackDealUrl?: string | null
+): string {
   if (!raw) return ''
 
   // If already full HTML with paragraphs and no raw hashes, return as is (stripping any accidental empty/hash paragraphs)
@@ -133,7 +151,7 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
     // Ignore stray hash symbols or markdown debris
     if (/^#+$/.test(firstLine.trim())) {
       if (remainingLines && !/^#+$/.test(remainingLines.trim())) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline)}</p>`)
+        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline, fallbackDealUrl)}</p>`)
       }
       continue
     }
@@ -151,15 +169,15 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
       const title = headingMatch[2].replace(/^#+\s*/, '').replace(/\s*#+$/, '').trim()
       if (level <= 2) {
         if (!/^overview$/i.test(title)) {
-          htmlBlocks.push(`<h2>${formatInline(title, isExpired, expiryTimeline)}</h2>`)
+          htmlBlocks.push(`<h2>${formatInline(title, isExpired, expiryTimeline, fallbackDealUrl)}</h2>`)
         }
       } else if (level === 3) {
-        htmlBlocks.push(`<h3>${formatInline(title, isExpired, expiryTimeline)}</h3>`)
+        htmlBlocks.push(`<h3>${formatInline(title, isExpired, expiryTimeline, fallbackDealUrl)}</h3>`)
       } else {
-        htmlBlocks.push(`<h4>${formatInline(title, isExpired, expiryTimeline)}</h4>`)
+        htmlBlocks.push(`<h4>${formatInline(title, isExpired, expiryTimeline, fallbackDealUrl)}</h4>`)
       }
       if (remainingLines) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline)}</p>`)
+        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline, fallbackDealUrl)}</p>`)
       }
       continue
     }
@@ -175,7 +193,7 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
         </div>
       `)
       if (remainingLines) {
-        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline)}</p>`)
+        htmlBlocks.push(`<p>${formatInline(remainingLines, isExpired, expiryTimeline, fallbackDealUrl)}</p>`)
       }
       continue
     }
@@ -196,7 +214,7 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
     if (/^\d+\.\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
         const itemText = line.replace(/^\d+\.\s+/, '').trim()
-        return `<li>${formatInline(itemText, isExpired, expiryTimeline)}</li>`
+        return `<li>${formatInline(itemText, isExpired, expiryTimeline, fallbackDealUrl)}</li>`
       }).join('')
       htmlBlocks.push(`<ol class="list-decimal pl-6 my-4 space-y-2 text-zinc-300">${listItems}</ol>`)
       continue
@@ -206,7 +224,7 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
     if (/^[-*•]\s+/.test(firstLine)) {
       const listItems = lines.map(line => {
         const itemText = line.replace(/^[-*•]\s+/, '').trim()
-        return `<li>${formatInline(itemText, isExpired, expiryTimeline)}</li>`
+        return `<li>${formatInline(itemText, isExpired, expiryTimeline, fallbackDealUrl)}</li>`
       }).join('')
       htmlBlocks.push(`<ul>${listItems}</ul>`)
       continue
@@ -222,8 +240,8 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
     paragraphContent = paragraphContent.replace(/^#+\s+/, '')
 
     // If paragraph is a standalone CTA button link
-    if (/^\s*\[([^\]]+)\]\(([^)]+)\)\s*$/.test(paragraphContent)) {
-      htmlBlocks.push(formatInline(paragraphContent, isExpired, expiryTimeline))
+    if (/^\s*\[([^\]]+)\]\(([^)]*)\)\s*$/.test(paragraphContent)) {
+      htmlBlocks.push(formatInline(paragraphContent, isExpired, expiryTimeline, fallbackDealUrl))
       continue
     }
 
@@ -232,15 +250,20 @@ export function parseMarkdownToHtml(raw: string, isExpired?: boolean, expiryTime
       return `<div class="my-6 rounded-2xl overflow-hidden"><img src="${url}" alt="${alt || 'Audio Plugin Software'}" loading="lazy" class="w-full h-auto object-cover rounded-2xl select-none" /></div>`
     })
 
-    htmlBlocks.push(`<p>${formatInline(paragraphContent, isExpired, expiryTimeline)}</p>`)
+    htmlBlocks.push(`<p>${formatInline(paragraphContent, isExpired, expiryTimeline, fallbackDealUrl)}</p>`)
   }
 
   return htmlBlocks.join('\n')
 }
 
-export function BlogContentRenderer({ content, isExpired, expiryTimeline }: BlogContentRendererProps) {
+export function BlogContentRenderer({
+  content,
+  isExpired,
+  expiryTimeline,
+  fallbackDealUrl,
+}: BlogContentRendererProps) {
   if (!content) return null
-  const htmlContent = parseMarkdownToHtml(content, isExpired, expiryTimeline)
+  const htmlContent = parseMarkdownToHtml(content, isExpired, expiryTimeline, fallbackDealUrl)
 
   return (
     <div className="blog-content prose prose-invert max-w-none">

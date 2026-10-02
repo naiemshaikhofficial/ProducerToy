@@ -128,10 +128,18 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
 
         const safeSourceUrl = resolveSafeDealUrl(rewritten.product_url, item.directDealUrl, item.link)
         let finalContent = sanitizeScrapedText(rewritten.content)
-        if (!finalContent.includes('](') && safeSourceUrl) {
-          const isFree = rewritten.category === 'Free VSTs' || rewritten.deal_price === '$0' || rewritten.title.toLowerCase().includes('free')
-          const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
-          finalContent += `\n\n[${ctaLabel}](${safeSourceUrl})`
+        if (safeSourceUrl) {
+          finalContent = finalContent.replace(/\]\(\s*#?[^)]*\)/g, (match) => {
+            if (match === '](#)' || match === ']()' || match.startsWith('](#')) {
+              return `](${safeSourceUrl})`
+            }
+            return match
+          })
+          if (!finalContent.includes(`](${safeSourceUrl})`)) {
+            const isFree = rewritten.category === 'Free VSTs' || rewritten.deal_price === '$0' || rewritten.title.toLowerCase().includes('free')
+            const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
+            finalContent += `\n\n[${ctaLabel}](${safeSourceUrl})`
+          }
         }
 
         return {
