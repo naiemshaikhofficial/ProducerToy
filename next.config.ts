@@ -42,7 +42,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/site/faq',
-        destination: '/support',
+        destination: '/faq',
         permanent: true,
       },
       {
@@ -71,13 +71,8 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: '/faq',
-        destination: '/support',
-        permanent: true,
-      },
-      {
         source: '/faqs',
-        destination: '/support',
+        destination: '/faq',
         permanent: true,
       },
     ];
