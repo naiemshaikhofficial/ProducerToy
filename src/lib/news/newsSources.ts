@@ -274,6 +274,8 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
   const seenUrls = new Set<string>()
 
   const sourcePages = [
+    'https://www.pluginboutique.com/deals?featured=true&sort=hot',
+    'https://www.pluginboutique.com/deals?sort=hot',
     'https://www.pluginboutique.com/deals',
     'https://www.pluginboutique.com/categories/54-Vocal-Processing',
   ]

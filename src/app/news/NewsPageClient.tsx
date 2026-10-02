@@ -101,7 +101,7 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
       if (daysOld < 3) score += 15
       else if (daysOld < 7) score += 10
       else if (daysOld < 14) score += 5
-    } catch {}
+    } catch { }
 
     if (score > maxScore) {
       maxScore = score
@@ -156,11 +156,11 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
   return (
     <div className="w-full bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 pb-12 sm:pb-16">
-        
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-12 sm:pb-16">
+
         {/* Featured Hero Story (1:1 with Epic Games Screenshot) */}
         {featuredArticle && (
-          <div className="mb-10 sm:mb-12">
+          <div className="mb-10 sm:mb-14">
             <Link
               href={`/news/${featuredArticle.slug}`}
               prefetch={true}
@@ -179,7 +179,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     className="w-full h-full object-cover rounded-3xl filter blur-xl sm:blur-2xl scale-100"
                   />
                 </div>
-                
+
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#18181c] shadow-2xl">
                   <Image
                     src={getHighResCoverImage(featuredArticle.cover_image)}
@@ -205,11 +205,10 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     <>
                       <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-300 mb-2.5 tracking-wide">
                         {featuredArticle.badge && (
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
-                            featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
-                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                              : 'bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/30'
-                          }`}>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            : 'bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/30'
+                            }`}>
                             {featuredArticle.badge}
                           </span>
                         )}
