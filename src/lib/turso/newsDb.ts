@@ -77,8 +77,23 @@ export async function initNewsSchema(): Promise<void> {
   }
 }
 
+export {
+  TOPIC_STOPWORDS,
+  getTitleKeywords,
+  getTopicSignature,
+  calculateTitleSimilarity,
+  deduplicateArticlesByTopic,
+} from '@/lib/news/topicDeduplication'
+
+import {
+  getTitleKeywords,
+  getTopicSignature,
+  calculateTitleSimilarity,
+  deduplicateArticlesByTopic,
+} from '@/lib/news/topicDeduplication'
+
 /**
- * Retrieve news articles with optional filters
+ * Retrieve news articles with optional filters & automatic topic deduplication
  */
 export async function getNewsArticles(options?: {
   category?: string
@@ -109,12 +124,16 @@ export async function getNewsArticles(options?: {
     query += ` WHERE ` + conditions.join(' AND ')
   }
 
+  // Fetch with buffer so deduplication yields complete desired limit
+  const fetchLimit = limit > 0 ? Math.ceil(limit * 1.5) + 15 : limit
   query += ` ORDER BY published_at DESC LIMIT ? OFFSET ?`
-  args.push(limit, offset)
+  args.push(fetchLimit, offset)
 
   try {
     const result = await client.execute({ sql: query, args })
-    return result.rows.map((row) => parseArticleRow(row))
+    const parsed = result.rows.map((row) => parseArticleRow(row))
+    const deduplicated = deduplicateArticlesByTopic(parsed)
+    return limit > 0 ? deduplicated.slice(0, limit) : deduplicated
   } catch (err) {
     console.error('[getNewsArticles] Error querying news:', err)
     return []
@@ -122,7 +141,7 @@ export async function getNewsArticles(options?: {
 }
 
 /**
- * Retrieve a single news article by its slug
+ * Retrieve a single news article by its slug, with legacy duplicate alias fallback
  */
 export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | null> {
   await initNewsSchema()
@@ -134,8 +153,33 @@ export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | 
       args: [slug],
     })
 
-    if (result.rows.length === 0) return null
-    return parseArticleRow(result.rows[0])
+    if (result.rows.length > 0) {
+      return parseArticleRow(result.rows[0])
+    }
+
+    // Historical superseded slug redirects to canonical URLs
+    const legacyRedirects: Record<string, string> = {
+      'get-up-to-62-off-eastwest-sounds-modern-producer-bundle-synth-month-sale':
+        'native-instruments-synths-80-off-plugin-boutique-synth-month',
+      'native-instruments-inmusic-brands-acquisition-news':
+        'native-instruments-inmusic-brands-acquisition-news',
+      'inmusic-acquires-native-instruments-traktor-implications':
+        'inmusic-acquires-native-instruments-izotope-plugin-alliance-and-brainworx-mixonline',
+      'inmusic-acquires-native-instruments-traktor-future':
+        'inmusic-acquires-native-instruments-izotope-plugin-alliance-and-brainworx-mixonline',
+    }
+
+    if (legacyRedirects[slug]) {
+      const aliasResult = await client.execute({
+        sql: `SELECT * FROM news_articles WHERE slug = ? LIMIT 1`,
+        args: [legacyRedirects[slug]],
+      })
+      if (aliasResult.rows.length > 0) {
+        return parseArticleRow(aliasResult.rows[0])
+      }
+    }
+
+    return null
   } catch (err) {
     console.error('[getNewsArticleBySlug] Error:', err)
     return null
@@ -164,20 +208,23 @@ export async function findExistingArticle(
   const client = getTursoClient()
 
   try {
-    const opts: ArticleExistsOptions = typeof optionsOrUrl === 'string'
-      ? {
-          sourceUrl: optionsOrUrl,
-          slug: legacySlug,
-          coverImage: legacyExtra?.coverImage,
-          publishedAt: legacyExtra?.publishedAt,
-        }
-      : optionsOrUrl
+    const opts: ArticleExistsOptions =
+      typeof optionsOrUrl === 'string'
+        ? {
+            sourceUrl: optionsOrUrl,
+            slug: legacySlug,
+            coverImage: legacyExtra?.coverImage,
+            publishedAt: legacyExtra?.publishedAt,
+          }
+        : optionsOrUrl
 
     const conditions: string[] = []
     const args: any[] = []
 
     // 1. Check exact URLs (feed link, direct deal URL, source URL)
-    const urlsToCheck = [opts.sourceUrl, opts.directDealUrl, opts.feedLink].filter(Boolean) as string[]
+    const urlsToCheck = [opts.sourceUrl, opts.directDealUrl, opts.feedLink].filter(
+      Boolean
+    ) as string[]
     for (const u of urlsToCheck) {
       conditions.push('source_url = ?')
       args.push(u)
@@ -186,7 +233,12 @@ export async function findExistingArticle(
       try {
         const parsed = new URL(u)
         const cleanPath = `${parsed.hostname}${parsed.pathname}`.replace(/\/+$/, '')
-        if (cleanPath && cleanPath.length > 8 && !cleanPath.includes('bedroomproducersblog.com') && !cleanPath.includes('producertoy.com')) {
+        if (
+          cleanPath &&
+          cleanPath.length > 8 &&
+          !cleanPath.includes('bedroomproducersblog.com') &&
+          !cleanPath.includes('producertoy.com')
+        ) {
           conditions.push('source_url LIKE ?')
           args.push(`%${cleanPath}%`)
         }
@@ -200,19 +252,18 @@ export async function findExistingArticle(
     }
 
     // 3. Check cover image (if external URL, e.g. from original publisher upload)
-    if (opts.coverImage && !opts.coverImage.includes('pollinations.ai') && opts.coverImage.startsWith('http')) {
+    if (
+      opts.coverImage &&
+      !opts.coverImage.includes('pollinations.ai') &&
+      opts.coverImage.startsWith('http')
+    ) {
       conditions.push('cover_image = ?')
       args.push(opts.coverImage)
     }
 
-    // 4. Check core product title match (e.g. "Pizza Bagel Plugins Schmear", "Airwindows ConsoleX3")
+    // 4. Check core product title match (e.g. "Pizza Bagel Plugins Schmear", "Native Instruments Synths")
     if (opts.title) {
-      const words = opts.title
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, ' ')
-        .split(/\s+/)
-        .filter(w => w.length >= 4 && !['free', 'plugin', 'plugins', 'vsts', 'vst', 'audio', 'deals', 'deal', 'with', 'from', 'every', 'down', 'giveaway', 'drop', 'drops', 'release', 'releases', 'sale', 'massive'].includes(w))
-      
+      const words = getTitleKeywords(opts.title)
       if (words.length >= 2) {
         const pattern = `%${words.slice(0, 2).join('%')}%`
         conditions.push('LOWER(title) LIKE ?')
@@ -223,11 +274,26 @@ export async function findExistingArticle(
     if (conditions.length === 0) return null
 
     const result = await client.execute({
-      sql: `SELECT * FROM news_articles WHERE ${conditions.join(' OR ')} LIMIT 1`,
+      sql: `SELECT * FROM news_articles WHERE ${conditions.join(' OR ')} ORDER BY published_at DESC LIMIT 5`,
       args,
     })
     if (result.rows.length === 0) return null
-    return parseArticleRow(result.rows[0])
+
+    const candidates = result.rows.map((row) => parseArticleRow(row))
+
+    // If matching by title, verify topic similarity to avoid false positives
+    if (opts.title) {
+      const targetSig = getTopicSignature(opts.title)
+      for (const candidate of candidates) {
+        const candSig = getTopicSignature(candidate.title)
+        const sim = calculateTitleSimilarity(opts.title, candidate.title)
+        if ((targetSig && candSig && targetSig === candSig) || sim >= 0.5) {
+          return candidate
+        }
+      }
+    }
+
+    return candidates[0]
   } catch {
     return null
   }

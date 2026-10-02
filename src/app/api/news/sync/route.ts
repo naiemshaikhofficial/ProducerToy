@@ -89,13 +89,30 @@ async function handleSync(req: Request) {
       // Rewrite with Groq AI Llama 3.3 & save to Turso
       const article = await rewriteNewsWithGroq(item)
 
-      // If updating an existing article, preserve canonical ID and slug to maintain link integrity and replace in-place
-      if (existingArticle) {
-        article.id = existingArticle.id
-        article.slug = existingArticle.slug
-        article.created_at = existingArticle.created_at
+      // Post-rewrite deduplication check: If an article covering this exact topic already exists, merge in-place
+      let canonicalTarget = existingArticle
+      if (!canonicalTarget) {
+        canonicalTarget = await findExistingArticle({ title: article.title })
+      }
+
+      if (canonicalTarget) {
+        article.id = canonicalTarget.id
+        article.slug = canonicalTarget.slug
+        article.created_at = canonicalTarget.created_at
         // Re-timestamp to current time so the refreshed deal bubbles to the top of the feed
         article.published_at = new Date().toISOString()
+      } else {
+        // Genuinely new article: ensure slug accurately reflects the rewritten clean headline
+        const cleanSlug = article.title
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .slice(0, 80)
+          .replace(/-$/, '')
+        if (cleanSlug.length >= 5) {
+          article.slug = cleanSlug
+        }
       }
 
       // Strict Quality Gate: Future articles MUST have a valid, non-empty, non-placeholder image

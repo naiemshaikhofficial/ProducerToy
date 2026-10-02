@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { NewsArticle } from '@/lib/turso/newsDb'
+import { deduplicateArticlesByTopic } from '@/lib/news/topicDeduplication'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
 interface NewsPageClientProps {
@@ -115,11 +116,17 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
 export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   const [visibleCount, setVisibleCount] = useState(12)
 
+  // Ensure initial articles are cleanly topic-deduplicated
+  const articles = React.useMemo(
+    () => deduplicateArticlesByTopic(initialArticles),
+    [initialArticles]
+  )
+
   // 1 Featured Hero Article (Priority: Sponsored -> Sabse Tagda Brand Deal)
-  const featuredArticle = getTopFeaturedArticle(initialArticles)
+  const featuredArticle = getTopFeaturedArticle(articles)
 
   // All other cards in 3-column Grid (Excluding the featured hero so it never duplicates)
-  const remainingArticles = initialArticles.filter((a) => a.id !== featuredArticle?.id)
+  const remainingArticles = articles.filter((a) => a.id !== featuredArticle?.id)
   const gridArticles = remainingArticles.slice(0, visibleCount)
   const hasMore = visibleCount < remainingArticles.length
 

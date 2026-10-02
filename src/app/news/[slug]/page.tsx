@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { notFound, redirect, RedirectType } from 'next/navigation'
 import { getNewsArticleBySlug, getRelatedNews } from '@/lib/turso/newsDb'
 import { NewsArticleClient } from './NewsArticleClient'
 
@@ -154,6 +154,11 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
   if (!article) {
     notFound()
+  }
+
+  // Canonical SEO 308 Redirect: If accessed via a legacy/superseded slug, redirect to canonical slug
+  if (article.slug && article.slug !== slug) {
+    redirect(`/news/${article.slug}`, RedirectType.replace)
   }
 
   const relatedArticles = await getRelatedNews(article.slug, article.category, 3)
