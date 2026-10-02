@@ -199,26 +199,42 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
               {/* Right Column: Date + Headline + Read more (Matching Epic Games Screenshot) */}
               <div className="lg:col-span-5 flex flex-col justify-center">
-                <div className="flex items-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-300 mb-2.5 tracking-wide">
-                  {featuredArticle.badge && (
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
-                      featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : 'bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/30'
-                    }`}>
-                      {featuredArticle.badge}
-                    </span>
-                  )}
-                  <span>{formatEpicDate(featuredArticle.published_at)}</span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-white leading-[1.2] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
-                  {cleanHtmlTitle(featuredArticle.title)}
-                  {detectDealExpiry(featuredArticle).isExpired && (
-                    <span className="ml-2 text-zinc-400 font-bold text-lg sm:text-2xl tracking-normal inline-block align-baseline select-none">
-                      [Expired]
-                    </span>
-                  )}
-                </h1>
+                {(() => {
+                  const heroExpiry = detectDealExpiry(featuredArticle)
+                  return (
+                    <>
+                      <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-300 mb-2.5 tracking-wide">
+                        {featuredArticle.badge && (
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${
+                            featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              : 'bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/30'
+                          }`}>
+                            {featuredArticle.badge}
+                          </span>
+                        )}
+                        <span>{formatEpicDate(featuredArticle.published_at)}</span>
+                        {heroExpiry.isExpired ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700">
+                            Expired
+                          </span>
+                        ) : heroExpiry.expiryTimeline ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                            {heroExpiry.expiryTimeline}
+                          </span>
+                        ) : null}
+                      </div>
+                      <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-white leading-[1.2] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
+                        {cleanHtmlTitle(featuredArticle.title)}
+                        {heroExpiry.isExpired && (
+                          <span className="ml-2 text-zinc-400 font-bold text-lg sm:text-2xl tracking-normal inline-block align-baseline select-none">
+                            [Expired]
+                          </span>
+                        )}
+                      </h1>
+                    </>
+                  )
+                })()}
                 <div>
                   <span className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
                     Read more
@@ -232,45 +248,57 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
         {/* 3-Column Card Grid (1:1 with Epic Games - Compact, Sleek Cards) */}
         {gridArticles.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-14">
-            {gridArticles.map((article, idx) => (
-              <Link
-                key={article.id || idx}
-                href={`/news/${article.slug}`}
-                prefetch={true}
-                className="group flex flex-col bg-[#1a1a1e] hover:bg-[#222228] rounded-2xl p-2.5 sm:p-3 border-0 transition-all duration-200 cursor-pointer shadow-md"
-              >
-                {/* 16:9 Inset Image with rounded corners */}
-                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
-                  <Image
-                    src={getHighResCoverImage(article.cover_image)}
-                    alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
-                    title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-[1.02] transition-transform duration-300 ease-out"
-                  />
-                  {/* Category Pill in bottom-left */}
-                  <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] font-semibold text-white tracking-wide">
-                    {article.category || 'News'}
+            {gridArticles.map((article, idx) => {
+              const cardExpiry = detectDealExpiry(article)
+              return (
+                <Link
+                  key={article.id || idx}
+                  href={`/news/${article.slug}`}
+                  prefetch={true}
+                  className="group flex flex-col bg-[#1a1a1e] hover:bg-[#222228] rounded-2xl p-2.5 sm:p-3 border-0 transition-all duration-200 cursor-pointer shadow-md"
+                >
+                  {/* 16:9 Inset Image with rounded corners */}
+                  <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
+                    <Image
+                      src={getHighResCoverImage(article.cover_image)}
+                      alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
+                      title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-[1.02] transition-transform duration-300 ease-out"
+                    />
+                    {/* Category Pill in bottom-left */}
+                    <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] font-semibold text-white tracking-wide">
+                      {article.category || 'News'}
+                    </div>
                   </div>
-                </div>
 
-                {/* Card Text Content (Compact typography matching Epic) */}
-                <div className="pt-2.5 pb-1 px-1 flex flex-col flex-1">
-                  <div className="text-[11px] font-medium text-zinc-400 mb-1">
-                    {formatEpicDate(article.published_at)}
+                  {/* Card Text Content (Compact typography matching Epic) */}
+                  <div className="pt-2.5 pb-1 px-1 flex flex-col flex-1">
+                    <div className="flex items-center justify-between gap-2 text-[11px] font-medium text-zinc-400 mb-1.5">
+                      <span>{formatEpicDate(article.published_at)}</span>
+                      {cardExpiry.isExpired ? (
+                        <span className="text-zinc-400 font-bold uppercase tracking-wider text-[10px] bg-zinc-800/90 border border-zinc-700/60 px-1.5 py-0.5 rounded shrink-0">
+                          Expired
+                        </span>
+                      ) : cardExpiry.expiryTimeline ? (
+                        <span className="text-amber-400/90 font-medium tracking-wide text-[10px] bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded shrink-0">
+                          {cardExpiry.expiryTimeline}
+                        </span>
+                      ) : null}
+                    </div>
+                    <h2 className="text-[14px] sm:text-[14.5px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
+                      {cleanHtmlTitle(article.title)}
+                      {cardExpiry.isExpired && (
+                        <span className="ml-1.5 text-zinc-400 font-bold text-xs sm:text-sm tracking-normal inline-block align-baseline select-none">
+                          [Expired]
+                        </span>
+                      )}
+                    </h2>
                   </div>
-                  <h2 className="text-[14px] sm:text-[14.5px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
-                    {cleanHtmlTitle(article.title)}
-                    {detectDealExpiry(article).isExpired && (
-                      <span className="ml-1.5 text-zinc-400 font-bold text-xs sm:text-sm tracking-normal inline-block align-baseline select-none">
-                        [Expired]
-                      </span>
-                    )}
-                  </h2>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         )}
 

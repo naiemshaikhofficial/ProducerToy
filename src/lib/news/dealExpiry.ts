@@ -43,15 +43,18 @@ export function parseExpiryDateText(
 ): { isExpired: boolean; date: Date; formatted: string } | null {
   if (!rawText || typeof rawText !== 'string') return null
 
-  // Remove ordinal suffixes e.g. 1st, 2nd, 3rd, 4th
-  const clean = rawText.replace(/(\d+)(?:st|nd|rd|th)/gi, '$1').trim()
+  // Strip prefixes such as "Ends on", "Ends", "Until", "Valid until", "Expires on", etc.
+  const clean = rawText
+    .replace(/^(?:ends\s+(?:on\s+)?|until\s+|valid\s+until\s+|expires\s+(?:on\s+)?|valid\s+through\s+)/i, '')
+    .replace(/(\d+)(?:st|nd|rd|th)/gi, '$1')
+    .trim()
 
   // Pattern 1: Month Day Year? (e.g. "Nov 01", "Nov 1, 2024", "November 1 2026")
-  const m1 = clean.match(/([a-zA-Z]+)\s+(\d{1,2})(?:,?\s*(\d{4}))?/)
-  // Pattern 2: Day Month Year? (e.g. "01 Nov", "1 November 2026")
-  const m2 = clean.match(/(\d{1,2})\s+([a-zA-Z]+)(?:,?\s*(\d{4}))?/)
+  const m1 = clean.match(/^([a-zA-Z]+)\s+(\d{1,2})(?:,?\s*(\d{4}))?/)
+  // Pattern 2: Day Month Year? (e.g. "01 Nov", "1 November 2026", "04 Oct")
+  const m2 = clean.match(/^(\d{1,2})\s+([a-zA-Z]+)(?:,?\s*(\d{4}))?/)
   // Pattern 3: Numeric format (e.g. "2026-11-01" or "11/01/2026" or "01-11-2026")
-  const m3 = clean.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/)
+  const m3 = clean.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/)
 
   let monthIndex = -1
   let day = -1
@@ -126,7 +129,17 @@ export function detectDealExpiry(article: {
   badge?: string
   deal_expires_at?: string | null
 }): DealExpiryResult {
-  // 1. Explicit badge check
+  // 1. Explicit title check e.g. [Expired]
+  if (article.title && /\[EXPIRED\]/i.test(article.title)) {
+    return {
+      isExpired: true,
+      expiryTimeline: null,
+      expiryDateStr: null,
+      rawText: 'Expired',
+    }
+  }
+
+  // 2. Explicit badge check
   if (article.badge && /EXPIRED/i.test(article.badge)) {
     return {
       isExpired: true,
@@ -136,9 +149,16 @@ export function detectDealExpiry(article: {
     }
   }
 
-  // 2. Explicit specs check (e.g. Status: 'Expired')
+  // 3. Explicit specs check (e.g. Status: 'Expired' or Valid Until: 'Expired')
   const specs = article.specs || {}
-  const statusVal = specs['Status'] || specs['status']
+  const statusVal =
+    specs['Status'] ||
+    specs['status'] ||
+    specs['Valid Until'] ||
+    specs['valid_until'] ||
+    specs['Expiry Date'] ||
+    specs['Timeline']
+
   if (statusVal && /EXPIRED/i.test(statusVal)) {
     return {
       isExpired: true,
@@ -148,7 +168,7 @@ export function detectDealExpiry(article: {
     }
   }
 
-  // 3. Check explicit date fields in specs or top-level deal_expires_at
+  // 4. Check explicit date fields in specs or top-level deal_expires_at
   const candidateDates = [
     article.deal_expires_at,
     specs['Valid Until'],
@@ -162,11 +182,21 @@ export function detectDealExpiry(article: {
   ].filter(Boolean) as string[]
 
   for (const dateVal of candidateDates) {
+    if (/EXPIRED/i.test(dateVal)) {
+      return {
+        isExpired: true,
+        expiryTimeline: null,
+        expiryDateStr: null,
+        rawText: 'Expired',
+      }
+    }
+
     const parsed = parseExpiryDateText(dateVal, article.published_at)
     if (parsed) {
-      const displayTimeline = dateVal.toLowerCase().startsWith('until') || dateVal.toLowerCase().startsWith('ends')
-        ? dateVal
-        : `Until ${parsed.formatted}`
+      const displayTimeline =
+        dateVal.toLowerCase().startsWith('until') || dateVal.toLowerCase().startsWith('ends')
+          ? dateVal
+          : `Until ${parsed.formatted}`
 
       return {
         isExpired: parsed.isExpired,
@@ -177,31 +207,22 @@ export function detectDealExpiry(article: {
     }
   }
 
-  // 4. Scan title, content, and excerpt for timeline patterns
-  // E.g.: "40% off until Nov 01", "Sale ends October 31", "Valid through November 15", "until 1 November"
-  const textCorpus = [article.title, article.excerpt, article.content].filter(Boolean).join('\n')
-
-  // Check for explicit "deal has expired" text
-  if (
-    /(?:deal|offer|sale|giveaway|promo)\s+(?:has\s+)?(?:ended|expired)/i.test(textCorpus) ||
-    /this offer is no longer available/i.test(textCorpus)
-  ) {
-    return {
-      isExpired: true,
-      expiryTimeline: null,
-      expiryDateStr: null,
-      rawText: 'Expired',
-    }
-  }
+  // 5. Scan title, excerpt, and all specs values for timeline patterns
+  // E.g.: "40% off until Nov 01", "Sale ends October 31", "Valid through November 15", "Ends Oct 11"
+  // (Do not scan unstructured multi-paragraph content to prevent false positive matches on phrases like 'before this deal has ended')
+  const specsValues = specs ? Object.values(specs).filter(v => typeof v === 'string') : []
+  const textCorpus = [article.title, article.excerpt, ...specsValues]
+    .filter(Boolean)
+    .join('\n')
 
   const timelineMatches = [
-    // "until Nov 01" / "until 1 November"
+    // "until Nov 01" / "until 1 November" / "ends Oct 11"
     ...textCorpus.matchAll(
       /(?:valid\s+)?(?:until|ends\s+on|ends|runs\s+until|valid\s+through|available\s+until|through|expires\s+on?)\s+([a-zA-Z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s*\d{4})?|\d{1,2}(?:st|nd|rd|th)?\s+[a-zA-Z]+(?:,?\s*\d{4})?|\d{4}[-/]\d{1,2}[-/]\d{1,2})/gi
     ),
     // "[X]% off until [Date]" pattern (as seen on Plugin Boutique)
     ...textCorpus.matchAll(
-      /\b\d{1,2}%\s+off\s+until\s+([a-zA-Z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s*\d{4})?|\d{1,2}(?:st|nd|rd|th)?\s+[a-zA-Z]+(?:,?\s*\d{4})?)/gi
+      /\b\d{1,2}%\s+off\s+(?:until|ends)\s+([a-zA-Z]+\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s*\d{4})?|\d{1,2}(?:st|nd|rd|th)?\s+[a-zA-Z]+(?:,?\s*\d{4})?)/gi
     ),
   ]
 
@@ -211,9 +232,10 @@ export function detectDealExpiry(article: {
 
     const parsed = parseExpiryDateText(rawDatePart, article.published_at)
     if (parsed) {
+      const isEnds = /ends/i.test(match[0])
       return {
         isExpired: parsed.isExpired,
-        expiryTimeline: `Until ${parsed.formatted}`,
+        expiryTimeline: isEnds ? `Ends ${parsed.formatted}` : `Until ${parsed.formatted}`,
         expiryDateStr: parsed.formatted,
         rawText: match[0].trim(),
       }

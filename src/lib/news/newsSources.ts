@@ -263,102 +263,116 @@ export const MUSIC_NEWS_FEEDS: Array<{
 ]
 
 /**
- * Fetches the official deals directly from Plugin Boutique Deals (https://www.pluginboutique.com/deals).
+ * Fetches official deals directly from Plugin Boutique:
+ * 1. Hot Deals (https://www.pluginboutique.com/deals) - IRON 2, Roland, MODO BASS 2, etc.
+ * 2. Vocal Processing (https://www.pluginboutique.com/categories/54-Vocal-Processing) - Waves Tune Real-Time, Little AlterBoy, etc.
  * Parses exact product name, brand, category, direct deal slug, high-res banner, discount %, pricing, and expiry timeline ("Ends [date]").
  * Automatically appends ProducerToy's referral tag (68affa2b94f43).
  */
 export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]> {
   const items: RawFeedItem[] = []
-  try {
-    const res = await fetch('https://r.jina.ai/https://www.pluginboutique.com/deals', {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        Accept: 'text/plain',
-      },
-      next: { revalidate: 1800 },
-    })
-    if (!res.ok) return items
-    const text = await res.text()
+  const seenUrls = new Set<string>()
 
-    const productBlocks = text.split(/(?=\[!\[Image \d+: Product image\])/)
-    for (const block of productBlocks) {
-      const imgMatch = block.match(
-        /\[!\[Image \d+: Product image\]\((https:\/\/banners\.pluginboutique\.com\/[^\)]+)\)\]\((https:\/\/www\.pluginboutique\.com\/product\/[^\)]+)\)/
-      )
-      if (!imgMatch) continue
+  const sourcePages = [
+    'https://www.pluginboutique.com/deals',
+    'https://www.pluginboutique.com/categories/54-Vocal-Processing',
+  ]
 
-      const imageUrl = imgMatch[1]
-      const rawProductUrl = imgMatch[2]
-      const cleanUrl = sanitizeDealUrl(rawProductUrl) || rawProductUrl
+  for (const pageUrl of sourcePages) {
+    try {
+      const res = await fetch(`https://r.jina.ai/${pageUrl}`, {
+        headers: {
+          Accept: 'text/plain',
+        },
+        next: { revalidate: 1800 },
+      })
+      if (!res.ok) continue
+      const text = await res.text()
 
-      // Ends date: e.g. [Ends 11 Oct Hot!]
-      const endsMatch = block.match(/\[(Ends\s+\d{1,2}\s+[a-zA-Z]+[^\]]*)\]/i)
-      const expiry = endsMatch ? endsMatch[1].replace(/Hot!|New!/gi, '').trim() : ''
+      const productBlocks = text.split(/(?=\[!\[Image \d+: Product image\])/)
+      for (const block of productBlocks) {
+        const imgMatch = block.match(
+          /\[!\[Image \d+: Product image\]\((https:\/\/banners\.pluginboutique\.com\/[^\)]+)\)\]\((https:\/\/www\.pluginboutique\.com\/product\/[^\)]+)\)/
+        )
+        if (!imgMatch) continue
 
-      // Category & Manufacturer e.g. [Virtual Instruments](...) by [UJAM](...)
-      const byMatch = block.match(/\[([^\]]+)\]\([^\)]+\)\s*by\s*\[([^\]]+)\]/i)
-      const category = byMatch ? byMatch[1].trim() : 'Deals & Sales'
-      const brand = byMatch ? byMatch[2].trim() : ''
+        const imageUrl = imgMatch[1]
+        const rawProductUrl = imgMatch[2]
+        const cleanUrl = sanitizeDealUrl(rawProductUrl) || rawProductUrl
 
-      // Name: appears before 'by' or right after the links
-      const nameMatch = block.match(/\n\s*([^\n\[\]]{2,60})\s*\n\s*\[[^\]]+\]\([^\)]+\)\s*by/)
-      const name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
+        // Deduplicate across pages
+        const urlKey = cleanUrl.toLowerCase().split('?')[0]
+        if (seenUrls.has(urlKey)) continue
+        seenUrls.add(urlKey)
 
-      // Prices & discount
-      const priceMatches = [...block.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
-      const discountMatch = block.match(/(\d+%\s*off)/i)
+        // Ends date: e.g. [Ends 11 Oct Hot!] or [Ends 04 Oct Hot!]
+        const endsMatch = block.match(/\[(Ends\s+\d{1,2}\s+[a-zA-Z]+[^\]]*)\]/i)
+        const expiry = endsMatch ? endsMatch[1].replace(/Hot!|New!/gi, '').trim() : ''
 
-      let regularPrice: string | null = null
-      let dealPrice: string | null = null
-      if (priceMatches.length >= 2) {
-        regularPrice = '$' + priceMatches[0]
-        dealPrice = '$' + priceMatches[1]
-      } else if (priceMatches.length === 1) {
-        dealPrice = '$' + priceMatches[0]
+        // Category & Manufacturer e.g. [Virtual Instruments](...) by [UJAM](...)
+        const byMatch = block.match(/\[([^\]]+)\]\([^\)]+\)\s*by\s*\[([^\]]+)\]/i)
+        const category = byMatch ? byMatch[1].trim() : 'Deals & Sales'
+        const brand = byMatch ? byMatch[2].trim() : ''
+
+        // Name: appears before 'by' or right after the links
+        const nameMatch = block.match(/\n\s*([^\n\[\]]{2,60})\s*\n\s*\[[^\]]+\]\([^\)]+\)\s*by/)
+        const name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
+
+        // Prices & discount
+        const priceMatches = [...block.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
+        const discountMatch = block.match(/(\d+%\s*off)/i)
+
+        let regularPrice: string | null = null
+        let dealPrice: string | null = null
+        if (priceMatches.length >= 2) {
+          regularPrice = '$' + priceMatches[0]
+          dealPrice = '$' + priceMatches[1]
+        } else if (priceMatches.length === 1) {
+          dealPrice = '$' + priceMatches[0]
+        }
+        const discount = discountMatch ? discountMatch[1].toUpperCase() : ''
+
+        if (name && cleanUrl) {
+          const fullTitle = brand
+            ? `${brand} ${name} Deal: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
+            : `${name} Sale: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
+
+          const snippet = `${brand ? brand + ' ' : ''}${name} is currently on sale${discount ? ` at ${discount}` : ''}. Official verified deal price is ${dealPrice || 'discounted'}${regularPrice ? ` (regularly ${regularPrice})` : ''}.${expiry ? ` Limited-time offer ${expiry}.` : ''}`
+
+          const item: RawFeedItem = {
+            title: fullTitle,
+            link: cleanUrl,
+            pubDate: new Date().toUTCString(),
+            creator: brand || 'Plugin Boutique',
+            contentSnippet: snippet,
+            imageUrl,
+            sourceName: 'Plugin Boutique Deals',
+            isPrimary: true,
+            directDealUrl: cleanUrl,
+          }
+
+          if (expiry) {
+            ;(item as any).expiryTimeline = expiry
+          }
+          if (dealPrice) {
+            ;(item as any).dealPrice = dealPrice
+          }
+          if (regularPrice) {
+            ;(item as any).regularPrice = regularPrice
+          }
+          if (brand) {
+            ;(item as any).brand = brand
+          }
+          if (discount) {
+            ;(item as any).discount = discount
+          }
+
+          items.push(item)
+        }
       }
-      const discount = discountMatch ? discountMatch[1].toUpperCase() : ''
-
-      if (name && cleanUrl) {
-        const fullTitle = brand
-          ? `${brand} ${name} Deal: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
-          : `${name} Sale: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
-
-        const snippet = `${brand ? brand + ' ' : ''}${name} is currently on sale${discount ? ` at ${discount}` : ''}. Official verified deal price is ${dealPrice || 'discounted'}${regularPrice ? ` (regularly ${regularPrice})` : ''}.${expiry ? ` Limited-time offer ${expiry}.` : ''}`
-
-        const item: RawFeedItem = {
-          title: fullTitle,
-          link: cleanUrl,
-          pubDate: new Date().toUTCString(),
-          creator: brand || 'Plugin Boutique',
-          contentSnippet: snippet,
-          imageUrl,
-          sourceName: 'Plugin Boutique Deals',
-          isPrimary: true,
-          directDealUrl: cleanUrl,
-        }
-
-        if (expiry) {
-          ;(item as any).expiryTimeline = expiry
-        }
-        if (dealPrice) {
-          ;(item as any).dealPrice = dealPrice
-        }
-        if (regularPrice) {
-          ;(item as any).regularPrice = regularPrice
-        }
-        if (brand) {
-          ;(item as any).brand = brand
-        }
-        if (discount) {
-          ;(item as any).discount = discount
-        }
-
-        items.push(item)
-      }
+    } catch (err) {
+      console.warn(`[fetchPluginBoutiqueDealsFeedItems] Error fetching ${pageUrl}:`, err)
     }
-  } catch (err) {
-    console.warn('[fetchPluginBoutiqueDealsFeedItems] Error fetching Plugin Boutique deals:', err)
   }
   return items
 }
@@ -372,8 +386,7 @@ export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
   try {
     const res = await fetch('https://r.jina.ai/https://plugindeals.net/', {
       headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        Accept: 'text/plain',
       },
       next: { revalidate: 1800 },
     })
