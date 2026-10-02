@@ -125,8 +125,19 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
   const offerUrl = resolveOfferLink(article.source_url)
 
-  const getHighResCoverImage = (url?: string | null): string => {
-    if (!url) return '/placeholder.jpg'
+  const getHighResCoverImage = (url?: string | null, title?: string): string => {
+    if (
+      !url ||
+      typeof url !== 'string' ||
+      url.includes('googleusercontent.com') ||
+      url.includes('gstatic.com') ||
+      url.includes('news.google.com') ||
+      url.includes('placeholder')
+    ) {
+      const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
+      const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
+      return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1920&height=1080&nologo=true`
+    }
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
@@ -153,7 +164,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         style={{ height: '620px' }}
       >
         <img
-          src={getHighResCoverImage(article.cover_image)}
+          src={getHighResCoverImage(article.cover_image, article.title)}
           alt=""
           className="w-full h-full object-cover object-top opacity-100"
           style={{
@@ -227,7 +238,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         >
           <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
             <img
-              src={getHighResCoverImage(article.cover_image)}
+              src={getHighResCoverImage(article.cover_image, article.title)}
               alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
               title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
               className="w-full h-full object-cover"
@@ -351,7 +362,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 >
                   <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#181818] border border-white/5">
                     <Image
-                      src={getHighResCoverImage(rel.cover_image)}
+                      src={getHighResCoverImage(rel.cover_image, rel.title)}
                       alt={cleanHtmlTitle(rel.title)}
                       fill
                       sizes="(max-width: 640px) 100vw, 33vw"

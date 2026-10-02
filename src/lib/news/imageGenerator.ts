@@ -16,6 +16,67 @@ const PB_EXCLUDED_BANNER_HASHES = [
   'os8m6mahsfku7pzwoym0d2g90i6c', // Maor Appelbaum testimonial headshot
 ]
 
+export function isForbiddenCoverImageUrl(url?: string | null): boolean {
+  if (!url || typeof url !== 'string') return true
+  const lower = url.toLowerCase().trim()
+  if (!lower.startsWith('http://') && !lower.startsWith('https://')) return true
+
+  // Strictly block any Google News / Google account / Google usercontent / gstatic logos
+  if (
+    lower.includes('googleusercontent.com') ||
+    lower.includes('gstatic.com') ||
+    lower.includes('news.google.com') ||
+    lower.includes('google.com/rss') ||
+    lower.includes('google.com/logos') ||
+    lower.includes('google.com/favicon') ||
+    lower.includes('lh3.google') ||
+    lower.includes('lh4.google') ||
+    lower.includes('lh5.google') ||
+    lower.includes('lh6.google') ||
+    lower.includes('google.com')
+  ) {
+    return true
+  }
+
+  // Block placeholders, avatars, tracking pixels, generic stock images
+  if (
+    lower.includes('placeholder') ||
+    lower.includes('avatar') ||
+    lower.includes('pixel') ||
+    lower.includes('1x1') ||
+    lower.includes('photo-1598488035139-bdbb2231ce04') ||
+    lower.includes('default_image') ||
+    lower.includes('no-image') ||
+    lower.includes('no_image') ||
+    lower.includes('default-thumbnail') ||
+    lower.includes('favicon')
+  ) {
+    return true
+  }
+
+  // Block excluded gift banners & headshots
+  if (PB_EXCLUDED_BANNER_HASHES.some(h => lower.includes(h))) {
+    return true
+  }
+
+  return false
+}
+
+async function resolveRedirectToBannerCdn(url: string): Promise<string> {
+  if (!url || !url.includes('rails/active_storage/blobs/redirect')) return url
+  try {
+    const res = await fetch(url, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(3000) })
+    const loc = res.headers.get('location')
+    if (loc) {
+      const hash = loc.split('/').pop()?.split('?')[0]
+      if (hash && hash.length > 10) {
+        return `https://banners.pluginboutique.com/${hash}`
+      }
+    }
+  } catch {}
+  return url
+}
+
 async function extractUltraHdFromProductHtml(html: string, title?: string): Promise<string | null> {
   const cleanTitle = (title || '').toLowerCase()
 
@@ -31,18 +92,22 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
   const bannerBlob = html.match(
     /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+(?:NewsPage|Banner|Artwork|gui|plugin)[^\s"']*/i
   )
-  if (bannerBlob) return bannerBlob[0]
+  if (bannerBlob && !isForbiddenCoverImageUrl(bannerBlob[0])) {
+    return await resolveRedirectToBannerCdn(bannerBlob[0])
+  }
 
   // 3. Any active storage developer blob in the gallery
   const anyBlob = html.match(
     /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+/i
   )
-  if (anyBlob) return anyBlob[0]
+  if (anyBlob && !isForbiddenCoverImageUrl(anyBlob[0])) {
+    return await resolveRedirectToBannerCdn(anyBlob[0])
+  }
 
   // 4. Product page official social card (og:image)
   const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
-  if (ogMatch && ogMatch[1].startsWith('http') && !PB_EXCLUDED_BANNER_HASHES.some(h => ogMatch[1].includes(h))) {
-    return ogMatch[1]
+  if (ogMatch && !isForbiddenCoverImageUrl(ogMatch[1])) {
+    return await resolveRedirectToBannerCdn(ogMatch[1])
   }
 
   // 5. Full UI Screenshot (UI 1 / UI 2 / Main Interface / Screenshot)
@@ -50,7 +115,7 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     html.match(/<img[^>]+alt=["'][^"']*(?:UI\s*1|UI\s*2|Interface|Screenshot)[^"']*["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
     html.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["'][^"']*(?:UI\s*1|UI\s*2|Interface|Screenshot)[^"']*["']/i)
 
-  if (uiMatch && !PB_EXCLUDED_BANNER_HASHES.some(h => uiMatch[1].includes(h))) {
+  if (uiMatch && !isForbiddenCoverImageUrl(uiMatch[1])) {
     return uiMatch[1]
   }
 
@@ -59,13 +124,13 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     html.match(/<img[^>]+alt=["']Main Image["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
     html.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["']Main Image["']/i)
 
-  if (mainImgMatch && !PB_EXCLUDED_BANNER_HASHES.some(h => mainImgMatch[1].includes(h))) {
+  if (mainImgMatch && !isForbiddenCoverImageUrl(mainImgMatch[1])) {
     return mainImgMatch[1]
   }
 
   // 7. Extract all banner tags and find the largest resolution master screenshot (> 35KB)
   const candidateUrls = [...new Set([...html.matchAll(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/gi)].map(m => m[0]))]
-  const validCandidates = candidateUrls.filter(u => !PB_EXCLUDED_BANNER_HASHES.some(h => u.includes(h)))
+  const validCandidates = candidateUrls.filter(u => !isForbiddenCoverImageUrl(u))
 
   let bestBanner: string | null = null
   let maxLen = 0
@@ -105,26 +170,29 @@ export async function resolveProductBannerImage(
       if (pRes.ok) {
         const html = await pRes.text()
         const ultraHd = await extractUltraHdFromProductHtml(html, title)
-        if (ultraHd) {
+        if (ultraHd && !isForbiddenCoverImageUrl(ultraHd)) {
           return ultraHd
         }
       }
     } catch {}
   }
 
-  // 2. If existing valid image is provided and NOT a low-res Plugin Boutique thumbnail, use it
+  // 2. If existing valid image is provided and NOT forbidden or a low-res Plugin Boutique thumbnail, use it
   if (
     existingImageUrl &&
-    existingImageUrl.startsWith('http') &&
-    !existingImageUrl.includes('placeholder') &&
-    !existingImageUrl.includes('photo-1598488035139-bdbb2231ce04') &&
+    !isForbiddenCoverImageUrl(existingImageUrl) &&
     !existingImageUrl.includes('banners.pluginboutique.com')
   ) {
     return existingImageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
-  // 3. Try extracting high-res og:image from direct merchant/developer dealUrl
-  if (dealUrl && dealUrl.startsWith('http')) {
+  // 3. Try extracting high-res og:image from direct merchant/developer dealUrl (excluding Google redirectors)
+  if (
+    dealUrl &&
+    dealUrl.startsWith('http') &&
+    !dealUrl.includes('google.com') &&
+    !dealUrl.includes('news.google')
+  ) {
     try {
       const res = await fetch(dealUrl, {
         headers: {
@@ -139,32 +207,52 @@ export async function resolveProductBannerImage(
         const ogMatch =
           html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
           html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-        if (
-          ogMatch &&
-          ogMatch[1].startsWith('http') &&
-          !ogMatch[1].includes('placeholder') &&
-          !ogMatch[1].includes('default') &&
-          !ogMatch[1].includes('logo-')
-        ) {
+        if (ogMatch && !isForbiddenCoverImageUrl(ogMatch[1])) {
           return ogMatch[1].replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
         }
       }
     } catch {}
   }
 
-  // 3. Search Plugin Boutique and navigate to product page for Ultra HD UI screenshot / banner
+  // 4. Search Plugin Boutique and navigate to product page for Ultra HD UI screenshot / banner
   try {
+    const searchQueries: string[] = []
+    const lowerTitle = title.toLowerCase()
+
+    if (lowerTitle.includes('native instruments')) {
+      searchQueries.push('Native Instruments Massive', 'Native Instruments')
+    }
+    if (lowerTitle.includes('minimal audio')) {
+      searchQueries.push('Minimal Audio')
+    }
+    if (lowerTitle.includes('fabfilter')) {
+      searchQueries.push('FabFilter')
+    }
+    if (lowerTitle.includes('arturia')) {
+      searchQueries.push('Arturia')
+    }
+    if (lowerTitle.includes('soundtoys')) {
+      searchQueries.push('Soundtoys')
+    }
+    if (lowerTitle.includes('cubase')) {
+      searchQueries.push('Cubase Pro')
+    }
+
     const cleanSearchQuery = title
       .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
-      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle|free)\b/gi, ' ')
+      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle|free|major savings|this week|limited time)\b/gi, ' ')
       .replace(/[^a-zA-Z0-9\s]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 45)
 
-    if (cleanSearchQuery.length >= 3) {
+    if (cleanSearchQuery.length >= 3 && !searchQueries.includes(cleanSearchQuery)) {
+      searchQueries.push(cleanSearchQuery)
+    }
+
+    for (const q of searchQueries) {
       const searchRes = await fetch(
-        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(cleanSearchQuery)}`,
+        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(q)}`,
         {
           headers: {
             'User-Agent':
@@ -189,7 +277,7 @@ export async function resolveProductBannerImage(
             if (pRes.ok) {
               const pHtml = await pRes.text()
               const ultraHd = await extractUltraHdFromProductHtml(pHtml, title)
-              if (ultraHd) {
+              if (ultraHd && !isForbiddenCoverImageUrl(ultraHd)) {
                 return ultraHd
               }
             }
@@ -198,14 +286,14 @@ export async function resolveProductBannerImage(
 
         // If product page didn't yield a high-res banner, check search results for banner
         const bannerMatch = searchHtml.match(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/i)
-        if (bannerMatch && !PB_EXCLUDED_BANNER_HASHES.some(h => bannerMatch[0].includes(h))) {
+        if (bannerMatch && !isForbiddenCoverImageUrl(bannerMatch[0])) {
           return bannerMatch[0]
         }
       }
     }
   } catch {}
 
-  // 4. Guaranteed 1080p Ultra HD synthesized audio workstation graphic
+  // 5. Guaranteed 1080p Ultra HD synthesized audio workstation graphic
   const cleanTitle = title.replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
   const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1920&height=1080&nologo=true&seed=${Math.floor(
@@ -218,12 +306,7 @@ export function getArticleCoverImage(
   category: string,
   existingImageUrl?: string
 ): string {
-  if (
-    existingImageUrl &&
-    existingImageUrl.startsWith('http') &&
-    !existingImageUrl.includes('placeholder') &&
-    !existingImageUrl.includes('photo-1598488035139-bdbb2231ce04')
-  ) {
+  if (existingImageUrl && !isForbiddenCoverImageUrl(existingImageUrl)) {
     return existingImageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 

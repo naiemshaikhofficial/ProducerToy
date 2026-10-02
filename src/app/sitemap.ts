@@ -105,7 +105,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 2. Process Dynamic News Articles from Turso
   if (newsResult.status === 'fulfilled' && newsResult.value && newsResult.value.length > 0) {
     newsEntries = newsResult.value.map((n) => {
-      const highResImg = (n.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+      let highResImg = (n.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+      if (highResImg.includes('googleusercontent.com') || highResImg.includes('gstatic.com') || highResImg.includes('news.google.com')) {
+        highResImg = ''
+      }
       const sanitizedImg = sanitizeXmlUrl(highResImg || n.cover_image)
       return {
         url: `${baseUrl}/news/${encodeURIComponent(n.slug)}`,

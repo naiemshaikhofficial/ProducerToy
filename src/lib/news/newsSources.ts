@@ -679,9 +679,21 @@ function cleanHtmlSnippet(html: string): string {
 
 function isValidImageUrl(url: string): boolean {
   if (!url) return false
-  const lower = url.toLowerCase()
-  // Skip tracking pixels or gravatars
-  if (lower.includes('avatar') || lower.includes('pixel') || lower.includes('1x1')) return false
+  const lower = url.toLowerCase().trim()
+  // Skip tracking pixels, gravatars, avatars, or google usercontent/logos
+  if (
+    lower.includes('avatar') ||
+    lower.includes('pixel') ||
+    lower.includes('1x1') ||
+    lower.includes('googleusercontent.com') ||
+    lower.includes('gstatic.com') ||
+    lower.includes('news.google.com') ||
+    lower.includes('google.com') ||
+    lower.includes('placeholder') ||
+    lower.includes('favicon')
+  ) {
+    return false
+  }
   return (
     lower.startsWith('http') &&
     (lower.includes('.jpg') ||

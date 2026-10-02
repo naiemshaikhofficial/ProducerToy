@@ -133,8 +133,19 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     }
   }
 
-  const getHighResCoverImage = (url?: string | null): string => {
-    if (!url) return '/placeholder.jpg'
+  const getHighResCoverImage = (url?: string | null, title?: string): string => {
+    if (
+      !url ||
+      typeof url !== 'string' ||
+      url.includes('googleusercontent.com') ||
+      url.includes('gstatic.com') ||
+      url.includes('news.google.com') ||
+      url.includes('placeholder')
+    ) {
+      const cleanTitle = (title || 'music production vst audio plugin').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
+      const prompt = `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanTitle}`
+      return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true`
+    }
     // Strip WordPress & CMS thumbnail suffixes (-128x71, -150x150, -300x169, -768x432, -1024x576) to always fetch crisp original Full HD master
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
@@ -174,7 +185,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   aria-hidden="true"
                 >
                   <img
-                    src={getHighResCoverImage(featuredArticle.cover_image)}
+                    src={getHighResCoverImage(featuredArticle.cover_image, featuredArticle.title)}
                     alt=""
                     className="w-full h-full object-cover rounded-3xl filter blur-xl sm:blur-2xl scale-100"
                   />
@@ -182,7 +193,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#18181c] shadow-2xl">
                   <Image
-                    src={getHighResCoverImage(featuredArticle.cover_image)}
+                    src={getHighResCoverImage(featuredArticle.cover_image, featuredArticle.title)}
                     alt={`${cleanHtmlTitle(featuredArticle.title)} - Free Plugin & Audio News - Producer Toy`}
                     title={`${cleanHtmlTitle(featuredArticle.title)} - Producer Toy`}
                     fill
@@ -259,7 +270,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   {/* 16:9 Inset Image with rounded corners */}
                   <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
                     <Image
-                      src={getHighResCoverImage(article.cover_image)}
+                      src={getHighResCoverImage(article.cover_image, article.title)}
                       alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
                       title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                       fill

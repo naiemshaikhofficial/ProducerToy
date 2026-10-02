@@ -22,7 +22,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
   }
 
-  const highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  let highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  if (
+    !highResImage ||
+    highResImage.includes('googleusercontent.com') ||
+    highResImage.includes('gstatic.com') ||
+    highResImage.includes('news.google.com') ||
+    highResImage.includes('placeholder')
+  ) {
+    const cleanT = (article.title || 'audio-production').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
+    highResImage = `https://image.pollinations.ai/prompt/${encodeURIComponent(`sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanT}`)}?width=1200&height=675&nologo=true`
+  }
   const cleanTitle = (article.title || '')
     .replace(/&#038;/g, '&')
     .replace(/&#38;/g, '&')
@@ -148,7 +158,17 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
   const relatedArticles = await getRelatedNews(article.slug, article.category, 3)
 
-  const highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  let highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+  if (
+    !highResImage ||
+    highResImage.includes('googleusercontent.com') ||
+    highResImage.includes('gstatic.com') ||
+    highResImage.includes('news.google.com') ||
+    highResImage.includes('placeholder')
+  ) {
+    const cleanT = (article.title || 'audio-production').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
+    highResImage = `https://image.pollinations.ai/prompt/${encodeURIComponent(`sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanT}`)}?width=1200&height=675&nologo=true`
+  }
   const cleanTitle = (article.title || '')
     .replace(/&#038;/g, '&')
     .replace(/&#38;/g, '&')
