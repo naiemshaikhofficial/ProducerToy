@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { fetchMusicNewsFeedItems, extractDirectDealInfo } from '@/lib/news/newsSources'
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
-import { articleExists, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
+import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
+import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // 60 seconds
@@ -59,8 +60,8 @@ async function handleSync(req: Request) {
         }
       }
 
-      // Check deduplication across source URL, direct product URL, image URL, and title
-      const alreadyExists = await articleExists({
+      // Check if this product or deal already exists in the database
+      const existingArticle = await findExistingArticle({
         feedLink: item.link,
         directDealUrl: item.directDealUrl,
         sourceUrl: item.directDealUrl || item.link,
@@ -69,13 +70,33 @@ async function handleSync(req: Request) {
         slug,
       })
 
-      if (alreadyExists) {
-        skippedCount++
-        continue
+      if (existingArticle) {
+        const existingExpiry = detectDealExpiry(existingArticle)
+        const isOlderThan24h =
+          Date.now() - new Date(existingArticle.published_at).getTime() > 24 * 60 * 60 * 1000
+
+        // If it's already active and fresh (within 24h), skip redundant LLM rewrite
+        if (!existingExpiry.isExpired && !isOlderThan24h) {
+          skippedCount++
+          continue
+        }
+
+        console.log(
+          `[News Sync] Reactivating / Replacing existing deal for "${existingArticle.title}" with new offer`
+        )
       }
 
       // Rewrite with Groq AI Llama 3.3 & save to Turso
       const article = await rewriteNewsWithGroq(item)
+
+      // If updating an existing article, preserve canonical ID and slug to maintain link integrity and replace in-place
+      if (existingArticle) {
+        article.id = existingArticle.id
+        article.slug = existingArticle.slug
+        article.created_at = existingArticle.created_at
+        // Re-timestamp to current time so the refreshed deal bubbles to the top of the feed
+        article.published_at = new Date().toISOString()
+      }
 
       // Strict Quality Gate: Future articles MUST have a valid, non-empty, non-placeholder image
       if (

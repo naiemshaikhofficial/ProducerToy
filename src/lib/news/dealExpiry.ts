@@ -40,7 +40,7 @@ export interface DealExpiryResult {
 export function parseExpiryDateText(
   rawText: string,
   publishedAt?: string
-): { isExpired: boolean; date: Date; formatted: string } | null {
+): { isExpired: boolean; date: Date; formatted: string; isGracePeriod?: boolean } | null {
   if (!rawText || typeof rawText !== 'string') return null
 
   // Strip prefixes such as "Ends on", "Ends", "Until", "Valid until", "Expires on", etc.
@@ -172,11 +172,16 @@ export function parseExpiryDateText(
   const expiryDate = new Date(Date.UTC(year, monthIndex, day, 23, 59, 59, 999))
   if (isNaN(expiryDate.getTime())) return null
 
-  const isExpired = Date.now() > expiryDate.getTime()
+  const diffMs = Date.now() - expiryDate.getTime()
+  // 36-hour timezone grace period for active sales (PST/PDT offset + same-week store closeout)
+  const isGracePeriod = diffMs > 0 && diffMs <= 36 * 60 * 60 * 1000
+  const isExpired = diffMs > 36 * 60 * 60 * 1000
+
   return {
     isExpired,
+    isGracePeriod,
     date: expiryDate,
-    formatted,
+    formatted: isGracePeriod ? 'Ending Soon' : formatted,
   }
 }
 
@@ -257,7 +262,9 @@ export function detectDealExpiry(article: {
     const parsed = parseExpiryDateText(dateVal, article.published_at)
     if (parsed) {
       let displayTimeline = `Until ${parsed.formatted}`
-      if (parsed.formatted === 'Today') {
+      if (parsed.formatted === 'Ending Soon' || (parsed as any).isGracePeriod) {
+        displayTimeline = 'Ending Soon'
+      } else if (parsed.formatted === 'Today') {
         displayTimeline = 'Ends Today'
       } else if (parsed.formatted === 'Tomorrow') {
         displayTimeline = 'Ends Tomorrow'

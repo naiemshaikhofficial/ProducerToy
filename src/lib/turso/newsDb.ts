@@ -153,13 +153,13 @@ export interface ArticleExistsOptions {
 }
 
 /**
- * Check if an article already exists by source URL, deal URL, slug, cover image or title keywords
+ * Find an existing article by source URL, deal URL, slug, cover image or title keywords
  */
-export async function articleExists(
+export async function findExistingArticle(
   optionsOrUrl: string | ArticleExistsOptions,
   legacySlug?: string,
   legacyExtra?: { coverImage?: string; publishedAt?: string }
-): Promise<boolean> {
+): Promise<NewsArticle | null> {
   await initNewsSchema()
   const client = getTursoClient()
 
@@ -220,16 +220,29 @@ export async function articleExists(
       }
     }
 
-    if (conditions.length === 0) return false
+    if (conditions.length === 0) return null
 
     const result = await client.execute({
-      sql: `SELECT 1 FROM news_articles WHERE ${conditions.join(' OR ')} LIMIT 1`,
+      sql: `SELECT * FROM news_articles WHERE ${conditions.join(' OR ')} LIMIT 1`,
       args,
     })
-    return result.rows.length > 0
+    if (result.rows.length === 0) return null
+    return parseArticleRow(result.rows[0])
   } catch {
-    return false
+    return null
   }
+}
+
+/**
+ * Check if an article already exists by source URL, deal URL, slug, cover image or title keywords
+ */
+export async function articleExists(
+  optionsOrUrl: string | ArticleExistsOptions,
+  legacySlug?: string,
+  legacyExtra?: { coverImage?: string; publishedAt?: string }
+): Promise<boolean> {
+  const article = await findExistingArticle(optionsOrUrl, legacySlug, legacyExtra)
+  return article !== null
 }
 
 /**
