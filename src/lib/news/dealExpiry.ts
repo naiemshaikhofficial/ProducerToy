@@ -49,6 +49,69 @@ export function parseExpiryDateText(
     .replace(/(\d+)(?:st|nd|rd|th)/gi, '$1')
     .trim()
 
+  // Relative: Today / Tonight / Ends Today
+  if (/^(?:today|tonight|ends?\s+today|ending\s+today|ends?\s+tonight)/i.test(clean)) {
+    const now = new Date()
+    const expiryDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999))
+    return {
+      isExpired: Date.now() > expiryDate.getTime(),
+      date: expiryDate,
+      formatted: 'Today',
+    }
+  }
+
+  // Relative: Tomorrow / Ends Tomorrow
+  if (/^(?:tomorrow|ends?\s+tomorrow|ending\s+tomorrow)/i.test(clean)) {
+    const now = new Date()
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    const expiryDate = new Date(Date.UTC(tomorrow.getUTCFullYear(), tomorrow.getUTCMonth(), tomorrow.getUTCDate(), 23, 59, 59, 999))
+    return {
+      isExpired: false,
+      date: expiryDate,
+      formatted: 'Tomorrow',
+    }
+  }
+
+  // Countdown timer format: e.g. "00:01:35:57" or "00 01 35 57" (Days Hours Minutes Seconds)
+  const timerMatch = clean.match(/^(\d{2})[:\s]+(\d{2})[:\s]+(\d{2})[:\s]+(\d{2})/)
+  if (timerMatch) {
+    const days = parseInt(timerMatch[1], 10)
+    const hours = parseInt(timerMatch[2], 10)
+    const minutes = parseInt(timerMatch[3], 10)
+    const seconds = parseInt(timerMatch[4], 10)
+    const totalMs = (((days * 24 + hours) * 60 + minutes) * 60 + seconds) * 1000
+
+    const expiryDate = new Date(Date.now() + totalMs)
+    let formatted = 'Today'
+    if (days > 1) {
+      formatted = `${days} Days`
+    } else if (days === 1) {
+      formatted = 'Tomorrow'
+    } else if (hours > 0) {
+      formatted = `${hours}h Left`
+    } else if (minutes > 0) {
+      formatted = `${minutes}m Left`
+    }
+
+    return {
+      isExpired: totalMs <= 0,
+      date: expiryDate,
+      formatted,
+    }
+  }
+
+  // Relative hours: e.g. "Ends in 1h" or "1 hour" or "2 hours"
+  const hoursLeftMatch = clean.match(/^(\d{1,2})\s*(?:hours?|hrs?|h)\s*(?:left)?/i)
+  if (hoursLeftMatch) {
+    const hrs = parseInt(hoursLeftMatch[1], 10)
+    const expiryDate = new Date(Date.now() + hrs * 60 * 60 * 1000)
+    return {
+      isExpired: hrs <= 0,
+      date: expiryDate,
+      formatted: `${hrs}h Left`,
+    }
+  }
+
   // Pattern 1: Month Day Year? (e.g. "Nov 01", "Nov 1, 2024", "November 1 2026")
   const m1 = clean.match(/^([a-zA-Z]+)\s+(\d{1,2})(?:,?\s*(\d{4}))?/)
   // Pattern 2: Day Month Year? (e.g. "01 Nov", "1 November 2026", "04 Oct")
@@ -193,10 +256,19 @@ export function detectDealExpiry(article: {
 
     const parsed = parseExpiryDateText(dateVal, article.published_at)
     if (parsed) {
-      const displayTimeline =
-        dateVal.toLowerCase().startsWith('until') || dateVal.toLowerCase().startsWith('ends')
-          ? dateVal
-          : `Until ${parsed.formatted}`
+      let displayTimeline = `Until ${parsed.formatted}`
+      if (parsed.formatted === 'Today') {
+        displayTimeline = 'Ends Today'
+      } else if (parsed.formatted === 'Tomorrow') {
+        displayTimeline = 'Ends Tomorrow'
+      } else if (parsed.formatted.includes('Left') || parsed.formatted.includes('Days')) {
+        displayTimeline = parsed.formatted.includes('Left') ? parsed.formatted : `Ends in ${parsed.formatted}`
+      } else if (
+        dateVal.toLowerCase().startsWith('until') ||
+        dateVal.toLowerCase().startsWith('ends')
+      ) {
+        displayTimeline = dateVal
+      }
 
       return {
         isExpired: parsed.isExpired,
