@@ -4,6 +4,7 @@ import { getComingSoonRules, type ComingSoonRuleContext } from './comingSoonRule
 import { getGatewayRules } from './gatewayRules'
 import { getPolicyConductRules, type PolicyContext } from './policyConductRules'
 import { getPlatformInfoRules } from './platformInfoRules'
+import { getSiteKnowledgeRules } from './siteKnowledgeRules'
 import { getTicketRules } from './ticketRules'
 
 export * from './identityRules'
@@ -12,6 +13,7 @@ export * from './comingSoonRules'
 export * from './gatewayRules'
 export * from './policyConductRules'
 export * from './platformInfoRules'
+export * from './siteKnowledgeRules'
 export * from './ticketRules'
 
 export interface SupportPromptContext {
@@ -42,6 +44,7 @@ export function buildSupportSystemPrompt(ctx: SupportPromptContext): string {
     getTicketRules(),
     getPolicyConductRules(ctx.policy),
     getPlatformInfoRules(),
+    getSiteKnowledgeRules(),
   ]
 
   return sections.filter(Boolean).join('\n\n')

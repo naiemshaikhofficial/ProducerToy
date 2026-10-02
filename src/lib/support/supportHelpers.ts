@@ -111,6 +111,58 @@ export function isOffTopicQuery(query: string): boolean {
   if (!query) return false
   const q = query.toLowerCase().trim()
 
+  // STRICT EXEMPTION: Any query about Producer Toy, founder, News, FAQ, About, DAW setup, VSTs, or audio tools is ALWAYS on-topic
+  const onTopicExceptions = [
+    'producer toy',
+    'producertoy',
+    'sampleswala',
+    'naiem',
+    'shaikh',
+    'vst',
+    'plugin',
+    'plugins',
+    'sample',
+    'samples',
+    'sound',
+    'soundbank',
+    'preset',
+    'presets',
+    'daw',
+    'fl studio',
+    'ableton',
+    'logic pro',
+    'cubase',
+    'studio one',
+    'reaper',
+    'bitwig',
+    'news',
+    'deal',
+    'deals',
+    'faq',
+    'faqs',
+    'about',
+    'founder',
+    'sell',
+    'selling',
+    'distribute',
+    'affiliate',
+    'commission',
+    'refund',
+    'license',
+    'serial',
+    'key',
+    'download',
+    'order',
+    'ticket',
+    'support',
+    'gift',
+    'gifts',
+    'wishlist',
+  ]
+  if (onTopicExceptions.some((term) => q.includes(term))) {
+    return false
+  }
+
   const offTopicKeywords = [
     // Cooking, Food & Recipes
     'recipe',
