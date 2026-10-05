@@ -236,11 +236,12 @@ REQUIREMENTS:
    - In music blogs (BPB, GearNews, Rekkerd), this is consistently placed at the bottom of the article after "More info: [Product Name ($XX)](url)" or "Product page:". Always extract this exact deep product page link.
    - NEVER use image URLs (e.g. .jpg, .png, ytimg), NEVER link to YouTube, and NEVER link to competitor blogs or empty placeholder anchors.
    - If a specific product slug exists on the developer's website, always include the deep path (e.g. /megamorph/ or /oscope/), not just the root domain.
-8. MULTI-PLUGIN DEALS & ROUNDUPS:
-   - If this article covers MULTIPLE plugins or deals (e.g. Roland JD-800, Native Instruments FM8, Slate Digital MetaTune):
-     a) Give EACH plugin its own dedicated ### section with in-depth features, discounts, and pricing.
-     b) For EACH plugin, include its direct deal link right under its section, formatted as a clear action button: e.g. [Get Roland JD-800 Deal (€68.43)](url). NEVER include retailer names like "at Plugin Boutique" in the button label.
-     c) NEVER omit any plugin or only provide one link when multiple are featured! Every single featured product must have its own deal link and pricing details.
+8. MULTI-PLUGIN DEALS, CURATED GUIDES & ROUNDUPS:
+   - If this article covers MULTIPLE plugins, sample packs, or is a curated listicle/guide (e.g. "Best Free Kontakt Libraries", "Top Synth Plugins", "Free VST Essentials"):
+     a) Name and showcase EACH recommended software, library, or tool with its own dedicated ### heading.
+     b) For EACH featured item, include an authentic preview image: e.g. ![Instrument / UI Preview](https://image.pollinations.ai/prompt/{url-encoded-description}?width=1200&height=675&nologo=true) or authentic resource screenshot.
+     c) For EACH featured item, include its direct official download or deal link right under its section, formatted as a clear action button: e.g. [Download Free Plugin](url) or [Get Official Deal](url).
+     d) NEVER output vague abstract commentary without showcasing the actual tools, their resource images, and direct download links! Every featured item must have its own action button.
 9. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
 10. DEAL EXPIRY & VALIDITY TIMELINE:
    - If the source mentions an end date, expiration date, or limited-time sale deadline (e.g. "40% off until Nov 01", "sale ends Oct 31", "until November 1", "runs through Nov 1st"):

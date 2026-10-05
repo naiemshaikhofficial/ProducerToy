@@ -33,6 +33,11 @@ function sanitizeLinkUrl(url: string): string {
     }
   }
 
+  // Auto-correct deprecated or moved vendor URLs
+  if (clean.toLowerCase().includes('native-instruments.com') && clean.toLowerCase().includes('/innovations/kontakt-player')) {
+    return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+  }
+
   return clean
 }
 

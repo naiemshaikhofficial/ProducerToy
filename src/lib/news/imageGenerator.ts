@@ -228,35 +228,45 @@ export async function resolveProductBannerImage(
     const searchQueries: string[] = []
     const lowerTitle = title.toLowerCase()
 
-    if (lowerTitle.includes('native instruments')) {
-      searchQueries.push('Native Instruments Massive', 'Native Instruments')
-    }
-    if (lowerTitle.includes('minimal audio')) {
-      searchQueries.push('Minimal Audio')
-    }
-    if (lowerTitle.includes('fabfilter')) {
-      searchQueries.push('FabFilter')
-    }
-    if (lowerTitle.includes('arturia')) {
-      searchQueries.push('Arturia')
-    }
-    if (lowerTitle.includes('soundtoys')) {
-      searchQueries.push('Soundtoys')
-    }
-    if (lowerTitle.includes('cubase')) {
-      searchQueries.push('Cubase Pro')
-    }
+    // If this is an editorial guide, roundup, industry news, or acquisition story, do NOT search Plugin Boutique for random individual products
+    const isEditorialOrRoundup =
+      /acquires|acquisition|industry|guide|roundup|best|top \d+|overview|opinion|roadmap|vs\b|libraries|collection|bundles/i.test(
+        title
+      )
 
-    const cleanSearchQuery = title
-      .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
-      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle|free|major savings|this week|limited time)\b/gi, ' ')
-      .replace(/[^a-zA-Z0-9\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 45)
+    if (!isEditorialOrRoundup) {
+      if (lowerTitle.includes('massive x')) {
+        searchQueries.push('Native Instruments Massive X')
+      } else if (lowerTitle.includes('reaktor')) {
+        searchQueries.push('Native Instruments Reaktor')
+      } else if (lowerTitle.includes('guitar rig')) {
+        searchQueries.push('Native Instruments Guitar Rig')
+      } else if (lowerTitle.includes('minimal audio')) {
+        searchQueries.push('Minimal Audio')
+      } else if (lowerTitle.includes('fabfilter')) {
+        searchQueries.push('FabFilter')
+      } else if (lowerTitle.includes('arturia')) {
+        searchQueries.push('Arturia')
+      } else if (lowerTitle.includes('soundtoys')) {
+        searchQueries.push('Soundtoys')
+      } else if (lowerTitle.includes('cubase')) {
+        searchQueries.push('Cubase Pro')
+      }
 
-    if (cleanSearchQuery.length >= 3 && !searchQueries.includes(cleanSearchQuery)) {
-      searchQueries.push(cleanSearchQuery)
+      const cleanSearchQuery = title
+        .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
+        .replace(
+          /\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle|free|major savings|this week|limited time)\b/gi,
+          ' '
+        )
+        .replace(/[^a-zA-Z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 45)
+
+      if (cleanSearchQuery.length >= 3 && !searchQueries.includes(cleanSearchQuery)) {
+        searchQueries.push(cleanSearchQuery)
+      }
     }
 
     for (const q of searchQueries) {
@@ -327,11 +337,24 @@ export function generateThemedCoverPrompt(title: string): string {
     return `modern vocal production recording studio with studio microphone, vocal waveform visualizer, audio pitch correction plugin interface on monitor, neon lighting 8k render for "${clean.slice(0, 65)}"`
   }
   if (
+    lower.includes('acquire') ||
+    lower.includes('acquisition') ||
+    lower.includes('ownership') ||
+    lower.includes('industry') ||
+    lower.includes('inmusic') ||
+    lower.includes('boris fx')
+  ) {
+    return `futuristic audio software technology headquarters with illuminated holographic DAW sound console and audio engineering displays, professional music technology corporate news header for "${clean.slice(0, 65)}", 8k render, cinematic dark cyan lighting`
+  }
+  if (lower.includes('sound design') || lower.includes('software deals') || lower.includes('plugin roundup')) {
+    return `cutting edge audio software sound design laboratory with visual harmonic spectrum analyzer, futuristic synthesizer modules, and plugin interfaces on ultra-wide screens, 8k render for "${clean.slice(0, 65)}", neon violet studio lighting`
+  }
+  if (
     lower.includes('synth') ||
     lower.includes('synthesizer') ||
     lower.includes('wavetable') ||
     lower.includes('fm8') ||
-    lower.includes('massive')
+    (lower.includes('massive') && !lower.includes('massive discounts'))
   ) {
     return `sleek modular analog synthesizer workstation with patch cables, illuminated oscilloscopes, and wavetable displays, professional audio tech editorial header for "${clean.slice(0, 65)}", 8k render, cinematic ambient lighting`
   }
