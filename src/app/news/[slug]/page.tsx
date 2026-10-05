@@ -2,7 +2,6 @@ import { Metadata } from 'next'
 import { notFound, redirect, RedirectType } from 'next/navigation'
 import { getNewsArticleBySlug, getRelatedNews } from '@/lib/turso/newsDb'
 import { NewsArticleClient } from './NewsArticleClient'
-import { getTopicFallbackImage } from '@/lib/news/topicDeduplication'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -30,9 +29,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     highResImage.includes('googleusercontent.com') ||
     highResImage.includes('gstatic.com') ||
     highResImage.includes('news.google.com') ||
+    highResImage.includes('images.unsplash.com') ||
     highResImage.includes('placeholder')
   ) {
-    highResImage = getTopicFallbackImage(article.title, article.category)
+    highResImage = 'https://producertoy.com/icon.png'
   }
   const cleanTitle = (article.title || '')
     .replace(/&#038;/g, '&')
@@ -173,9 +173,10 @@ export default async function NewsArticlePage({ params }: PageProps) {
     highResImage.includes('googleusercontent.com') ||
     highResImage.includes('gstatic.com') ||
     highResImage.includes('news.google.com') ||
+    highResImage.includes('images.unsplash.com') ||
     highResImage.includes('placeholder')
   ) {
-    highResImage = getTopicFallbackImage(article.title, article.category)
+    highResImage = 'https://producertoy.com/icon.png'
   }
   const cleanTitle = (article.title || '')
     .replace(/&#038;/g, '&')

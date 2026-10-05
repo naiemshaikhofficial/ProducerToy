@@ -7,7 +7,6 @@ import { NewsArticle } from '@/lib/turso/newsDb'
 import {
   deduplicateArticlesByTopic,
   generateThemedCoverPrompt,
-  getTopicFallbackImage,
 } from '@/lib/news/topicDeduplication'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
@@ -50,16 +49,17 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
   const activeArticles = articles.filter((a) => !detectDealExpiry(a).isExpired)
   const candidateArticles = activeArticles.length > 0 ? activeArticles : articles
 
-  // Priority 1: Sponsored or Partner article
-  const sponsored = candidateArticles.find(
+  // Priority 1: Sponsored, Partner, or explicit is_featured article
+  const topPick = candidateArticles.find(
     (a) =>
+      (a as any).is_featured === 1 ||
       (a as any).is_sponsored === 1 ||
       a.badge?.toUpperCase().includes('SPONSORED') ||
       a.badge?.toUpperCase().includes('PARTNER') ||
       Boolean(a.specs?.['Sponsored']) ||
       Boolean(a.specs?.['Partner'])
   )
-  if (sponsored) return sponsored
+  if (topPick) return topPick
 
   // Priority 2: Sabse tagda brand deal offer
   let bestArticle = candidateArticles[0]
@@ -97,9 +97,9 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
       else if (discountNum >= 30) score += 10
     }
 
-    // 4. Explicit is_featured flag (+15 points)
+    // 4. Explicit is_featured flag (+50 points)
     if (article.is_featured === 1) {
-      score += 15
+      score += 50
     }
 
     // 5. Freshness / Recency Bonus (within last 7 days +15 points)
@@ -152,9 +152,12 @@ function NewsCardImage({
   sizes?: string
   className?: string
 }) {
-  const fallback = getTopicFallbackImage(title, category)
+  const fallback = '/icon.png'
   const initial =
-    !src || src.includes('pollinations.ai') || EXCLUDED_BANNER_PATTERNS.some((pat) => src.includes(pat))
+    !src ||
+    src.includes('pollinations.ai') ||
+    src.includes('images.unsplash.com') ||
+    EXCLUDED_BANNER_PATTERNS.some((pat) => src.includes(pat))
       ? fallback
       : src
 
@@ -221,19 +224,20 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||
       url.includes('news.google.com') ||
+      url.includes('images.unsplash.com') ||
       url.includes('bedroomproducersblog.com') ||
       url.includes('ujam.com/fileadmin') ||
       url.includes('placeholder') ||
       EXCLUDED_BANNER_PATTERNS.some((pat) => url.includes(pat))
     ) {
-      return getTopicFallbackImage(title, category)
+      return '/icon.png'
     }
     // Strip WordPress & CMS thumbnail suffixes (-128x71, -150x150, -300x169, -768x432, -1024x576) to always fetch crisp original Full HD master
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
   const getFallbackCoverImage = (title?: string, category?: string): string => {
-    return getTopicFallbackImage(title, category)
+    return '/icon.png'
   }
 
   const cleanHtmlTitle = (title?: string | null): string => {

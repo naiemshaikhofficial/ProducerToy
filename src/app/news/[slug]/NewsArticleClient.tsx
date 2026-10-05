@@ -13,7 +13,6 @@ import {
 import { NewsArticle } from '@/lib/turso/newsDb'
 import {
   generateThemedCoverPrompt,
-  getTopicFallbackImage,
 } from '@/lib/news/topicDeduplication'
 import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
@@ -210,7 +209,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       url.includes('placeholder') ||
       EXCLUDED_BANNER_PATTERNS.some((pat) => url.includes(pat))
     ) {
-      return getTopicFallbackImage(title, article.category)
+      return '/icon.png'
     }
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
@@ -241,7 +240,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       .trim()
   }
 
-  const fallbackPrompt = getTopicFallbackImage(article.title, article.category)
+  const fallbackPrompt = '/icon.png'
 
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white relative overflow-hidden">

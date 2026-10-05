@@ -95,10 +95,127 @@ export function sanitizeDealUrl(url?: string | null): string | null {
  * Extracts the exact outbound product/deal URL and any promo/coupon code from an article web page.
  * Uses reader proxy with timeout to reliably parse through Cloudflare blocks.
  */
+export interface LiveProductDetails {
+  title: string
+  brand: string
+  dealPrice: string | null
+  regularPrice: string | null
+  discount: string | null
+  expiryTimeline: string | null
+  coverImage: string | null
+  isDealActive: boolean
+}
+
+/**
+ * Scrapes live product details directly from Plugin Boutique product page:
+ * Verifies exact current price, regular price, discount %, expiry date, and Full HD master graphic.
+ */
+export async function fetchPluginBoutiqueProductLiveDetails(productUrl: string): Promise<LiveProductDetails | null> {
+  if (!productUrl || !productUrl.includes('pluginboutique.com/product/')) return null
+  try {
+    const cleanUrl = productUrl.split('?')[0]
+    const res = await fetch(cleanUrl, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      },
+      signal: AbortSignal.timeout(5000),
+    })
+    if (!res.ok) return null
+    const html = await res.text()
+
+    const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
+    const title = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : ''
+
+    const brandMatch = html.match(/href=["']\/manufacturers\/[^"']+["'][^>]*>(.*?)<\/a>/i)
+    const brand = brandMatch ? brandMatch[1].replace(/<[^>]+>/g, '').trim() : ''
+
+    const dealPriceMatch = html.match(
+      /<span[^>]*class=["'][^"']*text-gray-800[^"']*["'][^>]*>\s*(\$[0-9]+(?:\.[0-9]{2})?)\s*<\/span>/i
+    )
+    const regularPriceMatch = html.match(
+      /<span[^>]*class=["'][^"']*line-through[^"']*["'][^>]*>\s*(\$[0-9]+(?:\.[0-9]{2})?)\s*<\/span>/i
+    )
+    const discountMatch = html.match(/(\d+%\s*off(?:\s*until\s*[a-zA-Z]+\s+\d{1,2})?)/i)
+
+    const dealPrice = dealPriceMatch ? dealPriceMatch[1] : null
+    const regularPrice = regularPriceMatch ? regularPriceMatch[1] : null
+
+    let discount: string | null = null
+    let expiryTimeline: string | null = null
+
+    if (discountMatch) {
+      const parts = discountMatch[1].split(/\s+until\s+/i)
+      discount = parts[0].toUpperCase()
+      if (parts[1]) {
+        expiryTimeline = `until ${parts[1].trim()}`
+      }
+    }
+
+    if (!discount && dealPrice && regularPrice) {
+      const dNum = parseFloat(dealPrice.replace('$', ''))
+      const rNum = parseFloat(regularPrice.replace('$', ''))
+      if (rNum > dNum && rNum > 0) {
+        discount = `${Math.round(((rNum - dNum) / rNum) * 100)}% OFF`
+      }
+    }
+
+    let coverImage: string | null = null
+    const masterBlobs = [
+      ...html.matchAll(/https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+/gi),
+      ...html.matchAll(/https:\/\/www\.pluginboutique\.com\/ckeditor_assets\/pictures\/[^\s"']+/gi),
+    ].map((m) => m[0])
+
+    for (const b of masterBlobs) {
+      const lowerB = b.toLowerCase()
+      if (
+        lowerB.includes('8703u6x0') ||
+        lowerB.includes('62597t') ||
+        lowerB.includes('2ep2ag') ||
+        lowerB.includes('dewmln') ||
+        lowerB.includes('tvs4y0') ||
+        lowerB.includes('icon') ||
+        lowerB.includes('avatar')
+      ) {
+        continue
+      }
+      coverImage = b
+      break
+    }
+
+    const isDealActive = Boolean(dealPrice && regularPrice && dealPrice !== regularPrice)
+
+    return {
+      title,
+      brand,
+      dealPrice,
+      regularPrice,
+      discount,
+      expiryTimeline,
+      coverImage,
+      isDealActive,
+    }
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Extracts the exact outbound product/deal URL and any promo/coupon code from an article web page.
+ * Uses reader proxy with timeout to reliably parse through Cloudflare blocks.
+ */
 export async function extractDirectDealInfo(articleUrl: string): Promise<{
   bestUrl?: string
   couponCode?: string
   expiryTimeline?: string
+  dealPrice?: string | null
+  regularPrice?: string | null
+  discount?: string | null
+  brand?: string | null
+  productName?: string | null
+  coverImage?: string | null
+  isDealActive?: boolean
 } | null> {
   if (!articleUrl || typeof articleUrl !== 'string') return null
 
@@ -210,6 +327,25 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
     )
     if (expiryMatch) {
       expiryTimeline = expiryMatch[0].trim()
+    }
+
+    // If destination is a Plugin Boutique product page, verify live pricing & active status
+    if (bestUrl && bestUrl.includes('pluginboutique.com/product/')) {
+      const pbLive = await fetchPluginBoutiqueProductLiveDetails(bestUrl)
+      if (pbLive) {
+        return {
+          bestUrl,
+          couponCode,
+          expiryTimeline: pbLive.expiryTimeline || expiryTimeline,
+          dealPrice: pbLive.dealPrice,
+          regularPrice: pbLive.regularPrice,
+          discount: pbLive.discount,
+          brand: pbLive.brand,
+          productName: pbLive.title,
+          coverImage: pbLive.coverImage,
+          isDealActive: pbLive.isDealActive,
+        }
+      }
     }
 
     return { bestUrl, couponCode, expiryTimeline }
@@ -516,13 +652,133 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
 }
 
 /**
+ * Fetches real-time verified audio plugin news and releases from curated Telegram channels
+ * (e.g. https://t.me/s/legalvst).
+ * Prioritizes official hardware/GUI master graphics, verified discounts, and referral link rewriting.
+ */
+export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'): Promise<RawFeedItem[]> {
+  const items: RawFeedItem[] = []
+  try {
+    const res = await fetch(`https://t.me/s/${channelUsername}`, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      next: { revalidate: 900 },
+    })
+    if (!res.ok) return items
+    const html = await res.text()
+
+    const fullMsgs = [
+      ...html.matchAll(
+        /<div class="tgme_widget_message\b[^>]*data-post="([^"]+)"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/gi
+      ),
+    ]
+
+    for (const post of fullMsgs.slice(-15)) {
+      const postId = post[1]
+      const content = post[2]
+      const textMatch = content.match(/<div class="tgme_widget_message_text[^>]*>([\s\S]*?)<\/div>/i)
+      if (!textMatch) continue
+
+      const cleanContent = textMatch[1].replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim()
+      const lines = cleanContent.split('\n').map((l) => l.trim()).filter(Boolean)
+      if (lines.length === 0) continue
+
+      const rawTitle = lines[0]
+      if (rawTitle.toLowerCase().includes('pinned a photo') || rawTitle.length < 5) continue
+
+      const photoMatch = content.match(/background-image:url\('([^']+)'\)/i)
+      const imageUrl = photoMatch ? photoMatch[1] : undefined
+
+      // Extract outbound links (excluding telegram internal links)
+      const rawLinks = [...content.matchAll(/href="([^"]+)"/gi)]
+        .map((m) => m[1])
+        .filter((l) => !l.includes('t.me/') && !l.includes('telegram.org'))
+
+      let directDealUrl: string | undefined
+      for (const l of rawLinks) {
+        const cleaned = sanitizeDealUrl(l)
+        if (cleaned) {
+          directDealUrl = cleaned
+          break
+        }
+      }
+
+      // If no direct link found in post, search Plugin Boutique for the official product
+      if (!directDealUrl) {
+        directDealUrl = await resolvePluginBoutiqueProductUrl(rawTitle)
+      }
+
+      // Scrape live product details from Plugin Boutique if available
+      let dealPrice: string | null = null
+      let regularPrice: string | null = null
+      let discount: string | null = null
+      let expiryTimeline: string | null = null
+      let masterImage = imageUrl
+
+      if (directDealUrl && directDealUrl.includes('pluginboutique.com/product/')) {
+        const liveDetails = await fetchPluginBoutiqueProductLiveDetails(directDealUrl)
+        if (liveDetails) {
+          dealPrice = liveDetails.dealPrice
+          regularPrice = liveDetails.regularPrice
+          discount = liveDetails.discount
+          expiryTimeline = liveDetails.expiryTimeline
+          if (liveDetails.coverImage) {
+            masterImage = liveDetails.coverImage
+          }
+        }
+      }
+
+      let formattedTitle = rawTitle
+      if (discount && dealPrice) {
+        formattedTitle = `${rawTitle} Deal: ${discount} (${dealPrice})`
+      } else if (dealPrice) {
+        formattedTitle = `${rawTitle} Deal: ${dealPrice}`
+      }
+
+      const item: RawFeedItem = {
+        title: formattedTitle,
+        link: directDealUrl || `https://t.me/${postId}`,
+        pubDate: new Date().toUTCString(),
+        creator: 'Legal VST VIP',
+        contentSnippet: cleanContent.slice(0, 1000),
+        imageUrl: masterImage,
+        sourceName: 'Legal VST (Telegram VIP)',
+        isPrimary: true,
+        directDealUrl,
+      }
+
+      if (dealPrice) (item as any).dealPrice = dealPrice
+      if (regularPrice) (item as any).regularPrice = regularPrice
+      if (discount) (item as any).discount = discount
+      if (expiryTimeline) (item as any).expiryTimeline = expiryTimeline
+
+      items.push(item)
+    }
+  } catch (err) {
+    console.warn('[fetchTelegramChannelFeedItems] Error:', err)
+  }
+  return items
+}
+
+/**
  * Fetch and parse RSS items from music production feeds
- * Prioritizes official Plugin Boutique Deals, PluginDeals, Rekkerd, AudioPlugin Guy, and BPB items
+ * Prioritizes VIP Telegram channel (@legalvst), official Plugin Boutique Deals, and verified partners
  */
 export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
   const allItems: RawFeedItem[] = []
 
-  // 1. Fetch official Plugin Boutique Deals directly (highest priority)
+  // 1. VIP PRIORITY: Fetch verified deals from @legalvst Telegram channel
+  try {
+    const tgItems = await fetchTelegramChannelFeedItems('legalvst')
+    allItems.push(...tgItems)
+  } catch (err) {
+    console.warn('[fetchMusicNewsFeedItems] Error in Telegram fetch:', err)
+  }
+
+  // 2. Fetch official Plugin Boutique Deals directly
   try {
     const pbItems = await fetchPluginBoutiqueDealsFeedItems()
     allItems.push(...pbItems)
@@ -530,7 +786,7 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
     console.warn('[fetchMusicNewsFeedItems] Error in Plugin Boutique fetch:', err)
   }
 
-  // 2. Fetch PluginDeals.net items with verified referral replacement
+  // 3. Fetch PluginDeals.net items with verified referral replacement
   try {
     const pdItems = await fetchPluginDealsFeedItems()
     allItems.push(...pdItems)
@@ -786,25 +1042,35 @@ export async function verifyArticleQuality(article: {
     }
   }
 
-  // 2. Strict Image Verification
+  // 2. Strict Genuine HD Image Verification (Zero AI, Zero Stock Fallbacks)
   const img = article.cover_image
   if (
     !img ||
     typeof img !== 'string' ||
-    img.length < 10 ||
+    img.length < 15 ||
     img.includes('placeholder') ||
     img.includes('pollinations.ai') ||
+    img.includes('images.unsplash.com') ||
     img.includes('news.google.com') ||
     img.includes('googleusercontent.com') ||
-    img.includes('photo-1598488035139-bdbb2231ce04')
+    img.includes('gstatic.com') ||
+    img.includes('photo-1598488035139-bdbb2231ce04') ||
+    img.includes('62597tdwpbuqa4wb3ytyr780r83o') ||
+    img.includes('8703u6x0lrzyjlnucnb396u4m6qb')
   ) {
-    return { isValid: false, reason: 'Invalid, broken, or prohibited image URL' }
+    return { isValid: false, reason: 'Invalid, low-res, placeholder, or non-authentic image URL' }
   }
 
-  // 3. Strict Deal & Genuine Pricing Verification
+  // 3. Strict Genuine Pricing Verification (Zero Fake Pricing, Zero Inactive Deals)
   if (article.category === 'Deals & Sales') {
-    if (!article.deal_price && !article.specs?.['Price'] && !article.specs?.['Discounted Price']) {
-      return { isValid: false, reason: 'Deals & Sales article missing verified deal price' }
+    if (!article.deal_price || article.deal_price === 'Special Offer' || !article.deal_price.startsWith('$')) {
+      return { isValid: false, reason: 'Deals & Sales article missing verified deal price ($XX.XX)' }
+    }
+    if (!article.deal_regular_price || !article.deal_regular_price.startsWith('$')) {
+      return { isValid: false, reason: 'Deals & Sales article missing verified regular price ($YY.YY)' }
+    }
+    if (article.deal_price === article.deal_regular_price) {
+      return { isValid: false, reason: 'Product is at full price, not an active deal' }
     }
   }
 

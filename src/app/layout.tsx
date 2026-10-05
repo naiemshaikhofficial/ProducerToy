@@ -148,7 +148,7 @@ export default function RootLayout({
           id="impact-affiliate"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
-            __html: `(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7711863-ac02-45ed-a75d-49aa37eb071a1.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');`,
+            __html: `(function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A7711863-ac02-45ed-a75d-49aa37eb071a1.js','script','impactStat',document,window);impactStat('trackImpression');`,
           }}
         />
       </head>

@@ -46,17 +46,35 @@ async function handleSync(req: Request) {
         .replace(/(^-|-$)+/g, '')
         .slice(0, 90)
 
-      // Automatically extract direct developer/merchant deal URL & coupon code first
-      if (!item.directDealUrl) {
-        const dealInfo = await extractDirectDealInfo(item.link)
-        if (dealInfo?.bestUrl) {
+      // Automatically extract direct developer/merchant deal URL & live pricing first
+      const dealInfo = await extractDirectDealInfo(item.directDealUrl || item.link)
+      if (dealInfo) {
+        if (dealInfo.bestUrl) {
           item.directDealUrl = dealInfo.bestUrl
         }
-        if (dealInfo?.couponCode && !(item as any).couponCode) {
+        if (dealInfo.couponCode && !(item as any).couponCode) {
           (item as any).couponCode = dealInfo.couponCode
         }
-        if (dealInfo?.expiryTimeline && !(item as any).expiryTimeline) {
+        if (dealInfo.expiryTimeline && !(item as any).expiryTimeline) {
           (item as any).expiryTimeline = dealInfo.expiryTimeline
+        }
+        if (dealInfo.dealPrice && !(item as any).dealPrice) {
+          (item as any).dealPrice = dealInfo.dealPrice
+        }
+        if (dealInfo.regularPrice && !(item as any).regularPrice) {
+          (item as any).regularPrice = dealInfo.regularPrice
+        }
+        if (dealInfo.discount && !(item as any).discount) {
+          (item as any).discount = dealInfo.discount
+        }
+        if (dealInfo.coverImage) {
+          item.imageUrl = dealInfo.coverImage
+        }
+        // Strict: If verified as NOT an active deal (e.g. regular price only), skip it!
+        if (dealInfo.isDealActive === false) {
+          console.log(`[News Sync] Skipping non-discounted product: "${item.title}"`)
+          skippedCount++
+          continue
         }
       }
 

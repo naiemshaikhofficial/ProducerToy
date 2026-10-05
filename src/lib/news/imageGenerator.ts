@@ -73,21 +73,6 @@ export function isForbiddenCoverImageUrl(url?: string | null): boolean {
   return false
 }
 
-async function resolveRedirectToBannerCdn(url: string): Promise<string> {
-  if (!url || !url.includes('rails/active_storage/blobs/redirect')) return url
-  try {
-    const res = await fetch(url, { method: 'HEAD', redirect: 'manual', signal: AbortSignal.timeout(3000) })
-    const loc = res.headers.get('location')
-    if (loc) {
-      const hash = loc.split('/').pop()?.split('?')[0]
-      if (hash && hash.length > 10) {
-        return `https://banners.pluginboutique.com/${hash}`
-      }
-    }
-  } catch {}
-  return url
-}
-
 async function extractUltraHdFromProductHtml(html: string, title?: string): Promise<string | null> {
   const cleanTitle = (title || '').toLowerCase()
 
@@ -99,29 +84,35 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     return 'https://www.ujam.com/fileadmin/_processed_/b/c/csm_vg-iron2_307c7d8d5d.jpg'
   }
 
-  // 2. High-res gallery developer banner / news banner blob
-  const bannerBlob = html.match(
-    /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+(?:NewsPage|Banner|Artwork|gui|plugin)[^\s"']*/i
-  )
-  if (bannerBlob && !isForbiddenCoverImageUrl(bannerBlob[0])) {
-    return await resolveRedirectToBannerCdn(bannerBlob[0])
+  // 2. High-res ckeditor pictures (Retina original masters 1800px - 3600px)
+  const ckeditorMatch = html.match(/https:\/\/www\.pluginboutique\.com\/ckeditor_assets\/pictures\/[^\s"']+/i)
+  if (ckeditorMatch && !isForbiddenCoverImageUrl(ckeditorMatch[0])) {
+    return ckeditorMatch[0]
   }
 
-  // 3. Any active storage developer blob in the gallery
+  // 3. High-res gallery developer banner / news banner blob
+  const bannerBlob = html.match(
+    /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+(?:NewsPage|Banner|Artwork|gui|plugin|screenshot|hero|Center|Stage)[^\s"']*/i
+  )
+  if (bannerBlob && !isForbiddenCoverImageUrl(bannerBlob[0])) {
+    return bannerBlob[0]
+  }
+
+  // 4. Any active storage developer blob in the gallery
   const anyBlob = html.match(
     /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+/i
   )
   if (anyBlob && !isForbiddenCoverImageUrl(anyBlob[0])) {
-    return await resolveRedirectToBannerCdn(anyBlob[0])
+    return anyBlob[0]
   }
 
-  // 4. Product page official social card (og:image)
+  // 5. Product page official social card (og:image)
   const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
   if (ogMatch && !isForbiddenCoverImageUrl(ogMatch[1])) {
-    return await resolveRedirectToBannerCdn(ogMatch[1])
+    return ogMatch[1]
   }
 
-  // 5. Full UI Screenshot (UI 1 / UI 2 / Main Interface / Screenshot)
+  // 6. Full UI Screenshot (UI 1 / UI 2 / Main Interface / Screenshot)
   const uiMatch =
     html.match(/<img[^>]+alt=["'][^"']*(?:UI\s*1|UI\s*2|Interface|Screenshot)[^"']*["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
     html.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["'][^"']*(?:UI\s*1|UI\s*2|Interface|Screenshot)[^"']*["']/i)
@@ -130,7 +121,7 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     return uiMatch[1]
   }
 
-  // 6. Main Product Hardware / GUI Image
+  // 7. Main Product Hardware / GUI Image
   const mainImgMatch =
     html.match(/<img[^>]+alt=["']Main Image["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
     html.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["']Main Image["']/i)
@@ -139,7 +130,7 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     return mainImgMatch[1]
   }
 
-  // 7. Extract all banner tags and find the largest resolution master screenshot (> 35KB)
+  // 8. Extract all banner tags and find the largest resolution master screenshot (> 35KB)
   const candidateUrls = [...new Set([...html.matchAll(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/gi)].map(m => m[0]))]
   const validCandidates = candidateUrls.filter(u => !isForbiddenCoverImageUrl(u))
 
@@ -308,8 +299,8 @@ export async function resolveProductBannerImage(
     }
   } catch {}
 
-  // 5. Guaranteed 1080p Ultra HD topic-relevant authentic audio visual (Zero 402, High Reliability)
-  return getTopicFallbackImage(title)
+  // 5. Genuine Product Image (No generic Unsplash fallbacks, No AI generated images)
+  return existingImageUrl || '/icon.png'
 }
 
 export function generateThemedCoverPrompt(title: string): string {
@@ -378,5 +369,5 @@ export function getArticleCoverImage(
     return existingImageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
-  return getTopicFallbackImage(title, category)
+  return '/icon.png'
 }
