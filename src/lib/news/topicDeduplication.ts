@@ -210,3 +210,57 @@ export function generateThemedCoverPrompt(title?: string | null): string {
   }
   return `sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${clean.slice(0, 75)}`
 }
+
+export const TOPIC_HD_COVERS: Record<string, string> = {
+  kontakt: 'https://www.native-instruments.com/cdn/shop/files/kontakt-8-player-featured-image.png?v=1786960549',
+  synth: 'https://images.unsplash.com/photo-1598653222000-6b7b7a552625?auto=format&fit=crop&w=1920&q=85',
+  mixing: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1920&q=85',
+  vocal: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1920&q=85',
+  guitar: 'https://images.unsplash.com/photo-1516924962500-2b4b3b99ea02?auto=format&fit=crop&w=1920&q=85',
+  drums: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=1920&q=85',
+  industry: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1920&q=85',
+  sounddesign: 'https://images.unsplash.com/photo-1520523839898-50712825e617?auto=format&fit=crop&w=1920&q=85',
+  freevst: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1920&q=85',
+  default: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1920&q=85',
+}
+
+export function getTopicFallbackImage(title?: string | null, category?: string | null): string {
+  const lower = `${title || ''} ${category || ''}`.toLowerCase()
+
+  if (lower.includes('kontakt') || lower.includes('sampler') || lower.includes('sample library')) {
+    return TOPIC_HD_COVERS.kontakt
+  }
+  if (lower.includes('vocal') || lower.includes('pitch') || lower.includes('tune') || lower.includes('autotune')) {
+    return TOPIC_HD_COVERS.vocal
+  }
+  if (lower.includes('guitar') || lower.includes('pedal') || lower.includes('amp') || lower.includes('distortion')) {
+    return TOPIC_HD_COVERS.guitar
+  }
+  if (lower.includes('drum') || lower.includes('beat') || lower.includes('percussion') || lower.includes('808')) {
+    return TOPIC_HD_COVERS.drums
+  }
+  if (lower.includes('synth') || lower.includes('wavetable') || lower.includes('fm8') || lower.includes('keys')) {
+    return TOPIC_HD_COVERS.synth
+  }
+  if (
+    lower.includes('acquire') ||
+    lower.includes('acquisition') ||
+    lower.includes('ownership') ||
+    lower.includes('inmusic') ||
+    lower.includes('boris fx') ||
+    lower.includes('izotope')
+  ) {
+    return TOPIC_HD_COVERS.industry
+  }
+  if (lower.includes('sound design') || lower.includes('roundup') || lower.includes('software deals') || lower.includes('bundle')) {
+    return TOPIC_HD_COVERS.sounddesign
+  }
+  if (lower.includes('free vst') || lower.includes('freeware') || lower.includes('free plugin') || lower.includes('zero-cost')) {
+    return TOPIC_HD_COVERS.freevst
+  }
+  if (lower.includes('mix') || lower.includes('master') || lower.includes('compressor') || lower.includes('eq') || lower.includes('reverb')) {
+    return TOPIC_HD_COVERS.mixing
+  }
+
+  return TOPIC_HD_COVERS.default
+}

@@ -11,7 +11,10 @@ import {
   Clock,
 } from 'lucide-react'
 import { NewsArticle } from '@/lib/turso/newsDb'
-import { generateThemedCoverPrompt } from '@/lib/news/topicDeduplication'
+import {
+  generateThemedCoverPrompt,
+  getTopicFallbackImage,
+} from '@/lib/news/topicDeduplication'
 import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
@@ -190,6 +193,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     if (
       !url ||
       typeof url !== 'string' ||
+      url.includes('pollinations.ai') ||
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||
       url.includes('news.google.com') ||
@@ -198,8 +202,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       url.includes('placeholder') ||
       EXCLUDED_BANNER_PATTERNS.some((pat) => url.includes(pat))
     ) {
-      const prompt = generateThemedCoverPrompt(title)
-      return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1920&height=1080&nologo=true`
+      return getTopicFallbackImage(title, article.category)
     }
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
@@ -223,9 +226,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       .replace(/&#8221;/g, '”')
   }
 
-  const fallbackPrompt = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    generateThemedCoverPrompt(article.title)
-  )}?width=1920&height=1080&nologo=true`
+  const fallbackPrompt = getTopicFallbackImage(article.title, article.category)
 
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white relative overflow-hidden">

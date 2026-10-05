@@ -7,6 +7,7 @@ import { NewsArticle } from '@/lib/turso/newsDb'
 import {
   deduplicateArticlesByTopic,
   generateThemedCoverPrompt,
+  getTopicFallbackImage,
 } from '@/lib/news/topicDeduplication'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
@@ -132,6 +133,7 @@ function NewsCardImage({
   src,
   alt,
   title,
+  category,
   fill,
   priority,
   sizes,
@@ -140,18 +142,20 @@ function NewsCardImage({
   src: string
   alt: string
   title: string
+  category?: string
   fill?: boolean
   priority?: boolean
   sizes?: string
   className?: string
 }) {
-  const [imgSrc, setImgSrc] = useState(src)
-  const [hasError, setHasError] = useState(false)
+  const fallback = getTopicFallbackImage(title, category)
+  const initial =
+    !src || src.includes('pollinations.ai') || EXCLUDED_BANNER_PATTERNS.some((pat) => src.includes(pat))
+      ? fallback
+      : src
 
-  const prompt = generateThemedCoverPrompt(title)
-  const fallback = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-    prompt
-  )}?width=1200&height=675&nologo=true`
+  const [imgSrc, setImgSrc] = useState(initial)
+  const [hasError, setHasError] = useState(false)
 
   return (
     <Image
@@ -199,10 +203,11 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     }
   }
 
-  const getHighResCoverImage = (url?: string | null, title?: string): string => {
+  const getHighResCoverImage = (url?: string | null, title?: string, category?: string): string => {
     if (
       !url ||
       typeof url !== 'string' ||
+      url.includes('pollinations.ai') ||
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||
       url.includes('news.google.com') ||
@@ -211,16 +216,14 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
       url.includes('placeholder') ||
       EXCLUDED_BANNER_PATTERNS.some((pat) => url.includes(pat))
     ) {
-      const prompt = generateThemedCoverPrompt(title)
-      return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true`
+      return getTopicFallbackImage(title, category)
     }
     // Strip WordPress & CMS thumbnail suffixes (-128x71, -150x150, -300x169, -768x432, -1024x576) to always fetch crisp original Full HD master
     return url.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
-  const getFallbackCoverImage = (title?: string): string => {
-    const prompt = generateThemedCoverPrompt(title)
-    return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1200&height=675&nologo=true`
+  const getFallbackCoverImage = (title?: string, category?: string): string => {
+    return getTopicFallbackImage(title, category)
   }
 
   const cleanHtmlTitle = (title?: string | null): string => {

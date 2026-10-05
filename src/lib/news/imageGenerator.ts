@@ -5,6 +5,8 @@
  * 3. Searches Plugin Boutique for matching product and extracts banners.pluginboutique.com image.
  * 4. Fallbacks to high-res synthesized audio graphic.
  */
+import { getTopicFallbackImage } from './topicDeduplication'
+
 const PB_EXCLUDED_BANNER_HASHES = [
   '62597tdwpbuqa4wb3ytyr780r83o', // Academy Award plaque banner (unrelated to products)
   '8703u6x0lrzyjlnucnb396u4m6qb', // Melodyne 5 Essential gift
@@ -306,11 +308,8 @@ export async function resolveProductBannerImage(
     }
   } catch {}
 
-  // 5. Guaranteed 1080p Ultra HD title-relevant audio workstation graphic
-  const prompt = generateThemedCoverPrompt(title)
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1920&height=1080&nologo=true&seed=${Math.floor(
-    Math.random() * 99999
-  )}`
+  // 5. Guaranteed 1080p Ultra HD topic-relevant authentic audio visual (Zero 402, High Reliability)
+  return getTopicFallbackImage(title)
 }
 
 export function generateThemedCoverPrompt(title: string): string {
@@ -379,8 +378,5 @@ export function getArticleCoverImage(
     return existingImageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
-  const prompt = generateThemedCoverPrompt(title)
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1920&height=1080&nologo=true&seed=${Math.floor(
-    Math.random() * 99999
-  )}`
+  return getTopicFallbackImage(title, category)
 }
