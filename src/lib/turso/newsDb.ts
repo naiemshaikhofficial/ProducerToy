@@ -375,10 +375,13 @@ export async function getRelatedNews(excludeSlug: string, category: string, limi
 
   try {
     const result = await client.execute({
-      sql: `SELECT * FROM news_articles WHERE slug != ? ORDER BY CASE WHEN category = ? THEN 0 ELSE 1 END, published_at DESC LIMIT ?`,
-      args: [excludeSlug, category, limit],
+      sql: `SELECT * FROM news_articles WHERE slug != ? AND badge != 'EXPIRED' ORDER BY CASE WHEN category = ? THEN 0 ELSE 1 END, published_at DESC LIMIT ?`,
+      args: [excludeSlug, category, limit * 2],
     })
-    return result.rows.map((row) => parseArticleRow(row))
+    const parsed = result.rows.map((row) => parseArticleRow(row))
+    const { detectDealExpiry } = await import('@/lib/news/dealExpiry')
+    const activeOnly = parsed.filter((a) => !detectDealExpiry(a).isExpired)
+    return activeOnly.slice(0, limit)
   } catch {
     return []
   }

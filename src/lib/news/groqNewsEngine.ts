@@ -145,6 +145,16 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           }
         }
 
+        // Enforce brand and exact product name integrity (prevent AI from inventing fictional titles)
+        const verifiedBrand = (item as any).brand
+        const verifiedProductName = (item as any).productName
+        if (verifiedBrand && rewritten.title && !rewritten.title.toUpperCase().includes(verifiedBrand.toUpperCase())) {
+          rewritten.title = `${verifiedBrand} ${rewritten.title}`
+        }
+        if (verifiedProductName && rewritten.title && !rewritten.title.toLowerCase().includes(verifiedProductName.toLowerCase())) {
+          rewritten.title = `${verifiedBrand ? verifiedBrand + ' ' : ''}${verifiedProductName} Deal: ${verifiedDiscount ? verifiedDiscount + ' ' : ''}(${rewritten.deal_price || 'Special Offer'})`
+        }
+
         // Deal Expiry / Validity Timeline detection (feed ground-truth takes highest priority)
         const detectedExpiry = verifiedExpiry || rewritten.expiry_date || null
         if (detectedExpiry) {
@@ -257,7 +267,8 @@ REQUIREMENTS:
    - Write titles that match what active music producers and audio engineers search for on Google: e.g. "[Brand] [Product] [Category/Feature] Deal: [X]% Off ($[Price] VST)".
    - NEVER use repetitive, spammy formulas like "Record Low Price on Industry Standard Audio Plugin" on multiple products! Every title must be unique, high-intent, and specific to the actual plugin.
    - Target top ranking search keywords: free VST plugins, synth VST deals, vocal compressor plugins, audio plugin sales, coupon codes, and 2026 DAW essentials.
-2. STRICT ACCURACY ON PRICING, DISCOUNT & EXPIRY (ZERO FABRICATION):
+2. STRICT ACCURACY ON PRICING, DISCOUNT, EXPIRY & PRODUCT NAME (ZERO FABRICATION):
+   - EXACT PRODUCT NAME INTEGRITY: You MUST preserve the exact real product name and brand. If the product is "UAD Mix Tape Pro", do NOT change it to "Analog Tape Bundle"! If the product is "ZENOLOGY PRO", do not change it! Keep the exact product identity: "${item.title}".
    - If Verified Official Discount (e.g. 80% OFF) is provided above, you MUST use that EXACT discount in the title, excerpt, and specs. NEVER guess or invent different percentages (e.g. do NOT write 88% if it is 80%)!
    - If Verified Sale Price ($39) and Regular Price ($199) are provided, use them exactly: deal_price="${(item as any).dealPrice || '$XX'}", deal_regular_price="${(item as any).regularPrice || '$XX'}".
    - If Verified Sale End Date / Expiry Deadline (e.g. 'until Nov 01' or 'Nov 01') is provided:

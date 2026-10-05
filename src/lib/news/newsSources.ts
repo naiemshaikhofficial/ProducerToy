@@ -391,6 +391,9 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
           if (brand) {
             ;(item as any).brand = brand
           }
+          if (name) {
+            ;(item as any).productName = name
+          }
           if (discount) {
             ;(item as any).discount = discount
           }
