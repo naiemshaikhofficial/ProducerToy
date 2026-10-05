@@ -1,3 +1,5 @@
+import { parseExpiryDateText, detectDealExpiry } from '@/lib/news/dealExpiry'
+
 export interface RawFeedItem {
   title: string
   link: string
@@ -312,6 +314,14 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
         const endsMatch = block.match(/(?:\[?\s*(?:Ends|until|runs through|valid through|sale ends)\s+([a-zA-Z]+\s+\d{1,2}|\d{1,2}\s+[a-zA-Z]+[^\]\n\r]*?)\]?)/i)
         const expiry = endsMatch ? endsMatch[1].replace(/Hot!|New!/gi, '').trim() : ''
 
+        // STRICT CHECK: If the deal date has already expired, skip immediately!
+        if (expiry) {
+          const expCheck = parseExpiryDateText(expiry)
+          if (expCheck && expCheck.isExpired) {
+            continue
+          }
+        }
+
         // Category & Manufacturer e.g. [Virtual Instruments](...) by [UJAM](...)
         const byMatch = block.match(/\[([^\]]+)\]\([^\)]+\)\s*by\s*\[([^\]]+)\]/i)
         const category = byMatch ? byMatch[1].trim() : 'Deals & Sales'
@@ -418,6 +428,12 @@ export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
       const title = cleanText(match[1].trim())
       const rawUrl = match[2].trim()
       const expiry = match[3].replace(/_Expiry:\s*/i, '').replace(/_/g, '').trim()
+      if (expiry) {
+        const expCheck = parseExpiryDateText(expiry)
+        if (expCheck && expCheck.isExpired) {
+          continue
+        }
+      }
       const cleanUrl = sanitizeDealUrl(rawUrl) || rawUrl
 
       items.push({
@@ -747,14 +763,32 @@ function isValidImageUrl(url: string): boolean {
  */
 export async function verifyArticleQuality(article: {
   title?: string
+  content?: string
+  excerpt?: string
   source_url?: string | null
   cover_image?: string | null
+  category?: string | null
+  badge?: string | null
+  specs?: Record<string, string> | null
+  deal_price?: string | null
+  deal_regular_price?: string | null
+  deal_expires_at?: string | null
 }): Promise<{ isValid: boolean; reason?: string }> {
-  // 1. Strict Image Verification
+  // 1. Strict Expiry Verification: NEVER publish an expired deal!
+  const expiryCheck = detectDealExpiry(article)
+  if (expiryCheck.isExpired) {
+    return {
+      isValid: false,
+      reason: `Deal has already ended or expired (${expiryCheck.expiryTimeline || 'Deadline passed'})`,
+    }
+  }
+
+  // 2. Strict Image Verification
   const img = article.cover_image
   if (
     !img ||
     typeof img !== 'string' ||
+    img.length < 10 ||
     img.includes('placeholder') ||
     img.includes('pollinations.ai') ||
     img.includes('news.google.com') ||
@@ -762,6 +796,13 @@ export async function verifyArticleQuality(article: {
     img.includes('photo-1598488035139-bdbb2231ce04')
   ) {
     return { isValid: false, reason: 'Invalid, broken, or prohibited image URL' }
+  }
+
+  // 3. Strict Deal & Genuine Pricing Verification
+  if (article.category === 'Deals & Sales') {
+    if (!article.deal_price && !article.specs?.['Price'] && !article.specs?.['Discounted Price']) {
+      return { isValid: false, reason: 'Deals & Sales article missing verified deal price' }
+    }
   }
 
   // 2. Strict Deal Link Verification

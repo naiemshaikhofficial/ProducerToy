@@ -173,15 +173,13 @@ export function parseExpiryDateText(
   if (isNaN(expiryDate.getTime())) return null
 
   const diffMs = Date.now() - expiryDate.getTime()
-  // 36-hour timezone grace period for active sales (PST/PDT offset + same-week store closeout)
-  const isGracePeriod = diffMs > 0 && diffMs <= 36 * 60 * 60 * 1000
-  const isExpired = diffMs > 36 * 60 * 60 * 1000
+  const isExpired = diffMs > 0
 
   return {
     isExpired,
-    isGracePeriod,
+    isGracePeriod: false,
     date: expiryDate,
-    formatted: isGracePeriod ? 'Ending Soon' : formatted,
+    formatted,
   }
 }
 

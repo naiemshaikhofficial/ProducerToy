@@ -46,8 +46,12 @@ const TOP_AUDIO_BRANDS = [
 export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | undefined {
   if (!articles || articles.length === 0) return undefined
 
+  // Strictly filter out expired articles so the hero is 100% active and authentic
+  const activeArticles = articles.filter((a) => !detectDealExpiry(a).isExpired)
+  const candidateArticles = activeArticles.length > 0 ? activeArticles : articles
+
   // Priority 1: Sponsored or Partner article
-  const sponsored = articles.find(
+  const sponsored = candidateArticles.find(
     (a) =>
       (a as any).is_sponsored === 1 ||
       a.badge?.toUpperCase().includes('SPONSORED') ||
@@ -58,10 +62,10 @@ export function getTopFeaturedArticle(articles: NewsArticle[]): NewsArticle | un
   if (sponsored) return sponsored
 
   // Priority 2: Sabse tagda brand deal offer
-  let bestArticle = articles[0]
+  let bestArticle = candidateArticles[0]
   let maxScore = -1
 
-  for (const article of articles) {
+  for (const article of candidateArticles) {
     let score = 0
     const upperTitle = (article.title || '').toUpperCase()
     const upperBadge = (article.badge || '').toUpperCase()
@@ -180,10 +184,16 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   const [visibleCount, setVisibleCount] = useState(12)
 
   // Ensure initial articles are cleanly topic-deduplicated
-  const articles = React.useMemo(
+  const rawArticles = React.useMemo(
     () => deduplicateArticlesByTopic(initialArticles),
     [initialArticles]
   )
+
+  // Producer Toy strictly showcases 100% authentic, active, unexpired deals & audio news
+  const articles = React.useMemo(() => {
+    const unexpired = rawArticles.filter((a) => !detectDealExpiry(a).isExpired)
+    return unexpired.length > 0 ? unexpired : rawArticles
+  }, [rawArticles])
 
   // 1 Featured Hero Article (Priority: Sponsored -> Sabse Tagda Brand Deal)
   const featuredArticle = getTopFeaturedArticle(articles)

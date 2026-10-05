@@ -132,6 +132,28 @@ async function handleSync(req: Request) {
       }
     }
 
+    // Automated Expiry Sweep: Detect any active deals in DB whose validity period has elapsed and mark as EXPIRED
+    let expiredSweptCount = 0
+    try {
+      const recentArticles = await getNewsArticles({ limit: 60 })
+      for (const existingItem of recentArticles) {
+        if (existingItem.badge?.toUpperCase() !== 'EXPIRED') {
+          const exp = detectDealExpiry(existingItem)
+          if (exp.isExpired) {
+            existingItem.badge = 'EXPIRED'
+            existingItem.specs = { ...(existingItem.specs || {}), Status: 'Expired' }
+            await saveNewsArticle(existingItem)
+            expiredSweptCount++
+          }
+        }
+      }
+      if (expiredSweptCount > 0) {
+        console.log(`[News Sync] Automated Expiry Sweep marked ${expiredSweptCount} deals as EXPIRED in DB`)
+      }
+    } catch (sweepErr: any) {
+      console.warn('[News Sync Expiry Sweep Warning]:', sweepErr?.message || sweepErr)
+    }
+
     // Automatically submit new article URLs to IndexNow for instantaneous search engine indexing
     let indexNowResult: any = null
     if (savedSlugs.length > 0) {
