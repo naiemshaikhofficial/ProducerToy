@@ -86,16 +86,32 @@ export function sanitizeScrapedText(text: string): string {
  */
 export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticle> {
   const apiKey = process.env.GROQ_API_KEY?.trim()
+  const geminiApiKey = process.env.GEMINI_API_KEY?.trim()
   const coverImage = await resolveProductBannerImage(
     item.title,
     item.imageUrl,
     item.directDealUrl || item.link
   )
 
+  let rewritten: GroqRewriteResponse | null = null
+
   if (apiKey) {
     try {
-      const rewritten = await callGroqLlama(item, apiKey)
-      if (rewritten) {
+      rewritten = await callGroqLlama(item, apiKey)
+    } catch (err) {
+      console.warn('[rewriteNewsWithGroq] Groq rewrite error, attempting Gemini fallback:', err)
+    }
+  }
+
+  if (!rewritten && geminiApiKey) {
+    try {
+      rewritten = await callGeminiFlash(item, geminiApiKey)
+    } catch (err) {
+      console.warn('[rewriteNewsWithGroq] Gemini rewrite error:', err)
+    }
+  }
+
+  if (rewritten) {
         const detectedCoupon = rewritten.coupon_code || (item as any).couponCode || null
         const specs = rewritten.specs || {}
         if (detectedCoupon && !specs['Coupon Code']) {
@@ -182,20 +198,16 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           seo_keywords: rewritten.seo_keywords || '',
         }
       }
-    } catch (err) {
-      console.warn('[rewriteNewsWithGroq] Groq rewrite error, using fallback:', err)
-    }
-  }
 
-  // Graceful Fallback if Groq is unavailable
+  // Graceful Fallback if neither Groq nor Gemini is available
   return buildFallbackArticle(item, coverImage)
 }
 
-async function callGroqLlama(item: RawFeedItem, apiKey: string): Promise<GroqRewriteResponse | null> {
+function buildArticlePrompt(item: RawFeedItem): string {
   const directUrlNote = item.directDealUrl ? `Direct Official Product / Deal URL: ${item.directDealUrl}` : ''
   const detectedCouponNote = (item as any).couponCode ? `Detected Promo / Coupon Code: ${(item as any).couponCode}` : ''
 
-  const prompt = `You are the lead editor for Producer Toy (the premier digital audio workstation store for music producers, beatmakers, and audio engineers).
+  return `You are the lead editor for Producer Toy (the premier digital audio workstation store for music producers, beatmakers, and audio engineers).
 Rewrite the following audio news item from "${item.sourceName}" into a high-authority, original, engaging news article for music producers.
 
 ORIGINAL SOURCE:
@@ -216,34 +228,35 @@ REQUIREMENTS:
 3. FORMATTING & TECHNICAL PROSE:
    - Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture & FM Engine, ### Optical Compression & Transient Response, ### Compatibility & System Specs). Never output a single run-on wall of text.
    - Cover real DSP architecture, circuit modeling, sound character, and DAW workflows (Ableton Live, FL Studio, Logic Pro, Studio One).
-4. If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Universal Audio, Arturia, Soundtoys, Slate Digital, Softube, Klevgrand), prominently feature the brand name, product name, and format in the title and excerpt.
-4. COUPON CODE DETECTION & NARRATIVE:
+4. BRAND FOCUS:
+   - If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Universal Audio, Arturia, Soundtoys, Slate Digital, Softube, Klevgrand), prominently feature the brand name, product name, and format in the title and excerpt.
+5. COUPON CODE DETECTION & NARRATIVE:
    - If any coupon code, promo code, or voucher code is mentioned in the source or detected above (e.g. 'BPB100OFF', 'SUMMER90'):
      a) Set "coupon_code" to the exact code.
      b) Set "badge": "COUPON CODE".
      c) Add "Coupon Code": code inside "specs".
      d) In the article narrative, include a clear section explaining step-by-step how users enter this coupon code at checkout to drop the price (for example, dropping from $49.00 to $0.00 / FREE).
    - If no coupon code is required, leave "coupon_code" empty. Do NOT invent fake coupon codes.
-5. MEGA DEAL & BADGE CLASSIFICATION:
+6. MEGA DEAL & BADGE CLASSIFICATION:
    - If a coupon code is required: set "badge": "COUPON CODE".
    - If discount is 70%+, 80%+, 90%+, price drop, or record-low: set "badge": "MEGA DEAL".
    - If it's a 100% free giveaway / freeware: set "badge": "FREEWARE".
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
    - Otherwise: set "badge": "HOT DEAL" or "NEW RELEASE".
-6. NEVER mention third-party blogs, sources, or third-party stores (Bedroom Producers Blog, AudioPlugin Guy, Rekkerd, KVR, Gearnews, Plugin Boutique). Write strictly as the Producer Toy official editorial newsroom. Do NOT say "on Plugin Boutique" or "at Plugin Boutique" - write "now", "today", or "official deal".
-7. EXACT DEEP PRODUCT OR DEAL OFFER LINK (NEVER IMAGES OR ROOT DOMAINS):
+7. NEVER mention third-party blogs, sources, or third-party stores (Bedroom Producers Blog, AudioPlugin Guy, Rekkerd, KVR, Gearnews, Plugin Boutique). Write strictly as the Producer Toy official editorial newsroom. Do NOT say "on Plugin Boutique" or "at Plugin Boutique" - write "now", "today", or "official deal".
+8. EXACT DEEP PRODUCT OR DEAL OFFER LINK (NEVER IMAGES OR ROOT DOMAINS):
    - Set "product_url" to the exact official product download/store/offer landing page (e.g. "https://syncaudio.io/megamorph/", "https://audija.com/oscope/", "https://safari-pedals.com/products/the-camel-strip-wildin-channel-strip", or specific Plugin Boutique product deal page).
    - In music blogs (BPB, GearNews, Rekkerd), this is consistently placed at the bottom of the article after "More info: [Product Name ($XX)](url)" or "Product page:". Always extract this exact deep product page link.
    - NEVER use image URLs (e.g. .jpg, .png, ytimg), NEVER link to YouTube, and NEVER link to competitor blogs or empty placeholder anchors.
    - If a specific product slug exists on the developer's website, always include the deep path (e.g. /megamorph/ or /oscope/), not just the root domain.
-8. MULTI-PLUGIN DEALS, CURATED GUIDES & ROUNDUPS:
+9. MULTI-PLUGIN DEALS, CURATED GUIDES & ROUNDUPS:
    - If this article covers MULTIPLE plugins, sample packs, or is a curated listicle/guide (e.g. "Best Free Kontakt Libraries", "Top Synth Plugins", "Free VST Essentials"):
      a) Name and showcase EACH recommended software, library, or tool with its own dedicated ### heading.
-     b) For EACH featured item, include an authentic preview image: e.g. ![Instrument / UI Preview](https://image.pollinations.ai/prompt/{url-encoded-description}?width=1200&height=675&nologo=true) or authentic resource screenshot.
+     b) For EACH featured item, include an authentic preview image (developer screenshot, official UI graphic, or authentic resource URL).
      c) For EACH featured item, include its direct official download or deal link right under its section, formatted as a clear action button: e.g. [Download Free Plugin](url) or [Get Official Deal](url).
      d) NEVER output vague abstract commentary without showcasing the actual tools, their resource images, and direct download links! Every featured item must have its own action button.
-9. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
-10. DEAL EXPIRY & VALIDITY TIMELINE:
+10. ZERO BOILERPLATE: NEVER generate generic boilerplate phrases like "### Key Highlights & Features", "Audio Production Excellence", "Workflow Integration", "### How to Get It", or "[here](#)". Every detail must be genuine, accurate, and specific to the actual software.
+11. DEAL EXPIRY & VALIDITY TIMELINE:
    - If the source mentions an end date, expiration date, or limited-time sale deadline (e.g. "40% off until Nov 01", "sale ends Oct 31", "until November 1", "runs through Nov 1st"):
      a) Set "expiry_date": "Nov 01" (or the exact timeline).
      b) Add "Valid Until": "Nov 01" (or exact timeline) inside "specs".
@@ -275,7 +288,10 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
   },
   "seo_keywords": "native instruments sale, massive x deal, coupon code, vst discount"
 }`
+}
 
+async function callGroqLlama(item: RawFeedItem, apiKey: string): Promise<GroqRewriteResponse | null> {
+  const prompt = buildArticlePrompt(item)
   const modelsToTry = [
     'qwen/qwen3.8-27b',
     'openai/gpt-oss-120b',
@@ -311,7 +327,50 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
       const json = await response.json()
       const rawText = json.choices?.[0]?.message?.content?.trim() || ''
 
-      // Clean JSON output in case model added code block markers
+      const cleanJson = rawText
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim()
+
+      return JSON.parse(cleanJson) as GroqRewriteResponse
+    } catch {
+      continue
+    }
+  }
+
+  return null
+}
+
+async function callGeminiFlash(item: RawFeedItem, apiKey: string): Promise<GroqRewriteResponse | null> {
+  const prompt = buildArticlePrompt(item)
+  const modelsToTry = ['gemini-flash-lite-latest', 'gemini-flash-latest']
+
+  for (const model of modelsToTry) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              responseMimeType: 'application/json',
+              temperature: 0.3,
+            },
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        continue
+      }
+
+      const json = await response.json()
+      const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+      if (!rawText) continue
+
       const cleanJson = rawText
         .replace(/^```json\s*/i, '')
         .replace(/^```\s*/i, '')
