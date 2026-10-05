@@ -544,6 +544,13 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
     }
   }
 
+  // Sort by pubDate descending so the freshest releases across all feeds (Bedroom Producers Blog, Rekkerd, Plugin Boutique) are synchronized first
+  allItems.sort((a, b) => {
+    const timeA = new Date(a.pubDate).getTime() || 0
+    const timeB = new Date(b.pubDate).getTime() || 0
+    return timeB - timeA
+  })
+
   return allItems
 }
 

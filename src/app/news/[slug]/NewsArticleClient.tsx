@@ -91,36 +91,29 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     (article.title?.includes(',') && ctaLinksCount >= 1) ||
     /deals|roundup|plugins on sale|best deals|top deals|3 strong|4 strong|5 strong/i.test(article.title || '')
 
+  const isFreeProduct = Boolean(
+    article.category === 'Free VSTs' ||
+    article.deal_price === '$0' ||
+    article.badge === 'FREEWARE' ||
+    /free\s*vst|freeware|free\s*download|free\s*plugin|free\s*sample|free\s*instrument/i.test(
+      article.title || ''
+    )
+  )
+
+  const isPbDeal = Boolean(
+    (article.source_url && article.source_url.toLowerCase().includes('pluginboutique.com')) ||
+    article.source_name?.toLowerCase().includes('plugin boutique') ||
+    /plugin\s*boutique/i.test(article.title || '')
+  )
+
   const PB_AFFILIATE_ID = '68affa2b94f43'
 
   const resolveOfferLink = (url?: string | null): string => {
-    if (!url || url === '/store' || url.includes('producertoy.com/store')) {
-      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
-    }
-    const lower = url.toLowerCase()
-    if (
-      /\.(jpg|jpeg|png|webp|gif|svg|avif)(\?.*)?$/i.test(url) ||
-      lower.includes('ytimg.com') ||
-      lower.includes('youtube.com') ||
-      lower.includes('youtu.be')
-    ) {
-      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
-    }
-    if (
-      lower.includes('gearnews.com') ||
-      lower.includes('bedroomproducersblog.com') ||
-      lower.includes('rekkerd.org') ||
-      lower.includes('kvraudio.com') ||
-      lower.includes('musictech.com') ||
-      lower.includes('cdm.link') ||
-      lower.includes('news.google.com')
-    ) {
-      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
-    }
-    if (url.includes('pluginboutique.com')) {
+    // 1. If it's a Plugin Boutique deal/product URL, attach / ensure user's affiliate referral ID
+    if (url && url.toLowerCase().includes('pluginboutique.com')) {
       try {
         const parsed = new URL(url)
-        Array.from(parsed.searchParams.keys()).forEach(key => {
+        Array.from(parsed.searchParams.keys()).forEach((key) => {
           if (key !== 'a_aid') {
             if (/^data\d*$/i.test(key) || /^utm_/i.test(key) || key.toLowerCase() === 'affiliate') {
               parsed.searchParams.delete(key)
@@ -137,7 +130,42 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         return clean.includes('?') ? `${clean}&a_aid=${PB_AFFILIATE_ID}` : `${clean}?a_aid=${PB_AFFILIATE_ID}`
       }
     }
-    return url
+
+    // 2. If it's an authentic developer or vendor URL (Native Instruments, Spitfire, GitHub, developer site)
+    if (url && typeof url === 'string' && url.trim().length > 5) {
+      const lower = url.toLowerCase().trim()
+      const isScraperBlog =
+        lower.includes('gearnews.com') ||
+        lower.includes('bedroomproducersblog.com') ||
+        lower.includes('rekkerd.org') ||
+        lower.includes('kvraudio.com') ||
+        lower.includes('musictech.com') ||
+        lower.includes('cdm.link') ||
+        lower.includes('news.google.com')
+
+      const isMedia =
+        /\.(jpg|jpeg|png|webp|gif|svg|avif)(\?.*)?$/i.test(url) ||
+        lower.includes('ytimg.com') ||
+        lower.includes('youtube.com') ||
+        lower.includes('youtu.be')
+
+      if (!isScraperBlog && !isMedia && (lower.startsWith('http://') || lower.startsWith('https://'))) {
+        return url
+      }
+    }
+
+    // 3. Fallbacks: ONLY send to Plugin Boutique if the product/story is genuinely from Plugin Boutique
+    if (isPbDeal) {
+      return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
+    }
+
+    // 4. For Free VSTs and zero-cost tools, fallback to Producer Toy's curated free tools directory
+    if (isFreeProduct) {
+      return '/free-vst-plugins'
+    }
+
+    // 5. Default internal catalog fallback
+    return '/store'
   }
 
   const offerUrl = resolveOfferLink(article.source_url)
@@ -344,13 +372,13 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             <div className="my-10 flex flex-col items-center justify-center w-full clear-both">
               <a
                 href={offerUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                target={offerUrl.startsWith('/') ? '_self' : '_blank'}
+                rel={offerUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
                 className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline text-center group"
               >
                 <span>
-                  {article.category === 'Free VSTs' || article.deal_price === '$0' || article.title?.toLowerCase().includes('free')
-                    ? 'Download Free Plugin'
+                  {isFreeProduct
+                    ? (offerUrl.startsWith('/') ? 'Explore Free VST Plugins' : 'Download Free Plugin')
                     : 'Get Official Deal'}
                 </span>
                 <ExternalLink className="w-4 h-4 text-white shrink-0 group-hover:translate-x-0.5 transition-transform" />

@@ -43,9 +43,9 @@ function formatInline(
   fallbackDealUrl?: string | null
 ): string {
   const defaultAffiliateUrl =
-    fallbackDealUrl && fallbackDealUrl !== '#' && fallbackDealUrl.length > 5
+    fallbackDealUrl && fallbackDealUrl !== '#' && fallbackDealUrl.length > 2
       ? sanitizeLinkUrl(fallbackDealUrl)
-      : `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
+      : '/free-vst-plugins'
 
   return text
     // **bold**
@@ -55,7 +55,7 @@ function formatInline(
     // [text](url) - Convert markdown links and style CTA deal buttons
     .replace(/\[([^\]]+)\]\(([^)]*)\)/g, (match, linkText, rawUrl) => {
       let url = sanitizeLinkUrl(rawUrl)
-      if (url === '#' || !url || url.length < 3) {
+      if (url === '#' || !url || url.length < 2) {
         url = defaultAffiliateUrl
       }
 
@@ -76,6 +76,8 @@ function formatInline(
         cleanLinkText.toLowerCase().includes('€') ||
         cleanLinkText.toLowerCase().includes('$')
 
+      const isExternal = !url.startsWith('/')
+
       if (isCtaButton) {
         const subtext = isExpired
           ? `<span class="deal-expired-subtext mt-1.5 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide block">Expired</span>`
@@ -83,10 +85,10 @@ function formatInline(
           ? `<span class="deal-timeline-subtext mt-1.5 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide block">${expiryTimeline}</span>`
           : ''
 
-        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" target="_blank" rel="noopener noreferrer" class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
+        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
       }
 
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
+      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
     })
     // `code`
     .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')

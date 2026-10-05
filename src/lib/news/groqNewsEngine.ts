@@ -126,7 +126,23 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         }
         const deterministicId = `news_${Math.abs(hash).toString(36)}`
 
-        const safeSourceUrl = resolveSafeDealUrl(rewritten.product_url, item.directDealUrl, item.link)
+        const isFree =
+          rewritten.category === 'Free VSTs' ||
+          rewritten.deal_price === '$0' ||
+          rewritten.title?.toLowerCase().includes('free')
+        const isPb =
+          item.sourceName?.toLowerCase().includes('plugin boutique') ||
+          Boolean(item.directDealUrl?.toLowerCase().includes('pluginboutique.com')) ||
+          Boolean(item.link?.toLowerCase().includes('pluginboutique.com')) ||
+          Boolean(rewritten.product_url?.toLowerCase().includes('pluginboutique.com'))
+
+        const safeSourceUrl = resolveSafeDealUrl(
+          rewritten.product_url,
+          item.directDealUrl,
+          item.link,
+          isFree,
+          isPb
+        )
         let finalContent = sanitizeScrapedText(rewritten.content)
         if (safeSourceUrl) {
           finalContent = finalContent.replace(/\]\(\s*#?[^)]*\)/g, (match) => {
@@ -310,7 +326,13 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
   return null
 }
 
-function resolveSafeDealUrl(productUrl?: string, directDealUrl?: string, itemLink?: string): string {
+function resolveSafeDealUrl(
+  productUrl?: string,
+  directDealUrl?: string,
+  itemLink?: string,
+  isFree?: boolean,
+  isPbDeal?: boolean
+): string {
   // 1. If direct deal URL from HTML exists (Thomann, Plugin Boutique, developer sites, etc.)
   const cleanDirect = sanitizeDealUrl(directDealUrl)
   if (cleanDirect) {
@@ -326,8 +348,15 @@ function resolveSafeDealUrl(productUrl?: string, directDealUrl?: string, itemLin
   if (cleanItem) {
     return cleanItem
   }
-  // 4. Default fallback: Plugin Boutique Deals with user's affiliate referral ID
-  return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+  // 4. Default fallback: ONLY send to Plugin Boutique if the product/deal is genuinely from Plugin Boutique
+  if (isPbDeal) {
+    return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+  }
+  // For Free VSTs, fallback to Producer Toy's curated free tools directory
+  if (isFree) {
+    return `https://producertoy.com/free-vst-plugins`
+  }
+  return `https://producertoy.com/store`
 }
 
 function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticle {
@@ -339,7 +368,18 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
 
   const cleanedSnippet = sanitizeScrapedText(item.contentSnippet || item.title)
 
-  const safeSourceUrl = resolveSafeDealUrl(undefined, item.directDealUrl, item.link)
+  const isPb =
+    item.sourceName?.toLowerCase().includes('plugin boutique') ||
+    Boolean(item.directDealUrl?.toLowerCase().includes('pluginboutique.com')) ||
+    Boolean(item.link?.toLowerCase().includes('pluginboutique.com'))
+
+  const safeSourceUrl = resolveSafeDealUrl(
+    undefined,
+    item.directDealUrl,
+    item.link,
+    isFree,
+    isPb
+  )
 
   // Clean narrative editorial content without any artificial headings or bullet points
   const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
