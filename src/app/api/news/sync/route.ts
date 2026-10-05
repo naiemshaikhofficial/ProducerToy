@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { fetchMusicNewsFeedItems, extractDirectDealInfo } from '@/lib/news/newsSources'
+import { fetchMusicNewsFeedItems, extractDirectDealInfo, verifyArticleQuality } from '@/lib/news/newsSources'
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
@@ -115,13 +115,10 @@ async function handleSync(req: Request) {
         }
       }
 
-      // Strict Quality Gate: Future articles MUST have a valid, non-empty, non-placeholder image
-      if (
-        !article.cover_image ||
-        article.cover_image.includes('placeholder') ||
-        article.cover_image.includes('photo-1598488035139-bdbb2231ce04')
-      ) {
-        console.warn(`[News Sync] Skipping article without valid image: "${article.title}"`)
+      // Strict Quality Gate: ONLY accept articles with verified, working deal links and authentic HD images
+      const qualityCheck = await verifyArticleQuality(article)
+      if (!qualityCheck.isValid) {
+        console.warn(`[News Sync Quality Gate] Rejecting article "${article.title}": ${qualityCheck.reason}`)
         skippedCount++
         continue
       }

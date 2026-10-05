@@ -137,8 +137,16 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     // 2. If it's an authentic developer or vendor URL (Native Instruments, Spitfire, GitHub, developer site)
     if (url && typeof url === 'string' && url.trim().length > 5) {
       const lower = url.toLowerCase().trim()
-      if (lower.includes('native-instruments.com') && lower.includes('/innovations/kontakt-player')) {
-        return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+      if (lower.includes('native-instruments.com')) {
+        if (lower.includes('/innovations/kontakt-player')) {
+          return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+        }
+        if (lower.includes('/products/software')) {
+          return 'https://www.native-instruments.com/collections/music-creation'
+        }
+        if (lower.includes('/specials/deals')) {
+          return 'https://www.native-instruments.com/collections/komplete-bundles'
+        }
       }
 
       const isScraperBlog =

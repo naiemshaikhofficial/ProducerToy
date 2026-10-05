@@ -34,8 +34,16 @@ function sanitizeLinkUrl(url: string): string {
   }
 
   // Auto-correct deprecated or moved vendor URLs
-  if (clean.toLowerCase().includes('native-instruments.com') && clean.toLowerCase().includes('/innovations/kontakt-player')) {
-    return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+  if (clean.toLowerCase().includes('native-instruments.com')) {
+    if (clean.toLowerCase().includes('/innovations/kontakt-player')) {
+      return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+    }
+    if (clean.toLowerCase().includes('/products/software')) {
+      return 'https://www.native-instruments.com/collections/music-creation'
+    }
+    if (clean.toLowerCase().includes('/specials/deals')) {
+      return 'https://www.native-instruments.com/collections/komplete-bundles'
+    }
   }
 
   return clean

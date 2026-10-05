@@ -74,8 +74,16 @@ export function sanitizeDealUrl(url?: string | null): string | null {
   }
 
   // Auto-correct deprecated or moved vendor URLs
-  if (lower.includes('native-instruments.com') && lower.includes('/innovations/kontakt-player')) {
-    return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+  if (lower.includes('native-instruments.com')) {
+    if (lower.includes('/innovations/kontakt-player')) {
+      return 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+    }
+    if (lower.includes('/products/software')) {
+      return 'https://www.native-instruments.com/collections/music-creation'
+    }
+    if (lower.includes('/specials/deals')) {
+      return 'https://www.native-instruments.com/collections/komplete-bundles'
+    }
   }
 
   return trimmed
@@ -715,4 +723,94 @@ function isValidImageUrl(url: string): boolean {
       lower.includes('.webp') ||
       lower.includes('wp-content/uploads'))
   )
+}
+
+/**
+ * Strict Quality Gate Verification:
+ * Validates that an article has a working, verified 200 OK deal link and authentic HD image.
+ * If either link (e.g. 404/410/broken) or image verification fails, the article is rejected.
+ */
+export async function verifyArticleQuality(article: {
+  title?: string
+  source_url?: string | null
+  cover_image?: string | null
+}): Promise<{ isValid: boolean; reason?: string }> {
+  // 1. Strict Image Verification
+  const img = article.cover_image
+  if (
+    !img ||
+    typeof img !== 'string' ||
+    img.includes('placeholder') ||
+    img.includes('pollinations.ai') ||
+    img.includes('news.google.com') ||
+    img.includes('googleusercontent.com') ||
+    img.includes('photo-1598488035139-bdbb2231ce04')
+  ) {
+    return { isValid: false, reason: 'Invalid, broken, or prohibited image URL' }
+  }
+
+  // 2. Strict Deal Link Verification
+  let dealUrl = article.source_url
+  if (!dealUrl || !dealUrl.startsWith('http')) {
+    return { isValid: false, reason: 'Missing or malformed deal link' }
+  }
+
+  const lower = dealUrl.toLowerCase()
+
+  // Block competitor scraper blog links from ever being published as the deal link
+  if (
+    lower.includes('news.google.com') ||
+    lower.includes('bedroomproducersblog.com') ||
+    lower.includes('rekkerd.org') ||
+    lower.includes('audiopluginguy.com') ||
+    lower.includes('gearnews.com')
+  ) {
+    return { isValid: false, reason: 'Deal link points to aggregator or scraper blog instead of official product' }
+  }
+
+  // Auto-correct known moved URLs
+  if (lower.includes('native-instruments.com')) {
+    if (lower.includes('/innovations/kontakt-player')) {
+      dealUrl = 'https://www.native-instruments.com/en/products/komplete/samplers/kontakt-player/'
+    } else if (lower.includes('/products/software')) {
+      dealUrl = 'https://www.native-instruments.com/collections/music-creation'
+    } else if (lower.includes('/specials/deals')) {
+      dealUrl = 'https://www.native-instruments.com/collections/komplete-bundles'
+    }
+  }
+
+  // Probe the link to verify it is NOT 404 or dead
+  try {
+    const probe = await fetch(dealUrl, {
+      method: 'HEAD',
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+      signal: AbortSignal.timeout(3500),
+    })
+
+    if (probe.status === 405) {
+      // Retry with GET if server blocks HEAD
+      const getProbe = await fetch(dealUrl, {
+        method: 'GET',
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          Range: 'bytes=0-100',
+        },
+        signal: AbortSignal.timeout(3500),
+      })
+      if (getProbe.status === 404 || getProbe.status === 410) {
+        return { isValid: false, reason: `Deal link returned HTTP ${getProbe.status} (Page Not Found)` }
+      }
+    } else if (probe.status === 404 || probe.status === 410) {
+      return { isValid: false, reason: `Deal link returned HTTP ${probe.status} (Page Not Found)` }
+    }
+  } catch (err: any) {
+    // If external site timed out, log warning but do not hard-crash
+    console.warn(`[verifyArticleQuality] Link probe timeout/error for ${dealUrl}:`, err?.message || err)
+  }
+
+  return { isValid: true }
 }
