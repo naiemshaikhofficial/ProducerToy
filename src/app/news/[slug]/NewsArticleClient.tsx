@@ -214,6 +214,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   const cleanHtmlTitle = (title?: string | null): string => {
     if (!title) return ''
     return title
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#0?39;/gi, "'")
       .replace(/&#038;/g, '&')
       .replace(/&#38;/g, '&')
       .replace(/&amp;/g, '&')
@@ -224,6 +228,9 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       .replace(/&#8212;/g, '—')
       .replace(/&#8220;/g, '“')
       .replace(/&#8221;/g, '”')
+      .replace(/<[^>]+>/g, '')
+      .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|bpb|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
+      .trim()
   }
 
   const fallbackPrompt = getTopicFallbackImage(article.title, article.category)

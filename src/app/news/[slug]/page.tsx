@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { notFound, redirect, RedirectType } from 'next/navigation'
 import { getNewsArticleBySlug, getRelatedNews } from '@/lib/turso/newsDb'
 import { NewsArticleClient } from './NewsArticleClient'
+import { getTopicFallbackImage } from '@/lib/news/topicDeduplication'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -18,20 +19,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!article) {
     return {
-      title: 'Article Not Found | Producer Toy News',
+      title: 'Article Not Found',
     }
   }
 
   let highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   if (
     !highResImage ||
+    highResImage.includes('pollinations.ai') ||
     highResImage.includes('googleusercontent.com') ||
     highResImage.includes('gstatic.com') ||
     highResImage.includes('news.google.com') ||
     highResImage.includes('placeholder')
   ) {
-    const cleanT = (article.title || 'audio-production').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
-    highResImage = `https://image.pollinations.ai/prompt/${encodeURIComponent(`sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanT}`)}?width=1200&height=675&nologo=true`
+    highResImage = getTopicFallbackImage(article.title, article.category)
   }
   const cleanTitle = (article.title || '')
     .replace(/&#038;/g, '&')
@@ -44,6 +45,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .replace(/&#8212;/g, '—')
     .replace(/&#8220;/g, '"')
     .replace(/&#8221;/g, '"')
+    .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
     .trim()
 
   const isFree =
@@ -52,18 +54,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     /free|freeware|giveaway|100% off|zero cost|gratuit/i.test(cleanTitle) ||
     /free/i.test(article.deal_price || '')
 
-  // High-Intent Dynamic Title targeting "free plugin", "plugin news", "music plugins", "audio plugins", and Producer Toy
+  // High-Intent Dynamic Title targeting "free plugin", "plugin news", "music plugins", "audio plugins".
+  // (Root layout template '%s | Producer Toy' automatically appends '| Producer Toy' once)
   let title = ''
   if (isFree) {
     if (/free/i.test(cleanTitle)) {
-      title = `${cleanTitle} | Free VST Plugin News | Producer Toy`
+      title = `${cleanTitle} — Free VST Plugin News`
     } else {
-      title = `${cleanTitle} – Free VST Plugin Download & Audio News | Producer Toy`
+      title = `${cleanTitle} — Free VST Download & Plugin News`
     }
   } else if (article.category === 'Deals & Sales' || article.deal_price) {
-    title = `${cleanTitle} – Audio Plugin Deals & VST News | Producer Toy`
+    title = `${cleanTitle} — Audio Plugin Deals & VST News`
   } else {
-    title = `${cleanTitle} | Music Plugins & Audio News | Producer Toy`
+    title = `${cleanTitle} — Music Plugins & Audio Tech News`
   }
 
   const baseExcerpt = (article.excerpt || '')
@@ -166,13 +169,13 @@ export default async function NewsArticlePage({ params }: PageProps) {
   let highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   if (
     !highResImage ||
+    highResImage.includes('pollinations.ai') ||
     highResImage.includes('googleusercontent.com') ||
     highResImage.includes('gstatic.com') ||
     highResImage.includes('news.google.com') ||
     highResImage.includes('placeholder')
   ) {
-    const cleanT = (article.title || 'audio-production').replace(/&#?[a-z0-9]+;/gi, ' ').slice(0, 80)
-    highResImage = `https://image.pollinations.ai/prompt/${encodeURIComponent(`sleek futuristic music production synthesizer daw studio vst plugin neon amber lighting high resolution 8k render, professional audio technology article header for ${cleanT}`)}?width=1200&height=675&nologo=true`
+    highResImage = getTopicFallbackImage(article.title, article.category)
   }
   const cleanTitle = (article.title || '')
     .replace(/&#038;/g, '&')
@@ -185,6 +188,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
     .replace(/&#8212;/g, '—')
     .replace(/&#8220;/g, '"')
     .replace(/&#8221;/g, '"')
+    .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
     .trim()
 
   const isFree =

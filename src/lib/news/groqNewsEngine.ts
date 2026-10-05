@@ -24,6 +24,10 @@ export function sanitizeScrapedText(text: string): string {
   if (!text) return ''
   return text
     // Decode HTML entities
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0?39;/gi, "'")
     .replace(/&#8217;/g, "'")
     .replace(/&#8216;/g, "'")
     .replace(/&#8220;/g, '"')
@@ -35,8 +39,10 @@ export function sanitizeScrapedText(text: string): string {
     .replace(/&#228;/g, 'ä')
     .replace(/&#246;/g, 'ö')
     .replace(/&#252;/g, 'ü')
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
+    // Strip raw HTML elements (e.g. <a href="...">, <font ...>, <span>, <p>, <div>, etc.)
+    .replace(/<\/?(?:a|font|span|p|div|br|strong|em|b|i|img|table|tr|td|th|ul|ol|li)[^>]*>/gi, ' ')
+    // Strip raw Google News redirects
+    .replace(/https?:\/\/news\.google\.com\/[^\s)\]"']*/gi, '')
     // Remove ellipses and snippet cutoffs
     .replace(/\[\.\.\.?\]/gi, '')
     .replace(/\[\.\.\./gi, '')
@@ -70,12 +76,10 @@ export function sanitizeScrapedText(text: string): string {
           : `${clean}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
       }
     })
-    // External music scrapers & blogs
-    .replace(/rekkerd(?:\.org)?/gi, 'our partners')
-    .replace(/gearnews(?:\.com)?/gi, 'audio tech news')
-    .replace(/kvraudio(?:\.com)?/gi, 'community reports')
-    .replace(/musictech(?:\.com)?/gi, 'studio insights')
+    // Strip trailing source attribution tags like '- studio insights', '- Guitar World', '- MusicTech'
+    .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
     .replace(/^(News|Deal|Review):\s*/i, '')
+    .replace(/\s{2,}/g, ' ')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
@@ -426,6 +430,10 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
   const category = isFree ? 'Free VSTs' : isDeal ? 'Deals & Sales' : 'Tech & Gear'
   const badge = isFree ? 'FREEWARE' : isDeal ? 'HOT DEAL' : 'NEW RELEASE'
 
+  const cleanedTitle = sanitizeScrapedText(item.title)
+    .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
+    .trim()
+
   const cleanedSnippet = sanitizeScrapedText(item.contentSnippet || item.title)
 
   const isPb =
@@ -441,13 +449,14 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
     isPb
   )
 
-  // Clean narrative editorial content without any artificial headings or bullet points
   const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
-  const content = `${cleanedSnippet}
+  const content = `### Editorial Overview
 
-This audio release brings refined sound design and practical mixing utility directly to music creators. Built with high precision processing, it slots seamlessly into modern DAW production workflows across FL Studio, Ableton Live, Logic Pro, and Studio One.
+${cleanedSnippet}
 
-To explore this deal or find more audio production essentials, visit the Producer Toy catalog below.
+### Production Workflow & Integration
+
+Designed for modern music producers, sound designers, and mixing engineers, this release integrates seamlessly into popular digital audio workstations including FL Studio, Ableton Live, Logic Pro, and Studio One.
 
 [${ctaLabel}](${safeSourceUrl})`
 
@@ -461,8 +470,8 @@ To explore this deal or find more audio production essentials, visit the Produce
 
   return {
     id: deterministicId,
-    slug: slugify(item.title),
-    title: sanitizeScrapedText(item.title),
+    slug: slugify(cleanedTitle),
+    title: cleanedTitle,
     excerpt: cleanedSnippet.slice(0, 160) + '...',
     content,
     category,

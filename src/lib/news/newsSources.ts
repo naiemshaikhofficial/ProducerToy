@@ -242,18 +242,6 @@ export const MUSIC_NEWS_FEEDS: Array<{
     isPrimary: true,
   },
   {
-    name: 'Google News (Audio Brands Deals)',
-    url: 'https://news.google.com/rss/search?q=(Native+Instruments+OR+FabFilter+OR+iZotope+OR+Arturia+OR+Soundtoys+OR+Universal+Audio)+AND+(deal+OR+sale+OR+discount+OR+free+OR+vst+OR+coupon)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: true,
-  },
-  {
-    name: 'Google News (Mega VST Deals & Coupons)',
-    url: 'https://news.google.com/rss/search?q=(VST+OR+plugin)+AND+(deal+OR+discount+OR+coupon+OR+giveaway+OR+%22price+drop%22)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: false,
-  },
-  {
     name: 'KVR Audio',
     url: 'https://www.kvraudio.com/news/rss.xml',
     categoryDefault: 'Tech & Gear',
@@ -661,6 +649,7 @@ function parseRssItems(xml: string, sourceName: string, isPrimary = false): RawF
 
 function cleanText(text: string): string {
   return text
+    // Decode HTML entities
     .replace(/&#038;/g, '&')
     .replace(/&#38;/g, '&')
     .replace(/&amp;/g, '&')
@@ -676,14 +665,26 @@ function cleanText(text: string): string {
     .replace(/&#8221;/g, '”')
     .replace(/&#160;/g, ' ')
     .replace(/&nbsp;/g, ' ')
+    // Strip any HTML tags that may be embedded in titles
+    .replace(/<[^>]+>/g, '')
+    // Strip trailing source attribution tags like '- studio insights', '- Guitar World', '- MusicTech'
+    .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|bpb|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
     .trim()
 }
 
 function cleanHtmlSnippet(html: string): string {
   return html
+    // Decode escaped entities first so embedded tags can be stripped
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    // Strip all HTML tags
     .replace(/<[^>]+>/g, ' ')
+    // Strip raw Google News redirects
+    .replace(/https?:\/\/news\.google\.com\/[^\s)\]"']*/gi, '')
+    // Collapse whitespace
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 3000)
