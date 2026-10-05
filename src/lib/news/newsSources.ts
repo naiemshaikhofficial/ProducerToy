@@ -308,8 +308,8 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
         if (seenUrls.has(urlKey)) continue
         seenUrls.add(urlKey)
 
-        // Ends date: e.g. [Ends 11 Oct Hot!] or [Ends 04 Oct Hot!]
-        const endsMatch = block.match(/\[(Ends\s+\d{1,2}\s+[a-zA-Z]+[^\]]*)\]/i)
+        // Ends date: e.g. [Ends 11 Oct Hot!], 'until Nov 01', 'Ends Nov 01', etc.
+        const endsMatch = block.match(/(?:\[?\s*(?:Ends|until|runs through|valid through|sale ends)\s+([a-zA-Z]+\s+\d{1,2}|\d{1,2}\s+[a-zA-Z]+[^\]\n\r]*?)\]?)/i)
         const expiry = endsMatch ? endsMatch[1].replace(/Hot!|New!/gi, '').trim() : ''
 
         // Category & Manufacturer e.g. [Virtual Instruments](...) by [UJAM](...)
@@ -321,19 +321,34 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
         const nameMatch = block.match(/\n\s*([^\n\[\]]{2,60})\s*\n\s*\[[^\]]+\]\([^\)]+\)\s*by/)
         const name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
 
-        // Prices & discount
+        // Prices & discount: Parse accurately (deal price is ALWAYS the lower amount)
         const priceMatches = [...block.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
         const discountMatch = block.match(/(\d+%\s*off)/i)
 
         let regularPrice: string | null = null
         let dealPrice: string | null = null
         if (priceMatches.length >= 2) {
-          regularPrice = '$' + priceMatches[0]
-          dealPrice = '$' + priceMatches[1]
+          const num0 = parseFloat(priceMatches[0])
+          const num1 = parseFloat(priceMatches[1])
+          if (num0 < num1) {
+            dealPrice = '$' + priceMatches[0]
+            regularPrice = '$' + priceMatches[1]
+          } else {
+            dealPrice = '$' + priceMatches[1]
+            regularPrice = '$' + priceMatches[0]
+          }
         } else if (priceMatches.length === 1) {
           dealPrice = '$' + priceMatches[0]
         }
-        const discount = discountMatch ? discountMatch[1].toUpperCase() : ''
+
+        let discount = discountMatch ? discountMatch[1].toUpperCase() : ''
+        if (!discount && dealPrice && regularPrice) {
+          const dVal = parseFloat(dealPrice.replace('$', ''))
+          const rVal = parseFloat(regularPrice.replace('$', ''))
+          if (rVal > dVal && rVal > 0) {
+            discount = `${Math.round(((rVal - dVal) / rVal) * 100)}% OFF`
+          }
+        }
 
         if (name && cleanUrl) {
           const fullTitle = brand

@@ -122,9 +122,32 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           specs['Coupon Code'] = detectedCoupon
         }
 
-        // Deal Expiry / Validity Timeline detection
-        const detectedExpiry = rewritten.expiry_date || (item as any).expiryTimeline || null
-        if (detectedExpiry && !specs['Valid Until'] && !specs['Expiry Date']) {
+        // Enforce verified ground-truth values from source feed
+        const verifiedDealPrice = (item as any).dealPrice
+        const verifiedRegularPrice = (item as any).regularPrice
+        const verifiedDiscount = (item as any).discount
+        const verifiedExpiry = (item as any).expiryTimeline
+
+        if (verifiedDealPrice) {
+          rewritten.deal_price = verifiedDealPrice
+          if (!specs['Price']) {
+            specs['Price'] = verifiedRegularPrice ? `${verifiedDealPrice} (Regular ${verifiedRegularPrice})` : verifiedDealPrice
+          }
+        }
+        if (verifiedRegularPrice) {
+          rewritten.deal_regular_price = verifiedRegularPrice
+        }
+        if (verifiedDiscount) {
+          specs['Discount'] = verifiedDiscount
+          if (rewritten.title) {
+            // Correct any hallucinated percentage in title (e.g. 88% OFF -> 80% OFF)
+            rewritten.title = rewritten.title.replace(/\b\d+%\s*(?:off|discount)\b/gi, verifiedDiscount)
+          }
+        }
+
+        // Deal Expiry / Validity Timeline detection (feed ground-truth takes highest priority)
+        const detectedExpiry = verifiedExpiry || rewritten.expiry_date || null
+        if (detectedExpiry) {
           specs['Valid Until'] = detectedExpiry
         } else if (!specs['Valid Until'] && !specs['Expiry Date']) {
           const autoDetect = detectDealExpiry({
@@ -210,6 +233,10 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
 function buildArticlePrompt(item: RawFeedItem): string {
   const directUrlNote = item.directDealUrl ? `Direct Official Product / Deal URL: ${item.directDealUrl}` : ''
   const detectedCouponNote = (item as any).couponCode ? `Detected Promo / Coupon Code: ${(item as any).couponCode}` : ''
+  const verifiedPriceNote = (item as any).dealPrice ? `Verified Sale / Deal Price: ${(item as any).dealPrice}` : ''
+  const verifiedRegularNote = (item as any).regularPrice ? `Verified Original / List Price: ${(item as any).regularPrice}` : ''
+  const verifiedDiscountNote = (item as any).discount ? `Verified Official Discount: ${(item as any).discount}` : ''
+  const verifiedExpiryNote = (item as any).expiryTimeline ? `Verified Sale End Date / Expiry Deadline: ${(item as any).expiryTimeline}` : ''
 
   return `You are the lead editor for Producer Toy (the premier digital audio workstation store for music producers, beatmakers, and audio engineers).
 Rewrite the following audio news item from "${item.sourceName}" into a high-authority, original, engaging news article for music producers.
@@ -220,15 +247,24 @@ Link: ${item.link}
 Content Snippet: ${item.contentSnippet}
 ${directUrlNote}
 ${detectedCouponNote}
+${verifiedPriceNote}
+${verifiedRegularNote}
+${verifiedDiscountNote}
+${verifiedExpiryNote}
 
 REQUIREMENTS:
 1. OPTIMIZE FOR GOOGLE #1 RANKING (HIGH-INTENT SEO):
    - Write titles that match what active music producers and audio engineers search for on Google: e.g. "[Brand] [Product] [Category/Feature] Deal: [X]% Off ($[Price] VST)".
    - NEVER use repetitive, spammy formulas like "Record Low Price on Industry Standard Audio Plugin" on multiple products! Every title must be unique, high-intent, and specific to the actual plugin.
    - Target top ranking search keywords: free VST plugins, synth VST deals, vocal compressor plugins, audio plugin sales, coupon codes, and 2026 DAW essentials.
-2. ACCURATE PRICING & ZERO DATA FABRICATION:
-   - Always extract and display the REAL prices and discount percentages from the source (for example, if a synth drops from $99 to $10, state $10.00 and 89% OFF).
-   - NEVER invent or hallucinate arbitrary prices (e.g. inventing "$39.99" when the actual deal is "$10.00"). If a price is unspecified, leave deal_price null or write "Special Offer".
+2. STRICT ACCURACY ON PRICING, DISCOUNT & EXPIRY (ZERO FABRICATION):
+   - If Verified Official Discount (e.g. 80% OFF) is provided above, you MUST use that EXACT discount in the title, excerpt, and specs. NEVER guess or invent different percentages (e.g. do NOT write 88% if it is 80%)!
+   - If Verified Sale Price ($39) and Regular Price ($199) are provided, use them exactly: deal_price="${(item as any).dealPrice || '$XX'}", deal_regular_price="${(item as any).regularPrice || '$XX'}".
+   - If Verified Sale End Date / Expiry Deadline (e.g. 'until Nov 01' or 'Nov 01') is provided:
+     a) Set "expiry_date": "Nov 01" (clean date).
+     b) Add "Valid Until": "Nov 01" inside "specs".
+     c) Mention clearly in the article narrative that this deal runs until Nov 01!
+   - NEVER invent or hallucinate arbitrary prices. If a price is unspecified, leave deal_price null or write "Special Offer".
 3. FORMATTING & TECHNICAL PROSE:
    - Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture & FM Engine, ### Optical Compression & Transient Response, ### Compatibility & System Specs). Never output a single run-on wall of text.
    - Cover real DSP architecture, circuit modeling, sound character, and DAW workflows (Ableton Live, FL Studio, Logic Pro, Studio One).
