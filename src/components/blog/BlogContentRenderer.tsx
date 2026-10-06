@@ -330,9 +330,13 @@ export function parseMarkdownToHtml(
     // Remove any accidental leading stray hashes in a paragraph
     paragraphContent = paragraphContent.replace(/^#+\s+/, '')
 
-    // If paragraph is a standalone CTA button link at the end of the story,
-    // skip it so NewsArticleClient's dedicated Get Official Deal / Download Free Plugin button is the sole action button
-    if (/^\s*\[(?:Get Official Deal|Download Free Plugin|Get Deal|Claim Deal|Buy Plugin|Download Now|Redeem Deal|Official Deal)[^\]]*\]\([^)]*\)\s*$/i.test(paragraphContent)) {
+    // Strip any trailing CTA button link attached to the end of a paragraph
+    // so NewsArticleClient's dedicated Get Official Deal / Download Free Plugin button is the sole action button
+    paragraphContent = paragraphContent
+      .replace(/\s*\[(?:Get Official Deal|Download Free Plugin|Get Deal|Claim Deal|Buy Plugin|Download Now|Redeem Deal|Official Deal)[^\]]*\]\([^)]*\)\s*$/i, '')
+      .trim()
+
+    if (!paragraphContent) {
       continue
     }
 

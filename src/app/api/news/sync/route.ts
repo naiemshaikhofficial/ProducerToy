@@ -141,26 +141,10 @@ async function handleSync(req: Request) {
         )
       }
 
-      // 2. If item has no direct deal URL, resolve authentic product deal URL
-      if (!item.directDealUrl && item.title) {
-        item.directDealUrl = await resolveAuthenticProductDealUrl(item.title)
-      } else if (
-        item.directDealUrl &&
-        (item.directDealUrl.includes('/deals/') ||
-          item.directDealUrl.includes('/manufacturers/') ||
-          item.directDealUrl.includes('/articles/')) &&
-        item.title
-      ) {
-        // If deal URL points to a generic deals collection hub or promo article, resolve exact product page
-        const exactProduct = await resolvePluginBoutiqueProductUrl(item.title)
-        if (exactProduct && exactProduct.includes('/product/')) {
-          item.directDealUrl = exactProduct
-        }
-      }
-
-      // 3. Extract direct developer/merchant deal URL & live pricing ONLY if needed
+      // 1. ALWAYS extract direct developer / merchant deal URL, cover image & pricing from article link (item.link) FIRST!
+      // High-authority music blogs (BPB, Rekkerd, AudioPlugin Guy) already link to the real product page in their text!
       if (!item.dealPrice || !item.imageUrl || !item.directDealUrl) {
-        const dealInfo = await extractDirectDealInfo(item.directDealUrl || item.link)
+        const dealInfo = await extractDirectDealInfo(item.link || item.directDealUrl)
         if (dealInfo) {
           if (dealInfo.bestUrl) {
             item.directDealUrl = dealInfo.bestUrl
@@ -180,15 +164,34 @@ async function handleSync(req: Request) {
           if (dealInfo.discount && !(item as any).discount) {
             (item as any).discount = dealInfo.discount
           }
-          if (dealInfo.coverImage) {
+          // NEVER overwrite an already authentic cover image from the RSS feed!
+          if (dealInfo.coverImage && !item.imageUrl) {
             item.imageUrl = dealInfo.coverImage
           }
           // Strict: If verified as NOT an active deal (e.g. regular price only), skip it!
-          if (dealInfo.isDealActive === false) {
+          if (!isFree && dealInfo.isDealActive === false) {
             console.log(`[News Sync] Skipping non-discounted product: "${item.title}"`)
             skippedCount++
             continue
           }
+        }
+      }
+
+      // 2. Only if item STILL has no direct deal URL after extracting from the article page:
+      if (!item.directDealUrl && item.title) {
+        item.directDealUrl = await resolveAuthenticProductDealUrl(item.title, isFree)
+      } else if (
+        !isFree &&
+        item.directDealUrl &&
+        (item.directDealUrl.includes('/deals/') ||
+          item.directDealUrl.includes('/manufacturers/') ||
+          item.directDealUrl.includes('/articles/')) &&
+        item.title
+      ) {
+        // If deal URL points to a generic deals collection hub or promo article, resolve exact product page
+        const exactProduct = await resolvePluginBoutiqueProductUrl(item.title)
+        if (exactProduct && exactProduct.includes('/product/')) {
+          item.directDealUrl = exactProduct
         }
       }
 

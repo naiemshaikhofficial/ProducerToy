@@ -725,9 +725,20 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
       )
       if (searchRes.ok) {
         const html = await searchRes.text()
-        const prodMatch = html.match(/href=["'](\/product\/[^"']+)["']/i)
-        if (prodMatch) {
-          return `https://www.pluginboutique.com${prodMatch[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+        if (!html.includes('0 Products Found') && !html.includes('No products found')) {
+          const prodMatches = [...html.matchAll(/href=["'](\/product\/[^"']+)["']/gi)]
+          const queryWords = q
+            .toLowerCase()
+            .split(/\s+/)
+            .filter((w) => w.length >= 3 && !['audio', 'sound', 'deal', 'sale', 'vst', 'plug'].includes(w))
+
+          for (const m of prodMatches) {
+            const slug = m[1].toLowerCase()
+            const isRelevant = queryWords.length === 0 || queryWords.some((w) => slug.includes(w))
+            if (isRelevant) {
+              return `https://www.pluginboutique.com${m[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+            }
+          }
         }
       }
     } catch {}
@@ -743,7 +754,7 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
  * 2. If not on Plugin Boutique (e.g. freeware, developer-direct plugins), searches DuckDuckGo for the authentic developer/product page.
  * 3. Falls back to Plugin Boutique deals only as last resort.
  */
-export async function resolveAuthenticProductDealUrl(productName: string): Promise<string> {
+export async function resolveAuthenticProductDealUrl(productName: string, isFree = false): Promise<string> {
   try {
     const cleanQuery = productName
       .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
@@ -754,27 +765,40 @@ export async function resolveAuthenticProductDealUrl(productName: string): Promi
       .slice(0, 45)
 
     if (cleanQuery.length >= 3) {
-      // 1. Try Plugin Boutique first
-      const searchRes = await fetch(
-        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(cleanQuery)}`,
-        {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          },
-          signal: AbortSignal.timeout(3500),
-        }
-      )
-      if (searchRes.ok) {
-        const html = await searchRes.text()
-        const prodMatch = html.match(/href=["'](\/product\/[^"']+)["']/i)
-        if (prodMatch) {
-          return `https://www.pluginboutique.com${prodMatch[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+      // 1. Try Plugin Boutique ONLY if NOT freeware / free plugin
+      if (!isFree) {
+        const searchRes = await fetch(
+          `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(cleanQuery)}`,
+          {
+            headers: {
+              'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            },
+            signal: AbortSignal.timeout(3500),
+          }
+        )
+        if (searchRes.ok) {
+          const html = await searchRes.text()
+          if (!html.includes('0 Products Found') && !html.includes('No products found')) {
+            const prodMatches = [...html.matchAll(/href=["'](\/product\/[^"']+)["']/gi)]
+            const queryWords = cleanQuery
+              .toLowerCase()
+              .split(/\s+/)
+              .filter((w) => w.length >= 3 && !['audio', 'sound', 'deal', 'sale', 'vst'].includes(w))
+            for (const m of prodMatches) {
+              const slug = m[1].toLowerCase()
+              const isRelevant = queryWords.length === 0 || queryWords.some((w) => slug.includes(w))
+              if (isRelevant) {
+                return `https://www.pluginboutique.com${m[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+              }
+            }
+          }
         }
       }
 
       // 2. Search DuckDuckGo for official developer product / download page
-      const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(cleanQuery)}`, {
+      const ddgQuery = isFree ? `${cleanQuery} free vst download` : `${cleanQuery} vst`
+      const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(ddgQuery)}`, {
         headers: {
           'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
@@ -795,7 +819,7 @@ export async function resolveAuthenticProductDealUrl(productName: string): Promi
     }
   } catch {}
 
-  return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+  return isFree ? 'https://producertoy.com/free-vst-plugins' : `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
 }
 
 /**

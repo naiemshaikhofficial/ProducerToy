@@ -236,10 +236,10 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
             }
             return match
           })
-          if (!finalContent.includes(`](${safeSourceUrl})`)) {
-            const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
-            finalContent += `\n\n[${ctaLabel}](${safeSourceUrl})`
-          }
+          // Strip any trailing CTA links from content so NewsArticleClient renders the sole dedicated action button
+          finalContent = finalContent
+            .replace(/\s*\[(?:Get Official Deal|Download Free Plugin|Get Deal|Claim Deal|Buy Plugin|Download Now|Redeem Deal|Official Deal)[^\]]*\]\([^)]*\)\s*$/i, '')
+            .trim()
         }
 
         const finalCategory = isFree ? 'Free VSTs' : rewritten.category || 'Deals & Sales'
