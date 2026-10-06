@@ -116,10 +116,38 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
   }
 
   if (rewritten) {
-        const detectedCoupon = rewritten.coupon_code || (item as any).couponCode || null
+        // STRICT ANTI-HALLUCINATION FOR COUPON CODES:
+        // A coupon code can ONLY be accepted if it explicitly exists in the feed item or raw source text.
+        // If the AI invented/hallucinated a code (e.g. "TRUE100", "FREE100", "SAVE50") not in source, discard it!
+        let detectedCoupon: string | null = (item as any).couponCode || null
+        if (!detectedCoupon && rewritten.coupon_code) {
+          const rawSource = `${item.title} ${item.contentSnippet || ''}`.toUpperCase()
+          const candidate = rewritten.coupon_code.toUpperCase().trim()
+          if (
+            rawSource.includes(candidate) &&
+            candidate.length >= 3 &&
+            !['FREE', 'DEAL', 'CODE', 'SALE', 'TRUE', 'NONE', 'NULL'].includes(candidate)
+          ) {
+            detectedCoupon = rewritten.coupon_code.trim()
+          } else {
+            console.warn(`[Anti-Hallucination] Discarding fabricated coupon code: "${rewritten.coupon_code}"`)
+            rewritten.coupon_code = undefined
+          }
+        }
+
         const specs = rewritten.specs || {}
-        if (detectedCoupon && !specs['Coupon Code']) {
+        if (detectedCoupon) {
           specs['Coupon Code'] = detectedCoupon
+        } else {
+          delete specs['Coupon Code']
+        }
+
+        // Clean hallucinated coupon code patterns from title if no verified code exists
+        if (!detectedCoupon && rewritten.title) {
+          rewritten.title = rewritten.title
+            .replace(/\b(?:with\s+code\s*:?|code\s*:?)\s*[A-Z0-9_-]+\b/gi, '')
+            .replace(/\s{2,}/g, ' ')
+            .trim()
         }
 
         // Enforce verified ground-truth values from source feed
@@ -281,15 +309,18 @@ REQUIREMENTS:
    - Cover real DSP architecture, circuit modeling, sound character, and DAW workflows (Ableton Live, FL Studio, Logic Pro, Studio One).
 4. BRAND FOCUS:
    - If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Universal Audio, Arturia, Soundtoys, Slate Digital, Softube, Klevgrand), prominently feature the brand name, product name, and format in the title and excerpt.
-5. COUPON CODE DETECTION & NARRATIVE:
-   - If any coupon code, promo code, or voucher code is mentioned in the source or detected above (e.g. 'BPB100OFF', 'SUMMER90'):
-     a) Set "coupon_code" to the exact code.
+5. COUPON CODES & CLAIM INSTRUCTIONS (ZERO FABRICATION):
+   - CRITICAL: NEVER GUESS, INVENT, OR FABRICATE COUPON CODES! If an explicit promo or voucher code is NOT provided word-for-word in the source snippet above, set "coupon_code": null and DO NOT include "Coupon Code" in specs. Never invent fictional codes like 'TRUE100', 'SAVE50', or 'FREE100'.
+   - If an authentic coupon code IS detected or provided above:
+     a) Set "coupon_code" to the exact verified code.
      b) Set "badge": "COUPON CODE".
      c) Add "Coupon Code": code inside "specs".
-     d) In the article narrative, include a clear section explaining step-by-step how users enter this coupon code at checkout to drop the price (for example, dropping from $49.00 to $0.00 / FREE).
-   - If no coupon code is required, leave "coupon_code" empty. Do NOT invent fake coupon codes.
+     d) Clearly explain how to enter this code at checkout.
+   - HOW TO CLAIM / GIVEAWAY REQUIREMENTS:
+     - If a freebie requires newsletter signup, entering an email, or creating a free user account (e.g. Rapid Flow anniversary giveaway), explain this REAL procedure clearly (e.g. "Enter your email in the newsletter signup form on the developer's official site to receive your unique code / license via email").
+     - NEVER instruct users to apply an imaginary public coupon code if the deal actually requires email signup.
 6. MEGA DEAL & BADGE CLASSIFICATION:
-   - If a coupon code is required: set "badge": "COUPON CODE".
+   - If a verified coupon code is required: set "badge": "COUPON CODE".
    - If discount is 70%+, 80%+, 90%+, price drop, or record-low: set "badge": "MEGA DEAL".
    - If it's a 100% free giveaway / freeware: set "badge": "FREEWARE".
    - If it's a 24h-48h flash sale: set "badge": "FLASH SALE".
@@ -322,22 +353,21 @@ Return ONLY a valid JSON object without markdown code blocks, matching this exac
   "content": "Full markdown content with ## headings and paragraphs.",
   "category": "Deals & Sales",
   "badge": "MEGA DEAL",
-  "coupon_code": "SUMMER90",
+  "coupon_code": null,
   "expiry_date": "Nov 01",
   "reading_time": "3 MIN READ",
   "deal_price": "$19",
   "deal_regular_price": "$199",
-  "product_url": "https://native-instruments.com/deal",
+  "product_url": "https://developer-site.com/product-page",
   "specs": {
     "Brand": "Native Instruments",
     "Discount": "90% OFF",
-    "Coupon Code": "SUMMER90",
     "Valid Until": "Nov 01",
     "Format": "VST3, AU, AAX",
     "Compatibility": "Windows & macOS (Apple Silicon native)",
     "Price": "$19 (Regular $199)"
   },
-  "seo_keywords": "native instruments sale, massive x deal, coupon code, vst discount"
+  "seo_keywords": "native instruments sale, massive x deal, vst discount"
 }`
 }
 

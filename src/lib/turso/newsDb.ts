@@ -28,11 +28,20 @@ export interface NewsArticle {
 let isInitialized = false
 
 // In-Memory L1 Cache: Keeps Turso DB read usage at 0 during high-traffic bursts and background revalidation
-const NEWS_MEMORY_CACHE = new Map<string, { data: any; expiry: number }>()
+const globalForNews = globalThis as unknown as {
+  newsMemoryCache?: Map<string, { data: any; expiry: number }>
+}
+const NEWS_MEMORY_CACHE =
+  globalForNews.newsMemoryCache ?? new Map<string, { data: any; expiry: number }>()
+globalForNews.newsMemoryCache = NEWS_MEMORY_CACHE
+
 const NEWS_MEMORY_TTL_MS = 5 * 60 * 1000 // 5 minutes in-memory TTL
 
 export function clearNewsMemoryCache() {
   NEWS_MEMORY_CACHE.clear()
+  if (globalForNews.newsMemoryCache) {
+    globalForNews.newsMemoryCache.clear()
+  }
 }
 
 /**
@@ -202,6 +211,8 @@ export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | 
 
     // Historical superseded slug redirects to canonical URLs
     const legacyRedirects: Record<string, string> = {
+      'rapid-flow-true-ab-referencing-plugin-free-with-code-true100-save-39':
+        'rapid-flow-true-ab-referencing-plugin-free-giveaway-save-39',
       'get-up-to-62-off-eastwest-sounds-modern-producer-bundle-synth-month-sale':
         'native-instruments-synths-80-off-plugin-boutique-synth-month',
       'native-instruments-inmusic-brands-acquisition-news':
