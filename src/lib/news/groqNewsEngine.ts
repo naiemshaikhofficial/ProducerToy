@@ -224,7 +224,7 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           isFree,
           isPb
         )
-        let finalContent = sanitizeScrapedText(rewritten.content)
+        let finalContent = splitMergedHeadings(sanitizeScrapedText(rewritten.content))
         if (safeSourceUrl) {
           finalContent = finalContent.replace(/\]\(\s*#?[^)]*\)/g, (match) => {
             if (match === '](#)' || match === ']()' || match.startsWith('](#')) {
@@ -305,7 +305,14 @@ REQUIREMENTS:
      c) Mention clearly in the article narrative that this deal runs until Nov 01!
    - NEVER invent or hallucinate arbitrary prices. If a price is unspecified, leave deal_price null or write "Special Offer".
 3. FORMATTING & TECHNICAL PROSE:
-   - Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture & FM Engine, ### Optical Compression & Transient Response, ### Compatibility & System Specs). Never output a single run-on wall of text.
+   - Format the "content" into distinct, engaging multi-paragraph journalistic prose with informative topic headings (e.g. ### Synth Architecture & FM Engine).
+   - CRITICAL MARKDOWN STRUCTURE: Always put headings on their own isolated line followed by a blank line before the paragraph:
+     CORRECT:
+     ### Synth Architecture & FM Engine
+     
+     This synthesizer features a dual-core DSP engine...
+     
+     NEVER put heading and body text on the same line! Never bold the entire paragraph.
    - Cover real DSP architecture, circuit modeling, sound character, and DAW workflows (Ableton Live, FL Studio, Logic Pro, Studio One).
 4. BRAND FOCUS:
    - If this article features a big audio brand (such as Native Instruments, FabFilter, iZotope, Universal Audio, Arturia, Soundtoys, Slate Digital, Softube, Klevgrand), prominently feature the brand name, product name, and format in the title and excerpt.
@@ -584,4 +591,84 @@ function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '')
     .slice(0, 90)
+}
+
+export function splitMergedHeadings(text: string): string {
+  if (!text) return ''
+  const sentenceStarters = new Set([
+    'the', 'this', 'these', 'that', 'a', 'an',
+    'engineered', 'designed', 'featuring', 'equipped', 'built', 'crafted', 'powered',
+    'whether', 'with', 'without', 'from', 'as', 'in', 'for', 'if', 'when', 'while',
+    'take', 'grab', 'get', 'claim', 'download', 'visit', 'check', 'producers', 'engineers', 'musicians', 'users'
+  ])
+
+  const headingKeywords = new Set([
+    'overview', 'features', 'highlights', 'integration', 'compatibility', 'workflow',
+    'requirements', 'specs', 'specifications', 'architecture', 'engine', 'eq', 'dynamics',
+    'processing', 'metering', 'synthesis', 'sound', 'design', 'controls', 'details',
+    'hardware', 'software', 'discount', 'deal', 'offer', 'pricing', 'summary'
+  ])
+
+  let processed = text.replace(/([^\n#])\s*(#{1,6}\s+)/g, '$1\n\n$2')
+
+  processed = processed.replace(/^(#{1,6})\s+(.+)$/gm, (lineMatch, hashes, rest) => {
+    // If line has a list dash right in it: e.g. "### Key Features - **4-Band..." or "### System Requirements - **OS:**"
+    const dashListMatch = rest.match(/^([A-Za-z0-9\s&/,]+?)\s*[-–—]\s*(.+)$/)
+    if (dashListMatch && dashListMatch[1].trim().length <= 40) {
+      const heading = dashListMatch[1].trim()
+      const firstListItem = dashListMatch[2].trim()
+      return `${hashes} ${heading}\n\n- ${firstListItem}`
+    }
+
+    if (rest.length <= 50 && !rest.includes('. ')) {
+      return lineMatch
+    }
+
+    const words = rest.split(/\s+/)
+    let bestSplitIndex = -1
+
+    for (let i = 0; i < Math.min(words.length - 2, 8); i++) {
+      const currentWordClean = words[i].toLowerCase().replace(/[^a-z]/g, '')
+      const nextWord = words[i + 1]
+      const nextWordClean = nextWord.toLowerCase().replace(/[^a-z]/g, '')
+
+      // Never split directly after prepositions, articles, or conjunctions
+      if (['how', 'to', 'for', 'and', 'with', 'in', 'of', 'your', 'the', 'a', 'an'].includes(currentWordClean)) {
+        continue
+      }
+
+      // Check if next word is a list bullet
+      if (/^[-*•]/.test(nextWord)) {
+        bestSplitIndex = i + 1
+        break
+      }
+
+      // Check if next word is an unambiguous sentence starter
+      if (sentenceStarters.has(nextWordClean) && /^[A-Z]/.test(nextWord)) {
+        bestSplitIndex = i + 1
+        break
+      }
+
+      // If next word is also a heading keyword (e.g. "Workflow Integration", "System Requirements"), keep going
+      if (headingKeywords.has(nextWordClean)) {
+        continue
+      }
+
+      // Check if current word is a known heading keyword and next word is capitalized/acronym
+      if (headingKeywords.has(currentWordClean) && /^[A-Z]/.test(nextWord)) {
+        bestSplitIndex = i + 1
+        break
+      }
+    }
+
+    if (bestSplitIndex > 0) {
+      const headingTitle = words.slice(0, bestSplitIndex).join(' ')
+      const paragraphBody = words.slice(bestSplitIndex).join(' ')
+      return `${hashes} ${headingTitle}\n\n${paragraphBody}`
+    }
+
+    return lineMatch
+  })
+
+  return processed.replace(/(#{1,6}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
 }

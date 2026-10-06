@@ -149,10 +149,84 @@ export function parseMarkdownToHtml(
   // 3. Erase any lines that are solely hashes or markdown debris
   text = text.replace(/^[ \t]*#+[ \t]*$/gm, '')
 
-  // 4. Ensure headings have clean block separation before and after (exclude '#' from prefix)
-  text = text
-    .replace(/([^\n#])\s*(#{1,6}\s+)/g, '$1\n\n$2')
-    .replace(/(#{1,6}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
+  // 4. Ensure headings have clean block separation before and after
+  text = text.replace(/([^\n#])\s*(#{1,6}\s+)/g, '$1\n\n$2')
+
+  // Split any merged heading lines where heading title and paragraph body were output without a newline
+  const sentenceStarters = new Set([
+    'the', 'this', 'these', 'that', 'a', 'an',
+    'engineered', 'designed', 'featuring', 'equipped', 'built', 'crafted', 'powered',
+    'whether', 'with', 'without', 'from', 'as', 'in', 'for', 'if', 'when', 'while',
+    'take', 'grab', 'get', 'claim', 'download', 'visit', 'check', 'producers', 'engineers', 'musicians', 'users'
+  ])
+
+  const headingKeywords = new Set([
+    'overview', 'features', 'highlights', 'integration', 'compatibility', 'workflow',
+    'requirements', 'specs', 'specifications', 'architecture', 'engine', 'eq', 'dynamics',
+    'processing', 'metering', 'synthesis', 'sound', 'design', 'controls', 'details',
+    'hardware', 'software', 'discount', 'deal', 'offer', 'pricing', 'summary'
+  ])
+
+  text = text.replace(/^(#{1,6})\s+(.+)$/gm, (lineMatch, hashes, rest) => {
+    // If line has a list dash right in it: e.g. "### Key Features - **4-Band..." or "### System Requirements - **OS:**"
+    const dashListMatch = rest.match(/^([A-Za-z0-9\s&/,]+?)\s*[-–—]\s*(.+)$/)
+    if (dashListMatch && dashListMatch[1].trim().length <= 40) {
+      const heading = dashListMatch[1].trim()
+      const firstListItem = dashListMatch[2].trim()
+      return `${hashes} ${heading}\n\n- ${firstListItem}`
+    }
+
+    if (rest.length <= 50 && !rest.includes('. ')) {
+      return lineMatch
+    }
+
+    const words = rest.split(/\s+/)
+    let bestSplitIndex = -1
+
+    for (let i = 0; i < Math.min(words.length - 2, 8); i++) {
+      const currentWordClean = words[i].toLowerCase().replace(/[^a-z]/g, '')
+      const nextWord = words[i + 1]
+      const nextWordClean = nextWord.toLowerCase().replace(/[^a-z]/g, '')
+
+      // Never split directly after prepositions, articles, or conjunctions
+      if (['how', 'to', 'for', 'and', 'with', 'in', 'of', 'your', 'the', 'a', 'an'].includes(currentWordClean)) {
+        continue
+      }
+
+      // Check if next word is a list bullet
+      if (/^[-*•]/.test(nextWord)) {
+        bestSplitIndex = i + 1
+        break
+      }
+
+      // Check if next word is an unambiguous sentence starter
+      if (sentenceStarters.has(nextWordClean) && /^[A-Z]/.test(nextWord)) {
+        bestSplitIndex = i + 1
+        break
+      }
+
+      // If next word is also a heading keyword (e.g. "Workflow Integration", "System Requirements"), keep going
+      if (headingKeywords.has(nextWordClean)) {
+        continue
+      }
+
+      // Check if current word is a known heading keyword and next word is capitalized/acronym
+      if (headingKeywords.has(currentWordClean) && /^[A-Z]/.test(nextWord)) {
+        bestSplitIndex = i + 1
+        break
+      }
+    }
+
+    if (bestSplitIndex > 0) {
+      const headingTitle = words.slice(0, bestSplitIndex).join(' ')
+      const paragraphBody = words.slice(bestSplitIndex).join(' ')
+      return `${hashes} ${headingTitle}\n\n${paragraphBody}`
+    }
+
+    return lineMatch
+  })
+
+  text = text.replace(/(#{1,6}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
 
   // 5. Split into blocks
   const blocks = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean)
@@ -329,6 +403,8 @@ export function BlogContentRenderer({
         .blog-content p {
           margin-bottom: 1.5rem;
           color: #d4d4d8;
+          font-weight: 400 !important;
+          line-height: 1.85;
         }
 
         .blog-content strong {
