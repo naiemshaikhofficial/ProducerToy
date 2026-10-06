@@ -177,6 +177,14 @@ export async function fetchPluginBoutiqueProductLiveDetails(productUrl: string):
     for (const b of masterBlobs) {
       const lowerB = b.toLowerCase()
       if (
+        lowerB.includes('spacer') ||
+        lowerB.includes('transparent') ||
+        lowerB.includes('empty') ||
+        lowerB.includes('1x1') ||
+        lowerB.includes('pixel') ||
+        lowerB.includes('logo_black') ||
+        lowerB.includes('logo_dark') ||
+        lowerB.includes('logo_preview') ||
         lowerB.includes('8703u6x0') ||
         lowerB.includes('62597t') ||
         lowerB.includes('2ep2ag') ||
@@ -1071,12 +1079,18 @@ export async function verifyArticleQuality(article: {
     }
   }
 
-  // 2. Strict Genuine HD Image Verification (Zero AI, Zero Stock Fallbacks)
+  // 2. Strict Genuine HD Image Verification (Zero AI, Zero Stock Fallbacks, Zero Spacers)
   const img = article.cover_image
   if (
     !img ||
     typeof img !== 'string' ||
     img.length < 15 ||
+    img.toLowerCase().includes('spacer') ||
+    img.toLowerCase().includes('1x1') ||
+    img.toLowerCase().includes('transparent') ||
+    img.toLowerCase().includes('empty') ||
+    img.toLowerCase().includes('logo_black') ||
+    img.toLowerCase().includes('logo_dark') ||
     img.includes('placeholder') ||
     img.includes('pollinations.ai') ||
     img.includes('images.unsplash.com') ||
@@ -1087,7 +1101,7 @@ export async function verifyArticleQuality(article: {
     img.includes('62597tdwpbuqa4wb3ytyr780r83o') ||
     img.includes('8703u6x0lrzyjlnucnb396u4m6qb')
   ) {
-    return { isValid: false, reason: 'Invalid, low-res, placeholder, or non-authentic image URL' }
+    return { isValid: false, reason: 'Invalid, low-res, placeholder, spacer, or non-authentic image URL' }
   }
 
   // 3. Strict Genuine Pricing Verification (Zero Fake Pricing, Zero Inactive Deals)

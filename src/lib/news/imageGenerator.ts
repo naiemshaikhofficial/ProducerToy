@@ -20,9 +20,25 @@ const PB_EXCLUDED_BANNER_HASHES = [
 ]
 
 export function isForbiddenCoverImageUrl(url?: string | null): boolean {
-  if (!url || typeof url !== 'string') return true
+  if (!url || typeof url !== 'string' || url.length < 15) return true
   const lower = url.toLowerCase().trim()
   if (!lower.startsWith('http://') && !lower.startsWith('https://')) return true
+
+  // Strictly block transparent spacers, 1x1 pixels, empty placeholders, and invisible black logos
+  if (
+    lower.includes('spacer') ||
+    lower.includes('1x1') ||
+    lower.includes('pixel') ||
+    lower.includes('transparent') ||
+    lower.includes('empty') ||
+    lower.includes('blank') ||
+    lower.includes('content_spacer') ||
+    lower.includes('logo_black') ||
+    lower.includes('logo_dark') ||
+    lower.includes('logo_preview')
+  ) {
+    return true
+  }
 
   // Strictly block any Google News / Google account / Google usercontent / gstatic logos
   if (
@@ -45,8 +61,6 @@ export function isForbiddenCoverImageUrl(url?: string | null): boolean {
   if (
     lower.includes('placeholder') ||
     lower.includes('avatar') ||
-    lower.includes('pixel') ||
-    lower.includes('1x1') ||
     lower.includes('photo-1598488035139-bdbb2231ce04') ||
     lower.includes('default_image') ||
     lower.includes('no-image') ||
@@ -81,38 +95,40 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     return 'https://media.wavescdn.com/images/products/plugins/share/waves-tune-real-time.jpg'
   }
   if (cleanTitle.includes('iron 2')) {
-    return 'https://www.ujam.com/fileadmin/_processed_/b/c/csm_vg-iron2_307c7d8d5d.jpg'
+    return 'https://banners.pluginboutique.com/wh70xwmo9aeynmum40t249dd7jd3'
   }
 
-  // 2. High-res ckeditor pictures (Retina original masters 1800px - 3600px)
-  const ckeditorMatch = html.match(/https:\/\/www\.pluginboutique\.com\/ckeditor_assets\/pictures\/[^\s"']+/i)
-  if (ckeditorMatch && !isForbiddenCoverImageUrl(ckeditorMatch[0])) {
-    return ckeditorMatch[0]
+  // 2. HIGHEST PRIORITY: Official developer & PB active_storage master graphic blobs
+  const allMasterBlobs = [
+    ...html.matchAll(
+      /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"'<>]+/gi
+    ),
+  ].map((m) => m[0])
+
+  for (const blob of allMasterBlobs) {
+    if (!isForbiddenCoverImageUrl(blob)) {
+      return blob
+    }
   }
 
-  // 3. High-res gallery developer banner / news banner blob
-  const bannerBlob = html.match(
-    /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+(?:NewsPage|Banner|Artwork|gui|plugin|screenshot|hero|Center|Stage)[^\s"']*/i
-  )
-  if (bannerBlob && !isForbiddenCoverImageUrl(bannerBlob[0])) {
-    return bannerBlob[0]
-  }
-
-  // 4. Any active storage developer blob in the gallery
-  const anyBlob = html.match(
-    /https:\/\/www\.pluginboutique\.com\/rails\/active_storage\/blobs\/redirect\/[^\s"']+/i
-  )
-  if (anyBlob && !isForbiddenCoverImageUrl(anyBlob[0])) {
-    return anyBlob[0]
-  }
-
-  // 5. Product page official social card (og:image)
+  // 3. Product page official social card (og:image)
   const ogMatch = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
   if (ogMatch && !isForbiddenCoverImageUrl(ogMatch[1])) {
     return ogMatch[1]
   }
 
-  // 6. Full UI Screenshot (UI 1 / UI 2 / Main Interface / Screenshot)
+  // 4. High-res ckeditor pictures (only if NOT a spacer or logo)
+  const allCkeditor = [
+    ...html.matchAll(/https:\/\/www\.pluginboutique\.com\/ckeditor_assets\/pictures\/[^\s"'<>]+/gi),
+  ].map((m) => m[0])
+
+  for (const ck of allCkeditor) {
+    if (!isForbiddenCoverImageUrl(ck)) {
+      return ck
+    }
+  }
+
+  // 5. Full UI Screenshot (UI 1 / UI 2 / Main Interface / Screenshot)
   const uiMatch =
     html.match(/<img[^>]+alt=["'][^"']*(?:UI\s*1|UI\s*2|Interface|Screenshot)[^"']*["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
     html.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["'][^"']*(?:UI\s*1|UI\s*2|Interface|Screenshot)[^"']*["']/i)
@@ -121,7 +137,7 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     return uiMatch[1]
   }
 
-  // 7. Main Product Hardware / GUI Image
+  // 6. Main Product Hardware / GUI Image
   const mainImgMatch =
     html.match(/<img[^>]+alt=["']Main Image["'][^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["']/i) ||
     html.match(/<img[^>]+src=["'](https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+)["'][^>]+alt=["']Main Image["']/i)
@@ -130,27 +146,14 @@ async function extractUltraHdFromProductHtml(html: string, title?: string): Prom
     return mainImgMatch[1]
   }
 
-  // 8. Extract all banner tags and find the largest resolution master screenshot (> 35KB)
-  const candidateUrls = [...new Set([...html.matchAll(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/gi)].map(m => m[0]))]
-  const validCandidates = candidateUrls.filter(u => !isForbiddenCoverImageUrl(u))
-
-  let bestBanner: string | null = null
-  let maxLen = 0
-
-  for (const b of validCandidates.slice(0, 10)) {
-    try {
-      const bRes = await fetch(b, { method: 'HEAD', signal: AbortSignal.timeout(2500) })
-      const ct = bRes.headers.get('content-type') || ''
-      if (!ct.startsWith('image/')) continue
-      const len = parseInt(bRes.headers.get('content-length') || '0', 10)
-      if (len > 35000 && len > maxLen) {
-        maxLen = len
-        bestBanner = b
-      }
-    } catch {}
+  // 7. High-res banner master screenshot
+  const candidateUrls = [...new Set([...html.matchAll(/https:\/\/banners\.pluginboutique\.com\/[a-z0-9]+/gi)].map((m) => m[0]))]
+  const validCandidates = candidateUrls.filter((u) => !isForbiddenCoverImageUrl(u))
+  if (validCandidates.length > 0) {
+    return validCandidates[0]
   }
 
-  return bestBanner
+  return null
 }
 
 export async function resolveProductBannerImage(
