@@ -183,13 +183,43 @@ function NewsCardImage({
   )
 }
 
+const LOCAL_STORAGE_NEWS_KEY = 'producertoy_news_feed_v1'
+
 export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   const [visibleCount, setVisibleCount] = useState(12)
+  const [articlesList, setArticlesList] = useState<NewsArticle[]>(initialArticles)
 
-  // Ensure initial articles are cleanly topic-deduplicated
+  // Local Storage Caching: Store news locally in browser until new news arrives
+  React.useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return
+      if (initialArticles && initialArticles.length > 0) {
+        localStorage.setItem(
+          LOCAL_STORAGE_NEWS_KEY,
+          JSON.stringify({
+            articles: initialArticles,
+            updatedAt: Date.now(),
+          })
+        )
+        setArticlesList(initialArticles)
+      } else {
+        const stored = localStorage.getItem(LOCAL_STORAGE_NEWS_KEY)
+        if (stored) {
+          const parsed = JSON.parse(stored)
+          if (parsed?.articles && Array.isArray(parsed.articles) && parsed.articles.length > 0) {
+            setArticlesList(parsed.articles)
+          }
+        }
+      }
+    } catch {
+      // Graceful degradation if localStorage is disabled
+    }
+  }, [initialArticles])
+
+  // Ensure articles are cleanly topic-deduplicated
   const rawArticles = React.useMemo(
-    () => deduplicateArticlesByTopic(initialArticles),
-    [initialArticles]
+    () => deduplicateArticlesByTopic(articlesList),
+    [articlesList]
   )
 
   // Producer Toy strictly showcases 100% authentic, active, unexpired deals & audio news

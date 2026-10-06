@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import {
   fetchMusicNewsFeedItems,
   extractDirectDealInfo,
@@ -197,6 +198,20 @@ async function handleSync(req: Request) {
         console.log(`[News Sync] Successfully submitted ${urlsToPing.length} URLs to IndexNow`)
       } catch (indexErr: any) {
         console.warn('[News Sync] Failed to ping IndexNow:', indexErr?.message || indexErr)
+      }
+    }
+
+    // On-Demand Edge Cache Purge: Only purge static CDN cache if new articles were added or deals expired
+    // Keeps Vercel Edge & Turso DB usage at 0 for all regular visitors
+    if (processedCount > 0 || expiredSweptCount > 0) {
+      try {
+        revalidatePath('/news')
+        for (const slug of savedSlugs) {
+          revalidatePath(`/news/${slug}`)
+        }
+        console.log(`[News Sync] Successfully purged edge cache for /news and ${savedSlugs.length} articles`)
+      } catch (revErr: any) {
+        console.warn('[News Sync] Cache revalidation warning:', revErr?.message || revErr)
       }
     }
 

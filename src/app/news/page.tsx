@@ -2,8 +2,9 @@ import { Metadata } from 'next'
 import { getNewsArticles } from '@/lib/turso/newsDb'
 import { NewsPageClient } from './NewsPageClient'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// ISR Edge Caching: Statically generated on Edge CDN (0 serverless cost, 0 DB queries for visitors)
+// Automatically purged on-demand when /api/news/sync finds new news or expired deals
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: 'Free Plugins, Audio Plugin News & VST Deals | Producer Toy',

@@ -27,6 +27,15 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   const [copied, setCopied] = useState(false)
   const [copiedCoupon, setCopiedCoupon] = useState(false)
 
+  // Local Storage Caching: Store viewed article locally in browser
+  React.useEffect(() => {
+    try {
+      if (typeof window === 'undefined' || !article?.slug) return
+      const key = `producertoy_article_${article.slug}`
+      localStorage.setItem(key, JSON.stringify(article))
+    } catch {}
+  }, [article])
+
   const expiryInfo = detectDealExpiry(article)
   const isExpired = expiryInfo.isExpired
   const expiryTimeline = expiryInfo.expiryTimeline

@@ -1,10 +1,27 @@
 import { Metadata } from 'next'
 import { notFound, redirect, RedirectType } from 'next/navigation'
-import { getNewsArticleBySlug, getRelatedNews } from '@/lib/turso/newsDb'
+import { cache } from 'react'
+import { getNewsArticleBySlug, getRelatedNews, getNewsArticles } from '@/lib/turso/newsDb'
 import { NewsArticleClient } from './NewsArticleClient'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// ISR Edge Caching: Statically generated on Edge CDN (0 serverless cost, 0 DB queries for visitors)
+// Automatically purged on-demand when /api/news/sync finds new news or expired deals
+export const revalidate = 86400
+
+const getCachedArticle = cache(async (slug: string) => {
+  return getNewsArticleBySlug(slug)
+})
+
+export async function generateStaticParams() {
+  try {
+    const articles = await getNewsArticles({ limit: 40 })
+    return articles.map((a) => ({
+      slug: a.slug,
+    }))
+  } catch {
+    return []
+  }
+}
 
 interface PageProps {
   params: Promise<{
@@ -14,7 +31,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const article = await getNewsArticleBySlug(slug)
+  const article = await getCachedArticle(slug)
 
   if (!article) {
     return {
@@ -153,7 +170,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function NewsArticlePage({ params }: PageProps) {
   const { slug } = await params
-  const article = await getNewsArticleBySlug(slug)
+  const article = await getCachedArticle(slug)
 
   if (!article) {
     notFound()

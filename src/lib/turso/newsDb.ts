@@ -27,6 +27,14 @@ export interface NewsArticle {
 
 let isInitialized = false
 
+// In-Memory L1 Cache: Keeps Turso DB read usage at 0 during high-traffic bursts and background revalidation
+const NEWS_MEMORY_CACHE = new Map<string, { data: any; expiry: number }>()
+const NEWS_MEMORY_TTL_MS = 5 * 60 * 1000 // 5 minutes in-memory TTL
+
+export function clearNewsMemoryCache() {
+  NEWS_MEMORY_CACHE.clear()
+}
+
 /**
  * Ensures the news_articles table and indexes exist in Turso / SQLite
  */
@@ -101,6 +109,12 @@ export async function getNewsArticles(options?: {
   offset?: number
   featuredOnly?: boolean
 }): Promise<NewsArticle[]> {
+  const cacheKey = `articles_${options?.category || 'all'}_${options?.limit ?? 30}_${options?.offset ?? 0}_${Boolean(options?.featuredOnly)}`
+  const cached = NEWS_MEMORY_CACHE.get(cacheKey)
+  if (cached && Date.now() < cached.expiry) {
+    return cached.data
+  }
+
   await initNewsSchema()
   const client = getTursoClient()
 
@@ -133,7 +147,14 @@ export async function getNewsArticles(options?: {
     const result = await client.execute({ sql: query, args })
     const parsed = result.rows.map((row) => parseArticleRow(row))
     const deduplicated = deduplicateArticlesByTopic(parsed)
-    return limit > 0 ? deduplicated.slice(0, limit) : deduplicated
+    const finalArticles = limit > 0 ? deduplicated.slice(0, limit) : deduplicated
+
+    NEWS_MEMORY_CACHE.set(cacheKey, {
+      data: finalArticles,
+      expiry: Date.now() + NEWS_MEMORY_TTL_MS,
+    })
+
+    return finalArticles
   } catch (err) {
     console.error('[getNewsArticles] Error querying news:', err)
     return []
@@ -144,6 +165,12 @@ export async function getNewsArticles(options?: {
  * Retrieve a single news article by its slug, with legacy duplicate alias fallback
  */
 export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | null> {
+  const cacheKey = `article_slug_${slug}`
+  const cached = NEWS_MEMORY_CACHE.get(cacheKey)
+  if (cached && Date.now() < cached.expiry) {
+    return cached.data
+  }
+
   await initNewsSchema()
   const client = getTursoClient()
 
@@ -154,7 +181,12 @@ export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | 
     })
 
     if (result.rows.length > 0) {
-      return parseArticleRow(result.rows[0])
+      const article = parseArticleRow(result.rows[0])
+      NEWS_MEMORY_CACHE.set(cacheKey, {
+        data: article,
+        expiry: Date.now() + NEWS_MEMORY_TTL_MS,
+      })
+      return article
     }
 
     // Historical superseded slug redirects to canonical URLs
@@ -175,7 +207,12 @@ export async function getNewsArticleBySlug(slug: string): Promise<NewsArticle | 
         args: [legacyRedirects[slug]],
       })
       if (aliasResult.rows.length > 0) {
-        return parseArticleRow(aliasResult.rows[0])
+        const article = parseArticleRow(aliasResult.rows[0])
+        NEWS_MEMORY_CACHE.set(cacheKey, {
+          data: article,
+          expiry: Date.now() + NEWS_MEMORY_TTL_MS,
+        })
+        return article
       }
     }
 
@@ -359,6 +396,7 @@ export async function saveNewsArticle(article: NewsArticle): Promise<boolean> {
         article.seo_keywords ?? null,
       ],
     })
+    clearNewsMemoryCache()
     return true
   } catch (err) {
     console.error('[saveNewsArticle] Error saving article:', err)
