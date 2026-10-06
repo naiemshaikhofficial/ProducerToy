@@ -79,9 +79,21 @@ async function handleSync(req: Request) {
         )
       }
 
-      // 2. If item is from Telegram and has no direct deal URL, resolve authentic product deal URL
-      if (item.sourceName.includes('Telegram') && !item.directDealUrl && item.title) {
+      // 2. If item has no direct deal URL, resolve authentic product deal URL
+      if (!item.directDealUrl && item.title) {
         item.directDealUrl = await resolveAuthenticProductDealUrl(item.title)
+      } else if (
+        item.directDealUrl &&
+        (item.directDealUrl.includes('/deals/') ||
+          item.directDealUrl.includes('/manufacturers/') ||
+          item.directDealUrl.includes('/articles/')) &&
+        item.title
+      ) {
+        // If deal URL points to a generic deals collection hub or promo article, resolve exact product page
+        const exactProduct = await resolvePluginBoutiqueProductUrl(item.title)
+        if (exactProduct && exactProduct.includes('/product/')) {
+          item.directDealUrl = exactProduct
+        }
       }
 
       // 3. Extract direct developer/merchant deal URL & live pricing ONLY if needed

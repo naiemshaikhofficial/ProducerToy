@@ -657,18 +657,57 @@ export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
  * with Producer Toy's affiliate referral ID attached.
  */
 export async function resolvePluginBoutiqueProductUrl(productName: string): Promise<string> {
-  try {
-    const cleanQuery = productName
-      .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
-      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle)\b/gi, ' ')
-      .replace(/[^a-zA-Z0-9\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 45)
+  const candidates: string[] = []
 
-    if (cleanQuery.length >= 3) {
+  // 1. Base clean without deal/pricing suffixes
+  const stripped = productName
+    .replace(/(?:deal|sale|flash sale|limited time)?\s*:\s*\d+%.*$/i, '')
+    .replace(/(?:deal|sale)?\s*:\s*\(\s*\$[\d.]+\s*(?:vst)?\s*\).*$/i, '')
+    .replace(/\s*\(\s*\$[\d.]+\s*(?:vst)?\s*\).*$/i, '')
+    .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
+    .replace(/[^a-zA-Z0-9\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (stripped.length >= 3) {
+    candidates.push(stripped)
+  }
+
+  // 2. If title has "by" (e.g. "VM-COMP by Pulsar Audio")
+  const byMatch = productName.match(/([^.]+?)\s+by\s+([^.]+)/i)
+  if (byMatch) {
+    const model = byMatch[1].replace(/^(?:get|grab|free)\s+/i, '').trim()
+    const brand = byMatch[2].replace(/(?:deal|sale|\d+%).*$/i, '').trim()
+    candidates.push(`${brand} ${model}`)
+    candidates.push(model)
+  }
+
+  // 3. Remove common audio descriptor nouns (Tube Compressor, EQ, VST, Plugin, Synth, Audio)
+  const coreOnly = stripped
+    .replace(/\b(?:tube|compressor|limiter|equalizer|eq|reverb|delay|synth|synthesizer|workstation|plugin|vst3?|au|aax|bundle|audio)\b/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (coreOnly.length >= 3 && !candidates.includes(coreOnly)) {
+    candidates.push(coreOnly)
+  }
+
+  // 4. Fallback clean query
+  const cleanQuery = productName
+    .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
+    .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle)\b/gi, ' ')
+    .replace(/[^a-zA-Z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 45)
+  if (cleanQuery.length >= 3 && !candidates.includes(cleanQuery)) {
+    candidates.push(cleanQuery)
+  }
+
+  for (const q of candidates) {
+    if (q.length < 3) continue
+    try {
       const searchRes = await fetch(
-        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(cleanQuery)}`,
+        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(q)}`,
         {
           headers: {
             'User-Agent':
@@ -684,8 +723,8 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
           return `https://www.pluginboutique.com${prodMatch[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
         }
       }
-    }
-  } catch {}
+    } catch {}
+  }
 
   // Fallback: direct deals section with referral
   return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
