@@ -1,5 +1,8 @@
 import { NewsArticle } from '@/lib/turso/newsDb'
 import { getTursoClient } from '@/lib/turso/client'
+import path from 'path'
+import fs from 'fs'
+import sharp from 'sharp'
 
 function escapeHtml(text: string): string {
   if (!text) return ''
@@ -60,6 +63,64 @@ export async function markArticleAsPostedToTelegram(articleId: string): Promise<
 }
 
 /**
+ * Overlays the official ProducerToy logo badge onto the cover image for maximum brand presence
+ */
+async function createBrandedCoverImage(photoUrl: string): Promise<Buffer | null> {
+  try {
+    const res = await fetch(photoUrl, { signal: AbortSignal.timeout(10000) })
+    if (!res.ok) return null
+    const inputBuffer = Buffer.from(await res.arrayBuffer())
+
+    const metadata = await sharp(inputBuffer).metadata()
+    const width = metadata.width || 1200
+    const height = metadata.height || 800
+
+    const logoPath = path.join(process.cwd(), 'public', 'logo-white.png')
+    if (!fs.existsSync(logoPath)) {
+      return inputBuffer
+    }
+
+    // Resize logo proportionally (~26% of width, capped at 240px)
+    const targetLogoWidth = Math.min(Math.round(width * 0.26), 240)
+    const logoBuffer = await sharp(logoPath)
+      .resize({ width: targetLogoWidth })
+      .toBuffer()
+
+    const logoMeta = await sharp(logoBuffer).metadata()
+    const margin = Math.round(width * 0.035)
+
+    const backdropWidth = (logoMeta.width || 200) + 24
+    const backdropHeight = (logoMeta.height || 60) + 16
+    const badgeSvg = Buffer.from(`
+      <svg width="${backdropWidth}" height="${backdropHeight}">
+        <rect x="0" y="0" width="${backdropWidth}" height="${backdropHeight}" rx="12" fill="rgba(10, 10, 15, 0.82)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1.5"/>
+      </svg>
+    `)
+
+    const branded = await sharp(inputBuffer)
+      .composite([
+        {
+          input: badgeSvg,
+          top: margin,
+          left: margin,
+        },
+        {
+          input: logoBuffer,
+          top: margin + 8,
+          left: margin + 12,
+        },
+      ])
+      .jpeg({ quality: 92 })
+      .toBuffer()
+
+    return branded
+  } catch (err: any) {
+    console.warn('[TelegramPoster] Failed to brand image with sharp, will fallback:', err?.message || err)
+    return null
+  }
+}
+
+/**
  * Formats a NewsArticle into a high-converting, clean HTML caption for Telegram
  */
 export function formatTelegramCaption(article: NewsArticle): string {
@@ -89,10 +150,12 @@ export function formatTelegramCaption(article: NewsArticle): string {
     const validUntil = article.specs['Valid Until'] || article.specs['Expiry Date']
     const requirement = article.specs['Requirement']
     const format = article.specs['Format']
+    const license = article.specs['License']
 
     if (discount && !isFree) lines.push(`🏷️ <b>Discount:</b> ${escapeHtml(discount)}`)
     if (format) lines.push(`🎛️ <b>Format:</b> ${escapeHtml(format)}`)
     if (requirement) lines.push(`📋 <b>Requirement:</b> ${escapeHtml(requirement)}`)
+    if (license) lines.push(`🔑 <b>License:</b> ${escapeHtml(license)}`)
     if (validUntil) lines.push(`⏳ <b>Ends:</b> ${escapeHtml(validUntil)}`)
   }
 
@@ -110,7 +173,9 @@ export function formatTelegramCaption(article: NewsArticle): string {
     }
   }
 
-  lines.push(`📢 <i>Follow @ProducerToy for instant audio gear & plugin deals!</i>`)
+  // 5. Official ProducerToy Website & Channel Branding
+  lines.push(`🌐 <b>Website:</b> <a href="https://producertoy.com">producertoy.com</a>`)
+  lines.push(`📢 <i>Follow @producertoynews for instant audio gear & plugin deals!</i>`)
 
   let caption = lines.join('\n')
   // Telegram captions are limited to 1024 characters
@@ -122,37 +187,26 @@ export function formatTelegramCaption(article: NewsArticle): string {
 }
 
 /**
- * Builds the inline keyboard buttons for the post
+ * Builds the inline keyboard buttons for the post — directs 100% of traffic to ProducerToy
  */
 function buildInlineKeyboard(article: NewsArticle) {
-  const buttons: Array<Array<{ text: string; url: string }>> = []
-
-  const isFree =
-    article.badge === 'FREEWARE' ||
-    article.category === 'Free VSTs' ||
-    article.deal_price === '$0' ||
-    /free/i.test(article.title)
-
-  // Direct Claim / Download Button
-  if (article.source_url && /^https?:\/\//i.test(article.source_url)) {
-    buttons.push([
-      {
-        text: isFree ? '⚡ Download Free Plugin' : '🛒 Get Official Deal',
-        url: article.source_url,
-      },
-    ])
-  }
-
-  // Read on ProducerToy Button
   const articleUrl = `https://producertoy.com/news/${article.slug}`
-  buttons.push([
-    {
-      text: '📖 Read Full Story & Details',
-      url: articleUrl,
-    },
-  ])
-
-  return { inline_keyboard: buttons }
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: '📖 Read Full Story & Claim on ProducerToy',
+          url: articleUrl,
+        },
+      ],
+      [
+        {
+          text: '🌐 Explore ProducerToy Store',
+          url: 'https://producertoy.com',
+        },
+      ],
+    ],
+  }
 }
 
 /**
@@ -186,8 +240,32 @@ export async function postArticleToTelegram(
   const photoUrl = article.cover_image
 
   try {
-    // 1. Try sending photo with caption if valid image URL exists
+    // 1. First attempt: Create branded cover image with official ProducerToy logo badge
     if (photoUrl && /^https?:\/\//i.test(photoUrl)) {
+      const brandedBuffer = await createBrandedCoverImage(photoUrl)
+      if (brandedBuffer) {
+        const formData = new FormData()
+        formData.append('chat_id', channelId)
+        formData.append('photo', new Blob([new Uint8Array(brandedBuffer)], { type: 'image/jpeg' }), 'cover.jpg')
+        formData.append('caption', caption)
+        formData.append('parse_mode', 'HTML')
+        formData.append('reply_markup', JSON.stringify(replyMarkup))
+
+        const res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+          method: 'POST',
+          body: formData,
+        })
+        const data = await res.json()
+        if (data.ok) {
+          await markArticleAsPostedToTelegram(article.id)
+          console.log(`[TelegramPoster] Successfully posted branded photo to Telegram: "${article.title}"`)
+          return { success: true, messageId: data.result?.message_id }
+        } else {
+          console.warn(`[TelegramPoster] Branded photo upload failed: ${data.description}. Retrying via photo URL.`)
+        }
+      }
+
+      // 2. Second attempt: Send via direct photo URL
       const response = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -210,7 +288,7 @@ export async function postArticleToTelegram(
       }
     }
 
-    // 2. Fallback to sendMessage if photo fails or is absent
+    // 3. Fallback: Text message with inline keyboard
     const msgResponse = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
