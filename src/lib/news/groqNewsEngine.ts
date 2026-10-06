@@ -1,4 +1,4 @@
-import { RawFeedItem, sanitizeDealUrl, PLUGIN_BOUTIQUE_AFFILIATE_ID } from './newsSources'
+import { RawFeedItem, sanitizeDealUrl, PLUGIN_BOUTIQUE_AFFILIATE_ID, isFreePluginItem } from './newsSources'
 import { NewsArticle } from '../turso/newsDb'
 import { getArticleCoverImage, resolveProductBannerImage } from './imageGenerator'
 import { detectDealExpiry } from './dealExpiry'
@@ -210,7 +210,11 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         const isFree =
           rewritten.category === 'Free VSTs' ||
           rewritten.deal_price === '$0' ||
-          rewritten.title?.toLowerCase().includes('free')
+          rewritten.deal_price?.toLowerCase() === 'free' ||
+          rewritten.title?.toLowerCase().includes('free') ||
+          item.categoryDefault === 'Free VSTs' ||
+          isFreePluginItem(item)
+
         const isPb =
           item.sourceName?.toLowerCase().includes('plugin boutique') ||
           Boolean(item.directDealUrl?.toLowerCase().includes('pluginboutique.com')) ||
@@ -233,11 +237,20 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
             return match
           })
           if (!finalContent.includes(`](${safeSourceUrl})`)) {
-            const isFree = rewritten.category === 'Free VSTs' || rewritten.deal_price === '$0' || rewritten.title.toLowerCase().includes('free')
             const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
             finalContent += `\n\n[${ctaLabel}](${safeSourceUrl})`
           }
         }
+
+        const finalCategory = isFree ? 'Free VSTs' : rewritten.category || 'Deals & Sales'
+        const finalBadge = detectedCoupon
+          ? 'COUPON CODE'
+          : isFree
+          ? 'FREEWARE'
+          : rewritten.badge || 'HOT DEAL'
+        const finalDealPrice = isFree
+          ? (rewritten.deal_price || '$0')
+          : rewritten.deal_price || (item as any).dealPrice || null
 
         return {
           id: deterministicId,
@@ -245,19 +258,19 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           title: sanitizeScrapedText(rewritten.title),
           excerpt: sanitizeScrapedText(rewritten.excerpt),
           content: finalContent,
-          category: rewritten.category || 'Free VSTs',
-          badge: detectedCoupon ? 'COUPON CODE' : rewritten.badge || 'FREEWARE',
+          category: finalCategory,
+          badge: finalBadge,
           cover_image: coverImage,
           author_name: 'ProducerToy Editorial',
           author_role: 'Audio Technology Editor',
           reading_time: rewritten.reading_time || '3 MIN READ',
           source_name: 'ProducerToy',
           source_url: safeSourceUrl,
-          deal_price: rewritten.deal_price || (item as any).dealPrice || null,
+          deal_price: finalDealPrice,
           deal_regular_price: rewritten.deal_regular_price || (item as any).regularPrice || null,
           published_at: new Date(item.pubDate).toISOString(),
           created_at: new Date().toISOString(),
-          is_featured: item.isPrimary ? 1 : 0,
+          is_featured: isFree || item.isPrimary ? 1 : 0,
           specs,
           related_products: [],
           seo_keywords: rewritten.seo_keywords || '',
@@ -350,6 +363,12 @@ REQUIREMENTS:
      a) Set "expiry_date": "Nov 01" (or the exact timeline).
      b) Add "Valid Until": "Nov 01" (or exact timeline) inside "specs".
    - If no deadline or expiry date is mentioned, leave "expiry_date" empty.
+12. FREE PLUGINS & FREEWARE TOP PRIORITY:
+   - If this software is 100% Free, Freeware, or a Free Giveaway ($0):
+     a) Set "category": "Free VSTs".
+     b) Set "badge": "FREEWARE" (or "COUPON CODE" if a promo code is required).
+     c) Set "deal_price": "$0" or "Free".
+     d) Highlight prominently in the title and excerpt that it is FREE / 100% Free / Freeware for music producers!
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON object without markdown code blocks, matching this exact schema:
@@ -508,8 +527,11 @@ function resolveSafeDealUrl(
 }
 
 function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticle {
-  const isFree = item.title.toLowerCase().includes('free')
-  const isDeal = item.title.toLowerCase().includes('sale') || item.title.toLowerCase().includes('off') || item.title.toLowerCase().includes('deal')
+  const isFree = isFreePluginItem(item)
+  const isDeal =
+    item.title.toLowerCase().includes('sale') ||
+    item.title.toLowerCase().includes('off') ||
+    item.title.toLowerCase().includes('deal')
 
   const category = isFree ? 'Free VSTs' : isDeal ? 'Deals & Sales' : 'Tech & Gear'
   const badge = isFree ? 'FREEWARE' : isDeal ? 'HOT DEAL' : 'NEW RELEASE'

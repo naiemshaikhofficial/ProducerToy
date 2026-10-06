@@ -9,6 +9,7 @@ export interface RawFeedItem {
   imageUrl?: string
   sourceName: string
   isPrimary?: boolean
+  categoryDefault?: string
   directDealUrl?: string
   dealPrice?: string | null
   regularPrice?: string | null
@@ -415,6 +416,12 @@ export const MUSIC_NEWS_FEEDS: Array<{
   {
     name: 'Bedroom Producers Blog',
     url: 'https://bedroomproducersblog.com/feed/',
+    categoryDefault: 'Free VSTs',
+    isPrimary: true,
+  },
+  {
+    name: 'Rekkerd (Free VSTs & Freeware)',
+    url: 'https://rekkerd.org/tag/free/feed/',
     categoryDefault: 'Free VSTs',
     isPrimary: true,
   },
@@ -965,7 +972,7 @@ async function fetchRssFeedsConcurrently(): Promise<RawFeedItem[]> {
 
       if (!res.ok) return []
       const xml = await res.text()
-      return parseRssItems(xml, feed.name, feed.isPrimary)
+      return parseRssItems(xml, feed.name, feed.isPrimary, feed.categoryDefault)
     } catch {
       return []
     }
@@ -982,8 +989,95 @@ async function fetchRssFeedsConcurrently(): Promise<RawFeedItem[]> {
 }
 
 /**
+ * Detects whether an item is a Free Plugin, Freeware, or 100% Free Giveaway.
+ */
+export function isFreePluginItem(item: RawFeedItem): boolean {
+  if (item.categoryDefault === 'Free VSTs') {
+    const titleLower = (item.title || '').toLowerCase()
+    // If tagged under Free VSTs, ensure it's not a paid sale item with % off
+    if (!titleLower.includes('% off') && !titleLower.includes('sale') && !titleLower.includes('deal: $')) {
+      return true
+    }
+  }
+
+  const titleLower = (item.title || '').toLowerCase()
+  const snippetLower = (item.contentSnippet || '').toLowerCase()
+  const priceLower = (item.dealPrice || '').toLowerCase().trim()
+
+  if (priceLower === '$0' || priceLower === 'free' || priceLower === '$0.00' || priceLower === '0$') {
+    return true
+  }
+
+  const freePattern =
+    /\b(free|freeware|giveaway|100%\s*free|free\s*vst|free\s*plugin|free\s*download|for\s*free|free\s*sample|free\s*synth|free\s*reverb|free\s*instrument|free\s*pack|gratis|freebie)\b/i
+
+  if (freePattern.test(titleLower)) return true
+  if (item.sourceName.toLowerCase().includes('bedroom producers blog') && freePattern.test(snippetLower)) {
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Calculates priority score for feed ingestion:
+ * - Free plugins receive the HIGHEST priority (+200 pts)
+ * - Deep verified deals (80%+ off / <= $19) receive secondary priority (+90 pts)
+ * - Solid verified deals (50%+ off / <= $39) receive +60 pts
+ * - Minor deals receive +30 pts
+ * - Recency factor: items published in the last 24-72 hours receive up to +50 pts
+ */
+export function calculateItemPriority(item: RawFeedItem): number {
+  let score = 0
+  const isFree = isFreePluginItem(item)
+
+  if (isFree) {
+    score += 200 // Free plugins get top priority!
+  } else {
+    // For deals, apply strict quality scoring based on real verified discounts
+    const discount = (item.discount || '').toUpperCase()
+    const dealPrice = item.dealPrice ? parseFloat(item.dealPrice.replace('$', '')) : null
+
+    if (
+      discount.includes('80%') ||
+      discount.includes('85%') ||
+      discount.includes('90%') ||
+      discount.includes('95%') ||
+      (dealPrice !== null && dealPrice > 0 && dealPrice <= 19)
+    ) {
+      score += 90 // Mega deals / deep budget steals
+    } else if (
+      discount.includes('50%') ||
+      discount.includes('60%') ||
+      discount.includes('70%') ||
+      (dealPrice !== null && dealPrice <= 39)
+    ) {
+      score += 60 // Solid deals
+    } else {
+      score += 30 // Minor deals
+    }
+
+    // Penalize deals missing discount or pricing info
+    if (!item.discount && !item.dealPrice && !item.title.toLowerCase().includes('deal')) {
+      score -= 20
+    }
+  }
+
+  // Recency bonus
+  const time = new Date(item.pubDate).getTime() || 0
+  if (time > 0) {
+    const hoursAgo = Math.max(0, (Date.now() - time) / (1000 * 60 * 60))
+    const recencyBoost = Math.max(0, 50 - hoursAgo * 0.5)
+    score += recencyBoost
+  }
+
+  return score
+}
+
+/**
  * Fetch and parse RSS items from music production feeds in parallel.
  * Runs Telegram VIP (@legalvst), official Plugin Boutique Deals, and RSS feeds concurrently.
+ * Applies priority scoring: FREE plugins rank first, followed by verified top deals.
  */
 export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
   const [tgResult, pbResult, pdResult, rssResult] = await Promise.allSettled([
@@ -999,8 +1093,13 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
   if (pdResult.status === 'fulfilled') allItems.push(...pdResult.value)
   if (rssResult.status === 'fulfilled') allItems.push(...rssResult.value)
 
-  // Sort by pubDate descending so freshest releases are prioritized
+  // Prioritize items: Free plugins get top priority, followed by deep high-value deals with strict rules
   allItems.sort((a, b) => {
+    const scoreA = calculateItemPriority(a)
+    const scoreB = calculateItemPriority(b)
+    if (scoreB !== scoreA) {
+      return scoreB - scoreA
+    }
     const timeA = new Date(a.pubDate).getTime() || 0
     const timeB = new Date(b.pubDate).getTime() || 0
     return timeB - timeA
@@ -1012,7 +1111,12 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
 /**
  * Robust regex-based RSS item parser (works in Edge and Node runtimes)
  */
-function parseRssItems(xml: string, sourceName: string, isPrimary = false): RawFeedItem[] {
+function parseRssItems(
+  xml: string,
+  sourceName: string,
+  isPrimary = false,
+  categoryDefault?: string
+): RawFeedItem[] {
   const items: RawFeedItem[] = []
   const itemBlocks = xml.match(/<item[\s\S]*?<\/item>/gi) || []
 
@@ -1102,6 +1206,7 @@ function parseRssItems(xml: string, sourceName: string, isPrimary = false): RawF
       imageUrl,
       sourceName,
       isPrimary,
+      categoryDefault,
       directDealUrl,
     })
   }

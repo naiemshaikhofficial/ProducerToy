@@ -6,10 +6,12 @@ import {
   verifyArticleQuality,
   resolvePluginBoutiqueProductUrl,
   resolveAuthenticProductDealUrl,
+  isFreePluginItem,
+  RawFeedItem,
 } from '@/lib/news/newsSources'
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
-import { detectDealExpiry } from '@/lib/news/dealExpiry'
+import { detectDealExpiry, parseExpiryDateText } from '@/lib/news/dealExpiry'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // 60 seconds
@@ -44,8 +46,68 @@ async function handleSync(req: Request) {
     const processedTitles: string[] = []
     const savedSlugs: string[] = []
 
-    for (const item of feedItems) {
+    // CANDIDATE ALLOCATION:
+    // Prioritize FREE PLUGINS mostly (~70%), while allowing top verified DEALS that follow our rules
+    const freeCandidates = feedItems.filter((it) => isFreePluginItem(it))
+    const dealCandidates = feedItems.filter((it) => !isFreePluginItem(it))
+
+    let targetFree = 1
+    if (limitParam === 1) {
+      targetFree = freeCandidates.length > 0 ? 1 : 0
+    } else if (limitParam === 2) {
+      targetFree = freeCandidates.length > 0 ? 1 : 0
+    } else {
+      targetFree = Math.min(freeCandidates.length, Math.ceil(limitParam * 0.7))
+    }
+
+    const candidates: RawFeedItem[] = []
+    let fIdx = 0
+    let dIdx = 0
+
+    // 1. Pick target free candidates first
+    while (candidates.length < targetFree && fIdx < freeCandidates.length) {
+      candidates.push(freeCandidates[fIdx++])
+    }
+
+    // 2. Pick target verified deal candidates
+    const targetDeals = limitParam - candidates.length
+    let dealsAdded = 0
+    while (dealsAdded < targetDeals && dIdx < dealCandidates.length) {
+      candidates.push(dealCandidates[dIdx++])
+      dealsAdded++
+    }
+
+    // 3. Fallbacks to guarantee enough items to reach limitParam
+    while (candidates.length < limitParam && fIdx < freeCandidates.length) {
+      candidates.push(freeCandidates[fIdx++])
+    }
+    while (candidates.length < limitParam && dIdx < dealCandidates.length) {
+      candidates.push(dealCandidates[dIdx++])
+    }
+
+    // 4. Append remaining candidates in priority order as backup in case any items get skipped
+    while (fIdx < freeCandidates.length) {
+      candidates.push(freeCandidates[fIdx++])
+    }
+    while (dIdx < dealCandidates.length) {
+      candidates.push(dealCandidates[dIdx++])
+    }
+
+    for (const item of candidates) {
       if (processedCount >= limitParam) break
+
+      const isFree = isFreePluginItem(item)
+
+      // STRICT RULES FOR DEALS:
+      // If item is a paid deal, check that it is NOT expired
+      if (!isFree && item.expiryTimeline) {
+        const expCheck = parseExpiryDateText(item.expiryTimeline)
+        if (expCheck && expCheck.isExpired) {
+          console.log(`[News Sync] Skipping expired deal: "${item.title}"`)
+          skippedCount++
+          continue
+        }
+      }
 
       const slug = item.title
         .toLowerCase()
@@ -128,6 +190,19 @@ async function handleSync(req: Request) {
             continue
           }
         }
+      }
+
+      // Strict deal rule: If it's a paid product with no discount or verified sale, skip it!
+      if (
+        !isFree &&
+        !item.discount &&
+        !item.dealPrice &&
+        !item.title.toLowerCase().includes('deal') &&
+        !item.title.toLowerCase().includes('sale')
+      ) {
+        console.log(`[News Sync] Skipping non-deal product lacking verified discount: "${item.title}"`)
+        skippedCount++
+        continue
       }
 
       // Rewrite with Groq AI Llama 3.3 & save to Turso
