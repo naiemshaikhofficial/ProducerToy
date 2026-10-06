@@ -395,8 +395,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             />
           </div>
 
-          {/* Guaranteed Deal CTA Button: Displays at bottom ONLY if the article content does not already include an inline deal button */}
-          {offerUrl && !hasInlineCta && (
+          {/* Guaranteed Single Deal CTA Button: Clean, dedicated separation at bottom of story */}
+          {offerUrl && (
             <div className="my-10 flex flex-col items-center justify-center w-full clear-both">
               <a
                 href={offerUrl}

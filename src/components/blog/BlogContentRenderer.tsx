@@ -11,8 +11,10 @@ interface BlogContentRendererProps {
 
 const PB_AFFILIATE_ID = '68affa2b94f43'
 
-function sanitizeLinkUrl(url: string): string {
-  if (!url || url === '#' || url.startsWith('javascript:')) return '#'
+function sanitizeLinkUrl(url: string, defaultUrl: string = '/free-vst-plugins'): string {
+  if (!url || url === '#' || url.startsWith('javascript:') || url.includes('${') || url.includes('product_url')) {
+    return defaultUrl
+  }
   let clean = url.trim()
 
   // Ensure Plugin Boutique URLs always use Producer Toy's affiliate referral tag
@@ -53,10 +55,11 @@ function formatInline(
   text: string,
   isExpired?: boolean,
   expiryTimeline?: string | null,
-  fallbackDealUrl?: string | null
+  fallbackDealUrl?: string | null,
+  isStandaloneCta?: boolean
 ): string {
   const defaultAffiliateUrl =
-    fallbackDealUrl && fallbackDealUrl !== '#' && fallbackDealUrl.length > 2
+    fallbackDealUrl && fallbackDealUrl !== '#' && fallbackDealUrl.length > 2 && !fallbackDealUrl.includes('${')
       ? sanitizeLinkUrl(fallbackDealUrl)
       : '/free-vst-plugins'
 
@@ -67,8 +70,8 @@ function formatInline(
     .replace(/\*([^*]+)\*/g, '<em class="text-zinc-200 italic">$1</em>')
     // [text](url) - Convert markdown links and style CTA deal buttons
     .replace(/\[([^\]]+)\]\(([^)]*)\)/g, (match, linkText, rawUrl) => {
-      let url = sanitizeLinkUrl(rawUrl)
-      if (url === '#' || !url || url.length < 2) {
+      let url = sanitizeLinkUrl(rawUrl, defaultAffiliateUrl)
+      if (url === '#' || !url || url.length < 2 || url.includes('${')) {
         url = defaultAffiliateUrl
       }
 
@@ -82,13 +85,9 @@ function formatInline(
         cleanLinkText = 'Get Deal'
       }
 
-      const isCtaButton =
-        /^(get|claim|grab|download|buy|save|view|explore|redeem|official)\b/i.test(cleanLinkText) ||
-        cleanLinkText.toLowerCase().includes('deal') ||
-        cleanLinkText.toLowerCase().includes('% off') ||
-        cleanLinkText.toLowerCase().includes('€') ||
-        cleanLinkText.toLowerCase().includes('$')
-
+      // ONLY render full-width centered CTA button when explicitly passed as standalone CTA link!
+      // In-line links inside sentences or list items remain sleek inline text links
+      const isCtaButton = Boolean(isStandaloneCta)
       const isExternal = !url.startsWith('/')
 
       if (isCtaButton) {
@@ -135,7 +134,10 @@ export function parseMarkdownToHtml(
     .replace(/&#252;/g, 'ü')
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
-    // 2. Strip scraper boilerplate and third-party retailer mentions (Plugin Boutique, etc.)
+    // 2. Strip scraper boilerplate, leftover placeholders, and retailer mentions
+    .replace(/\s*More info:\s*\[[^\]]+\]\([^)]*\)/gi, '')
+    .replace(/\$\{product_url\}/gi, '')
+    .replace(/\$\{url\}/gi, '')
     .replace(/\b(?:on|at|from)\s+Plugin\s*Boutique(?!\.com)\b/gi, 'now')
     .replace(/\bPlugin\s*Boutique's(?!\.com)\b/gi, 'The official')
     .replace(/\bPlugin\s*Boutique(?!\.com)\b/gi, 'Producer Toy')
@@ -328,9 +330,9 @@ export function parseMarkdownToHtml(
     // Remove any accidental leading stray hashes in a paragraph
     paragraphContent = paragraphContent.replace(/^#+\s+/, '')
 
-    // If paragraph is a standalone CTA button link
-    if (/^\s*\[([^\]]+)\]\(([^)]*)\)\s*$/.test(paragraphContent)) {
-      htmlBlocks.push(formatInline(paragraphContent, isExpired, expiryTimeline, fallbackDealUrl))
+    // If paragraph is a standalone CTA button link at the end of the story,
+    // skip it so NewsArticleClient's dedicated Get Official Deal / Download Free Plugin button is the sole action button
+    if (/^\s*\[(?:Get Official Deal|Download Free Plugin|Get Deal|Claim Deal|Buy Plugin|Download Now|Redeem Deal|Official Deal)[^\]]*\]\([^)]*\)\s*$/i.test(paragraphContent)) {
       continue
     }
 
