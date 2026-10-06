@@ -173,6 +173,14 @@ async function handleSync(req: Request) {
         processedCount++
         processedTitles.push(article.title)
         savedSlugs.push(article.slug)
+
+        // Automatically dispatch newly saved article to Telegram channel
+        try {
+          const { postArticleToTelegram } = await import('@/lib/telegram/newsPoster')
+          await postArticleToTelegram(article)
+        } catch (tgErr: any) {
+          console.warn('[News Sync Telegram Dispatch Error]:', tgErr?.message || tgErr)
+        }
       }
     }
 
