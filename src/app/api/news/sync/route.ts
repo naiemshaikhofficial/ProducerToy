@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
-import { fetchMusicNewsFeedItems, extractDirectDealInfo, verifyArticleQuality } from '@/lib/news/newsSources'
+import {
+  fetchMusicNewsFeedItems,
+  extractDirectDealInfo,
+  verifyArticleQuality,
+  resolvePluginBoutiqueProductUrl,
+} from '@/lib/news/newsSources'
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
@@ -46,39 +51,7 @@ async function handleSync(req: Request) {
         .replace(/(^-|-$)+/g, '')
         .slice(0, 90)
 
-      // Automatically extract direct developer/merchant deal URL & live pricing first
-      const dealInfo = await extractDirectDealInfo(item.directDealUrl || item.link)
-      if (dealInfo) {
-        if (dealInfo.bestUrl) {
-          item.directDealUrl = dealInfo.bestUrl
-        }
-        if (dealInfo.couponCode && !(item as any).couponCode) {
-          (item as any).couponCode = dealInfo.couponCode
-        }
-        if (dealInfo.expiryTimeline && !(item as any).expiryTimeline) {
-          (item as any).expiryTimeline = dealInfo.expiryTimeline
-        }
-        if (dealInfo.dealPrice && !(item as any).dealPrice) {
-          (item as any).dealPrice = dealInfo.dealPrice
-        }
-        if (dealInfo.regularPrice && !(item as any).regularPrice) {
-          (item as any).regularPrice = dealInfo.regularPrice
-        }
-        if (dealInfo.discount && !(item as any).discount) {
-          (item as any).discount = dealInfo.discount
-        }
-        if (dealInfo.coverImage) {
-          item.imageUrl = dealInfo.coverImage
-        }
-        // Strict: If verified as NOT an active deal (e.g. regular price only), skip it!
-        if (dealInfo.isDealActive === false) {
-          console.log(`[News Sync] Skipping non-discounted product: "${item.title}"`)
-          skippedCount++
-          continue
-        }
-      }
-
-      // Check if this product or deal already exists in the database
+      // 1. FAST CHECK: If this product/article already exists and is fresh (<24h), skip scraping & LLM entirely!
       const existingArticle = await findExistingArticle({
         feedLink: item.link,
         directDealUrl: item.directDealUrl,
@@ -102,6 +75,45 @@ async function handleSync(req: Request) {
         console.log(
           `[News Sync] Reactivating / Replacing existing deal for "${existingArticle.title}" with new offer`
         )
+      }
+
+      // 2. If item is from Telegram and has no direct deal URL, resolve it on Plugin Boutique
+      if (item.sourceName.includes('Telegram') && !item.directDealUrl && item.title) {
+        item.directDealUrl = await resolvePluginBoutiqueProductUrl(item.title)
+      }
+
+      // 3. Extract direct developer/merchant deal URL & live pricing ONLY if needed
+      if (!item.dealPrice || !item.imageUrl || !item.directDealUrl) {
+        const dealInfo = await extractDirectDealInfo(item.directDealUrl || item.link)
+        if (dealInfo) {
+          if (dealInfo.bestUrl) {
+            item.directDealUrl = dealInfo.bestUrl
+          }
+          if (dealInfo.couponCode && !(item as any).couponCode) {
+            (item as any).couponCode = dealInfo.couponCode
+          }
+          if (dealInfo.expiryTimeline && !(item as any).expiryTimeline) {
+            (item as any).expiryTimeline = dealInfo.expiryTimeline
+          }
+          if (dealInfo.dealPrice && !(item as any).dealPrice) {
+            (item as any).dealPrice = dealInfo.dealPrice
+          }
+          if (dealInfo.regularPrice && !(item as any).regularPrice) {
+            (item as any).regularPrice = dealInfo.regularPrice
+          }
+          if (dealInfo.discount && !(item as any).discount) {
+            (item as any).discount = dealInfo.discount
+          }
+          if (dealInfo.coverImage) {
+            item.imageUrl = dealInfo.coverImage
+          }
+          // Strict: If verified as NOT an active deal (e.g. regular price only), skip it!
+          if (dealInfo.isDealActive === false) {
+            console.log(`[News Sync] Skipping non-discounted product: "${item.title}"`)
+            skippedCount++
+            continue
+          }
+        }
       }
 
       // Rewrite with Groq AI Llama 3.3 & save to Turso

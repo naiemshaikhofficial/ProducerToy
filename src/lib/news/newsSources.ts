@@ -10,6 +10,13 @@ export interface RawFeedItem {
   sourceName: string
   isPrimary?: boolean
   directDealUrl?: string
+  dealPrice?: string | null
+  regularPrice?: string | null
+  discount?: string | null
+  expiryTimeline?: string | null
+  couponCode?: string | null
+  brand?: string | null
+  productName?: string | null
 }
 
 export const PLUGIN_BOUTIQUE_AFFILIATE_ID = '68affa2b94f43'
@@ -219,9 +226,28 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
 } | null> {
   if (!articleUrl || typeof articleUrl !== 'string') return null
 
+  // Fast direct resolution for Plugin Boutique product URLs (skips Jina reader)
+  if (articleUrl.includes('pluginboutique.com/product/')) {
+    const cleanUrl = sanitizeDealUrl(articleUrl) || articleUrl
+    const live = await fetchPluginBoutiqueProductLiveDetails(articleUrl)
+    if (live) {
+      return {
+        bestUrl: cleanUrl,
+        dealPrice: live.dealPrice,
+        regularPrice: live.regularPrice,
+        discount: live.discount,
+        expiryTimeline: live.expiryTimeline,
+        brand: live.brand,
+        productName: live.title,
+        coverImage: live.coverImage,
+        isDealActive: live.isDealActive,
+      }
+    }
+  }
+
   try {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 4500)
+    const timeout = setTimeout(() => controller.abort(), 3500)
 
     const jinaUrl = `https://r.jina.ai/${articleUrl}`
     const res = await fetch(jinaUrl, {
@@ -415,130 +441,132 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
   const sourcePages = [
     'https://www.pluginboutique.com/deals?featured=true&sort=hot',
     'https://www.pluginboutique.com/deals?sort=hot',
-    'https://www.pluginboutique.com/deals',
-    'https://www.pluginboutique.com/categories/54-Vocal-Processing',
   ]
 
-  for (const pageUrl of sourcePages) {
-    try {
+  const results = await Promise.allSettled(
+    sourcePages.map(async (pageUrl) => {
       const res = await fetch(`https://r.jina.ai/${pageUrl}`, {
         headers: {
           Accept: 'text/plain',
         },
+        signal: AbortSignal.timeout(3500),
         next: { revalidate: 1800 },
       })
-      if (!res.ok) continue
-      const text = await res.text()
+      if (!res.ok) return ''
+      return res.text()
+    })
+  )
 
-      const productBlocks = text.split(/(?=\[!\[Image \d+: Product image\])/)
-      for (const block of productBlocks) {
-        const imgMatch = block.match(
-          /\[!\[Image \d+: Product image\]\((https:\/\/banners\.pluginboutique\.com\/[^\)]+)\)\]\((https:\/\/www\.pluginboutique\.com\/product\/[^\)]+)\)/
-        )
-        if (!imgMatch) continue
+  for (const r of results) {
+    if (r.status !== 'fulfilled' || !r.value) continue
+    const text = r.value
 
-        const imageUrl = imgMatch[1]
-        const rawProductUrl = imgMatch[2]
-        const cleanUrl = sanitizeDealUrl(rawProductUrl) || rawProductUrl
+    const productBlocks = text.split(/(?=\[!\[Image \d+: Product image\])/)
+    for (const block of productBlocks) {
+      const imgMatch = block.match(
+        /\[!\[Image \d+: Product image\]\((https:\/\/banners\.pluginboutique\.com\/[^\)]+)\)\]\((https:\/\/www\.pluginboutique\.com\/product\/[^\)]+)\)/
+      )
+      if (!imgMatch) continue
 
-        // Deduplicate across pages
-        const urlKey = cleanUrl.toLowerCase().split('?')[0]
-        if (seenUrls.has(urlKey)) continue
-        seenUrls.add(urlKey)
+      const imageUrl = imgMatch[1]
+      const rawProductUrl = imgMatch[2]
+      const cleanUrl = sanitizeDealUrl(rawProductUrl) || rawProductUrl
 
-        // Ends date: e.g. [Ends 11 Oct Hot!], 'until Nov 01', 'Ends Nov 01', etc.
-        const endsMatch = block.match(/(?:\[?\s*(?:Ends|until|runs through|valid through|sale ends)\s+([a-zA-Z]+\s+\d{1,2}|\d{1,2}\s+[a-zA-Z]+[^\]\n\r]*?)\]?)/i)
-        const expiry = endsMatch ? endsMatch[1].replace(/Hot!|New!/gi, '').trim() : ''
+      // Deduplicate across pages
+      const urlKey = cleanUrl.toLowerCase().split('?')[0]
+      if (seenUrls.has(urlKey)) continue
+      seenUrls.add(urlKey)
 
-        // STRICT CHECK: If the deal date has already expired, skip immediately!
-        if (expiry) {
-          const expCheck = parseExpiryDateText(expiry)
-          if (expCheck && expCheck.isExpired) {
-            continue
-          }
-        }
+      // Ends date: e.g. [Ends 11 Oct Hot!], 'until Nov 01', 'Ends Nov 01', etc.
+      const endsMatch = block.match(/(?:\[?\s*(?:Ends|until|runs through|valid through|sale ends)\s+([a-zA-Z]+\s+\d{1,2}|\d{1,2}\s+[a-zA-Z]+[^\]\n\r]*?)\]?)/i)
+      const expiry = endsMatch ? endsMatch[1].replace(/Hot!|New!/gi, '').trim() : ''
 
-        // Category & Manufacturer e.g. [Virtual Instruments](...) by [UJAM](...)
-        const byMatch = block.match(/\[([^\]]+)\]\([^\)]+\)\s*by\s*\[([^\]]+)\]/i)
-        const category = byMatch ? byMatch[1].trim() : 'Deals & Sales'
-        const brand = byMatch ? byMatch[2].trim() : ''
-
-        // Name: appears before 'by' or right after the links
-        const nameMatch = block.match(/\n\s*([^\n\[\]]{2,60})\s*\n\s*\[[^\]]+\]\([^\)]+\)\s*by/)
-        const name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
-
-        // Prices & discount: Parse accurately (deal price is ALWAYS the lower amount)
-        const priceMatches = [...block.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
-        const discountMatch = block.match(/(\d+%\s*off)/i)
-
-        let regularPrice: string | null = null
-        let dealPrice: string | null = null
-        if (priceMatches.length >= 2) {
-          const num0 = parseFloat(priceMatches[0])
-          const num1 = parseFloat(priceMatches[1])
-          if (num0 < num1) {
-            dealPrice = '$' + priceMatches[0]
-            regularPrice = '$' + priceMatches[1]
-          } else {
-            dealPrice = '$' + priceMatches[1]
-            regularPrice = '$' + priceMatches[0]
-          }
-        } else if (priceMatches.length === 1) {
-          dealPrice = '$' + priceMatches[0]
-        }
-
-        let discount = discountMatch ? discountMatch[1].toUpperCase() : ''
-        if (!discount && dealPrice && regularPrice) {
-          const dVal = parseFloat(dealPrice.replace('$', ''))
-          const rVal = parseFloat(regularPrice.replace('$', ''))
-          if (rVal > dVal && rVal > 0) {
-            discount = `${Math.round(((rVal - dVal) / rVal) * 100)}% OFF`
-          }
-        }
-
-        if (name && cleanUrl) {
-          const fullTitle = brand
-            ? `${brand} ${name} Deal: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
-            : `${name} Sale: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
-
-          const snippet = `${brand ? brand + ' ' : ''}${name} is currently on sale${discount ? ` at ${discount}` : ''}. Official verified deal price is ${dealPrice || 'discounted'}${regularPrice ? ` (regularly ${regularPrice})` : ''}.${expiry ? ` Limited-time offer ${expiry}.` : ''}`
-
-          const item: RawFeedItem = {
-            title: fullTitle,
-            link: cleanUrl,
-            pubDate: new Date().toUTCString(),
-            creator: brand || 'Plugin Boutique',
-            contentSnippet: snippet,
-            imageUrl,
-            sourceName: 'Plugin Boutique Deals',
-            isPrimary: true,
-            directDealUrl: cleanUrl,
-          }
-
-          if (expiry) {
-            ;(item as any).expiryTimeline = expiry
-          }
-          if (dealPrice) {
-            ;(item as any).dealPrice = dealPrice
-          }
-          if (regularPrice) {
-            ;(item as any).regularPrice = regularPrice
-          }
-          if (brand) {
-            ;(item as any).brand = brand
-          }
-          if (name) {
-            ;(item as any).productName = name
-          }
-          if (discount) {
-            ;(item as any).discount = discount
-          }
-
-          items.push(item)
+      // STRICT CHECK: If the deal date has already expired, skip immediately!
+      if (expiry) {
+        const expCheck = parseExpiryDateText(expiry)
+        if (expCheck && expCheck.isExpired) {
+          continue
         }
       }
-    } catch (err) {
-      console.warn(`[fetchPluginBoutiqueDealsFeedItems] Error fetching ${pageUrl}:`, err)
+
+      // Category & Manufacturer e.g. [Virtual Instruments](...) by [UJAM](...)
+      const byMatch = block.match(/\[([^\]]+)\]\([^\)]+\)\s*by\s*\[([^\]]+)\]/i)
+      const category = byMatch ? byMatch[1].trim() : 'Deals & Sales'
+      const brand = byMatch ? byMatch[2].trim() : ''
+
+      // Name: appears before 'by' or right after the links
+      const nameMatch = block.match(/\n\s*([^\n\[\]]{2,60})\s*\n\s*\[[^\]]+\]\([^\)]+\)\s*by/)
+      const name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
+
+      // Prices & discount: Parse accurately (deal price is ALWAYS the lower amount)
+      const priceMatches = [...block.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
+      const discountMatch = block.match(/(\d+%\s*off)/i)
+
+      let regularPrice: string | null = null
+      let dealPrice: string | null = null
+      if (priceMatches.length >= 2) {
+        const num0 = parseFloat(priceMatches[0])
+        const num1 = parseFloat(priceMatches[1])
+        if (num0 < num1) {
+          dealPrice = '$' + priceMatches[0]
+          regularPrice = '$' + priceMatches[1]
+        } else {
+          dealPrice = '$' + priceMatches[1]
+          regularPrice = '$' + priceMatches[0]
+        }
+      } else if (priceMatches.length === 1) {
+        dealPrice = '$' + priceMatches[0]
+      }
+
+      let discount = discountMatch ? discountMatch[1].toUpperCase() : ''
+      if (!discount && dealPrice && regularPrice) {
+        const dVal = parseFloat(dealPrice.replace('$', ''))
+        const rVal = parseFloat(regularPrice.replace('$', ''))
+        if (rVal > dVal && rVal > 0) {
+          discount = `${Math.round(((rVal - dVal) / rVal) * 100)}% OFF`
+        }
+      }
+
+      if (name && cleanUrl) {
+        const fullTitle = brand
+          ? `${brand} ${name} Deal: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
+          : `${name} Sale: ${discount ? discount + ' ' : ''}(${dealPrice || 'Special Offer'})`
+
+        const snippet = `${brand ? brand + ' ' : ''}${name} is currently on sale${discount ? ` at ${discount}` : ''}. Official verified deal price is ${dealPrice || 'discounted'}${regularPrice ? ` (regularly ${regularPrice})` : ''}.${expiry ? ` Limited-time offer ${expiry}.` : ''}`
+
+        const item: RawFeedItem = {
+          title: fullTitle,
+          link: cleanUrl,
+          pubDate: new Date().toUTCString(),
+          creator: brand || 'Plugin Boutique',
+          contentSnippet: snippet,
+          imageUrl,
+          sourceName: 'Plugin Boutique Deals',
+          isPrimary: true,
+          directDealUrl: cleanUrl,
+        }
+
+        if (expiry) {
+          ;(item as any).expiryTimeline = expiry
+        }
+        if (dealPrice) {
+          ;(item as any).dealPrice = dealPrice
+        }
+        if (regularPrice) {
+          ;(item as any).regularPrice = regularPrice
+        }
+        if (brand) {
+          ;(item as any).brand = brand
+        }
+        if (name) {
+          ;(item as any).productName = name
+        }
+        if (discount) {
+          ;(item as any).discount = discount
+        }
+
+        items.push(item)
+      }
     }
   }
   return items
@@ -555,6 +583,7 @@ export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
       headers: {
         Accept: 'text/plain',
       },
+      signal: AbortSignal.timeout(3500),
       next: { revalidate: 1800 },
     })
     if (!res.ok) return items
@@ -587,23 +616,23 @@ export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
       })
     }
 
-    // 2. Top Record Low Products
+    // 2. Top Record Low Products (instant in-memory parsing without blocking in loop)
     const topDealsRegex = /\[!\[[^\]]*\]\((https:\/\/plugindeals\.net\/deal-graphics\/[^)]+)\)\]\([^)]+\)\s*([^\n\r]+)/g
     while ((match = topDealsRegex.exec(text)) !== null) {
       const imageUrl = match[1].trim()
       const productName = cleanText(match[2].trim())
-      const exactProductUrl = await resolvePluginBoutiqueProductUrl(productName)
+      const fallbackUrl = `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
 
       items.push({
         title: `${productName} on Sale (Exclusive Deal)`,
-        link: exactProductUrl,
+        link: fallbackUrl,
         pubDate: new Date().toUTCString(),
         creator: 'Plugin Deals',
         contentSnippet: `${productName} is currently on sale at an exceptional discount. Official release with lifetime licensing and instant download.`,
         imageUrl,
         sourceName: 'PluginDeals',
         isPrimary: true,
-        directDealUrl: exactProductUrl,
+        directDealUrl: fallbackUrl,
       })
     }
   } catch (err) {
@@ -634,7 +663,7 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
             'User-Agent':
               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
           },
-          signal: AbortSignal.timeout(4500),
+          signal: AbortSignal.timeout(3500),
         }
       )
       if (searchRes.ok) {
@@ -655,6 +684,7 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
  * Fetches real-time verified audio plugin news and releases from curated Telegram channels
  * (e.g. https://t.me/s/legalvst).
  * Prioritizes official hardware/GUI master graphics, verified discounts, and referral link rewriting.
+ * Performs fast zero-blocking in-memory parsing over post data.
  */
 export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'): Promise<RawFeedItem[]> {
   const items: RawFeedItem[] = []
@@ -665,6 +695,7 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
+      signal: AbortSignal.timeout(3500),
       next: { revalidate: 900 },
     })
     if (!res.ok) return items
@@ -706,36 +737,42 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
         }
       }
 
-      // If no direct link found in post, search Plugin Boutique for the official product
-      if (!directDealUrl) {
-        directDealUrl = await resolvePluginBoutiqueProductUrl(rawTitle)
-      }
-
-      // Scrape live product details from Plugin Boutique if available
+      // In-memory extraction of discount, pricing, and expiry from post text
       let dealPrice: string | null = null
       let regularPrice: string | null = null
       let discount: string | null = null
       let expiryTimeline: string | null = null
-      let masterImage = imageUrl
 
-      if (directDealUrl && directDealUrl.includes('pluginboutique.com/product/')) {
-        const liveDetails = await fetchPluginBoutiqueProductLiveDetails(directDealUrl)
-        if (liveDetails) {
-          dealPrice = liveDetails.dealPrice
-          regularPrice = liveDetails.regularPrice
-          discount = liveDetails.discount
-          expiryTimeline = liveDetails.expiryTimeline
-          if (liveDetails.coverImage) {
-            masterImage = liveDetails.coverImage
-          }
+      const discountMatch = cleanContent.match(/(\d+%\s*off)/i)
+      if (discountMatch) {
+        discount = discountMatch[1].toUpperCase()
+      }
+
+      const priceMatches = [...cleanContent.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
+      if (priceMatches.length >= 2) {
+        const p1 = parseFloat(priceMatches[0])
+        const p2 = parseFloat(priceMatches[1])
+        if (p1 < p2) {
+          dealPrice = `$${priceMatches[0]}`
+          regularPrice = `$${priceMatches[1]}`
+        } else {
+          dealPrice = `$${priceMatches[1]}`
+          regularPrice = `$${priceMatches[0]}`
         }
+      } else if (priceMatches.length === 1) {
+        dealPrice = `$${priceMatches[0]}`
+      }
+
+      const expMatch = cleanContent.match(/(?:until|ends|valid through)\s+([a-zA-Z]+\s+\d{1,2}|\d{1,2}\s+[a-zA-Z]+[^.\n]*)/i)
+      if (expMatch) {
+        expiryTimeline = expMatch[1].trim()
       }
 
       let formattedTitle = rawTitle
       if (discount && dealPrice) {
         formattedTitle = `${rawTitle} Deal: ${discount} (${dealPrice})`
       } else if (dealPrice) {
-        formattedTitle = `${rawTitle} Deal: ${dealPrice}`
+        formattedTitle = `${rawTitle} Deal: (${dealPrice})`
       }
 
       const item: RawFeedItem = {
@@ -744,7 +781,7 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
         pubDate: new Date().toUTCString(),
         creator: 'Legal VST VIP',
         contentSnippet: cleanContent.slice(0, 1000),
-        imageUrl: masterImage,
+        imageUrl,
         sourceName: 'Legal VST (Telegram VIP)',
         isPrimary: true,
         directDealUrl,
@@ -764,37 +801,10 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
 }
 
 /**
- * Fetch and parse RSS items from music production feeds
- * Prioritizes VIP Telegram channel (@legalvst), official Plugin Boutique Deals, and verified partners
+ * Concurrently fetches and parses all RSS feeds with timeout protection
  */
-export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
-  const allItems: RawFeedItem[] = []
-
-  // 1. VIP PRIORITY: Fetch verified deals from @legalvst Telegram channel
-  try {
-    const tgItems = await fetchTelegramChannelFeedItems('legalvst')
-    allItems.push(...tgItems)
-  } catch (err) {
-    console.warn('[fetchMusicNewsFeedItems] Error in Telegram fetch:', err)
-  }
-
-  // 2. Fetch official Plugin Boutique Deals directly
-  try {
-    const pbItems = await fetchPluginBoutiqueDealsFeedItems()
-    allItems.push(...pbItems)
-  } catch (err) {
-    console.warn('[fetchMusicNewsFeedItems] Error in Plugin Boutique fetch:', err)
-  }
-
-  // 3. Fetch PluginDeals.net items with verified referral replacement
-  try {
-    const pdItems = await fetchPluginDealsFeedItems()
-    allItems.push(...pdItems)
-  } catch (err) {
-    console.warn('[fetchMusicNewsFeedItems] Error in PluginDeals fetch:', err)
-  }
-
-  for (const feed of MUSIC_NEWS_FEEDS) {
+async function fetchRssFeedsConcurrently(): Promise<RawFeedItem[]> {
+  const feedPromises = MUSIC_NEWS_FEEDS.map(async (feed) => {
     try {
       let res = await fetch(feed.url, {
         headers: {
@@ -802,10 +812,10 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
           Accept: 'application/rss+xml, application/xml, text/xml, */*',
         },
-        next: { revalidate: 1800 }, // 30 mins
+        signal: AbortSignal.timeout(3000),
+        next: { revalidate: 1800 },
       })
 
-      // If feed returns 403 or error and has a fallback URL, use fallback URL
       if (!res.ok && feed.fallbackUrl) {
         res = await fetch(feed.fallbackUrl, {
           headers: {
@@ -813,29 +823,48 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
             Accept: 'application/rss+xml, application/xml, text/xml, */*',
           },
+          signal: AbortSignal.timeout(3000),
           next: { revalidate: 1800 },
         })
       }
 
-      if (!res.ok) {
-        console.warn(`[fetchMusicNewsFeedItems] Feed ${feed.name} returned status ${res.status}`)
-        continue
-      }
-
+      if (!res.ok) return []
       const xml = await res.text()
-      const items = parseRssItems(xml, feed.name, feed.isPrimary)
+      return parseRssItems(xml, feed.name, feed.isPrimary)
+    } catch {
+      return []
+    }
+  })
 
-      if (feed.isPrimary) {
-        allItems.unshift(...items)
-      } else {
-        allItems.push(...items)
-      }
-    } catch (err) {
-      console.warn(`[fetchMusicNewsFeedItems] Error fetching feed ${feed.name}:`, err)
+  const results = await Promise.allSettled(feedPromises)
+  const items: RawFeedItem[] = []
+  for (const r of results) {
+    if (r.status === 'fulfilled') {
+      items.push(...r.value)
     }
   }
+  return items
+}
 
-  // Sort by pubDate descending so the freshest releases across all feeds (Bedroom Producers Blog, Rekkerd, Plugin Boutique) are synchronized first
+/**
+ * Fetch and parse RSS items from music production feeds in parallel.
+ * Runs Telegram VIP (@legalvst), official Plugin Boutique Deals, and RSS feeds concurrently.
+ */
+export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
+  const [tgResult, pbResult, pdResult, rssResult] = await Promise.allSettled([
+    fetchTelegramChannelFeedItems('legalvst'),
+    fetchPluginBoutiqueDealsFeedItems(),
+    fetchPluginDealsFeedItems(),
+    fetchRssFeedsConcurrently(),
+  ])
+
+  const allItems: RawFeedItem[] = []
+  if (tgResult.status === 'fulfilled') allItems.push(...tgResult.value)
+  if (pbResult.status === 'fulfilled') allItems.push(...pbResult.value)
+  if (pdResult.status === 'fulfilled') allItems.push(...pdResult.value)
+  if (rssResult.status === 'fulfilled') allItems.push(...rssResult.value)
+
+  // Sort by pubDate descending so freshest releases are prioritized
   allItems.sort((a, b) => {
     const timeA = new Date(a.pubDate).getTime() || 0
     const timeB = new Date(b.pubDate).getTime() || 0

@@ -16,7 +16,7 @@ jobs:
       - name: Trigger ProducerToy News Sync
         run: |
           echo "Triggering ProducerToy news sync at $(date -u)..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://producertoy.com/api/news/sync?limit=2" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 55 -X GET "https://producertoy.com/api/news/sync?limit=2" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
           HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
 
@@ -25,8 +25,20 @@ jobs:
           echo "$HTTP_BODY"
 
           if [ "$HTTP_STATUS" -ne 200 ]; then
-            echo "❌ News sync request failed with status $HTTP_STATUS"
-            exit 1
+            echo "⚠️ First attempt received status $HTTP_STATUS. Waiting 5s and retrying with limit=1..."
+            sleep 5
+            RETRY_RESP=$(curl -s -w "\n%{http_code}" --max-time 50 -X GET "https://producertoy.com/api/news/sync?limit=1" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
+            RETRY_BODY=$(echo "$RETRY_RESP" | sed '$d')
+            RETRY_STATUS=$(echo "$RETRY_RESP" | tail -n1)
+
+            echo "Retry HTTP Status Code: $RETRY_STATUS"
+            echo "Retry Response Body:"
+            echo "$RETRY_BODY"
+
+            if [ "$RETRY_STATUS" -ne 200 ]; then
+              echo "❌ News sync request failed with status $RETRY_STATUS"
+              exit 1
+            fi
           fi
 
           echo "✅ News sync completed successfully!"
