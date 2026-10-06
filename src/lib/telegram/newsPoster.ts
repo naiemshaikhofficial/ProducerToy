@@ -173,7 +173,8 @@ export function formatTelegramCaption(article: NewsArticle): string {
     }
   }
 
-  // 5. Official ProducerToy Website & Channel Branding
+  // 5. Official ProducerToy News & Website Branding
+  lines.push(`📰 <b>Read More Deals:</b> <a href="https://producertoy.com/news">producertoy.com/news</a>`)
   lines.push(`🌐 <b>Website:</b> <a href="https://producertoy.com">producertoy.com</a>`)
   lines.push(`📢 <i>Follow @producertoynews for instant audio gear & plugin deals!</i>`)
 
@@ -195,14 +196,14 @@ function buildInlineKeyboard(article: NewsArticle) {
     inline_keyboard: [
       [
         {
-          text: '📖 Read Full Story & Claim on ProducerToy',
+          text: '📖 Read Full Story & Claim',
           url: articleUrl,
         },
       ],
       [
         {
-          text: '🌐 Explore ProducerToy Store',
-          url: 'https://producertoy.com',
+          text: '📰 All Deals: producertoy.com/news',
+          url: 'https://producertoy.com/news',
         },
       ],
     ],
