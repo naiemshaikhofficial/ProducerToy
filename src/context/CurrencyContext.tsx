@@ -38,6 +38,67 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined)
 
 const DEFAULT_RATE = 95.0
+const RATE_CACHE_TTL_MS = 60 * 60 * 1000 // 1 hour client cache TTL
+
+// Module-level state: ensures only ONE in-flight request occurs across the whole app,
+// even under React StrictMode (mount -> unmount -> mount) or rapid re-renders.
+let activeExchangeRatePromise: Promise<number | null> | null = null
+let lastFetchedTime = 0
+
+async function fetchSingleExchangeRate(): Promise<number | null> {
+  const now = Date.now()
+
+  // 1. If fetched within the last 1 hour in memory, return null (reuse existing state)
+  if (lastFetchedTime && now - lastFetchedTime < RATE_CACHE_TTL_MS) {
+    return null
+  }
+
+  // 2. Check localStorage with timestamp to avoid redundant network calls on page loads
+  if (typeof window !== 'undefined') {
+    try {
+      const savedRate = localStorage.getItem('pt_exchange_rate')
+      const savedTime = localStorage.getItem('pt_exchange_rate_time')
+      if (savedRate && savedTime) {
+        const parsedRate = Number(savedRate)
+        const parsedTime = Number(savedTime)
+        if (parsedRate > 50 && parsedRate < 200 && now - parsedTime < RATE_CACHE_TTL_MS) {
+          lastFetchedTime = parsedTime
+          return parsedRate
+        }
+      }
+    } catch {}
+  }
+
+  // 3. Deduplicate in-flight network requests (singleton promise)
+  if (activeExchangeRatePromise) {
+    return activeExchangeRatePromise
+  }
+
+  activeExchangeRatePromise = (async () => {
+    try {
+      const res = await fetch('/api/exchange-rate')
+      if (res.ok) {
+        const data = await res.json()
+        const liveRate = Number(data?.rate)
+        if (liveRate && liveRate > 50 && liveRate < 200) {
+          lastFetchedTime = Date.now()
+          try {
+            localStorage.setItem('pt_exchange_rate', String(liveRate))
+            localStorage.setItem('pt_exchange_rate_time', String(lastFetchedTime))
+          } catch {}
+          return liveRate
+        }
+      }
+    } catch (err) {
+      console.warn('[Currency] Could not fetch live exchange rate:', err)
+    } finally {
+      activeExchangeRatePromise = null
+    }
+    return null
+  })()
+
+  return activeExchangeRatePromise
+}
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [region, setRegionState] = useState<RegionOption>(REGIONS[0])
@@ -85,6 +146,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
+      // Restore saved rate immediately from localStorage
       const savedRate = localStorage.getItem('pt_exchange_rate')
       if (savedRate) {
         const parsed = Number(savedRate)
@@ -96,26 +158,17 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       // LocalStorage fallback
     }
 
-    // Fetch live rate in background
-    const fetchLiveRate = async () => {
-      try {
-        const res = await fetch('/api/exchange-rate')
-        if (res.ok) {
-          const data = await res.json()
-          if (data.rate && Number(data.rate) > 50) {
-            const liveRate = Number(data.rate)
-            setExchangeRate(liveRate)
-            try {
-              localStorage.setItem('pt_exchange_rate', String(liveRate))
-            } catch {}
-          }
-        }
-      } catch (err) {
-        console.warn('Could not fetch live exchange rate:', err)
+    // Single deduplicated background fetch
+    let isMounted = true
+    fetchSingleExchangeRate().then((rate) => {
+      if (isMounted && rate && rate > 50) {
+        setExchangeRate(rate)
       }
-    }
+    })
 
-    fetchLiveRate()
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const setRegion = useCallback((regionId: string) => {
