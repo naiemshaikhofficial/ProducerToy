@@ -112,7 +112,18 @@ export async function getNewsArticles(options?: {
   const cacheKey = `articles_${options?.category || 'all'}_${options?.limit ?? 30}_${options?.offset ?? 0}_${Boolean(options?.featuredOnly)}`
   const cached = NEWS_MEMORY_CACHE.get(cacheKey)
   if (cached && Date.now() < cached.expiry) {
-    return cached.data
+    const hasForbidden =
+      Array.isArray(cached.data) &&
+      cached.data.some(
+        (a: any) =>
+          a.cover_image &&
+          (a.cover_image.includes('telesco.pe') ||
+            a.cover_image.includes('telegram') ||
+            a.cover_image.includes('t.me'))
+      )
+    if (!hasForbidden) {
+      return cached.data
+    }
   }
 
   await initNewsSchema()

@@ -57,6 +57,15 @@ export function isForbiddenCoverImageUrl(url?: string | null): boolean {
     return true
   }
 
+  // Strictly block Telegram channel images and CDNs (they contain channel watermarks / overlay stamps like @LEGALVST)
+  if (
+    lower.includes('telesco.pe') ||
+    lower.includes('telegram') ||
+    lower.includes('t.me')
+  ) {
+    return true
+  }
+
   // Block placeholders, avatars, tracking pixels, generic stock images
   if (
     lower.includes('placeholder') ||
@@ -302,8 +311,63 @@ export async function resolveProductBannerImage(
     }
   } catch {}
 
-  // 5. Genuine Product Image (No generic Unsplash fallbacks, No AI generated images)
-  return existingImageUrl || '/icon.png'
+  // 5. If not on Plugin Boutique (e.g. freeware / independent developer plugins), resolve authentic GUI render from audio web search
+  try {
+    const cleanSearch = title
+      .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
+      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle|free|vst3?|au|aax|windows|mac)\b/gi, ' ')
+      .replace(/[^a-zA-Z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 45)
+
+    if (cleanSearch.length >= 4) {
+      const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(cleanSearch)}`, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        },
+        signal: AbortSignal.timeout(3500),
+      })
+      if (ddgRes.ok) {
+        const ddgHtml = await ddgRes.text()
+        const rawUrls = [...ddgHtml.matchAll(/class="result__url"[^>]*>([^<]+)/gi)].map(m => m[1].trim())
+        for (const u of rawUrls.slice(0, 6)) {
+          const fullUrl = u.startsWith('http') ? u : `https://${u}`
+          if (
+            fullUrl.includes('patreon') ||
+            fullUrl.includes('reddit') ||
+            fullUrl.includes('youtube') ||
+            fullUrl.includes('x.com') ||
+            fullUrl.includes('facebook')
+          ) {
+            continue
+          }
+          try {
+            const pageRes = await fetch(fullUrl, {
+              headers: {
+                'User-Agent':
+                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+              },
+              signal: AbortSignal.timeout(3000),
+            })
+            if (pageRes.ok) {
+              const pageHtml = await pageRes.text()
+              const og =
+                pageHtml.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
+                pageHtml.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
+              if (og && !isForbiddenCoverImageUrl(og[1])) {
+                return og[1].replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+  } catch {}
+
+  // 6. Genuine Product Image (No generic Unsplash fallbacks, No AI generated images)
+  return existingImageUrl && !isForbiddenCoverImageUrl(existingImageUrl) ? existingImageUrl : '/icon.png'
 }
 
 export function generateThemedCoverPrompt(title: string): string {

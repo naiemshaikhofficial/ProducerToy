@@ -5,6 +5,7 @@ import {
   extractDirectDealInfo,
   verifyArticleQuality,
   resolvePluginBoutiqueProductUrl,
+  resolveAuthenticProductDealUrl,
 } from '@/lib/news/newsSources'
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
@@ -78,9 +79,9 @@ async function handleSync(req: Request) {
         )
       }
 
-      // 2. If item is from Telegram and has no direct deal URL, resolve it on Plugin Boutique
+      // 2. If item is from Telegram and has no direct deal URL, resolve authentic product deal URL
       if (item.sourceName.includes('Telegram') && !item.directDealUrl && item.title) {
-        item.directDealUrl = await resolvePluginBoutiqueProductUrl(item.title)
+        item.directDealUrl = await resolveAuthenticProductDealUrl(item.title)
       }
 
       // 3. Extract direct developer/merchant deal URL & live pricing ONLY if needed

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidateTag, revalidatePath } from 'next/cache'
+import { clearNewsMemoryCache } from '@/lib/turso/newsDb'
 
 /**
  * On-Demand Cache Invalidation Endpoint
@@ -139,10 +140,17 @@ async function handleRevalidation(req: NextRequest) {
       revalidatedItems.push(`tag:${tag}`)
     }
 
-    // 2. Revalidate by path (e.g., '/', '/store')
+    // 2. Revalidate by path (e.g., '/', '/store', '/news')
     if (path) {
+      if (path.includes('/news')) {
+        clearNewsMemoryCache()
+      }
       revalidatePath(path)
       revalidatedItems.push(`path:${path}`)
+    }
+
+    if (tag === 'news') {
+      clearNewsMemoryCache()
     }
 
     // If neither tag nor path was passed, default to revalidating 'products' and home '/'

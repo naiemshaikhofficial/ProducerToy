@@ -34,7 +34,7 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     return null
   }
 
-  // Block competitor blogs, social media, tracking pixels
+  // Block competitor blogs, social media, Telegram channel URLs, tracking pixels
   if (
     lower.includes('gearnews.com') ||
     lower.includes('bedroomproducersblog.com') ||
@@ -45,6 +45,9 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     lower.includes('cdm.link') ||
     lower.includes('news.google.com') ||
     lower.includes('producertoy.com') ||
+    lower.includes('t.me') ||
+    lower.includes('telegram.org') ||
+    lower.includes('telesco.pe') ||
     lower.includes('facebook.com') ||
     lower.includes('twitter.com') ||
     lower.includes('x.com') ||
@@ -689,6 +692,67 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
 }
 
 /**
+ * Resolves the genuine product / offer URL.
+ * 1. Checks if the product is on Plugin Boutique (/product/...).
+ * 2. If not on Plugin Boutique (e.g. freeware, developer-direct plugins), searches DuckDuckGo for the authentic developer/product page.
+ * 3. Falls back to Plugin Boutique deals only as last resort.
+ */
+export async function resolveAuthenticProductDealUrl(productName: string): Promise<string> {
+  try {
+    const cleanQuery = productName
+      .replace(/^(?:get|grab|save|up to|\d+%\s*off|deal|sale|flash deal|free)\b/gi, '')
+      .replace(/\b(?:by|from|for|\$\d+|€\d+|off|discount|bestsellers|sale|deal|bundle|free|vst3?|au|aax|windows|mac)\b/gi, ' ')
+      .replace(/[^a-zA-Z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 45)
+
+    if (cleanQuery.length >= 3) {
+      // 1. Try Plugin Boutique first
+      const searchRes = await fetch(
+        `https://www.pluginboutique.com/search?qs=match&q=${encodeURIComponent(cleanQuery)}`,
+        {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          },
+          signal: AbortSignal.timeout(3500),
+        }
+      )
+      if (searchRes.ok) {
+        const html = await searchRes.text()
+        const prodMatch = html.match(/href=["'](\/product\/[^"']+)["']/i)
+        if (prodMatch) {
+          return `https://www.pluginboutique.com${prodMatch[1]}?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+        }
+      }
+
+      // 2. Search DuckDuckGo for official developer product / download page
+      const ddgRes = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(cleanQuery)}`, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        },
+        signal: AbortSignal.timeout(3500),
+      })
+      if (ddgRes.ok) {
+        const ddgHtml = await ddgRes.text()
+        const rawUrls = [...ddgHtml.matchAll(/class="result__url"[^>]*>([^<]+)/gi)].map(m => m[1].trim())
+        for (const u of rawUrls) {
+          const fullUrl = u.startsWith('http') ? u : `https://${u}`
+          const sanitized = sanitizeDealUrl(fullUrl)
+          if (sanitized) {
+            return sanitized
+          }
+        }
+      }
+    }
+  } catch {}
+
+  return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
+}
+
+/**
  * Fetches real-time verified audio plugin news and releases from curated Telegram channels
  * (e.g. https://t.me/s/legalvst).
  * Prioritizes official hardware/GUI master graphics, verified discounts, and referral link rewriting.
@@ -709,9 +773,10 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
     if (!res.ok) return items
     const html = await res.text()
 
+    // Match each message wrapper cleanly, capturing the full post including inline keyboard buttons
     const fullMsgs = [
       ...html.matchAll(
-        /<div class="tgme_widget_message\b[^>]*data-post="([^"]+)"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/gi
+        /<div class="tgme_widget_message\b[^>]*data-post="([^"]+)"[^>]*>([\s\S]*?)(?=(?:<div class="tgme_widget_message\b|<\/body|$))/gi
       ),
     ]
 
@@ -728,16 +793,39 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
       const rawTitle = lines[0]
       if (rawTitle.toLowerCase().includes('pinned a photo') || rawTitle.length < 5) continue
 
-      const photoMatch = content.match(/background-image:url\('([^']+)'\)/i)
-      const imageUrl = photoMatch ? photoMatch[1] : undefined
+      // IMPORTANT: Strictly do NOT use the Telegram channel's photo (telesco.pe) because it has channel watermarks / overlay stamps (@LEGALVST).
+      // Leave imageUrl undefined so our crawler resolves the genuine, unwatermarked high-res product GUI/banner from the offer page!
+      const imageUrl = undefined
 
-      // Extract outbound links (excluding telegram internal links)
-      const rawLinks = [...content.matchAll(/href="([^"]+)"/gi)]
+      // Extract links from inline keyboard buttons (placed right below the post)
+      const inlineButtons = [...content.matchAll(/<a[^>]+class="[^"]*tgme_widget_message_inline_button[^"]*"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)]
+        .map((m) => ({
+          url: m[1],
+          label: m[2].replace(/<[^>]+>/g, '').trim(),
+        }))
+        .filter((b) => !b.url.includes('t.me/') && !b.url.includes('telegram.org') && !b.url.includes('telesco.pe'))
+
+      // Extract in-text outbound links
+      const rawTextLinks = [...textMatch[1].matchAll(/href="([^"]+)"/gi)]
         .map((m) => m[1])
-        .filter((l) => !l.includes('t.me/') && !l.includes('telegram.org'))
+        .filter((l) => !l.includes('t.me/') && !l.includes('telegram.org') && !l.includes('telesco.pe'))
 
+      // Prioritize specific product / deal links:
+      // 1. Inline button with /product/ or /deals/ or merchant/developer link (Patreon, dev site)
+      // 2. In-text links
+      // Ignore generic articles/2073 free-gift promotion if a specific product link exists!
       let directDealUrl: string | undefined
-      for (const l of rawLinks) {
+
+      const allCandidates: string[] = [
+        ...inlineButtons.map((b) => b.url),
+        ...rawTextLinks,
+      ]
+
+      // Filter out PB article gift links if a specific product or deal page is available
+      const nonGiftCandidates = allCandidates.filter((u) => !u.includes('pluginboutique.com/articles/'))
+      const candidatesToTest = nonGiftCandidates.length > 0 ? nonGiftCandidates : allCandidates
+
+      for (const l of candidatesToTest) {
         const cleaned = sanitizeDealUrl(l)
         if (cleaned) {
           directDealUrl = cleaned
@@ -785,7 +873,7 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
 
       const item: RawFeedItem = {
         title: formattedTitle,
-        link: directDealUrl || `https://t.me/${postId}`,
+        link: directDealUrl || '',
         pubDate: new Date().toUTCString(),
         creator: 'Legal VST VIP',
         contentSnippet: cleanContent.slice(0, 1000),
@@ -1097,11 +1185,14 @@ export async function verifyArticleQuality(article: {
     img.includes('news.google.com') ||
     img.includes('googleusercontent.com') ||
     img.includes('gstatic.com') ||
+    img.includes('telesco.pe') ||
+    img.includes('telegram') ||
+    img.includes('t.me') ||
     img.includes('photo-1598488035139-bdbb2231ce04') ||
     img.includes('62597tdwpbuqa4wb3ytyr780r83o') ||
     img.includes('8703u6x0lrzyjlnucnb396u4m6qb')
   ) {
-    return { isValid: false, reason: 'Invalid, low-res, placeholder, spacer, or non-authentic image URL' }
+    return { isValid: false, reason: 'Invalid, low-res, placeholder, spacer, telegram watermarked, or non-authentic image URL' }
   }
 
   // 3. Strict Genuine Pricing Verification (Zero Fake Pricing, Zero Inactive Deals)
@@ -1117,7 +1208,7 @@ export async function verifyArticleQuality(article: {
     }
   }
 
-  // 2. Strict Deal Link Verification
+  // 4. Strict Deal Link Verification
   let dealUrl = article.source_url
   if (!dealUrl || !dealUrl.startsWith('http')) {
     return { isValid: false, reason: 'Missing or malformed deal link' }
@@ -1125,15 +1216,18 @@ export async function verifyArticleQuality(article: {
 
   const lower = dealUrl.toLowerCase()
 
-  // Block competitor scraper blog links from ever being published as the deal link
+  // Block competitor scraper blog links or Telegram links from ever being published as the deal link
   if (
     lower.includes('news.google.com') ||
     lower.includes('bedroomproducersblog.com') ||
     lower.includes('rekkerd.org') ||
     lower.includes('audiopluginguy.com') ||
-    lower.includes('gearnews.com')
+    lower.includes('gearnews.com') ||
+    lower.includes('t.me') ||
+    lower.includes('telegram.org') ||
+    lower.includes('telesco.pe')
   ) {
-    return { isValid: false, reason: 'Deal link points to aggregator or scraper blog instead of official product' }
+    return { isValid: false, reason: 'Deal link points to aggregator, telegram channel, or scraper blog instead of official product' }
   }
 
   // Auto-correct known moved URLs
