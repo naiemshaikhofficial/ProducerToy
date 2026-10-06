@@ -221,8 +221,37 @@ export async function resolveProductBannerImage(
         const ogMatch =
           html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i) ||
           html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-        if (ogMatch && !isForbiddenCoverImageUrl(ogMatch[1])) {
-          return ogMatch[1].replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+        if (ogMatch) {
+          const rawImg = ogMatch[1].trim()
+          let resolvedImg = rawImg
+          if (rawImg.startsWith('/')) {
+            try {
+              resolvedImg = new URL(rawImg, dealUrl).toString()
+            } catch {}
+          }
+          if (!isForbiddenCoverImageUrl(resolvedImg)) {
+            return resolvedImg.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
+          }
+        }
+
+        // Secondary: check prominent GUI / product <img> on developer page
+        const imgMatches = [...html.matchAll(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi)].map((m) => m[1])
+        for (const candidate of imgMatches) {
+          let resolvedImg = candidate.trim()
+          if (candidate.startsWith('/')) {
+            try {
+              resolvedImg = new URL(candidate, dealUrl).toString()
+            } catch {}
+          }
+          if (
+            (resolvedImg.toLowerCase().includes('gui') ||
+              resolvedImg.toLowerCase().includes('product') ||
+              resolvedImg.toLowerCase().includes('ui') ||
+              resolvedImg.toLowerCase().includes('screenshot')) &&
+            !isForbiddenCoverImageUrl(resolvedImg)
+          ) {
+            return resolvedImg
+          }
         }
       }
     } catch {}
