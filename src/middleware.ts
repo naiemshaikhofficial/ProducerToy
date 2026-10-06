@@ -193,12 +193,20 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico, sitemap, robots
-     * - static local media files (svg, png, jpg, webp, mp3, wav, etc.)
+     * 🟢 ZERO-COST EDGE ARCHITECTURE:
+     * Only run middleware on routes requiring authentication session synchronization,
+     * authenticated checkouts, protected downloads, or API rate limiting.
+     *
+     * All public browsing pages (/, /news, /news/:slug, /store, /product/*, /free*, /brands*, etc.)
+     * and static assets bypass middleware completely. They are served directly from Vercel Edge CDN
+     * with 0 Function Invocations and 0 CPU seconds!
      */
-    '/((?!_next/static|_next/image|favicon\\.ico|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|woff|woff2|ttf|eot|mp3|wav|ogg|pdf|json|txt|webmanifest)$).*)',
+    '/account/:path*',
+    '/checkout/:path*',
+    '/cart/:path*',
+    '/library/:path*',
+    '/gifts/:path*',
+    '/auth/:path*',
+    '/api/:path*',
   ],
 }

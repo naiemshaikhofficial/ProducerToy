@@ -20,6 +20,96 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // 🟢 EDGE CDN CANONICAL REDIRECT (0 Compute, 0 Function Invocations):
+      // Vercel edge routers immediately redirect www.producertoy.com to producertoy.com without invoking serverless code
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.producertoy.com' }],
+        destination: 'https://producertoy.com/:path*',
+        permanent: true,
+      },
+      // Fast query param ?news -> /news redirect
+      {
+        source: '/',
+        has: [{ type: 'query', key: 'news' }],
+        destination: '/news',
+        permanent: false,
+      },
+      // Content paths on store subdomain -> redirect to apex domain
+      {
+        source: '/news/:path*',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/news/:path*',
+        permanent: false,
+      },
+      {
+        source: '/blog/:path*',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/blog/:path*',
+        permanent: false,
+      },
+      {
+        source: '/support/:path*',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/support/:path*',
+        permanent: false,
+      },
+      {
+        source: '/faq/:path*',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/faq/:path*',
+        permanent: false,
+      },
+      {
+        source: '/about',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/about',
+        permanent: false,
+      },
+      {
+        source: '/contact',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/contact',
+        permanent: false,
+      },
+      {
+        source: '/privacy',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/privacy',
+        permanent: false,
+      },
+      {
+        source: '/terms',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/terms',
+        permanent: false,
+      },
+      {
+        source: '/refund-policy',
+        has: [{ type: 'host', value: 'store.producertoy.com' }],
+        destination: 'https://producertoy.com/refund-policy',
+        permanent: false,
+      },
+      // Store-only paths on apex domain -> redirect to store subdomain
+      {
+        source: '/checkout/:path*',
+        has: [{ type: 'host', value: 'producertoy.com' }],
+        destination: 'https://store.producertoy.com/checkout/:path*',
+        permanent: false,
+      },
+      {
+        source: '/cart',
+        has: [{ type: 'host', value: 'producertoy.com' }],
+        destination: 'https://store.producertoy.com/cart',
+        permanent: false,
+      },
+      {
+        source: '/account/:path*',
+        has: [{ type: 'host', value: 'producertoy.com' }],
+        destination: 'https://store.producertoy.com/account/:path*',
+        permanent: false,
+      },
+      // Existing product redirects
       {
         source: '/products/:slug',
         destination: '/product/:slug',

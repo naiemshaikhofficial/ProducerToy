@@ -74,54 +74,46 @@ async function handleRevalidation(req: NextRequest) {
             safeRevalidateTag('homepage_products')
             safeRevalidateTag('products')
             revalidatePath('/', 'page')
-            revalidatePath('/', 'layout')
             revalidatePath('/store', 'page')
-            revalidatePath('/store', 'layout')
             revalidatePath('/free-vst-plugins', 'page')
-            revalidatePath('/product/[slug]', 'page')
-            revalidatePath('/p/[slug]', 'page')
-            revalidatePath('/products/[slug]', 'page')
 
             revalidatedItems.push(
               'tag:products',
               'tag:homepage_products',
               'path:/',
               'path:/store',
-              'path:/product/[slug]'
+              'path:/free-vst-plugins'
             )
 
             // Revalidate current product slug
             if (currentSlug) {
-              revalidatePath(`/product/${currentSlug}`)
-              revalidatePath(`/p/${currentSlug}`)
-              revalidatePath(`/products/${currentSlug}`)
+              revalidatePath(`/product/${currentSlug}`, 'page')
+              revalidatePath(`/p/${currentSlug}`, 'page')
+              revalidatePath(`/products/${currentSlug}`, 'page')
               revalidatedItems.push(`path:/product/${currentSlug}`)
             }
 
             // Revalidate old product slug if renamed
             if (previousSlug && previousSlug !== currentSlug) {
-              revalidatePath(`/product/${previousSlug}`)
-              revalidatePath(`/p/${previousSlug}`)
-              revalidatePath(`/products/${previousSlug}`)
+              revalidatePath(`/product/${previousSlug}`, 'page')
+              revalidatePath(`/p/${previousSlug}`, 'page')
+              revalidatePath(`/products/${previousSlug}`, 'page')
               revalidatedItems.push(`path:/product/${previousSlug} (renamed)`)
             }
           } else if (table === 'blogs' || table === 'blog_posts') {
             tag = 'blogs'
             revalidatePath('/blog', 'page')
-            revalidatePath('/blog', 'layout')
             if (currentSlug) {
-              revalidatePath(`/blog/${currentSlug}`)
+              revalidatePath(`/blog/${currentSlug}`, 'page')
               revalidatedItems.push(`path:/blog/${currentSlug}`)
             }
           } else if (table === 'categories' || table === 'subcategories') {
-            revalidatePath('/categories', 'layout')
             revalidatePath('/store', 'page')
-            revalidatePath('/store', 'layout')
             revalidatePath('/', 'page')
-            revalidatedItems.push('path:/categories', 'path:/store', 'path:/')
+            revalidatedItems.push('path:/store', 'path:/')
           } else if (table === 'brands') {
-            revalidatePath('/brands', 'layout')
-            revalidatePath('/manufacturers', 'layout')
+            revalidatePath('/brands', 'page')
+            revalidatePath('/manufacturers', 'page')
             revalidatePath('/store', 'page')
             revalidatePath('/', 'page')
             revalidatedItems.push('path:/brands', 'path:/manufacturers', 'path:/store', 'path:/')
