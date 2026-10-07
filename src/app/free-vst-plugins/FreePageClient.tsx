@@ -38,26 +38,31 @@ export function FreePageClient({ products }: FreePageClientProps) {
   const [selectedType, setSelectedType] = useState<string>('all')
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all')
 
-  // Filter out non-free items unless coming soon
+  // Filter strictly for authentic free PLUGINS (price == 0, is_active, plugin/vst type, excluding sample packs)
+  const isPlugin = (p: Product) =>
+    (p.product_type === 'plugin' || p.product_type === 'vst' || p.category_slugs?.includes('plugins')) &&
+    p.product_type !== 'sample_pack' &&
+    p.product_type !== 'drum_kit' &&
+    p.product_type !== 'preset'
+
   const freeProducts = useMemo(() => {
-    return products.filter((p) => Number(p.price_usd) === 0 && !p.is_coming_soon)
+    return products.filter((p) => Number(p.price_usd) === 0 && !p.is_coming_soon && isPlugin(p))
   }, [products])
 
   const comingSoonProducts = useMemo(() => {
-    return products.filter((p) => p.is_coming_soon)
+    return products.filter((p) => p.is_coming_soon && Number(p.price_usd) === 0 && isPlugin(p))
   }, [products])
 
-  // Featured flagship giveaway (e.g. Fresh Air or first free item)
+  // Featured flagship giveaway: MUST be a real free plugin from DB, never a sample pack
   const featuredGiveaway = useMemo(() => {
-    return freeProducts.find((p) => p.slug === 'fresh-air') || freeProducts[0] || products[0]
-  }, [freeProducts, products])
+    return freeProducts[0] || null
+  }, [freeProducts])
 
-  // Weekly Free Cards (3-Column layout matching 1:1 Epic Games Store)
+  // Weekly Free Cards
   const weeklyFreeCards = useMemo(() => {
     return [
-      ...freeProducts.slice(0, 2),
-      ...comingSoonProducts.slice(0, 1),
-      ...freeProducts.slice(2, 3),
+      ...freeProducts.slice(1, 3),
+      ...comingSoonProducts.slice(0, 2),
     ].slice(0, 3)
   }, [freeProducts, comingSoonProducts])
 
@@ -132,7 +137,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
       {/* ========================================================================= */}
       {/* 2. FEATURED WEEKLY GIVEAWAY BANNER (1:1 Split Hero Box)                   */}
       {/* ========================================================================= */}
-      {featuredGiveaway && (
+      {featuredGiveaway ? (
         <div className="w-full bg-[#18181c] border border-[#26262a] rounded-2xl p-4 sm:p-8 shadow-2xl overflow-hidden group">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
             
@@ -188,70 +193,102 @@ export function FreePageClient({ products }: FreePageClientProps) {
 
           </div>
         </div>
+      ) : (
+        <div className="w-full bg-[#18181c] border border-[#26262a] rounded-2xl p-6 sm:p-12 shadow-2xl overflow-hidden text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FA742B]/10 border border-[#FA742B]/20 text-[#FA742B] text-xs font-bold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            Official Free Drops
+          </div>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
+            Next Official In-Store Free Plugin Drop Coming Soon
+          </h2>
+          <p className="max-w-xl mx-auto text-xs sm:text-sm text-zinc-400 leading-relaxed">
+            Producer Toy partners with top audio developers for exclusive freeware drops. In the meantime, browse our daily verified Free VST News & freeware releases.
+          </p>
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/news"
+              prefetch={true}
+              className="h-11 px-6 rounded-xl bg-[#FA742B] hover:bg-[#E05A18] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#FA742B]/20 transition-all active:scale-[0.98]"
+            >
+              <Music className="w-4 h-4" />
+              <span>Browse Daily Free VST News</span>
+            </Link>
+            <Link
+              href="/store"
+              prefetch={true}
+              className="h-11 px-5 rounded-xl bg-transparent hover:bg-[#222226] text-white border border-[#383840] hover:border-zinc-400 font-bold text-xs sm:text-sm flex items-center justify-center transition-all"
+            >
+              Browse Store
+            </Link>
+          </div>
+        </div>
       )}
 
       {/* ========================================================================= */}
       {/* 3. WEEKLY FREE TOYS (1:1 Epic Games Store 3-Col Landscape Grid)           */}
       {/* ========================================================================= */}
-      <div className="space-y-5">
-        <div className="flex items-center gap-2.5">
-          <Gift className="w-5 h-5 text-[#FA742B]" />
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            Weekly Free Drops
-          </h2>
-        </div>
+      {weeklyFreeCards.length > 0 && (
+        <div className="space-y-5">
+          <div className="flex items-center gap-2.5">
+            <Gift className="w-5 h-5 text-[#FA742B]" />
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+              Weekly Free Drops
+            </h2>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {weeklyFreeCards.map((product) => {
-            const isComingSoon = product.is_coming_soon
-            const brandName = (product.brands as any)?.name || product.brand || 'Producer Toy'
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {weeklyFreeCards.map((product) => {
+              const isComingSoon = product.is_coming_soon
+              const brandName = (product.brands as any)?.name || product.brand || 'Producer Toy'
 
-            return (
-              <Link
-                key={product.id}
-                href={`/product/${product.slug}`}
-                prefetch={true}
-                className="group flex flex-col cursor-pointer select-none"
-              >
-                {/* 16:9 Landscape Card with Attached Bottom Status Bar */}
-                <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-[#202024] border border-[#2c2c30] shadow-lg flex flex-col justify-end">
-                  <Image
-                    src={getCdnImageUrl(product.cover_image, { width: 800 })}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+              return (
+                <Link
+                  key={product.id}
+                  href={`/product/${product.slug}`}
+                  prefetch={true}
+                  className="group flex flex-col cursor-pointer select-none"
+                >
+                  {/* 16:9 Landscape Card with Attached Bottom Status Bar */}
+                  <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-[#202024] border border-[#2c2c30] shadow-lg flex flex-col justify-end">
+                    <Image
+                      src={getCdnImageUrl(product.cover_image, { width: 800 })}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
 
-                  {/* Flush Bottom Status Bar on the Image */}
-                  <div
-                    className={`relative z-10 w-full py-2 px-3 text-center text-xs font-black tracking-wider uppercase transition-colors ${
-                      isComingSoon
-                        ? 'bg-[#000000]/95 text-white border-t border-white/10'
-                        : 'bg-[#FA742B] text-black shadow-md'
-                    }`}
-                  >
-                    {isComingSoon ? 'COMING SOON' : 'FREE NOW'}
+                    {/* Flush Bottom Status Bar on the Image */}
+                    <div
+                      className={`relative z-10 w-full py-2 px-3 text-center text-xs font-black tracking-wider uppercase transition-colors ${
+                        isComingSoon
+                          ? 'bg-[#000000]/95 text-white border-t border-white/10'
+                          : 'bg-[#FA742B] text-black shadow-md'
+                      }`}
+                    >
+                      {isComingSoon ? 'COMING SOON' : 'FREE NOW'}
+                    </div>
                   </div>
-                </div>
 
-                {/* Text Details Below Card */}
-                <div className="mt-3 space-y-0.5">
-                  <h3 className="font-bold text-base sm:text-[17px] text-white group-hover:text-[#FA742B] transition-colors leading-snug line-clamp-1">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-zinc-400 font-normal">
-                    {isComingSoon
-                      ? 'Coming Soon — Next Drop'
-                      : 'Free Now — Unlimited Download'}
-                  </p>
-                </div>
-              </Link>
-            )
-          })}
+                  {/* Text Details Below Card */}
+                  <div className="mt-3 space-y-0.5">
+                    <h3 className="font-bold text-base sm:text-[17px] text-white group-hover:text-[#FA742B] transition-colors leading-snug line-clamp-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-zinc-400 font-normal">
+                      {isComingSoon
+                        ? 'Coming Soon — Next Drop'
+                        : 'Free Now — Unlimited Download'}
+                    </p>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ========================================================================= */}
       {/* 4. TOP FREEWARE BANNERS (2-Column Wide Grid)                              */}

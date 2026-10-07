@@ -88,6 +88,17 @@ export function isForbiddenCoverImageUrl(url?: string | null): boolean {
     return true
   }
 
+  // Strictly block internal OG placeholder banners and generic store covers
+  if (
+    lower.includes('/api/og') ||
+    lower.includes('api/og') ||
+    lower.includes('free%20toys') ||
+    lower.includes('free-toys') ||
+    lower.includes('producertoy.com')
+  ) {
+    return true
+  }
+
   // Block excluded gift banners & headshots
   if (PB_EXCLUDED_BANNER_HASHES.some(h => lower.includes(h))) {
     return true
@@ -200,12 +211,13 @@ export async function resolveProductBannerImage(
     return existingImageUrl.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   }
 
-  // 3. Try extracting high-res og:image from direct merchant/developer dealUrl (excluding Google redirectors)
+  // 3. Try extracting high-res og:image from direct merchant/developer dealUrl (excluding Google & internal store)
   if (
     dealUrl &&
     dealUrl.startsWith('http') &&
     !dealUrl.includes('google.com') &&
-    !dealUrl.includes('news.google')
+    !dealUrl.includes('news.google') &&
+    !dealUrl.includes('producertoy.com')
   ) {
     try {
       const res = await fetch(dealUrl, {
@@ -247,10 +259,13 @@ export async function resolveProductBannerImage(
             (resolvedImg.toLowerCase().includes('gui') ||
               resolvedImg.toLowerCase().includes('product') ||
               resolvedImg.toLowerCase().includes('ui') ||
-              resolvedImg.toLowerCase().includes('screenshot')) &&
+              resolvedImg.toLowerCase().includes('screenshot') ||
+              resolvedImg.toLowerCase().includes('sample-packs') ||
+              resolvedImg.toLowerCase().includes('/vst/') ||
+              resolvedImg.toLowerCase().includes('wp-content/uploads/20')) &&
             !isForbiddenCoverImageUrl(resolvedImg)
           ) {
-            return resolvedImg
+            return resolvedImg.replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
           }
         }
       }

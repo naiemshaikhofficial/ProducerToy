@@ -207,13 +207,20 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         }
         const deterministicId = `news_${Math.abs(hash).toString(36)}`
 
-        const isFree =
-          rewritten.category === 'Free VSTs' ||
+        // Check for verified paid price or partial discount
+        const hasPaidPriceIndicator = Boolean(
+          (rewritten.deal_price && /\$[1-9]/.test(rewritten.deal_price)) ||
+          ((item as any).dealPrice && /\$[1-9]/.test((item as any).dealPrice)) ||
+          /\(\s*\$[1-9]/.test(rewritten.title || '') ||
+          /\b(?:[1-9]\d?)%\s*off\b/i.test(rewritten.title || '') ||
+          /\b(?:[1-9]\d?)%\s*off\b/i.test((item as any).discount || '')
+        )
+
+        const isFree = !hasPaidPriceIndicator && (
           rewritten.deal_price === '$0' ||
           rewritten.deal_price?.toLowerCase() === 'free' ||
-          rewritten.title?.toLowerCase().includes('free') ||
-          item.categoryDefault === 'Free VSTs' ||
           isFreePluginItem(item)
+        )
 
         const isPb =
           item.sourceName?.toLowerCase().includes('plugin boutique') ||
@@ -502,28 +509,28 @@ function resolveSafeDealUrl(
 ): string {
   // 1. If direct deal URL from HTML exists (Thomann, Plugin Boutique, developer sites, etc.)
   const cleanDirect = sanitizeDealUrl(directDealUrl)
-  if (cleanDirect) {
+  if (cleanDirect && !cleanDirect.includes('producertoy.com')) {
     return cleanDirect
   }
   // 2. If explicit productUrl from Groq AI is valid and NOT a scraper blog
   const cleanProduct = sanitizeDealUrl(productUrl)
-  if (cleanProduct) {
+  if (cleanProduct && !cleanProduct.includes('producertoy.com')) {
     return cleanProduct
   }
   // 3. If itemLink is NOT a scraper blog, check it
   const cleanItem = sanitizeDealUrl(itemLink)
-  if (cleanItem) {
+  if (cleanItem && !cleanItem.includes('producertoy.com')) {
     return cleanItem
   }
-  // 4. Default fallback: ONLY send to Plugin Boutique if the product/deal is genuinely from Plugin Boutique
+  // 4. Default fallback for Plugin Boutique deals
   if (isPbDeal) {
     return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
   }
-  // For Free VSTs, fallback to Producer Toy's curated free tools directory
-  if (isFree) {
-    return `https://producertoy.com/free-vst-plugins`
+  // 5. Fallback: preserve original feed item link if external so the user reaches the actual product/article
+  if (itemLink && itemLink.startsWith('http') && !itemLink.includes('producertoy.com')) {
+    return itemLink
   }
-  return `https://producertoy.com/store`
+  return directDealUrl || productUrl || itemLink || ''
 }
 
 function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticle {

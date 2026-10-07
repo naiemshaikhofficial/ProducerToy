@@ -50,18 +50,24 @@ export default async function FreeVstPluginsHubPage() {
   // Fetch all active products from persistent cache (0 DB hits)
   const allProducts = await getCachedActiveProducts()
   
-  // Real DB Free products (price === 0)
-  const freeProducts = allProducts.filter((p: any) => Number(p.price_usd) === 0 && !p.is_coming_soon)
+  // Real DB Free plugins only (price === 0 AND product_type is plugin, excluding sample packs)
+  const freePlugins = allProducts.filter((p: any) =>
+    Number(p.price_usd) === 0 &&
+    !p.is_coming_soon &&
+    (p.product_type === 'plugin' || p.product_type === 'vst' || p.category_slugs?.includes('plugins')) &&
+    p.product_type !== 'sample_pack' &&
+    p.product_type !== 'drum_kit'
+  )
 
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none pb-20">
       
       {/* Schema.org Structured Data for Google Ranking */}
       <CollectionPageJsonLd
-        title="Free Producer Toys — VST Plugins & Sounds"
+        title="Free Producer Toys — VST Plugins & Audio Tools"
         description="Browse and download 100% free VST3 and AU plugins for FL Studio, Ableton Live, Logic Pro, and Cubase."
         url="https://producertoy.com/free-vst-plugins"
-        items={freeProducts.map((p) => ({
+        items={freePlugins.map((p) => ({
           name: p.name,
           url: `https://producertoy.com/product/${p.slug}`,
           price: 0,
@@ -79,7 +85,7 @@ export default async function FreeVstPluginsHubPage() {
       />
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <FreePageClient products={allProducts} />
+        <FreePageClient products={freePlugins} />
       </div>
 
     </div>

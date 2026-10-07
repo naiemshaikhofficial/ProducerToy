@@ -155,6 +155,9 @@ function NewsCardImage({
   const fallback = '/icon.png'
   const initial =
     !src ||
+    src.includes('api/og') ||
+    src.includes('Free%20Toys') ||
+    src.includes('free-toys') ||
     src.includes('pollinations.ai') ||
     src.includes('images.unsplash.com') ||
     EXCLUDED_BANNER_PATTERNS.some((pat) => src.includes(pat))
@@ -250,6 +253,9 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     if (
       !url ||
       typeof url !== 'string' ||
+      url.includes('api/og') ||
+      url.includes('Free%20Toys') ||
+      url.includes('free-toys') ||
       url.includes('pollinations.ai') ||
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||

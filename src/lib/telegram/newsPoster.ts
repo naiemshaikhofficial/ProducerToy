@@ -131,11 +131,18 @@ export function formatTelegramCaption(article: NewsArticle): string {
   lines.push('')
 
   // 2. Pricing & Badge
-  const isFree =
+  const hasPaidPrice = Boolean(
+    article.deal_price &&
+    article.deal_price !== '$0' &&
+    article.deal_price.toLowerCase() !== 'free' &&
+    /\$[1-9]/.test(article.deal_price)
+  )
+  const isFree = !hasPaidPrice && (
     article.badge === 'FREEWARE' ||
     article.category === 'Free VSTs' ||
     article.deal_price === '$0' ||
-    /free/i.test(article.title)
+    article.deal_price?.toLowerCase() === 'free'
+  )
 
   if (isFree) {
     lines.push(`🎁 <b>Offer:</b> 100% FREE (Limited Time)`)
@@ -188,10 +195,42 @@ export function formatTelegramCaption(article: NewsArticle): string {
 }
 
 /**
- * Builds the inline keyboard buttons for the post — directs 100% of traffic to ProducerToy
+ * Builds the inline keyboard buttons for the post:
+ * If Plugin Boutique deal: direct PB deal link + ProducerToy story
+ * If free or other vendor: standard ProducerToy story link
  */
 function buildInlineKeyboard(article: NewsArticle) {
   const articleUrl = `https://producertoy.com/news/${article.slug}`
+  const isPbDeal = Boolean(
+    article.source_url &&
+    article.source_url.toLowerCase().includes('pluginboutique.com')
+  )
+
+  if (isPbDeal && article.source_url) {
+    return {
+      inline_keyboard: [
+        [
+          {
+            text: '⚡ Get Deal on Plugin Boutique',
+            url: article.source_url,
+          },
+        ],
+        [
+          {
+            text: '📖 Read on Producer Toy',
+            url: articleUrl,
+          },
+        ],
+        [
+          {
+            text: '📰 All Deals: producertoy.com/news',
+            url: 'https://producertoy.com/news',
+          },
+        ],
+      ],
+    }
+  }
+
   return {
     inline_keyboard: [
       [

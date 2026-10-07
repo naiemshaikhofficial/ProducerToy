@@ -331,13 +331,15 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
         if (
           lowerCleaned.includes('gumroad.com') ||
           lowerCleaned.includes('github.com') ||
+          lowerCleaned.includes('pianobook.co.uk') ||
+          lowerCleaned.includes('arswerk.it') ||
           lowerCleaned.includes('safari-pedals.com') ||
           lowerCleaned.includes('celestdsp.com') ||
           lowerCleaned.includes('syncaudio.io') ||
           lowerCleaned.includes('leitaudio.com') ||
           lowerCleaned.includes('abyzor.space')
         ) {
-          score += 25
+          score += 35
         }
 
         if (score > highestScore) {
@@ -1016,27 +1018,48 @@ async function fetchRssFeedsConcurrently(): Promise<RawFeedItem[]> {
  * Detects whether an item is a Free Plugin, Freeware, or 100% Free Giveaway.
  */
 export function isFreePluginItem(item: RawFeedItem): boolean {
-  if (item.categoryDefault === 'Free VSTs') {
-    const titleLower = (item.title || '').toLowerCase()
-    // If tagged under Free VSTs, ensure it's not a paid sale item with % off
-    if (!titleLower.includes('% off') && !titleLower.includes('sale') && !titleLower.includes('deal: $')) {
-      return true
-    }
-  }
-
   const titleLower = (item.title || '').toLowerCase()
   const snippetLower = (item.contentSnippet || '').toLowerCase()
   const priceLower = (item.dealPrice || '').toLowerCase().trim()
+  const discountLower = (item.discount || '').toLowerCase().trim()
 
+  // 1. HARD OVERRIDE: If it has a verified paid price (e.g. $49, $56, $29.99) -> STRICTLY A PAID DEAL, NEVER FREE!
+  if (priceLower && priceLower !== '$0' && priceLower !== 'free' && priceLower !== '$0.00' && priceLower !== '0$') {
+    const num = parseFloat(priceLower.replace(/[^0-9.]/g, ''))
+    if (!isNaN(num) && num > 0) {
+      return false
+    }
+  }
+
+  // 2. HARD OVERRIDE: If it has a partial discount (% OFF other than 100% OFF) or price in title -> STRICTLY A DEAL!
+  if (
+    (/\b(?:[1-9]\d?)%\s*off\b/i.test(titleLower) && !titleLower.includes('100% off')) ||
+    (/\b(?:[1-9]\d?)%\s*off\b/i.test(discountLower) && !discountLower.includes('100%')) ||
+    /\(\s*\$[1-9]\d*(?:\.\d+)?/i.test(titleLower) ||
+    /\bdeal:\s*\$[1-9]/i.test(titleLower)
+  ) {
+    return false
+  }
+
+  // 3. Positive match for $0 or free
   if (priceLower === '$0' || priceLower === 'free' || priceLower === '$0.00' || priceLower === '0$') {
     return true
   }
 
+  // 4. If title mentions 'sale' or 'deal: $' or 'discount', reject free classification
+  if (titleLower.includes('sale') || titleLower.includes('deal: $') || titleLower.includes('special offer')) {
+    return false
+  }
+
   const freePattern =
-    /\b(free|freeware|giveaway|100%\s*free|free\s*vst|free\s*plugin|free\s*download|for\s*free|free\s*sample|free\s*synth|free\s*reverb|free\s*instrument|free\s*pack|gratis|freebie)\b/i
+    /\b(freeware|giveaway|100%\s*free|free\s*vst|free\s*plugin|free\s*download|claim\s*your\s*free|for\s*free|gratis|freebie)\b/i
 
   if (freePattern.test(titleLower)) return true
-  if (item.sourceName.toLowerCase().includes('bedroom producers blog') && freePattern.test(snippetLower)) {
+  if (/\bfree\b/i.test(titleLower) && !titleLower.includes('off') && !titleLower.includes('$')) {
+    return true
+  }
+
+  if (item.categoryDefault === 'Free VSTs') {
     return true
   }
 
@@ -1348,6 +1371,10 @@ export async function verifyArticleQuality(article: {
     img.toLowerCase().includes('logo_black') ||
     img.toLowerCase().includes('logo_dark') ||
     img.includes('placeholder') ||
+    img.includes('api/og') ||
+    img.includes('Free%20Toys') ||
+    img.includes('free-toys') ||
+    img.includes('producertoy.com') ||
     img.includes('pollinations.ai') ||
     img.includes('images.unsplash.com') ||
     img.includes('news.google.com') ||
@@ -1360,7 +1387,7 @@ export async function verifyArticleQuality(article: {
     img.includes('62597tdwpbuqa4wb3ytyr780r83o') ||
     img.includes('8703u6x0lrzyjlnucnb396u4m6qb')
   ) {
-    return { isValid: false, reason: 'Invalid, low-res, placeholder, spacer, telegram watermarked, or non-authentic image URL' }
+    return { isValid: false, reason: 'Invalid, low-res, placeholder, spacer, internal OG banner, telegram watermarked, or non-authentic image URL' }
   }
 
   // 3. Strict Genuine Pricing Verification (Zero Fake Pricing, Zero Inactive Deals)
@@ -1384,7 +1411,7 @@ export async function verifyArticleQuality(article: {
 
   const lower = dealUrl.toLowerCase()
 
-  // Block competitor scraper blog links or Telegram links from ever being published as the deal link
+  // Block competitor scraper blog links, Telegram links, or internal store fallback links from ever being published as the deal link
   if (
     lower.includes('news.google.com') ||
     lower.includes('bedroomproducersblog.com') ||
@@ -1393,9 +1420,11 @@ export async function verifyArticleQuality(article: {
     lower.includes('gearnews.com') ||
     lower.includes('t.me') ||
     lower.includes('telegram.org') ||
-    lower.includes('telesco.pe')
+    lower.includes('telesco.pe') ||
+    lower.includes('producertoy.com/free-vst-plugins') ||
+    lower.includes('producertoy.com/store')
   ) {
-    return { isValid: false, reason: 'Deal link points to aggregator, telegram channel, or scraper blog instead of official product' }
+    return { isValid: false, reason: 'Deal link points to aggregator, telegram channel, internal store fallback, or scraper blog instead of official product' }
   }
 
   // Auto-correct known moved URLs

@@ -102,13 +102,16 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     (article.title?.includes(',') && ctaLinksCount >= 1) ||
     /deals|roundup|plugins on sale|best deals|top deals|3 strong|4 strong|5 strong/i.test(article.title || '')
 
-  const isFreeProduct = Boolean(
+  const hasPaidPrice = Boolean(
+    (article.deal_price && article.deal_price !== '$0' && article.deal_price.toLowerCase() !== 'free' && /\$[1-9]/.test(article.deal_price)) ||
+    /\(\s*\$[1-9]/.test(article.title || '') ||
+    /\b(?:[1-9]\d?)%\s*off\b/i.test(article.title || '')
+  )
+
+  const isFreeProduct = !hasPaidPrice && Boolean(
     article.category === 'Free VSTs' ||
     article.deal_price === '$0' ||
-    article.badge === 'FREEWARE' ||
-    /free\s*vst|freeware|free\s*download|free\s*plugin|free\s*sample|free\s*instrument/i.test(
-      article.title || ''
-    )
+    article.badge === 'FREEWARE'
   )
 
   const isPbDeal = Boolean(
@@ -172,7 +175,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         lower.includes('youtube.com') ||
         lower.includes('youtu.be')
 
-      if (!isScraperBlog && !isMedia && (lower.startsWith('http://') || lower.startsWith('https://'))) {
+      const isInternalFallback =
+        lower.includes('producertoy.com/free-vst-plugins') || lower.includes('producertoy.com/store')
+
+      if (!isScraperBlog && !isMedia && !isInternalFallback && (lower.startsWith('http://') || lower.startsWith('https://'))) {
         return url
       }
     }
@@ -209,6 +215,9 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     if (
       !url ||
       typeof url !== 'string' ||
+      url.includes('api/og') ||
+      url.includes('Free%20Toys') ||
+      url.includes('free-toys') ||
       url.includes('pollinations.ai') ||
       url.includes('googleusercontent.com') ||
       url.includes('gstatic.com') ||
