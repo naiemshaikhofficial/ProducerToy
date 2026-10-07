@@ -14,7 +14,6 @@ import { EpicNewReleases } from '@/components/EpicNewReleases'
 import { EpicStorefrontLists } from '@/components/EpicStorefrontLists'
 import { EpicMostPopular } from '@/components/EpicMostPopular'
 import { EpicTrending } from '@/components/EpicTrending'
-import { HomeBrandSeoSection } from '@/components/home/HomeBrandSeoSection'
 import { LocalDataCache } from '@/components/LocalDataCache'
 
 // 🟢 ZERO-RESOURCE CDN CACHING: Infinite cache (purged on-demand via /api/revalidate webhook).
@@ -103,9 +102,6 @@ export default async function HomePage() {
         <div>
           <EpicTrending products={products} />
         </div>
-
-        {/* 9th Section: Brand Entity Authority, Overview & FAQ (Google Knowledge Graph & AI Overview) */}
-        <HomeBrandSeoSection />
 
       </div>
 
