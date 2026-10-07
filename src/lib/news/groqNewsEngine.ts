@@ -2,6 +2,11 @@ import { RawFeedItem, sanitizeDealUrl, PLUGIN_BOUTIQUE_AFFILIATE_ID, isFreePlugi
 import { NewsArticle } from '../turso/newsDb'
 import { getArticleCoverImage, resolveProductBannerImage } from './imageGenerator'
 import { detectDealExpiry } from './dealExpiry'
+import {
+  detectProductKind,
+  getProductCtaLabel,
+  getDisplayCategory,
+} from './productClassifier'
 
 interface GroqRewriteResponse {
   title: string
@@ -248,11 +253,20 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
           })
           // Strip any trailing CTA links from content so NewsArticleClient renders the sole dedicated action button
           finalContent = finalContent
-            .replace(/\s*\[(?:Get Official Deal|Download Free Plugin|Get Deal|Claim Deal|Buy Plugin|Download Now|Redeem Deal|Official Deal)[^\]]*\]\([^)]*\)\s*$/i, '')
+            .replace(/\s*\[(?:Get Official Deal|Download Free Plugin|Download Free Drum Kit[s]?|Download Free Sample Pack[s]?|Download Free Presets?|Get Deal|Claim Deal|Buy Plugin|Download Now|Redeem Deal|Official Deal|Get Drum Kit Deal|Get Sample Pack Deal)[^\]]*\]\([^)]*\)\s*$/i, '')
             .trim()
         }
 
-        const finalCategory = isFree ? 'Free VSTs' : rewritten.category || 'Deals & Sales'
+        const productKind = detectProductKind({
+          title: rewritten.title || item.title,
+          category: rewritten.category || (item as any).category,
+          specs,
+          content: rewritten.content,
+        })
+        const finalCategory = getDisplayCategory(
+          isFree ? 'Free VSTs' : rewritten.category || 'Deals & Sales',
+          productKind
+        )
         const finalBadge = detectedCoupon
           ? 'COUPON CODE'
           : isFree
@@ -373,8 +387,11 @@ REQUIREMENTS:
      a) Set "expiry_date": "Nov 01" (or the exact timeline).
      b) Add "Valid Until": "Nov 01" (or exact timeline) inside "specs".
    - If no deadline or expiry date is mentioned, leave "expiry_date" empty.
-12. FREE PLUGINS & FREEWARE TOP PRIORITY:
-   - If this software is 100% Free, Freeware, or a Free Giveaway ($0):
+12. FREE DOWNLOADS & FREEEWARE CATEGORY ACCURACY:
+   - If this item is a Drum Kit, Sample Pack, Loops, or Soundbank:
+     a) Set "category": "Free Drum Kits" (for drum kits) or "Free Samples" (for sample packs) or "Free Presets" (for synth preset soundbanks).
+     b) NEVER call it a "Plugin" or "VST" if it is merely audio samples/WAV files!
+   - If this software is a real software plugin / VST / AU / virtual instrument that is 100% Free or Freeware ($0):
      a) Set "category": "Free VSTs".
      b) Set "badge": "FREEWARE" (or "COUPON CODE" if a promo code is required).
      c) Set "deal_price": "$0" or "Free".
@@ -543,7 +560,11 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
     item.title.toLowerCase().includes('off') ||
     item.title.toLowerCase().includes('deal')
 
-  const category = isFree ? 'Free VSTs' : isDeal ? 'Deals & Sales' : 'Tech & Gear'
+  const productKind = detectProductKind(item)
+  const category = getDisplayCategory(
+    isFree ? 'Free VSTs' : isDeal ? 'Deals & Sales' : 'Tech & Gear',
+    productKind
+  )
   const badge = isFree ? 'FREEWARE' : isDeal ? 'HOT DEAL' : 'NEW RELEASE'
 
   const cleanedTitle = sanitizeScrapedText(item.title)
@@ -565,7 +586,7 @@ function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticl
     isPb
   )
 
-  const ctaLabel = isFree ? 'Download Free Plugin' : 'Get Official Deal'
+  const ctaLabel = getProductCtaLabel({ productKind, isFree, title: item.title })
   const content = `### Editorial Overview
 
 ${cleanedSnippet}

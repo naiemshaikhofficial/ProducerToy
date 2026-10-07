@@ -10,6 +10,10 @@ import {
 } from '@/lib/news/topicDeduplication'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
 import { TelegramNewsBanner } from '@/components/news/TelegramNewsBanner'
+import {
+  detectProductKind,
+  getDisplayCategory,
+} from '@/lib/news/productClassifier'
 
 interface NewsPageClientProps {
   initialArticles: NewsArticle[]
@@ -328,7 +332,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                 <div className="relative aspect-video w-full rounded-xl sm:rounded-2xl overflow-hidden bg-[#18181c] shadow-xl sm:shadow-2xl">
                   <NewsCardImage
                     src={getHighResCoverImage(featuredArticle.cover_image, featuredArticle.title)}
-                    alt={`${cleanHtmlTitle(featuredArticle.title)} - Free Plugin & Audio News - Producer Toy`}
+                    alt={`${cleanHtmlTitle(featuredArticle.title)} - Producer Toy`}
                     title={`${cleanHtmlTitle(featuredArticle.title)} - Producer Toy`}
                     fill
                     sizes="(max-width: 1024px) 100vw, 60vw"
@@ -337,7 +341,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   />
                   {/* Category Pill in bottom-left */}
                   <div className="absolute bottom-2.5 left-2.5 sm:bottom-3.5 sm:left-3.5 px-2.5 sm:px-3 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] sm:text-[11px] font-semibold text-white tracking-wide">
-                    {featuredArticle.category || 'News'}
+                    {getDisplayCategory(featuredArticle.category, detectProductKind(featuredArticle))}
                   </div>
                 </div>
               </div>
@@ -405,7 +409,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
                     <NewsCardImage
                       src={getHighResCoverImage(article.cover_image, article.title)}
-                      alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
+                      alt={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                       title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -413,7 +417,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     />
                     {/* Category Pill in bottom-left */}
                     <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] font-semibold text-white tracking-wide">
-                      {article.category || 'News'}
+                      {getDisplayCategory(article.category, detectProductKind(article))}
                     </div>
                   </div>
 

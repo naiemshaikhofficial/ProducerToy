@@ -18,6 +18,11 @@ import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
 import { TelegramNewsBanner } from '@/components/news/TelegramNewsBanner'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
+import {
+  detectProductKind,
+  getProductCtaLabel,
+  getDisplayCategory,
+} from '@/lib/news/productClassifier'
 
 interface NewsArticleClientProps {
   article: NewsArticle
@@ -40,6 +45,12 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   const expiryInfo = detectDealExpiry(article)
   const isExpired = expiryInfo.isExpired
   const expiryTimeline = expiryInfo.expiryTimeline
+
+  const productKind = useMemo(() => detectProductKind(article), [article])
+  const displayCategory = useMemo(
+    () => getDisplayCategory(article.category, productKind),
+    [article.category, productKind]
+  )
 
   // Prevent duplicate CTA buttons: check if content already contains an inline deal button
   const hasInlineCta = useMemo(() => {
@@ -196,8 +207,14 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       return `https://www.pluginboutique.com/deals?a_aid=${PB_AFFILIATE_ID}`
     }
 
-    // 4. For Free VSTs and zero-cost tools, fallback to Producer Toy's curated free tools directory
+    // 4. For Free VSTs, Samples, Presets and zero-cost tools, fallback to Producer Toy's curated directories
     if (isFreeProduct) {
+      if (productKind === 'drum_kit' || productKind === 'sample_pack') {
+        return '/categories/sample-packs'
+      }
+      if (productKind === 'preset_pack') {
+        return '/categories/presets'
+      }
       return '/free-vst-plugins'
     }
 
@@ -308,7 +325,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           {/* Top Meta Row: Category Pill + Date + Expiry Status */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-3.5 sm:mb-5">
             <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5 shadow-sm">
-              {article.category || 'News'}
+              {displayCategory}
             </span>
             <span className="text-zinc-400 text-xs sm:text-sm font-medium drop-shadow-sm">
               {formattedDate}
@@ -352,7 +369,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             <img
               src={coverSrc}
               onError={() => setCoverSrc(fallbackPrompt)}
-              alt={`${cleanHtmlTitle(article.title)} - Free Plugin & Audio News - Producer Toy`}
+              alt={`${cleanHtmlTitle(article.title)} - Producer Toy`}
               title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
               className="w-full h-full object-cover"
             />
@@ -421,9 +438,12 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline text-center group"
               >
                 <span>
-                  {isFreeProduct
-                    ? (offerUrl.startsWith('/') ? 'Explore Free VST Plugins' : 'Download Free Plugin')
-                    : 'Get Official Deal'}
+                  {getProductCtaLabel({
+                    productKind,
+                    isFree: isFreeProduct,
+                    isInternalFallback: offerUrl.startsWith('/'),
+                    title: article.title,
+                  })}
                 </span>
                 <ExternalLink className="w-4 h-4 text-white shrink-0 group-hover:translate-x-0.5 transition-transform" />
               </a>
