@@ -12,6 +12,7 @@ import {
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
 import { detectDealExpiry, parseExpiryDateText } from '@/lib/news/dealExpiry'
+import { getTopicSignature } from '@/lib/news/topicDeduplication'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // 60 seconds
@@ -90,11 +91,26 @@ async function handleSync(req: Request) {
 
 async function executeSyncJob(limitParam: number) {
   console.log(`[News Sync] Starting news synchronization job (target: ${limitParam} articles)...`)
-  const feedItems = await fetchMusicNewsFeedItems()
+  const rawFeedItems = await fetchMusicNewsFeedItems()
   let processedCount = 0
   let skippedCount = 0
   const processedTitles: string[] = []
   const savedSlugs: string[] = []
+  const postedSignaturesInRun = new Set<string>()
+
+  // DEDUPLICATION: Eliminate duplicate items across different RSS feeds covering the exact same plugin
+  const seenFeedKeys = new Set<string>()
+  const feedItems: RawFeedItem[] = []
+  for (const item of rawFeedItems) {
+    const sig = getTopicSignature(item.title)
+    const normUrl = (item.directDealUrl || item.link || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/+$/, '')
+    const key = sig || normUrl
+    if (key && seenFeedKeys.has(key)) {
+      continue
+    }
+    if (key) seenFeedKeys.add(key)
+    feedItems.push(item)
+  }
 
   // CANDIDATE ALLOCATION:
   // Prioritize FREE PLUGINS mostly (~70%), while allowing top verified DEALS that follow our rules
@@ -298,12 +314,18 @@ async function executeSyncJob(limitParam: number) {
       processedTitles.push(article.title)
       savedSlugs.push(article.slug)
 
-      // Automatically dispatch newly saved article to Telegram channel
-      try {
-        const { postArticleToTelegram } = await import('@/lib/telegram/newsPoster')
-        await postArticleToTelegram(article)
-      } catch (tgErr: any) {
-        console.warn('[News Sync Telegram Dispatch Error]:', tgErr?.message || tgErr)
+      // Automatically dispatch newly saved article to Telegram channel (deduplicated by topic)
+      const topicSig = getTopicSignature(article.title)
+      if (topicSig && postedSignaturesInRun.has(topicSig)) {
+        console.log(`[News Sync] Skipping duplicate Telegram post for "${article.title}" in current sync run`)
+      } else {
+        if (topicSig) postedSignaturesInRun.add(topicSig)
+        try {
+          const { postArticleToTelegram } = await import('@/lib/telegram/newsPoster')
+          await postArticleToTelegram(article)
+        } catch (tgErr: any) {
+          console.warn('[News Sync Telegram Dispatch Error]:', tgErr?.message || tgErr)
+        }
       }
     }
   }

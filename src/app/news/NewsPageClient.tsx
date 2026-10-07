@@ -9,6 +9,7 @@ import {
   generateThemedCoverPrompt,
 } from '@/lib/news/topicDeduplication'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
+import { TelegramNewsBanner } from '@/components/news/TelegramNewsBanner'
 
 interface NewsPageClientProps {
   initialArticles: NewsArticle[]
@@ -447,7 +448,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
         {/* Load More Button */}
         {hasMore && (
-          <div className="text-center pt-2 pb-8">
+          <div className="text-center pt-2 pb-4">
             <button
               onClick={() => setVisibleCount((prev) => prev + 9)}
               className="px-8 py-3 bg-[#1a1a1e] hover:bg-[#222228] text-white font-bold text-xs sm:text-sm rounded-xl border-0 active:scale-95 transition-all shadow-md cursor-pointer"
@@ -456,6 +457,9 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
             </button>
           </div>
         )}
+
+        {/* Minimalist Plain Text Telegram Channel Note */}
+        <TelegramNewsBanner className="pt-2 pb-10" />
       </div>
     </div>
   )

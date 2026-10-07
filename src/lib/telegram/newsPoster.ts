@@ -12,8 +12,10 @@ function escapeHtml(text: string): string {
     .replace(/>/g, '&gt;')
 }
 
+import { getTopicSignature, calculateTitleSimilarity } from '@/lib/news/topicDeduplication'
+
 /**
- * Initializes the telegram_posts tracking table in Turso
+ * Initializes the telegram_posts tracking table in Turso with schema migration
  */
 async function initTelegramPostsTable(): Promise<void> {
   const client = getTursoClient()
@@ -21,41 +23,148 @@ async function initTelegramPostsTable(): Promise<void> {
     await client.execute(`
       CREATE TABLE IF NOT EXISTS telegram_posts (
         article_id TEXT PRIMARY KEY,
-        posted_at TEXT NOT NULL
+        posted_at TEXT NOT NULL,
+        slug TEXT,
+        title TEXT,
+        source_url TEXT,
+        topic_signature TEXT
       );
     `)
+
+    // Safe, idempotent column migrations for existing tables
+    try { await client.execute('ALTER TABLE telegram_posts ADD COLUMN slug TEXT;') } catch {}
+    try { await client.execute('ALTER TABLE telegram_posts ADD COLUMN title TEXT;') } catch {}
+    try { await client.execute('ALTER TABLE telegram_posts ADD COLUMN source_url TEXT;') } catch {}
+    try { await client.execute('ALTER TABLE telegram_posts ADD COLUMN topic_signature TEXT;') } catch {}
+
+    // Backfill title, slug, source_url from news_articles for any older records
+    try {
+      await client.execute(`
+        UPDATE telegram_posts
+        SET slug = (SELECT slug FROM news_articles WHERE news_articles.id = telegram_posts.article_id),
+            title = (SELECT title FROM news_articles WHERE news_articles.id = telegram_posts.article_id),
+            source_url = (SELECT source_url FROM news_articles WHERE news_articles.id = telegram_posts.article_id)
+        WHERE (slug IS NULL OR title IS NULL) AND article_id IN (SELECT id FROM news_articles);
+      `)
+    } catch {}
   } catch (err) {
     console.warn('[TelegramPoster] Failed to init telegram_posts table:', err)
   }
 }
 
 /**
- * Check whether an article has already been posted to Telegram
+ * Strict Multi-Layer Check: Determines whether an article has already been posted to Telegram.
+ * Checks article_id, slug, source_url, topic signature, and title similarity against recently posted items.
  */
-export async function isArticlePostedToTelegram(articleId: string): Promise<boolean> {
+export async function isArticlePostedToTelegram(articleOrId: NewsArticle | string): Promise<boolean> {
   await initTelegramPostsTable()
   const client = getTursoClient()
+
+  const articleId = typeof articleOrId === 'string' ? articleOrId : articleOrId.id
+  const article = typeof articleOrId === 'object' ? articleOrId : null
+
   try {
-    const res = await client.execute({
+    // 1. Exact Article ID match
+    const idRes = await client.execute({
       sql: 'SELECT article_id FROM telegram_posts WHERE article_id = ? LIMIT 1',
       args: [articleId],
     })
-    return res.rows.length > 0
-  } catch {
+    if (idRes.rows.length > 0) return true
+
+    if (!article) return false
+
+    // 2. Exact Slug match
+    if (article.slug) {
+      const slugRes = await client.execute({
+        sql: 'SELECT article_id FROM telegram_posts WHERE slug = ? LIMIT 1',
+        args: [article.slug],
+      })
+      if (slugRes.rows.length > 0) {
+        console.log(`[TelegramPoster] Slug "${article.slug}" already posted. Skipping duplicate.`)
+        return true
+      }
+    }
+
+    // 3. Exact or normalized Source / Product Deal URL match
+    if (article.source_url) {
+      const cleanUrl = article.source_url.split('?')[0].replace(/\/+$/, '')
+      const urlRes = await client.execute({
+        sql: 'SELECT article_id FROM telegram_posts WHERE source_url = ? OR source_url LIKE ? LIMIT 1',
+        args: [article.source_url, `%${cleanUrl}%`],
+      })
+      if (urlRes.rows.length > 0) {
+        console.log(`[TelegramPoster] Product URL "${cleanUrl}" already posted. Skipping duplicate.`)
+        return true
+      }
+    }
+
+    // 4. Topic Signature match (catches same product from different RSS feeds)
+    const targetSig = getTopicSignature(article.title)
+    if (targetSig) {
+      const sigRes = await client.execute({
+        sql: 'SELECT article_id FROM telegram_posts WHERE topic_signature = ? LIMIT 1',
+        args: [targetSig],
+      })
+      if (sigRes.rows.length > 0) {
+        console.log(`[TelegramPoster] Topic signature "${targetSig}" already posted. Skipping duplicate.`)
+        return true
+      }
+    }
+
+    // 5. Title keyword similarity check against last 40 posted items
+    if (article.title) {
+      const recentPosts = await client.execute({
+        sql: 'SELECT article_id, title FROM telegram_posts ORDER BY posted_at DESC LIMIT 40',
+      })
+      for (const row of recentPosts.rows) {
+        const postedTitle = row.title ? String(row.title) : ''
+        if (postedTitle) {
+          const sim = calculateTitleSimilarity(article.title, postedTitle)
+          if (sim >= 0.55) {
+            console.log(
+              `[TelegramPoster] Article "${article.title}" matched recently posted "${postedTitle}" (similarity: ${(sim * 100).toFixed(0)}%). Skipping duplicate.`
+            )
+            return true
+          }
+        }
+      }
+    }
+
+    return false
+  } catch (err) {
+    console.warn('[TelegramPoster] Error checking if article posted:', err)
     return false
   }
 }
 
 /**
- * Record an article as posted in Turso
+ * Record an article as posted in Turso with complete metadata for future deduplication
  */
-export async function markArticleAsPostedToTelegram(articleId: string): Promise<void> {
+export async function markArticleAsPostedToTelegram(articleOrId: NewsArticle | string): Promise<void> {
   await initTelegramPostsTable()
   const client = getTursoClient()
+
+  let articleId = ''
+  let slug = ''
+  let title = ''
+  let sourceUrl = ''
+  let topicSig = ''
+
+  if (typeof articleOrId === 'string') {
+    articleId = articleOrId
+  } else {
+    articleId = articleOrId.id
+    slug = articleOrId.slug || ''
+    title = articleOrId.title || ''
+    sourceUrl = articleOrId.source_url || ''
+    topicSig = getTopicSignature(articleOrId.title)
+  }
+
   try {
     await client.execute({
-      sql: 'INSERT OR REPLACE INTO telegram_posts (article_id, posted_at) VALUES (?, ?)',
-      args: [articleId, new Date().toISOString()],
+      sql: `INSERT OR REPLACE INTO telegram_posts (article_id, posted_at, slug, title, source_url, topic_signature)
+            VALUES (?, ?, ?, ?, ?, ?)`,
+      args: [articleId, new Date().toISOString(), slug, title, sourceUrl, topicSig],
     })
   } catch (err) {
     console.warn('[TelegramPoster] Failed to mark article as posted:', err)
@@ -299,7 +408,7 @@ export async function postArticleToTelegram(
 
   // Check if already posted
   if (!options?.force) {
-    const alreadyPosted = await isArticlePostedToTelegram(article.id)
+    const alreadyPosted = await isArticlePostedToTelegram(article)
     if (alreadyPosted) {
       console.log(`[TelegramPoster] Article "${article.title}" was already posted. Skipping.`)
       return { success: true }
@@ -328,7 +437,7 @@ export async function postArticleToTelegram(
         })
         const data = await res.json()
         if (data.ok) {
-          await markArticleAsPostedToTelegram(article.id)
+          await markArticleAsPostedToTelegram(article)
           console.log(`[TelegramPoster] Successfully posted branded photo to Telegram: "${article.title}"`)
           return { success: true, messageId: data.result?.message_id }
         } else {
@@ -351,7 +460,7 @@ export async function postArticleToTelegram(
 
       const data = await response.json()
       if (data.ok) {
-        await markArticleAsPostedToTelegram(article.id)
+        await markArticleAsPostedToTelegram(article)
         console.log(`[TelegramPoster] Successfully posted photo to Telegram channel: "${article.title}"`)
         return { success: true, messageId: data.result?.message_id }
       } else {
@@ -374,7 +483,7 @@ export async function postArticleToTelegram(
 
     const msgData = await msgResponse.json()
     if (msgData.ok) {
-      await markArticleAsPostedToTelegram(article.id)
+      await markArticleAsPostedToTelegram(article)
       console.log(`[TelegramPoster] Successfully sent text message to Telegram: "${article.title}"`)
       return { success: true, messageId: msgData.result?.message_id }
     } else {

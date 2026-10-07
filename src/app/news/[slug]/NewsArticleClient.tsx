@@ -16,6 +16,7 @@ import {
 } from '@/lib/news/topicDeduplication'
 import { BlogContentRenderer } from '@/components/blog/BlogContentRenderer'
 import { NewsGoogleAd } from '@/components/news/NewsGoogleAd'
+import { TelegramNewsBanner } from '@/components/news/TelegramNewsBanner'
 import { detectDealExpiry } from '@/lib/news/dealExpiry'
 
 interface NewsArticleClientProps {
@@ -443,6 +444,9 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           <div className="my-10">
             <NewsGoogleAd slot="news_article_inline" />
           </div>
+
+          {/* Minimalist Plain Text Telegram Channel Note */}
+          <TelegramNewsBanner className="my-8 border-0 bg-transparent" />
 
           {/* Article Footer Bar: Author & Share */}
           <div className="my-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-zinc-400">
