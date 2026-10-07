@@ -236,8 +236,17 @@ async function executeSyncJob(limitParam: number) {
         if (dealInfo.discount && !(item as any).discount) {
           (item as any).discount = dealInfo.discount
         }
-        if (dealInfo.coverImage && !item.imageUrl) {
-          item.imageUrl = dealInfo.coverImage
+        // Always prioritize authentic product GUI cover image over generic news site/scraper thumbnails
+        if (dealInfo.coverImage) {
+          const isGenericThumbnail =
+            !item.imageUrl ||
+            item.imageUrl.includes('dawcrash.com') ||
+            item.imageUrl.includes('1673d552') ||
+            item.imageUrl.includes('banner') ||
+            item.imageUrl.includes('logo')
+          if (isGenericThumbnail || !item.imageUrl) {
+            item.imageUrl = dealInfo.coverImage
+          }
         }
         // Strict: If verified as NOT an active deal (e.g. regular price only), skip it!
         if (!isFree && dealInfo.isDealActive === false) {

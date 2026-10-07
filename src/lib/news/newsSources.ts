@@ -37,6 +37,7 @@ export function sanitizeDealUrl(url?: string | null): string | null {
 
   // Block competitor blogs, social media, Telegram channel URLs, tracking pixels
   if (
+    lower.includes('dawcrash.com') ||
     lower.includes('gearnews.com') ||
     lower.includes('bedroomproducersblog.com') ||
     lower.includes('audiopluginguy.com') ||
@@ -51,6 +52,9 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     lower.includes('musicradar.com') ||
     lower.includes('soundonsound.com') ||
     lower.includes('attackmagazine.com') ||
+    lower.includes('afthemes.com') ||
+    lower.includes('feedburner.com') ||
+    lower.includes('feedproxy.google.com') ||
     lower.includes('news.google.com') ||
     lower.includes('producertoy.com') ||
     /(?:^|\/|\.)t\.me(?:\/|$)/.test(lower) ||

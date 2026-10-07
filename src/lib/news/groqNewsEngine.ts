@@ -546,11 +546,8 @@ function resolveSafeDealUrl(
   if (isPbDeal) {
     return `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
   }
-  // 5. Fallback: preserve original feed item link if external so the user reaches the actual product/article
-  if (itemLink && itemLink.startsWith('http') && !itemLink.includes('producertoy.com')) {
-    return itemLink
-  }
-  return directDealUrl || productUrl || itemLink || ''
+  // 5. Never return a news/scraper blog URL! Cleanly fallback to Producer Toy internal catalog
+  return isFree ? '/free-vst-plugins' : '/store'
 }
 
 function buildFallbackArticle(item: RawFeedItem, coverImage: string): NewsArticle {
