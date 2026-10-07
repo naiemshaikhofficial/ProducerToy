@@ -16,6 +16,33 @@ interface EpicHeroCarouselProps {
 
 const ROTATION_DURATION = 6500 // 6.5 seconds auto-advance on PC
 
+function formatDisplayBadge(brand?: string | null, productType?: string | null): string {
+  if (brand && brand !== 'Producer Toy') return brand
+  switch (productType?.toLowerCase()) {
+    case 'sample_pack':
+    case 'sample-pack':
+    case 'sound':
+    case 'sounds':
+      return 'Sample Pack'
+    case 'drum_kit':
+    case 'drum-kit':
+      return 'Drum Kit'
+    case 'preset':
+    case 'presets':
+    case 'preset_pack':
+      return 'Preset Pack'
+    case 'plugin':
+    case 'vst':
+      return 'VST Plugin'
+    case 'template':
+      return 'DAW Template'
+    case 'bundle':
+      return 'Bundle'
+    default:
+      return productType ? productType.replace(/[-_]+/g, ' ') : 'Sample Pack'
+  }
+}
+
 export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [progress, setProgress] = useState(0)
@@ -295,7 +322,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1.5 z-10">
                       {/* Category / Brand Tag */}
                       <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">
-                        {product.brand && product.brand !== 'Producer Toy' ? product.brand : (product.product_type || 'Sample Pack')}
+                        {formatDisplayBadge(product.brand, product.product_type)}
                       </span>
 
                       {/* Main Product Title */}
@@ -478,7 +505,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     {/* Brand / Category Tag */}
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300 bg-white/[0.08] backdrop-blur-md px-2.5 py-1 rounded-md border border-white/[0.06]">
-                        {product.brand && product.brand !== 'Producer Toy' ? product.brand : (product.product_type || 'Featured Release')}
+                        {formatDisplayBadge(product.brand, product.product_type)}
                       </span>
                     </div>
 

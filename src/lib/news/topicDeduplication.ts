@@ -69,6 +69,19 @@ export const TOPIC_STOPWORDS = new Set([
   'alert',
   'huge',
   'collection',
+  'exclusive',
+  'bpb',
+  'new',
+  'release',
+  'releases',
+  'announces',
+  'drops',
+  'unveils',
+  'launch',
+  'launches',
+  'available',
+  'download',
+  'downloads',
 ])
 
 export function getTitleKeywords(title?: string | null): string[] {
@@ -263,4 +276,75 @@ export function getTopicFallbackImage(title?: string | null, category?: string |
   }
 
   return TOPIC_HD_COVERS.default
+}
+
+/**
+ * Determines whether an incoming deal item represents a genuinely major update
+ * over an existing article (e.g. price drop, becomes free, new coupon code, or extended expiry date).
+ * If false, the existing article MUST be preserved without re-writing, re-scraping or re-posting to Telegram.
+ */
+export function isMajorDealChange(
+  existing: {
+    badge?: string | null
+    deal_price?: string | null
+    deal_regular_price?: string | null
+    published_at?: string | null
+    specs?: Record<string, string> | null
+  },
+  incoming: {
+    dealPrice?: string | null
+    regularPrice?: string | null
+    discount?: string | null
+    couponCode?: string | null
+    expiryTimeline?: string | null
+  }
+): boolean {
+  // 1. Existing was expired or marked EXPIRED, but incoming deal has a future valid expiry
+  const isExistingExpired =
+    existing.badge?.toUpperCase() === 'EXPIRED' ||
+    existing.specs?.['Status']?.toLowerCase() === 'expired'
+
+  if (isExistingExpired) {
+    if (incoming.expiryTimeline && !incoming.expiryTimeline.toLowerCase().includes('expired')) {
+      return true // Reactivated deal!
+    }
+  }
+
+  // 2. Incoming is 100% Free while existing was paid
+  const isIncomingFree =
+    incoming.dealPrice === '$0' ||
+    incoming.dealPrice?.toLowerCase() === 'free' ||
+    incoming.discount?.toLowerCase() === '100% off'
+  const isExistingPaid =
+    Boolean(existing.deal_price && /\$[1-9]/.test(existing.deal_price))
+
+  if (isIncomingFree && isExistingPaid) {
+    return true // Product transitioned from paid to free giveaway!
+  }
+
+  // 3. Significant price drop (e.g. $49 -> $19)
+  if (incoming.dealPrice && existing.deal_price) {
+    const oldP = parseFloat(existing.deal_price.replace(/[^0-9.]/g, ''))
+    const newP = parseFloat(incoming.dealPrice.replace(/[^0-9.]/g, ''))
+    if (!isNaN(oldP) && !isNaN(newP) && newP < oldP * 0.85) {
+      return true // At least 15% further price drop!
+    }
+  }
+
+  // 4. New coupon code added that the existing article did NOT have
+  if (incoming.couponCode && (!existing.specs?.['Coupon Code'] || existing.specs?.['Coupon Code'] !== incoming.couponCode)) {
+    return true // New verified discount coupon!
+  }
+
+  // 5. Significant discount increase (e.g. 50% OFF -> 80% OFF)
+  if (incoming.discount && existing.specs?.['Discount']) {
+    const oldDisc = parseInt(existing.specs['Discount'].replace(/[^0-9]/g, ''), 10)
+    const newDisc = parseInt(incoming.discount.replace(/[^0-9]/g, ''), 10)
+    if (!isNaN(oldDisc) && !isNaN(newDisc) && newDisc >= oldDisc + 15) {
+      return true // 15%+ better discount
+    }
+  }
+
+  // Identical offer - do NOT overwrite existing stable article
+  return false
 }

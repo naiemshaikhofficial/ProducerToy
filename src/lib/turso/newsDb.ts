@@ -320,13 +320,17 @@ export async function findExistingArticle(
       args.push(opts.coverImage)
     }
 
-    // 4. Check core product title match (e.g. "Pizza Bagel Plugins Schmear", "Native Instruments Synths")
+    // 4. Check core product title match (e.g. "HoRNet Butterfly", "Baby Audio Hyperwarp")
     if (opts.title) {
       const words = getTitleKeywords(opts.title)
       if (words.length >= 2) {
-        const pattern = `%${words.slice(0, 2).join('%')}%`
         conditions.push('LOWER(title) LIKE ?')
-        args.push(pattern)
+        args.push(`%${words[0]}%${words[1]}%`)
+
+        if (words.length >= 3) {
+          conditions.push('LOWER(title) LIKE ?')
+          args.push(`%${words[1]}%${words[2]}%`)
+        }
       }
     }
 

@@ -12,7 +12,7 @@ import {
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
 import { detectDealExpiry, parseExpiryDateText } from '@/lib/news/dealExpiry'
-import { getTopicSignature } from '@/lib/news/topicDeduplication'
+import { getTopicSignature, isMajorDealChange } from '@/lib/news/topicDeduplication'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // 60 seconds
@@ -188,8 +188,10 @@ async function executeSyncJob(limitParam: number) {
       .replace(/(^-|-$)+/g, '')
       .slice(0, 90)
 
-    // 1. FAST CHECK: If this product/article already exists and is fresh (<24h), skip scraping & LLM entirely!
-    const existingArticle = await findExistingArticle({
+    // 1. FAST DEDUPLICATION CHECK: If this product/article already exists in DB,
+    // only proceed if there is a GENUINELY MAJOR change (price drop, new coupon code, or extended expiry date).
+    // Otherwise preserve the existing stable article without rewriting or re-posting to Telegram!
+    let existingArticle = await findExistingArticle({
       feedLink: item.link,
       directDealUrl: item.directDealUrl,
       sourceUrl: item.directDealUrl || item.link,
@@ -199,18 +201,24 @@ async function executeSyncJob(limitParam: number) {
     })
 
     if (existingArticle) {
-      const existingExpiry = detectDealExpiry(existingArticle)
-      const isOlderThan24h =
-        Date.now() - new Date(existingArticle.published_at).getTime() > 24 * 60 * 60 * 1000
+      const hasMajorChange = isMajorDealChange(existingArticle, {
+        dealPrice: item.dealPrice,
+        regularPrice: item.regularPrice,
+        discount: item.discount,
+        couponCode: (item as any).couponCode,
+        expiryTimeline: item.expiryTimeline,
+      })
 
-      // If it's already active and fresh (within 24h), skip redundant LLM rewrite
-      if (!existingExpiry.isExpired && !isOlderThan24h) {
+      if (!hasMajorChange) {
+        console.log(
+          `[News Sync] Topic already covered by existing article "${existingArticle.title}". Skipping duplicate rewrite & Telegram re-post.`
+        )
         skippedCount++
         continue
       }
 
       console.log(
-        `[News Sync] Reactivating / Replacing existing deal for "${existingArticle.title}" with new offer`
+        `[News Sync] Major update detected for existing article "${existingArticle.title}". Updating deal details.`
       )
     }
 
@@ -330,18 +338,24 @@ async function executeSyncJob(limitParam: number) {
       processedTitles.push(article.title)
       savedSlugs.push(article.slug)
 
-      // Automatically dispatch newly saved article to Telegram channel (deduplicated by topic)
-      const topicSig = getTopicSignature(article.title)
-      if (topicSig && postedSignaturesInRun.has(topicSig)) {
-        console.log(`[News Sync] Skipping duplicate Telegram post for "${article.title}" in current sync run`)
-      } else {
-        if (topicSig) postedSignaturesInRun.add(topicSig)
-        try {
-          const { postArticleToTelegram } = await import('@/lib/telegram/newsPoster')
-          await postArticleToTelegram(article)
-        } catch (tgErr: any) {
-          console.warn('[News Sync Telegram Dispatch Error]:', tgErr?.message || tgErr)
+      // Automatically dispatch newly saved article to Telegram channel ONLY if this is a completely brand-new story!
+      // (Never re-post if canonicalTarget already existed in database)
+      const isNewStory = !canonicalTarget
+      if (isNewStory) {
+        const topicSig = getTopicSignature(article.title)
+        if (topicSig && postedSignaturesInRun.has(topicSig)) {
+          console.log(`[News Sync] Skipping duplicate Telegram post for "${article.title}" in current sync run`)
+        } else {
+          if (topicSig) postedSignaturesInRun.add(topicSig)
+          try {
+            const { postArticleToTelegram } = await import('@/lib/telegram/newsPoster')
+            await postArticleToTelegram(article)
+          } catch (tgErr: any) {
+            console.warn('[News Sync Telegram Dispatch Error]:', tgErr?.message || tgErr)
+          }
         }
+      } else {
+        console.log(`[News Sync] Preserving existing article "${article.title}". Skipping Telegram re-dispatch.`)
       }
     }
   }
