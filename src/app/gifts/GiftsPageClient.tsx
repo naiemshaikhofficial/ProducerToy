@@ -193,7 +193,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
             {/* Quick gift summary count pill if gifts exist */}
             {gifts.length > 0 && (
               <div className="bg-[#1c1c1c] border border-[#2c2c2c] px-3.5 py-1.5 rounded-full text-xs font-bold text-zinc-300 flex items-center gap-1.5">
-                <Gift className="w-3.5 h-3.5 text-[#FA742B]" />
+                <Gift className="w-3.5 h-3.5 text-[#0084FF]" />
                 <span>{gifts.length} Total Gift{gifts.length > 1 ? 's' : ''}</span>
               </div>
             )}
@@ -284,7 +284,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
                             gift.status === 'unopened'
                               ? isSentByMe && !isReceivedByMe
                                 ? 'bg-amber-950/40 border-amber-600/40 text-amber-400'
-                                : 'bg-[#FA742B]/15 border-[#FA742B]/40 text-[#FA742B]'
+                                : 'bg-[#0084FF]/15 border-[#0084FF]/40 text-[#0084FF]'
                               : gift.status === 'claimed'
                               ? 'bg-emerald-950/40 border-emerald-600/40 text-emerald-400'
                               : 'bg-rose-950/40 border-rose-600/40 text-rose-400'
@@ -338,7 +338,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
                           type="button"
                           onClick={() => handleClaimGift(gift)}
                           disabled={claimLoadingId === gift.id || rejectLoadingId === gift.id}
-                          className="flex-1 sm:flex-none bg-[#FA742B] hover:bg-[#E05A18] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#FA742B]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                          className="flex-1 sm:flex-none bg-[#0084FF] hover:bg-[#006FE6] text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#0084FF]/20 active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                           <Sparkles className="w-4 h-4" />
                           <span>
@@ -393,16 +393,16 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
             
             {/* Subtle Starburst Sparkle Background Glow Effect */}
             <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30">
-              <div className="w-[300px] sm:w-[450px] h-[300px] sm:h-[450px] bg-[#FA742B]/15 rounded-full blur-[90px]" />
+              <div className="w-[300px] sm:w-[450px] h-[300px] sm:h-[450px] bg-[#0084FF]/15 rounded-full blur-[90px]" />
             </div>
 
-            {/* Stylized Neon Gift Icon with ProducerToy Orange Glow */}
+            {/* Stylized Neon Gift Icon with ProducerToy Blue Glow */}
             <div className="relative z-10 flex flex-col items-center">
               
               {/* Gift Icon Box */}
               <div className="relative mb-5 flex items-center justify-center">
                 <svg
-                  className="w-20 h-20 sm:w-24 sm:h-24 text-[#FA742B] transition-transform duration-300 hover:scale-105"
+                  className="w-20 h-20 sm:w-24 sm:h-24 text-[#0084FF] transition-transform duration-300 hover:scale-105"
                   viewBox="0 0 64 64"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -410,7 +410,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
                   {/* Gift Box Top Lid / Ribbon Bow */}
                   <path
                     d="M24 16C24 12.6863 26.6863 10 30 10C32.5 10 32 18 32 18C32 18 31.5 10 34 10C37.3137 10 40 12.6863 40 16C40 19.3137 32 19 32 19C32 19 24 19.3137 24 16Z"
-                    stroke="#FA742B"
+                    stroke="#0084FF"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -422,7 +422,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
                     width="36"
                     height="8"
                     rx="3"
-                    stroke="#FA742B"
+                    stroke="#0084FF"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -430,7 +430,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
                   {/* Box Body Bottom */}
                   <path
                     d="M18 27V48C18 50.2091 19.7909 52 22 52H42C44.2091 52 46 50.2091 46 48V27"
-                    stroke="#FA742B"
+                    stroke="#0084FF"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -438,7 +438,7 @@ export function GiftsPageClient({ initialGifts = [] }: { initialGifts?: GiftReco
                   {/* Center Vertical Ribbon */}
                   <path
                     d="M32 19V52"
-                    stroke="#FA742B"
+                    stroke="#0084FF"
                     strokeWidth="2.8"
                     strokeLinecap="round"
                   />

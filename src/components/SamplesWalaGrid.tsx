@@ -47,8 +47,8 @@ export function SamplesWalaGrid({ products }: SamplesWalaGridProps) {
               prefetch={true}
               className="group inline-flex items-center gap-2"
             >
-              <h2 className="font-graffiti text-2xl sm:text-3xl lg:text-4xl text-white tracking-wide uppercase drop-shadow-[0_2px_10px_rgba(252,99,1,0.3)] transition-all group-hover:brightness-110">
-                PRODUCER TOY <span className="text-[#FC6301] font-sans font-black mx-1 inline-block -rotate-6">✕</span> SAMPLES WALA
+              <h2 className="font-graffiti text-2xl sm:text-3xl lg:text-4xl text-white tracking-wide uppercase drop-shadow-[0_2px_10px_rgba(0, 132, 255,0.3)] transition-all group-hover:brightness-110">
+                PRODUCER TOY <span className="text-[#0084FF] font-sans font-black mx-1 inline-block -rotate-6">✕</span> SAMPLES WALA
               </h2>
               <ChevronRight className="w-5 h-5 text-white/70 group-hover:text-white group-hover:translate-x-1 transition-all" />
             </Link>

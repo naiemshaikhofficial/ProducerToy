@@ -387,7 +387,7 @@ export default function EpicAccountClient({ initialUser }: EpicAccountClientProp
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#FA742B]/30 transition-colors">
+                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#0084FF]/30 transition-colors">
                     <div className="space-y-1">
                       <span className="text-sm font-bold text-white block">
                         Producer Toy End User License Agreement (EULA)
@@ -405,7 +405,7 @@ export default function EpicAccountClient({ initialUser }: EpicAccountClientProp
                     </Link>
                   </div>
 
-                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#FA742B]/30 transition-colors">
+                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#0084FF]/30 transition-colors">
                     <div className="space-y-1">
                       <span className="text-sm font-bold text-white block">
                         100% Royalty-Free Commercial Audio Licensing
@@ -423,7 +423,7 @@ export default function EpicAccountClient({ initialUser }: EpicAccountClientProp
                     </Link>
                   </div>
 
-                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#FA742B]/30 transition-colors">
+                  <div className="bg-[#181818] border border-[#242424] p-5 rounded-2xl flex items-center justify-between hover:border-[#0084FF]/30 transition-colors">
                     <div className="space-y-1">
                       <span className="text-sm font-bold text-white block">
                         Terms of Service & Purchase Policy

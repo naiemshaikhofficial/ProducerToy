@@ -482,7 +482,7 @@ export function FlStudioShowcase() {
         return (
           <Check
             className={`w-5 h-5 mx-auto ${
-              isProducer ? 'text-[#FA742B]' : 'text-white'
+              isProducer ? 'text-[#0084FF]' : 'text-white'
             }`}
           />
         )
@@ -492,7 +492,7 @@ export function FlStudioShowcase() {
     return (
       <span
         className={`text-base font-bold ${
-          isProducer ? 'text-[#FA742B]' : 'text-white'
+          isProducer ? 'text-[#0084FF]' : 'text-white'
         }`}
       >
         {val}
@@ -545,11 +545,11 @@ export function FlStudioShowcase() {
           </div>
 
           {/* Producer Edition (Most Popular) */}
-          <div className="relative bg-[#141210] border border-[#FC6301]/70 rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-md shadow-[#FC6301]/5 hover:border-[#FC6301] transition-all">
+          <div className="relative bg-[#141210] border border-[#0084FF]/70 rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-md shadow-[#0084FF]/5 hover:border-[#0084FF] transition-all">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-white">Producer Edition</h3>
-                <span className="text-[10px] font-black uppercase text-[#FC6301] tracking-wider">
+                <span className="text-[10px] font-black uppercase text-[#0084FF] tracking-wider">
                   Most popular
                 </span>
               </div>
@@ -564,7 +564,7 @@ export function FlStudioShowcase() {
                 <button
                   type="button"
                   onClick={(e) => handleAffiliateClick(e)}
-                  className="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-0.5 cursor-pointer"
+                  className="text-[#0084FF] hover:underline font-semibold inline-flex items-center gap-0.5 cursor-pointer"
                 >
                   Learn more
                 </button>
@@ -573,7 +573,7 @@ export function FlStudioShowcase() {
             <button
               type="button"
               onClick={(e) => handleAffiliateClick(e)}
-              className="w-full py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-[#FC6301] hover:bg-[#e05700] text-white transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-[#0084FF] hover:bg-[#006fe6] text-white transition-all shadow-md flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer"
             >
               <span>Buy Producer Edition</span>
               <ArrowRight size={14} />
@@ -677,7 +677,7 @@ export function FlStudioShowcase() {
         <div className="hidden lg:grid grid-cols-12 gap-4 px-6 py-3 text-xs font-bold uppercase tracking-wider text-zinc-400">
           <div className="col-span-6"></div>
           <div className="col-span-1.5 text-center">Fruity Edition</div>
-          <div className="col-span-1.5 text-center text-[#FA742B] font-extrabold">Producer Edition</div>
+          <div className="col-span-1.5 text-center text-[#0084FF] font-extrabold">Producer Edition</div>
           <div className="col-span-1.5 text-center">Signature Bundle</div>
           <div className="col-span-1.5 text-center">All Plugins Edition</div>
         </div>
@@ -722,7 +722,7 @@ export function FlStudioShowcase() {
                           {renderCell(row.fruity, false)}
                         </div>
                         <div>
-                          <span className="text-[10px] text-[#FA742B] font-bold block lg:hidden pb-1">Producer</span>
+                          <span className="text-[10px] text-[#0084FF] font-bold block lg:hidden pb-1">Producer</span>
                           {renderCell(row.producer, true)}
                         </div>
                         <div>
@@ -802,7 +802,7 @@ export function FlStudioShowcase() {
           <button
             type="button"
             onClick={(e) => handleAffiliateClick(e)}
-            className="inline-flex items-center gap-2 bg-[#FC6301] hover:bg-[#e05700] text-white font-extrabold text-sm py-4 px-8 rounded-xl transition-all shadow-xl shadow-[#FC6301]/20 active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 bg-[#0084FF] hover:bg-[#006fe6] text-white font-extrabold text-sm py-4 px-8 rounded-xl transition-all shadow-xl shadow-[#0084FF]/20 active:scale-95 cursor-pointer"
           >
             <span>Buy FL Studio</span>
             <ArrowRight size={16} />

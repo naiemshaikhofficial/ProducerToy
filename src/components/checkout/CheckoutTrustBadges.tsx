@@ -9,19 +9,19 @@ export function CheckoutTrustBadges() {
     <div className="bg-[#141414] border border-[#222222] rounded-xl p-4 sm:p-5 space-y-3.5">
       <div className="space-y-2.5 text-xs">
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <Zap size={13} className="text-[#FA742B] flex-shrink-0" />
+          <Zap size={13} className="text-[#0084FF] flex-shrink-0" />
           <span>Instant direct download &amp; vault license sync</span>
         </div>
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <ShieldCheck size={13} className="text-[#FA742B] flex-shrink-0" />
+          <ShieldCheck size={13} className="text-[#0084FF] flex-shrink-0" />
           <span>100% Royalty-Free clearance for commercial use</span>
         </div>
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <DownloadCloud size={13} className="text-[#FA742B] flex-shrink-0" />
+          <DownloadCloud size={13} className="text-[#0084FF] flex-shrink-0" />
           <span>Lifetime access &amp; re-downloads in user library</span>
         </div>
         <div className="flex items-center gap-2.5 text-zinc-300">
-          <Lock size={13} className="text-[#FA742B] flex-shrink-0" />
+          <Lock size={13} className="text-[#0084FF] flex-shrink-0" />
           <span>PCI-DSS Level 1 Encrypted Payment Gateway</span>
         </div>
       </div>

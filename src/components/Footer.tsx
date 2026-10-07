@@ -133,13 +133,13 @@ export function Footer() {
               </p>
               <ul className="space-y-1.5 text-xs text-zinc-400">
                 <li className="flex items-start gap-1.5">
-                  <span className="text-[#FC6301] font-bold">•</span> Free Exclusive Samplepacks & Plugins
+                  <span className="text-[#0084FF] font-bold">•</span> Free Exclusive Samplepacks & Plugins
                 </li>
                 <li className="flex items-start gap-1.5">
-                  <span className="text-[#FC6301] font-bold">•</span> Automatic discounts on checkout
+                  <span className="text-[#0084FF] font-bold">•</span> Automatic discounts on checkout
                 </li>
                 <li className="flex items-start gap-1.5">
-                  <span className="text-[#FC6301] font-bold">•</span> Extra Virtual Cash claimed immediately
+                  <span className="text-[#0084FF] font-bold">•</span> Extra Virtual Cash claimed immediately
                 </li>
               </ul>
 
@@ -147,7 +147,7 @@ export function Footer() {
                 <Link
                   href="/features/toywards"
                   prefetch={true}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#FC6301] transition-colors group"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#0084FF] transition-colors group"
                 >
                   <span>Find out more</span>
                   <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -164,11 +164,16 @@ export function Footer() {
           
           {/* Logo on Bottom Left */}
           <Link href="/" prefetch={true} className="inline-block hover:opacity-90 transition-opacity">
-            <img
-              src="/footer-logo.png"
-              alt="Producer Toy"
-              className="h-8 sm:h-9 w-auto object-contain"
-            />
+            <picture>
+              <source srcSet="/footer-logo.webp" type="image/webp" />
+              <img
+                src="/footer-logo.png"
+                alt="Producer Toy"
+                className="h-8 sm:h-9 w-auto object-contain"
+                width={200}
+                height={40}
+              />
+            </picture>
           </Link>
 
           {/* Copyright Text Centered/Balanced with Back to Top */}

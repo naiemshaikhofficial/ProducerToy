@@ -35,7 +35,7 @@ export default function RefundPolicyPage() {
           </Link>
 
           <div className="space-y-2">
-            <span className="text-xs font-bold text-[#FA742B] tracking-wider uppercase">
+            <span className="text-xs font-bold text-[#0084FF] tracking-wider uppercase">
               Consumer Protection &amp; Settlement Standard
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -49,7 +49,7 @@ export default function RefundPolicyPage() {
 
         {/* Highlight Alert Box */}
         <div className="bg-[#181818] border border-[#2a2a2a] rounded-xl p-5 space-y-2 text-xs text-zinc-300">
-          <div className="flex items-center gap-2 text-[#FA742B] font-bold text-sm">
+          <div className="flex items-center gap-2 text-[#0084FF] font-bold text-sm">
             <Clock size={18} />
             <span>Resolution SLA: D+4 Business Days</span>
           </div>
@@ -64,7 +64,7 @@ export default function RefundPolicyPage() {
           {/* Section 1: Digital Goods Nature */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <ShieldCheck size={18} className="text-[#FA742B]" />
+              <ShieldCheck size={18} className="text-[#0084FF]" />
               1. Digital Download Nature &amp; Final Sale Terms
             </h2>
             <p className="text-zinc-400 leading-relaxed">
@@ -78,7 +78,7 @@ export default function RefundPolicyPage() {
           {/* Section 2: Failed Transaction Auto-Refund (RBI Mandate) */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <RefreshCw size={18} className="text-[#FA742B]" />
+              <RefreshCw size={18} className="text-[#0084FF]" />
               2. Failed Transactions &amp; Technical Glitches (Harmonisation of TAT)
             </h2>
             <p className="text-zinc-400">
@@ -92,7 +92,7 @@ export default function RefundPolicyPage() {
                 <strong className="text-zinc-200">No Action Needed:</strong> The payment aggregator (Razorpay) and your issuing bank handle this reconciliation automatically.
               </li>
               <li>
-                <strong className="text-zinc-200">Support Assistance:</strong> If the funds do not reflect after 5 business days, please email our billing team at <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a> with your Payment ID (e.g. <code>pay_...</code>) or UPI UTR reference.
+                <strong className="text-zinc-200">Support Assistance:</strong> If the funds do not reflect after 5 business days, please email our billing team at <a href="mailto:support@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">support@producertoy.com</a> with your Payment ID (e.g. <code>pay_...</code>) or UPI UTR reference.
               </li>
             </ul>
           </section>
@@ -118,7 +118,7 @@ export default function RefundPolicyPage() {
           {/* Section 4: Non-Refundable Scenarios */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <AlertTriangle size={18} className="text-[#FA742B]" />
+              <AlertTriangle size={18} className="text-[#0084FF]" />
               4. Non-Refundable Scenarios
             </h2>
             <p className="text-zinc-400">Refunds or cancellations cannot be granted for:</p>
@@ -149,10 +149,10 @@ export default function RefundPolicyPage() {
               To request technical assistance, replacement keys, or submit a refund dispute:
             </p>
             <div className="bg-[#161616] border border-[#242424] rounded-xl p-4 space-y-1.5 text-xs text-zinc-400 mt-2">
-              <p><strong className="text-zinc-200">Step 1:</strong> Visit our <Link href="/support" className="text-[#FA742B] hover:underline font-semibold">Contact &amp; Support Desk</Link> or email <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a>.</p>
+              <p><strong className="text-zinc-200">Step 1:</strong> Visit our <Link href="/support" className="text-[#0084FF] hover:underline font-semibold">Contact &amp; Support Desk</Link> or email <a href="mailto:support@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">support@producertoy.com</a>.</p>
               <p><strong className="text-zinc-200">Step 2:</strong> Include your Order Number (e.g., <code>PT-M...</code>), registered email address, and specific issue details.</p>
               <p><strong className="text-zinc-200">Step 3:</strong> Our technical team will respond within 2–6 hours and guarantee resolution within <strong>D+4 business days</strong>.</p>
-              <p><strong className="text-zinc-200">Grievance Escalation:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">grievance@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Grievance Escalation:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">grievance@producertoy.com</a></p>
             </div>
           </section>
 

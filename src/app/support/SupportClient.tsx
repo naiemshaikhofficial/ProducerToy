@@ -31,7 +31,7 @@ export function SupportClient() {
     <Suspense
       fallback={
         <div className="w-full min-h-[calc(100vh-76px)] bg-[#070605] flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full border-2 border-[#FC6301]/20 border-t-[#FC6301] animate-spin" />
+          <div className="w-6 h-6 rounded-full border-2 border-[#0084FF]/20 border-t-[#0084FF] animate-spin" />
         </div>
       }
     >

@@ -18,11 +18,11 @@ export function BlogNewsletterCard() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#1c1c1c] to-[#141414] border border-[#2a2a2a] rounded-[24px] p-8 sm:p-12 shadow-2xl text-center space-y-6">
       {/* Subtle Orange Glow Accents */}
-      <div className="absolute -top-24 -left-24 w-60 h-60 bg-[#FA742B]/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-[#FA742B]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-24 -left-24 w-60 h-60 bg-[#0084FF]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-[#0084FF]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-2xl mx-auto space-y-3 relative z-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] border border-[#333333] text-[11px] font-bold text-[#FA742B] uppercase tracking-wider mb-1">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#262626] border border-[#333333] text-[11px] font-bold text-[#0084FF] uppercase tracking-wider mb-1">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Weekly Producer Newsletter</span>
         </div>
@@ -51,12 +51,12 @@ export function BlogNewsletterCard() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="w-full bg-[#121212] text-white text-xs sm:text-sm pl-11 pr-4 h-[44px] rounded-xl border border-[#333333] focus:border-[#FA742B] focus:outline-none placeholder:text-zinc-500 font-sans transition-colors"
+                className="w-full bg-[#121212] text-white text-xs sm:text-sm pl-11 pr-4 h-[44px] rounded-xl border border-[#333333] focus:border-[#0084FF] focus:outline-none placeholder:text-zinc-500 font-sans transition-colors"
               />
             </div>
             <button
               type="submit"
-              className="h-[44px] px-6 rounded-xl bg-[#FA742B] hover:bg-[#e05800] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-[#FA742B]/20 active:scale-95 cursor-pointer whitespace-nowrap"
+              className="h-[44px] px-6 rounded-xl bg-[#0084FF] hover:bg-[#006fe6] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-[#0084FF]/20 active:scale-95 cursor-pointer whitespace-nowrap"
             >
               Subscribe
             </button>

@@ -442,12 +442,12 @@ function ComingSoonAlertBox({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter email for instant drop alert..."
-          className="flex-1 min-w-[200px] bg-[#1a1a1e] border border-[#2e2e36] focus:border-[#FC6301] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none transition-colors"
+          className="flex-1 min-w-[200px] bg-[#1a1a1e] border border-[#2e2e36] focus:border-[#0084FF] rounded-lg px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none transition-colors"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0084FF] hover:bg-[#00A3FF] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap"
         >
           {status === 'loading' ? (
             <Loader2 size={12} className="animate-spin" />
@@ -744,7 +744,7 @@ export function EpicSupportAssistant({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#FC6301] hover:text-[#ff751a] font-semibold underline underline-offset-2 decoration-[#FC6301]/60 hover:decoration-[#ff751a] inline-flex items-center gap-0.5 transition-colors cursor-pointer"
+              className="text-[#0084FF] hover:text-[#00A3FF] font-semibold underline underline-offset-2 decoration-[#0084FF]/60 hover:decoration-[#00A3FF] inline-flex items-center gap-0.5 transition-colors cursor-pointer"
             >
               <span>{linkContent}</span>
               <ExternalLink size={12} className="inline ml-0.5" />
@@ -755,7 +755,7 @@ export function EpicSupportAssistant({
             <Link
               key={`link-${lIdx}-${matchIndex}`}
               href={url}
-              className="text-[#FC6301] hover:text-[#ff751a] font-semibold underline underline-offset-2 decoration-[#FC6301]/60 hover:decoration-[#ff751a] transition-colors cursor-pointer"
+              className="text-[#0084FF] hover:text-[#00A3FF] font-semibold underline underline-offset-2 decoration-[#0084FF]/60 hover:decoration-[#00A3FF] transition-colors cursor-pointer"
             >
               {linkContent}
             </Link>
@@ -1567,16 +1567,16 @@ export function EpicSupportAssistant({
       {/* SCREEN 1: HERO LANDING STATE (Exact 1:1 Epic Games Style in Orange Shade) */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#070503] text-white font-sans selection:bg-[#FC6301] selection:text-white overflow-hidden flex flex-col items-center justify-center">
+        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#03060a] text-white font-sans selection:bg-[#0084FF] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background: Exact Epic Games 3D angled geometry & elements in rich orange shade */}
-          {/* Deep Volumetric Atmospheric Orange Glow & Light Cones */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_12%_15%,_rgba(252,99,1,0.40)_0%,_rgba(255,115,25,0.22)_32%,_rgba(245,158,11,0.08)_60%,_transparent_80%)] pointer-events-none z-0" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_90%_25%,_rgba(252,99,1,0.20)_0%,_rgba(245,158,11,0.06)_40%,_transparent_70%)] pointer-events-none z-0" />
+          {/* Ambient Glowing Background: Exact Epic Games 3D angled geometry & elements in rich electric blue shade */}
+          {/* Deep Volumetric Atmospheric Blue Glow & Light Cones */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_12%_15%,_rgba(0,132,255,0.40)_0%,_rgba(0,180,255,0.22)_32%,_rgba(0,210,255,0.08)_60%,_transparent_80%)] pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_90%_25%,_rgba(0,132,255,0.20)_0%,_rgba(0,180,255,0.06)_40%,_transparent_70%)] pointer-events-none z-0" />
 
           {/* Large Angled Volumetric Light Shaft slicing from top-left across screen */}
-          <div className="absolute -top-36 -left-32 w-[900px] h-[650px] -rotate-[38deg] bg-gradient-to-r from-[#FC6301]/40 via-amber-500/22 to-transparent blur-3xl pointer-events-none z-0" />
-          <div className="absolute top-1/4 right-[2%] w-[260px] h-[600px] bg-gradient-to-b from-[#FC6301]/25 via-amber-600/12 to-transparent blur-3xl rounded-full pointer-events-none z-0" />
+          <div className="absolute -top-36 -left-32 w-[900px] h-[650px] -rotate-[38deg] bg-gradient-to-r from-[#0084FF]/40 via-cyan-500/22 to-transparent blur-3xl pointer-events-none z-0" />
+          <div className="absolute top-1/4 right-[2%] w-[260px] h-[600px] bg-gradient-to-b from-[#0084FF]/25 via-blue-600/12 to-transparent blur-3xl rounded-full pointer-events-none z-0" />
           
           {/* Epic Games Exact Match: Cinematic Camera Depth-of-Field Blurred Bokeh & Out-of-Focus 3D Stage Beams */}
           <svg
@@ -1607,45 +1607,45 @@ export function EpicSupportAssistant({
               </filter>
 
               {/* Glowing Beams Gradients */}
-              <linearGradient id="epicOrangeBeam" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffb366" stopOpacity="0.9" />
-                <stop offset="45%" stopColor="#FC6301" stopOpacity="0.75" />
-                <stop offset="100%" stopColor="#d9480f" stopOpacity="0.1" />
+              <linearGradient id="epicBlueBeam" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#80c8ff" stopOpacity="0.9" />
+                <stop offset="45%" stopColor="#0084FF" stopOpacity="0.75" />
+                <stop offset="100%" stopColor="#0047ab" stopOpacity="0.1" />
               </linearGradient>
 
               <linearGradient id="epicMutedBeam" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffaa40" stopOpacity="0.6" />
-                <stop offset="60%" stopColor="#FC6301" stopOpacity="0.3" />
+                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.6" />
+                <stop offset="60%" stopColor="#0084FF" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
               <linearGradient id="epicTrussFill" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#FC6301" stopOpacity="0.12" />
-                <stop offset="60%" stopColor="#f59e0b" stopOpacity="0.04" />
+                <stop offset="0%" stopColor="#0084FF" stopOpacity="0.12" />
+                <stop offset="60%" stopColor="#0284c7" stopOpacity="0.04" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
               {/* Music Notation Gradient */}
               <linearGradient id="musicNoteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffe4c4" stopOpacity="0.9" />
-                <stop offset="40%" stopColor="#ffaa40" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#FC6301" stopOpacity="0.4" />
+                <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.9" />
+                <stop offset="40%" stopColor="#38bdf8" stopOpacity="0.8" />
+                <stop offset="100%" stopColor="#0084FF" stopOpacity="0.4" />
               </linearGradient>
 
               {/* Music Wave Gradient */}
               <linearGradient id="musicWaveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ffaa40" stopOpacity="0.1" />
-                <stop offset="25%" stopColor="#FC6301" stopOpacity="0.7" />
-                <stop offset="50%" stopColor="#ffc078" stopOpacity="0.9" />
-                <stop offset="75%" stopColor="#FC6301" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="#d9480f" stopOpacity="0.1" />
+                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.1" />
+                <stop offset="25%" stopColor="#0084FF" stopOpacity="0.7" />
+                <stop offset="50%" stopColor="#7dd3fc" stopOpacity="0.9" />
+                <stop offset="75%" stopColor="#0084FF" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#0047ab" stopOpacity="0.1" />
               </linearGradient>
 
               {/* Circular Camera Aperture Bokeh Disc */}
               <radialGradient id="musicBokehCircle" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#fff0db" stopOpacity="0.55" />
-                <stop offset="45%" stopColor="#ffaa40" stopOpacity="0.32" />
-                <stop offset="85%" stopColor="#FC6301" stopOpacity="0.14" />
+                <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.55" />
+                <stop offset="45%" stopColor="#38bdf8" stopOpacity="0.32" />
+                <stop offset="85%" stopColor="#0084FF" stopOpacity="0.14" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </radialGradient>
             </defs>
@@ -1675,7 +1675,7 @@ export function EpicSupportAssistant({
             <path
               d="M -80 620 C 220 480, 500 740, 820 590 S 1220 470, 1520 640"
               fill="none"
-              stroke="url(#epicOrangeBeam)"
+              stroke="url(#epicBlueBeam)"
               strokeWidth="6"
               filter="url(#epicBokehExtreme)"
               opacity="0.35"
@@ -1700,11 +1700,11 @@ export function EpicSupportAssistant({
 
             {/* Foreground Deep-Blur Beamed Notes ♫ (Bottom-Left Depth) */}
             <g transform="translate(140, 630) rotate(-20) scale(1.5)" filter="url(#epicBokehExtreme)" opacity="0.38">
-              <ellipse cx="0" cy="40" rx="24" ry="16" transform="rotate(-25 0 40)" fill="#FC6301" />
-              <ellipse cx="78" cy="20" rx="24" ry="16" transform="rotate(-25 78 20)" fill="#FC6301" />
-              <rect x="18" y="-32" width="6" height="72" rx="3" fill="#FC6301" />
-              <rect x="96" y="-52" width="6" height="72" rx="3" fill="#FC6301" />
-              <polygon points="18,-32 102,-52 102,-36 18,-16" fill="#FC6301" />
+              <ellipse cx="0" cy="40" rx="24" ry="16" transform="rotate(-25 0 40)" fill="#0084FF" />
+              <ellipse cx="78" cy="20" rx="24" ry="16" transform="rotate(-25 78 20)" fill="#0084FF" />
+              <rect x="18" y="-32" width="6" height="72" rx="3" fill="#0084FF" />
+              <rect x="96" y="-52" width="6" height="72" rx="3" fill="#0084FF" />
+              <polygon points="18,-32 102,-52 102,-36 18,-16" fill="#0084FF" />
             </g>
 
             {/* Single Quarter Note ♩ (Lower-Right) */}
@@ -1715,23 +1715,23 @@ export function EpicSupportAssistant({
 
             {/* --- 3. DAW STUDIO AUDIO EQUALIZER SPECTRUM BARS (OUT-OF-FOCUS) --- */}
             <g transform="translate(610, 230)" filter="url(#epicBokehHeavy)" opacity="0.45">
-              <rect x="0" y="45" width="9" height="55" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="18" y="22" width="9" height="78" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="36" y="8" width="9" height="92" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="54" y="32" width="9" height="68" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="72" y="14" width="9" height="86" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="90" y="38" width="9" height="62" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="108" y="55" width="9" height="45" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="126" y="34" width="9" height="66" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="144" y="18" width="9" height="82" rx="4.5" fill="url(#epicOrangeBeam)" />
-              <rect x="162" y="48" width="9" height="52" rx="4.5" fill="url(#epicOrangeBeam)" />
+              <rect x="0" y="45" width="9" height="55" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="18" y="22" width="9" height="78" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="36" y="8" width="9" height="92" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="54" y="32" width="9" height="68" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="72" y="14" width="9" height="86" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="90" y="38" width="9" height="62" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="108" y="55" width="9" height="45" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="126" y="34" width="9" height="66" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="144" y="18" width="9" height="82" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="162" y="48" width="9" height="52" rx="4.5" fill="url(#epicBlueBeam)" />
             </g>
 
             {/* --- 4. STUDIO MONITOR ACOUSTIC SOUND RIPPLE RINGS --- */}
             <g transform="translate(230, 470)" filter="url(#epicBokehHeavy)" opacity="0.32">
-              <circle cx="0" cy="0" r="75" fill="none" stroke="#FC6301" strokeWidth="2.5" strokeDasharray="6 8" />
-              <circle cx="0" cy="0" r="120" fill="none" stroke="#ffaa40" strokeWidth="2" strokeDasharray="10 12" />
-              <circle cx="0" cy="0" r="165" fill="none" stroke="#FC6301" strokeWidth="1.5" strokeDasharray="14 16" />
+              <circle cx="0" cy="0" r="75" fill="none" stroke="#0084FF" strokeWidth="2.5" strokeDasharray="6 8" />
+              <circle cx="0" cy="0" r="120" fill="none" stroke="#38bdf8" strokeWidth="2" strokeDasharray="10 12" />
+              <circle cx="0" cy="0" r="165" fill="none" stroke="#0084FF" strokeWidth="1.5" strokeDasharray="14 16" />
             </g>
 
             {/* --- 5. NATURAL CIRCULAR CAMERA APERTURE BOKEH ORBS --- */}
@@ -1743,20 +1743,20 @@ export function EpicSupportAssistant({
           </svg>
 
           {/* Floating Glowing Bokeh Dust Particles (Subtle Animation) */}
-          <div className="absolute top-1/4 left-[24%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
-          <div className="absolute top-[32%] left-[28%] w-1.5 h-1.5 rounded-full bg-amber-400 opacity-95 pointer-events-none z-0 shadow-[0_0_10px_#f59e0b]" />
-          <div className="absolute bottom-1/3 left-[17%] w-4 h-4 rounded-full bg-[#ff7824] blur-[2px] opacity-75 pointer-events-none z-0" />
-          <div className="absolute top-[22%] right-[23%] w-2 h-2 rounded-full bg-amber-400 opacity-75 pointer-events-none z-0 shadow-[0_0_8px_#f59e0b]" />
-          <div className="absolute bottom-1/4 right-[21%] w-3 h-3 rounded-full bg-[#FC6301] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
-          <div className="absolute top-[48%] left-[14%] w-2 h-2 rounded-full bg-amber-300 opacity-85 pointer-events-none z-0 shadow-[0_0_6px_#fcd34d]" />
-          <div className="absolute top-[60%] right-[32%] w-1.5 h-1.5 rounded-full bg-[#ff9a42] opacity-75 pointer-events-none z-0" />
+          <div className="absolute top-1/4 left-[24%] w-3 h-3 rounded-full bg-[#0084FF] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
+          <div className="absolute top-[32%] left-[28%] w-1.5 h-1.5 rounded-full bg-cyan-400 opacity-95 pointer-events-none z-0 shadow-[0_0_10px_#06b6d4]" />
+          <div className="absolute bottom-1/3 left-[17%] w-4 h-4 rounded-full bg-[#0284c7] blur-[2px] opacity-75 pointer-events-none z-0" />
+          <div className="absolute top-[22%] right-[23%] w-2 h-2 rounded-full bg-cyan-400 opacity-75 pointer-events-none z-0 shadow-[0_0_8px_#06b6d4]" />
+          <div className="absolute bottom-1/4 right-[21%] w-3 h-3 rounded-full bg-[#0084FF] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
+          <div className="absolute top-[48%] left-[14%] w-2 h-2 rounded-full bg-sky-300 opacity-85 pointer-events-none z-0 shadow-[0_0_6px_#7dd3fc]" />
+          <div className="absolute top-[60%] right-[32%] w-1.5 h-1.5 rounded-full bg-[#38bdf8] opacity-75 pointer-events-none z-0" />
 
           {/* Center ambient warm aura behind heading */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(252,99,1,0.18),_transparent_70%)] blur-3xl pointer-events-none z-0" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(0,132,255,0.18),_transparent_70%)] blur-3xl pointer-events-none z-0" />
 
           {/* Server Status: Exact Epic Games style with green dot & checkmark */}
           <div className="absolute top-5 right-6 sm:top-6 sm:right-10 z-20">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] bg-[#140e0a] border border-[#2b201a] text-xs text-zinc-300 shadow-xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[6px] bg-[#090d14] border border-[#162133] text-xs text-zinc-300 shadow-xl">
               <span className="text-zinc-400 font-normal">Server status:</span>
               <span className="inline-flex items-center gap-1.5 text-[#00d66c] font-semibold text-xs">
                 <span className="w-3.5 h-3.5 rounded-full bg-[#00d66c] flex items-center justify-center text-black">
@@ -1772,7 +1772,7 @@ export function EpicSupportAssistant({
           {/* Center Hero Heading & Input (Strictly centered 1:1 with Epic Games) */}
           <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
             <div className="space-y-3 mb-7 sm:mb-8 flex flex-col items-center">
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 transition-transform hover:scale-105 duration-300 drop-shadow-[0_0_28px_rgba(252,99,1,0.5)]">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 transition-transform hover:scale-105 duration-300 drop-shadow-[0_0_28px_rgba(0,132,255,0.5)]">
                 <Image
                   src="/images/support-bot-logo.webp"
                   alt="Producer Toy Support Assistant Mascot"
@@ -1782,7 +1782,7 @@ export function EpicSupportAssistant({
                   className="object-contain"
                 />
               </div>
-              <p className="text-sm sm:text-[15px] font-medium text-orange-400 tracking-wide font-sans">
+              <p className="text-sm sm:text-[15px] font-medium text-sky-400 tracking-wide font-sans">
                 Producer Toy Support
               </p>
               <h1 className="text-4xl sm:text-[48px] font-bold text-white tracking-tight leading-tight">
@@ -1805,7 +1805,7 @@ export function EpicSupportAssistant({
                   className={`flex-1 bg-[#130d08] hover:bg-[#18100a] focus:bg-[#18100a] border rounded-[10px] px-5 py-3 sm:py-3.5 text-sm sm:text-[15px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed ${
                     inputError
                       ? 'border-rose-500 focus:border-rose-500'
-                      : 'border-white/20 hover:border-white/30 focus:border-[#FC6301]'
+                      : 'border-white/20 hover:border-white/30 focus:border-[#0084FF]'
                   }`}
                 />
 
@@ -1815,7 +1815,7 @@ export function EpicSupportAssistant({
                   aria-label="Submit problem"
                   className={`w-11 h-11 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                     heroInput.trim().length >= 3
-                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer active:scale-95'
+                      ? 'bg-[#0084FF] hover:bg-[#00A3FF] text-white shadow-lg shadow-[#0084FF]/40 cursor-pointer active:scale-95'
                       : 'bg-white/[0.07] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
                   }`}
                 >
@@ -1866,7 +1866,7 @@ export function EpicSupportAssistant({
           >
             <div className="w-full max-w-5xl mx-auto h-11 sm:h-12 flex items-center justify-center px-4 sm:px-8">
               <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] uppercase text-zinc-300 select-none font-sans flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FC6301] animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0084FF] animate-pulse" />
                 <span>Prody • Producer Toy Technical Support</span>
               </span>
             </div>
@@ -1906,9 +1906,9 @@ export function EpicSupportAssistant({
               }}
             >
               {/* Deep Atmospheric Studio Stage Glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[750px] h-[220px] bg-[radial-gradient(ellipse_75%_50%_at_50%_10%,_rgba(252,99,1,0.16)_0%,_rgba(255,123,43,0.06)_45%,_transparent_75%)] blur-3xl" />
-              <div className="absolute -top-16 -left-12 w-[500px] h-[200px] -rotate-[30deg] bg-gradient-to-r from-[#FC6301]/16 via-amber-500/08 to-transparent blur-3xl" />
-              <div className="absolute -top-16 -right-12 w-[500px] h-[200px] rotate-[30deg] bg-gradient-to-l from-[#FC6301]/14 via-amber-600/06 to-transparent blur-3xl" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[750px] h-[220px] bg-[radial-gradient(ellipse_75%_50%_at_50%_10%,_rgba(0, 132, 255,0.16)_0%,_rgba(255,123,43,0.06)_45%,_transparent_75%)] blur-3xl" />
+              <div className="absolute -top-16 -left-12 w-[500px] h-[200px] -rotate-[30deg] bg-gradient-to-r from-[#0084FF]/16 via-amber-500/08 to-transparent blur-3xl" />
+              <div className="absolute -top-16 -right-12 w-[500px] h-[200px] rotate-[30deg] bg-gradient-to-l from-[#0084FF]/14 via-amber-600/06 to-transparent blur-3xl" />
 
               {/* Chat Header Musical Bokeh SVG (Center kept completely clean and dark for 100% text contrast) */}
               <svg
@@ -1924,15 +1924,15 @@ export function EpicSupportAssistant({
                     <feGaussianBlur stdDeviation="8" />
                   </filter>
                   <linearGradient id="chatNoteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#ffe4c4" stopOpacity="0.75" />
-                    <stop offset="45%" stopColor="#ffaa40" stopOpacity="0.55" />
-                    <stop offset="100%" stopColor="#FC6301" stopOpacity="0.2" />
+                    <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.75" />
+                    <stop offset="45%" stopColor="#38bdf8" stopOpacity="0.55" />
+                    <stop offset="100%" stopColor="#0084FF" stopOpacity="0.2" />
                   </linearGradient>
                   <linearGradient id="chatWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stopColor="transparent" />
-                    <stop offset="20%" stopColor="#FC6301" stopOpacity="0.35" />
-                    <stop offset="50%" stopColor="#ffaa40" stopOpacity="0.45" />
-                    <stop offset="80%" stopColor="#FC6301" stopOpacity="0.35" />
+                    <stop offset="20%" stopColor="#0084FF" stopOpacity="0.35" />
+                    <stop offset="50%" stopColor="#38bdf8" stopOpacity="0.45" />
+                    <stop offset="80%" stopColor="#0084FF" stopOpacity="0.35" />
                     <stop offset="100%" stopColor="transparent" />
                   </linearGradient>
                 </defs>
@@ -1965,13 +1965,13 @@ export function EpicSupportAssistant({
 
                 {/* Outer Camera Aperture Bokeh Orbs (Pushed away from center) */}
                 <circle cx="280" cy="190" r="16" fill="#ffca80" filter="url(#chatBokehHeavy)" opacity="0.25" />
-                <circle cx="920" cy="180" r="18" fill="#FC6301" filter="url(#chatBokehHeavy)" opacity="0.2" />
+                <circle cx="920" cy="180" r="18" fill="#0084FF" filter="url(#chatBokehHeavy)" opacity="0.2" />
               </svg>
             </div>
 
             {/* Title Text Content with Mascot */}
             <div className="space-y-2 relative z-10 px-4 flex flex-col items-center">
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-1 drop-shadow-[0_0_20px_rgba(252,99,1,0.45)]">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-1 drop-shadow-[0_0_20px_rgba(0, 132, 255,0.45)]">
                 <Image
                   src="/images/support-bot-logo.webp"
                   alt="Producer Toy Support Assistant Mascot"
@@ -2016,7 +2016,7 @@ export function EpicSupportAssistant({
                         <span className="text-[11px] text-zinc-500">{msg.timestamp}</span>
                       </div>
 
-                      <div className="bg-gradient-to-r from-[#de5200] via-[#FC6301] to-[#ff7b2b] text-white font-medium px-6 py-3.5 sm:px-7 sm:py-4 rounded-2xl rounded-tr-xs max-w-xl sm:max-w-2xl shadow-lg shadow-[#FC6301]/20 text-[14.5px] sm:text-[15.5px] leading-relaxed">
+                      <div className="bg-gradient-to-r from-[#0051C7] via-[#0084FF] to-[#00A3FF] text-white font-medium px-6 py-3.5 sm:px-7 sm:py-4 rounded-2xl rounded-tr-xs max-w-xl sm:max-w-2xl shadow-lg shadow-[#0084FF]/20 text-[14.5px] sm:text-[15.5px] leading-relaxed">
                         {msg.content}
                       </div>
                     </div>
@@ -2051,7 +2051,7 @@ export function EpicSupportAssistant({
                           height={24}
                           className="w-6 h-6 object-contain shrink-0"
                         />
-                        <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#FC6301] animate-spin flex-shrink-0" />
+                        <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#0084FF] animate-spin flex-shrink-0" />
                         <span className="text-zinc-300 text-sm sm:text-[15px] font-normal">Thinking...</span>
                       </div>
                     ) : (
@@ -2124,7 +2124,7 @@ export function EpicSupportAssistant({
                               <a
                                 href={msg.verifiedDownload.downloadUrl}
                                 download
-                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs sm:text-[13px] font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#0084FF] hover:bg-[#00A3FF] text-white text-xs sm:text-[13px] font-bold transition-all shadow-md active:scale-95 cursor-pointer"
                               >
                                 <Download size={14} />
                                 <span>Download {msg.verifiedDownload.productName}</span>
@@ -2146,7 +2146,7 @@ export function EpicSupportAssistant({
                           <div className="rounded-xl bg-[#141417] border border-[#2d2d34] p-4 sm:p-5 space-y-3.5 shadow-xl">
                             <div className="flex items-center justify-between gap-2 border-b border-[#2d2d34] pb-2.5">
                               <div className="flex items-center gap-2">
-                                <Receipt size={15} className="text-[#FC6301]" />
+                                <Receipt size={15} className="text-[#0084FF]" />
                                 <span className="text-[11px] font-bold text-zinc-200 uppercase tracking-wider">
                                   Official Tax Invoice &bull; Order #{msg.verifiedOrder.orderNumber}
                                 </span>
@@ -2232,7 +2232,7 @@ export function EpicSupportAssistant({
                                     msg.verifiedOrder.customerName
                                   )
                                 }}
-                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0084FF] hover:bg-[#00A3FF] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
                               >
                                 <FileText size={13} />
                                 <span>View &amp; Print Official Tax Invoice</span>
@@ -2261,13 +2261,13 @@ export function EpicSupportAssistant({
                           {msg.recommendedProducts.map((prod) => (
                             <div
                               key={prod.id}
-                              className="rounded-xl bg-[#202024] border border-[#2f2f35] hover:border-[#FC6301]/60 p-2 sm:p-3.5 transition-all duration-200 shadow-lg group flex flex-col justify-between"
+                              className="rounded-xl bg-[#202024] border border-[#2f2f35] hover:border-[#0084FF]/60 p-2 sm:p-3.5 transition-all duration-200 shadow-lg group flex flex-col justify-between"
                             >
                               <div>
                                 {/* Exact 1:1 Square Poster Image */}
                                 <Link
                                   href={`/p/${prod.slug}`}
-                                  className="aspect-square w-full rounded-lg overflow-hidden relative bg-[#151518] border border-[#303036] shadow-sm group-hover:border-[#FC6301]/50 transition-colors block mb-2 sm:mb-2.5"
+                                  className="aspect-square w-full rounded-lg overflow-hidden relative bg-[#151518] border border-[#303036] shadow-sm group-hover:border-[#0084FF]/50 transition-colors block mb-2 sm:mb-2.5"
                                 >
                                   <Image
                                     src={prod.cover_image}
@@ -2281,7 +2281,7 @@ export function EpicSupportAssistant({
                                 {/* Product Details: Title & Price Header */}
                                 <div className="space-y-1">
                                   <Link href={`/p/${prod.slug}`} className="block">
-                                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#FC6301] transition-colors line-clamp-1 leading-snug">
+                                    <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-[#0084FF] transition-colors line-clamp-1 leading-snug">
                                       {prod.name}
                                     </h4>
                                   </Link>
@@ -2309,7 +2309,7 @@ export function EpicSupportAssistant({
                               <div className="pt-2.5 sm:pt-3 mt-auto">
                                 <Link
                                   href={`/p/${prod.slug}`}
-                                  className="w-full inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-2 rounded-lg bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-[11px] sm:text-xs shadow-md transition-all active:scale-95 text-center"
+                                  className="w-full inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-2 rounded-lg bg-[#0084FF] hover:bg-[#00A3FF] text-white font-bold text-[11px] sm:text-xs shadow-md transition-all active:scale-95 text-center"
                                 >
                                   <span>View Product</span>
                                   <ArrowRight size={12} strokeWidth={2.5} />
@@ -2361,7 +2361,7 @@ export function EpicSupportAssistant({
                                     <span className="truncate text-zinc-300 font-normal">{source.title}</span>
                                     <Link
                                       href={source.href}
-                                      className="inline-flex items-center gap-1 text-[#FC6301] hover:underline font-medium shrink-0"
+                                      className="inline-flex items-center gap-1 text-[#0084FF] hover:underline font-medium shrink-0"
                                     >
                                       <span>{source.label}</span>
                                       <ExternalLink size={11} />
@@ -2401,8 +2401,8 @@ export function EpicSupportAssistant({
                       {/* Top Header Badge */}
                       <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
                         <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-[#FC6301] animate-pulse" />
-                          <span className="text-[11px] font-bold text-[#FC6301] uppercase tracking-wider">
+                          <span className="w-2 h-2 rounded-full bg-[#0084FF] animate-pulse" />
+                          <span className="text-[11px] font-bold text-[#0084FF] uppercase tracking-wider">
                             Official Drop Alert &bull; Coming Soon
                           </span>
                         </div>
@@ -2456,7 +2456,7 @@ export function EpicSupportAssistant({
                       <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-xs">
                         <Link
                           href={`/p/${msg.comingSoonProduct.slug}`}
-                          className="inline-flex items-center gap-1.5 text-[#FC6301] hover:text-[#ff751a] font-semibold transition-colors"
+                          className="inline-flex items-center gap-1.5 text-[#0084FF] hover:text-[#00A3FF] font-semibold transition-colors"
                         >
                           <span>Preview {msg.comingSoonProduct.name} Page</span>
                           <ArrowRight size={13} />
@@ -2557,7 +2557,7 @@ export function EpicSupportAssistant({
                     <div className="w-full bg-[#18181c] border border-white/[0.08] text-white rounded-2xl p-5 sm:p-6 shadow-2xl space-y-3.5">
                       <div className="flex items-center justify-between flex-wrap gap-2.5 border-b border-white/10 pb-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-xl bg-[#FC6301] text-white flex items-center justify-center font-bold shadow-md shadow-[#FC6301]/25">
+                          <div className="w-8 h-8 rounded-xl bg-[#0084FF] text-white flex items-center justify-center font-bold shadow-md shadow-[#0084FF]/25">
                             <Headphones size={16} strokeWidth={2.5} />
                           </div>
                           <div>
@@ -2571,7 +2571,7 @@ export function EpicSupportAssistant({
                         </div>
 
                         {msg.liveChatStatus === 'checking' ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FC6301]/20 text-[#FC6301] border border-[#FC6301]/40 text-[11px] font-bold">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0084FF]/20 text-[#0084FF] border border-[#0084FF]/40 text-[11px] font-bold">
                             <Loader2 size={12} className="animate-spin" />
                             Connecting to Live Desk...
                           </span>
@@ -2585,7 +2585,7 @@ export function EpicSupportAssistant({
 
                       {msg.liveChatStatus === 'checking' ? (
                         <div className="py-2.5 flex items-center gap-3 text-zinc-300 text-xs sm:text-[13px] font-medium">
-                          <Loader2 size={16} className="animate-spin text-[#FC6301]" />
+                          <Loader2 size={16} className="animate-spin text-[#0084FF]" />
                           <span>Pinging senior audio engineers on the live desk...</span>
                         </div>
                       ) : (
@@ -2593,7 +2593,7 @@ export function EpicSupportAssistant({
                           <p className="text-xs sm:text-[13px] text-zinc-200 font-medium leading-relaxed">
                             All live audio engineers are currently occupied in active studio recording/mixing sessions or outside live desk hours.
                           </p>
-                          <p className="text-[11px] sm:text-xs text-[#FC6301] font-bold">
+                          <p className="text-[11px] sm:text-xs text-[#0084FF] font-bold">
                             Please submit a support ticket below — your query, setup details, and order info will be delivered directly to <span className="underline">support@producertoy.com</span>.
                           </p>
                         </div>
@@ -2626,7 +2626,7 @@ export function EpicSupportAssistant({
                       <div className="border-b border-white/10 pb-3 flex items-center justify-between flex-wrap gap-2">
                         <div>
                           <h3 className="text-xs sm:text-sm font-bold uppercase tracking-tight text-white flex items-center gap-2">
-                            <FileText size={16} className="text-[#FC6301]" />
+                            <FileText size={16} className="text-[#0084FF]" />
                             <span>Raise Official Support Ticket</span>
                           </h3>
                           <p className="text-[10px] sm:text-[11px] text-zinc-400 font-medium mt-0.5">
@@ -2634,7 +2634,7 @@ export function EpicSupportAssistant({
                           </p>
                         </div>
                         {user?.email && (
-                          <span className="text-[11px] text-[#FC6301] bg-[#FC6301]/10 border border-[#FC6301]/30 px-2.5 py-0.5 rounded-lg font-mono font-bold">
+                          <span className="text-[11px] text-[#0084FF] bg-[#0084FF]/10 border border-[#0084FF]/30 px-2.5 py-0.5 rounded-lg font-mono font-bold">
                             {user.email}
                           </span>
                         )}
@@ -2664,7 +2664,7 @@ export function EpicSupportAssistant({
                                 onClick={() => setTicketCategory(cat.id)}
                                 className={`p-2.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer text-xs font-bold ${
                                   isSelected
-                                    ? 'bg-[#FC6301] text-white border-[#FC6301] shadow-md shadow-[#FC6301]/30'
+                                    ? 'bg-[#0084FF] text-white border-[#0084FF] shadow-md shadow-[#0084FF]/30'
                                     : 'bg-[#202025] hover:bg-[#282830] text-zinc-300 hover:text-white border-white/5'
                                 }`}
                               >
@@ -2687,7 +2687,7 @@ export function EpicSupportAssistant({
                             value={ticketName}
                             onChange={(e) => setTicketName(e.target.value)}
                             placeholder="e.g. Producer Name"
-                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-1">
@@ -2700,7 +2700,7 @@ export function EpicSupportAssistant({
                             value={ticketEmail}
                             onChange={(e) => setTicketEmail(e.target.value)}
                             placeholder="producer@example.com"
-                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
                           />
                         </div>
                       </div>
@@ -2717,7 +2717,7 @@ export function EpicSupportAssistant({
                             value={ticketSubject}
                             onChange={(e) => setTicketSubject(e.target.value)}
                             placeholder="What do you need help with?"
-                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-1">
@@ -2729,7 +2729,7 @@ export function EpicSupportAssistant({
                             value={ticketOrderId}
                             onChange={(e) => setTicketOrderId(e.target.value)}
                             placeholder="e.g. PT-ORD-... or pay_..."
-                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all"
                           />
                         </div>
                       </div>
@@ -2743,7 +2743,7 @@ export function EpicSupportAssistant({
                           <select
                             value={ticketDaw}
                             onChange={(e) => setTicketDaw(e.target.value)}
-                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium focus:outline-none transition-all"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium focus:outline-none transition-all"
                           >
                             <option value="">Select DAW (Optional)</option>
                             <option value="FL Studio">FL Studio</option>
@@ -2764,7 +2764,7 @@ export function EpicSupportAssistant({
                           <select
                             value={ticketPriority}
                             onChange={(e) => setTicketPriority(e.target.value)}
-                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium focus:outline-none transition-all"
+                            className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium focus:outline-none transition-all"
                           >
                             {TICKET_PRIORITIES.map((p) => (
                               <option key={p.id} value={p.id}>
@@ -2786,14 +2786,14 @@ export function EpicSupportAssistant({
                           value={ticketDescription}
                           onChange={(e) => setTicketDescription(e.target.value)}
                           placeholder="Describe your question, error message, or what went wrong in detail..."
-                          className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#FC6301] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all resize-y"
+                          className="w-full bg-[#202025] border border-[#2e2e36] focus:border-[#0084FF] rounded-xl px-4 py-2.5 text-xs sm:text-[13px] text-white font-medium placeholder-zinc-500 focus:outline-none transition-all resize-y"
                         />
                       </div>
 
                       {/* Dispatch Notice & Submit Button */}
                       <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
                         <div className="flex items-center gap-2 text-[11px] text-zinc-400 font-medium">
-                          <Mail size={13} className="text-[#FC6301]" />
+                          <Mail size={13} className="text-[#0084FF]" />
                           <span>Priority Senior Audio Support Desk</span>
                         </div>
 
@@ -2801,7 +2801,7 @@ export function EpicSupportAssistant({
                           type="button"
                           onClick={() => handleCreateTicket(msg.id, msg.userQuery)}
                           disabled={isSubmittingTicket || !ticketEmail.trim() || !ticketSubject.trim() || !ticketDescription.trim()}
-                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#FC6301]/25 hover:shadow-md hover:translate-y-[-1px] cursor-pointer"
+                          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#0084FF] hover:bg-[#00A3FF] disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#0084FF]/25 hover:shadow-md hover:translate-y-[-1px] cursor-pointer"
                         >
                           {isSubmittingTicket ? (
                             <>
@@ -2848,7 +2848,7 @@ export function EpicSupportAssistant({
                         Your support ticket has been received. Our senior audio engineering desk will review your inquiry and get back to you directly via your registered email.
                       </p>
                       <div className="pt-1 flex items-center gap-2 flex-wrap">
-                        <span className="text-xs text-black font-mono font-bold bg-[#FC6301] px-3.5 py-1.5 rounded-lg shadow-md">
+                        <span className="text-xs text-black font-mono font-bold bg-[#0084FF] px-3.5 py-1.5 rounded-lg shadow-md">
                           Ref: #{msg.ticketNumber}
                         </span>
                         <span className="text-xs text-[#00d66c] bg-[#00d66c]/15 px-3 py-1.5 rounded-lg border border-[#00d66c]/40 font-bold">
@@ -2886,7 +2886,7 @@ export function EpicSupportAssistant({
                 <button
                   type="button"
                   onClick={handleResetToHero}
-                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl bg-[#FC6301] hover:bg-[#ff751a] text-white font-bold text-sm sm:text-[15px] transition-all duration-200 shadow-xl shadow-[#FC6301]/25 active:scale-[0.99] cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl bg-[#0084FF] hover:bg-[#00A3FF] text-white font-bold text-sm sm:text-[15px] transition-all duration-200 shadow-xl shadow-[#0084FF]/25 active:scale-[0.99] cursor-pointer"
                 >
                   <RotateCcw size={16} strokeWidth={2.4} />
                   <span>Start New Conversation</span>
@@ -2923,7 +2923,7 @@ export function EpicSupportAssistant({
                     aria-label="Chat options"
                     className={`w-10 h-10 rounded-full border flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
                       isOptionsMenuOpen
-                        ? 'bg-[#241710] border-[#FC6301]/60 text-white'
+                        ? 'bg-[#241710] border-[#0084FF]/60 text-white'
                         : 'bg-[#18181c] hover:bg-[#222228] border-white/[0.08] text-zinc-400 hover:text-white'
                     }`}
                   >
@@ -2945,7 +2945,7 @@ export function EpicSupportAssistant({
                       : 'Write a message...'
                   }
                   disabled={isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
-                  className="flex-1 bg-[#141417] hover:bg-[#18181c] focus:bg-[#18181c] border border-white/10 focus:border-[#FC6301] rounded-xl px-5 py-3 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#141417] hover:bg-[#18181c] focus:bg-[#18181c] border border-white/10 focus:border-[#0084FF] rounded-xl px-5 py-3 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
                 />
 
                 {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
@@ -2955,7 +2955,7 @@ export function EpicSupportAssistant({
                   aria-label="Send message"
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
                     chatInput.trim().length > 0 && !isTyping && !isChatEnded && policyStrikes < 4 && strikesRef.current < 4 && !messages.some((m) => m.isThinking)
-                      ? 'bg-[#FC6301] hover:bg-[#ff751a] text-white shadow-lg shadow-[#FC6301]/40 cursor-pointer'
+                      ? 'bg-[#0084FF] hover:bg-[#00A3FF] text-white shadow-lg shadow-[#0084FF]/40 cursor-pointer'
                       : 'bg-white/[0.06] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
                   }`}
                 >

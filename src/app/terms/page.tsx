@@ -36,7 +36,7 @@ export default function TermsAndConditionsPage() {
           </Link>
 
           <div className="space-y-2">
-            <span className="text-xs font-bold text-[#FA742B] tracking-wider uppercase">
+            <span className="text-xs font-bold text-[#0084FF] tracking-wider uppercase">
               Legal Agreement &amp; Compliance
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -50,7 +50,7 @@ export default function TermsAndConditionsPage() {
 
         {/* Regulatory Summary Alert */}
         <div className="bg-[#181818] border border-[#2a2a2a] rounded-xl p-5 space-y-2 text-xs text-zinc-300">
-          <div className="flex items-center gap-2 text-[#FA742B] font-bold text-sm">
+          <div className="flex items-center gap-2 text-[#0084FF] font-bold text-sm">
             <ShieldCheck size={18} />
             <span>Payment Aggregation &amp; Security Notice</span>
           </div>
@@ -65,14 +65,14 @@ export default function TermsAndConditionsPage() {
           {/* Section 1: Introduction & Legal Status */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <Scale size={18} className="text-[#FA742B]" />
+              <Scale size={18} className="text-[#0084FF]" />
               1. General Understanding &amp; Agreement
             </h2>
             <p className="text-zinc-400">
               This electronic document is published in accordance with the Information Technology Act, 2000 (as amended) and rules made thereunder. By accessing, browsing, registering for, or making a purchase on <strong>producertoy.com</strong> (&quot;Platform&quot; or &quot;Website&quot;), you (&quot;User&quot;, &quot;Customer&quot;, or &quot;Merchant&quot;) agree to be legally bound by these Terms of Use, together with our{' '}
-              <Link href="/privacy" className="text-[#FA742B] hover:underline font-semibold">Privacy Policy</Link>,{' '}
-              <Link href="/refund-policy" className="text-[#FA742B] hover:underline font-semibold">Refund Policy</Link>, and{' '}
-              <Link href="/purchase-policy" className="text-[#FA742B] hover:underline font-semibold">Purchase Policy</Link>.
+              <Link href="/privacy" className="text-[#0084FF] hover:underline font-semibold">Privacy Policy</Link>,{' '}
+              <Link href="/refund-policy" className="text-[#0084FF] hover:underline font-semibold">Refund Policy</Link>, and{' '}
+              <Link href="/purchase-policy" className="text-[#0084FF] hover:underline font-semibold">Purchase Policy</Link>.
             </p>
             <p className="text-zinc-400">
               Producer Toy is an Indian registered digital media and software marketplace entity providing original virtual instruments (VST/AU), audio soundbanks, sample packs, MIDI files, and DAW production templates to creators worldwide.
@@ -82,7 +82,7 @@ export default function TermsAndConditionsPage() {
           {/* Section 2: Payment Aggregation & Processing */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <FileText size={18} className="text-[#FA742B]" />
+              <FileText size={18} className="text-[#0084FF]" />
               2. Payment Aggregation &amp; Processing (Razorpay &amp; RBI Compliance)
             </h2>
             <p className="text-zinc-400">
@@ -122,7 +122,7 @@ export default function TermsAndConditionsPage() {
           {/* Section 4: Prohibited Products, Anti-Piracy & Usage Restrictions */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <AlertCircle size={18} className="text-[#FA742B]" />
+              <AlertCircle size={18} className="text-[#0084FF]" />
               4. Prohibited Activities &amp; Anti-Piracy Governance
             </h2>
             <p className="text-zinc-400">
@@ -196,8 +196,8 @@ export default function TermsAndConditionsPage() {
             <div className="bg-[#161616] border border-[#242424] rounded-xl p-4 space-y-1.5 text-xs text-zinc-400 mt-3">
               <p><strong className="text-zinc-200">Merchant Entity:</strong> Producer Toy Store (Operated in India)</p>
               <p><strong className="text-zinc-200">Registered Office:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</p>
-              <p><strong className="text-zinc-200">Compliance &amp; Legal Desk:</strong> <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a></p>
-              <p><strong className="text-zinc-200">Statutory Nodal / Grievance Officer:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">grievance@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Compliance &amp; Legal Desk:</strong> <a href="mailto:support@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">support@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Statutory Nodal / Grievance Officer:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">grievance@producertoy.com</a></p>
             </div>
           </section>
 

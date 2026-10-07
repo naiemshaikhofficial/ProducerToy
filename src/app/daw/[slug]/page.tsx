@@ -372,7 +372,7 @@ export default async function DawLandingPage({
         /* Standard DAW Landing Page */
         <div className="space-y-4 border-b border-[#202020] pb-8">
           <div className="space-y-2">
-            <span className="bg-[#1f1f1f] text-[#FA742B] border border-[#FA742B]/30 text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider inline-block">
+            <span className="bg-[#1f1f1f] text-[#0084FF] border border-[#0084FF]/30 text-xs font-bold px-3 py-1 rounded-md uppercase tracking-wider inline-block">
               {config.developer} Compatible
             </span>
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
@@ -417,7 +417,7 @@ export default async function DawLandingPage({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-[#141414] border border-[#262626] rounded-xl p-5 space-y-2">
-              <div className="flex items-center gap-2 text-[#FA742B]">
+              <div className="flex items-center gap-2 text-[#0084FF]">
                 <Cpu className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider text-white">Supported Formats</span>
               </div>

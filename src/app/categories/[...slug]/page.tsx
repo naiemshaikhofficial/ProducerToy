@@ -583,7 +583,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
             <Link
               href={baseUrl}
               prefetch={true}
-              className="inline-block mt-2 bg-[#FC6301] hover:bg-[#E05800] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
+              className="inline-block mt-2 bg-[#0084FF] hover:bg-[#006FE6] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors"
             >
               Clear Filters
             </Link>

@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
           </Link>
 
           <div className="space-y-2">
-            <span className="text-xs font-bold text-[#FA742B] tracking-wider uppercase">
+            <span className="text-xs font-bold text-[#0084FF] tracking-wider uppercase">
               Data Privacy &amp; Security Compliance
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -49,7 +49,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Highlight Alert Box */}
         <div className="bg-[#181818] border border-[#2a2a2a] rounded-xl p-5 space-y-2 text-xs text-zinc-300">
-          <div className="flex items-center gap-2 text-[#FA742B] font-bold text-sm">
+          <div className="flex items-center gap-2 text-[#0084FF] font-bold text-sm">
             <Lock size={18} />
             <span>Zero Payment Credential Storage Guarantee</span>
           </div>
@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
           {/* Section 1: Information We Collect */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <UserCheck size={18} className="text-[#FA742B]" />
+              <UserCheck size={18} className="text-[#0084FF]" />
               1. Information We Collect &amp; Process
             </h2>
             <p className="text-zinc-400">
@@ -80,7 +80,7 @@ export default function PrivacyPolicyPage() {
           {/* Section 2: Financial Data & TokenHQ Tokenisation */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <ShieldCheck size={18} className="text-[#FA742B]" />
+              <ShieldCheck size={18} className="text-[#0084FF]" />
               2. Financial Data Security &amp; Tokenisation Compliance
             </h2>
             <p className="text-zinc-400">
@@ -108,7 +108,7 @@ export default function PrivacyPolicyPage() {
               <li>Preventing financial fraud, bot attacks, and chargeback abuse.</li>
             </ul>
             <p className="text-zinc-400 font-semibold text-white pt-1">
-              <EyeOff size={16} className="inline mr-1.5 text-[#FA742B]" />
+              <EyeOff size={16} className="inline mr-1.5 text-[#0084FF]" />
               We will NEVER sell, lease, or rent customer personal data or email lists to any third-party advertisers.
             </p>
           </section>
@@ -144,7 +144,7 @@ export default function PrivacyPolicyPage() {
                   href="https://www.google.com/settings/ads"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#FA742B] hover:underline font-semibold"
+                  className="text-[#0084FF] hover:underline font-semibold"
                 >
                   Google Ads Settings
                 </a>
@@ -153,7 +153,7 @@ export default function PrivacyPolicyPage() {
                   href="https://www.aboutads.info/choices/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#FA742B] hover:underline font-semibold"
+                  className="text-[#0084FF] hover:underline font-semibold"
                 >
                   aboutads.info
                 </a>
@@ -198,8 +198,8 @@ export default function PrivacyPolicyPage() {
               <p><strong className="text-zinc-200">Designation:</strong> Data Protection &amp; Grievance Officer</p>
               <p><strong className="text-zinc-200">Entity:</strong> Producer Toy Store (India)</p>
               <p><strong className="text-zinc-200">Address:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</p>
-              <p><strong className="text-zinc-200">Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">grievance@producertoy.com</a></p>
-              <p><strong className="text-zinc-200">Support Desk:</strong> <a href="mailto:support@producertoy.com" className="text-[#FA742B] hover:underline font-semibold">support@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">grievance@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Support Desk:</strong> <a href="mailto:support@producertoy.com" className="text-[#0084FF] hover:underline font-semibold">support@producertoy.com</a></p>
               <p><strong className="text-zinc-200">Response Timeline:</strong> Acknowledgment within 24 hours, resolution within D+4 business days.</p>
             </div>
           </section>

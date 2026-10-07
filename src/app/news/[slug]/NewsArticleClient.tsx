@@ -286,7 +286,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   const fallbackPrompt = '/icon.png'
 
   return (
-    <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white relative overflow-hidden">
+    <article className="min-h-screen bg-[#121212] text-white selection:bg-[#0084FF] selection:text-white relative overflow-hidden">
       {/* 1:1 Epic Games Sharp Atmospheric Product Background: Full clarity at top behind transparent fixed header, smoothly dissolves down into pure #121212 */}
       <div
         className="absolute top-0 left-0 right-0 w-full overflow-hidden z-0 pointer-events-none select-none h-[420px] sm:h-[620px]"
@@ -383,9 +383,9 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         >
           {/* Prominent 1-Click Copy Coupon Box inside story if coupon exists */}
           {couponCode && (
-            <div className="mb-8 p-3.5 sm:p-5 bg-[#18181c] border border-[#FC6301]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 shadow-xl">
+            <div className="mb-8 p-3.5 sm:p-5 bg-[#18181c] border border-[#0084FF]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 shadow-xl">
               <div className="flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#FC6301]/10 border border-[#FC6301]/30 flex items-center justify-center shrink-0 text-[#FC6301]">
+                <div className="w-10 h-10 rounded-xl bg-[#0084FF]/10 border border-[#0084FF]/30 flex items-center justify-center shrink-0 text-[#0084FF]">
                   <Tag className="w-5 h-5" />
                 </div>
                 <div>
@@ -409,7 +409,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                   href={offerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden sm:inline-flex px-4 py-2.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-extrabold text-xs sm:text-sm rounded-xl active:scale-95 transition-all items-center gap-1.5 shadow-md cursor-pointer shrink-0"
+                  className="hidden sm:inline-flex px-4 py-2.5 bg-[#0084FF] hover:bg-[#006fe6] text-white font-extrabold text-xs sm:text-sm rounded-xl active:scale-95 transition-all items-center gap-1.5 shadow-md cursor-pointer shrink-0"
                 >
                   <span>Redeem Deal</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -435,7 +435,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 href={offerUrl}
                 target={offerUrl.startsWith('/') ? '_self' : '_blank'}
                 rel={offerUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline text-center group"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline text-center group"
               >
                 <span>
                   {getProductCtaLabel({

@@ -478,7 +478,7 @@ export default async function BestOfRoundupPage({
                     </div>
 
                     <Link href={`/product/${product.slug}`} className="block group">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-[#FA742B] transition-colors">
+                      <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-[#0084FF] transition-colors">
                         {product.name}
                       </h3>
                     </Link>

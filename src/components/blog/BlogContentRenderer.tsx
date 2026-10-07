@@ -97,10 +97,10 @@ function formatInline(
           ? `<span class="deal-timeline-subtext mt-1.5 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide block">${expiryTimeline}</span>`
           : ''
 
-        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#FC6301]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
+        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
       }
 
-      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="text-[#FC6301] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
+      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="text-[#0084FF] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
     })
     // `code`
     .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
@@ -391,7 +391,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content a {
-          color: #FA742B;
+          color: #0084FF;
           text-decoration: underline;
           text-underline-offset: 4px;
           font-weight: 600;
@@ -459,7 +459,7 @@ export function BlogContentRenderer({
           position: absolute;
           left: 0.25rem;
           top: 0;
-          color: #FA742B;
+          color: #0084FF;
           font-weight: bold;
           font-size: 1.35rem;
           line-height: 1;
@@ -477,7 +477,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content ol li::marker {
-          color: #FA742B;
+          color: #0084FF;
           font-weight: bold;
         }
 
@@ -486,7 +486,7 @@ export function BlogContentRenderer({
           margin: 2rem 0;
           padding: 1.25rem 1.5rem;
           background: #181818;
-          border-left: 4px solid #FA742B;
+          border-left: 4px solid #0084FF;
           border-radius: 0 12px 12px 0;
           color: #e4e4e7;
           font-style: normal;
@@ -561,7 +561,7 @@ export function BlogContentRenderer({
         .blog-content .cta-box {
           background: linear-gradient(135deg, #1c1c1c 0%, #151515 100%);
           border: 1px solid #2a2a2a;
-          border-left: 4px solid #FA742B;
+          border-left: 4px solid #0084FF;
           border-radius: 14px;
           padding: 1.5rem 1.75rem;
           margin: 2.25rem 0;
@@ -585,7 +585,7 @@ export function BlogContentRenderer({
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          background: #FA742B;
+          background: #0084FF;
           color: #ffffff !important;
           font-weight: 700;
           text-decoration: none !important;
@@ -595,11 +595,11 @@ export function BlogContentRenderer({
           text-transform: uppercase;
           letter-spacing: 0.05em;
           transition: all 0.15s ease;
-          box-shadow: 0 4px 14px rgba(250, 116, 43, 0.3);
+          box-shadow: 0 4px 14px rgba(0, 132, 255, 0.3);
         }
 
         .blog-content .cta-btn:hover {
-          background: #e05a18;
+          background: #006fe6;
           transform: translateY(-1px);
         }
 

@@ -132,7 +132,7 @@ export function RelatedProductsSection({
                 </h4>
                 <div className="text-xs font-bold text-zinc-300 pt-0.5">
                   {isFree ? (
-                    <span className="text-[#FA742B]">FREE</span>
+                    <span className="text-[#0084FF]">FREE</span>
                   ) : (
                     formatPrice(item.price_inr, item.price_usd)
                   )}

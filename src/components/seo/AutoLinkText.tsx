@@ -72,7 +72,7 @@ export function AutoLinkText({
           key={`${matchIndex}-${matchedText}`}
           href={targetLink.url}
           prefetch={true}
-          className="text-zinc-200 hover:text-white underline underline-offset-2 hover:decoration-[#FA742B] transition-colors"
+          className="text-zinc-200 hover:text-white underline underline-offset-2 hover:decoration-[#0084FF] transition-colors"
         >
           {matchedText}
         </Link>

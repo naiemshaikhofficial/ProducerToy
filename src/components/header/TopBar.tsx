@@ -818,7 +818,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 placeholder="Search"
                 value={desktopSearchQuery}
                 onChange={(e) => setDesktopSearchQuery(e.target.value)}
-                className="bg-[#202024] hover:bg-[#28282c] focus:bg-[#28282c] border border-white/10 rounded-full pl-9 pr-7 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none w-[160px] lg:w-[200px] transition-all focus:border-[#FC6301]"
+                className="bg-[#202024] hover:bg-[#28282c] focus:bg-[#28282c] border border-white/10 rounded-full pl-9 pr-7 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none w-[160px] lg:w-[200px] transition-all focus:border-[#0084FF]"
               />
               {desktopSearchQuery && (
                 <button
@@ -1035,7 +1035,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Link
             href={user ? "/library" : "/auth"}
             prefetch={true}
-            className="bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-md shadow-[#FC6301]/20 flex items-center justify-center cursor-pointer tracking-tight"
+            className="bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-md shadow-[#0084FF]/20 flex items-center justify-center cursor-pointer tracking-tight"
           >
             {user ? 'Library' : 'Sign In'}
           </Link>
@@ -1057,7 +1057,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               <Link
                 href={user ? "/library" : "/auth"}
                 prefetch={true}
-                className="bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
+                className="bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
               >
                 {user ? 'Library' : 'Sign In'}
               </Link>

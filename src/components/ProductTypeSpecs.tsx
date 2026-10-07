@@ -381,7 +381,7 @@ export function ProductSpecsOverview({
               {/* 5. License */}
               <div>
                 <span className="text-xs text-zinc-500 block">License</span>
-                <span className="text-[#FA742B] font-semibold block">
+                <span className="text-[#0084FF] font-semibold block">
                   100% Royalty-Free
                 </span>
               </div>

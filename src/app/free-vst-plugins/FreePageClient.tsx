@@ -152,7 +152,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
                 priority
               />
               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-              <div className="absolute top-3.5 left-3.5 bg-[#FA742B] text-black font-black text-xs px-3.5 py-1 rounded-md uppercase tracking-wider shadow-md">
+              <div className="absolute top-3.5 left-3.5 bg-[#0084FF] text-black font-black text-xs px-3.5 py-1 rounded-md uppercase tracking-wider shadow-md">
                 Featured Free Toy
               </div>
             </div>
@@ -160,7 +160,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
             {/* Right Column: Giveaway Copy & CTA */}
             <div className="lg:col-span-5 flex flex-col justify-center space-y-4 sm:space-y-6">
               <div className="space-y-2">
-                <span className="text-xs sm:text-sm font-bold text-[#FA742B] tracking-wide uppercase">
+                <span className="text-xs sm:text-sm font-bold text-[#0084FF] tracking-wide uppercase">
                   Weekly Free Plugin Giveaway
                 </span>
                 <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight leading-tight">
@@ -175,7 +175,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
                 <Link
                   href={`/product/${featuredGiveaway.slug}`}
                   prefetch={true}
-                  className="h-12 px-6 rounded-xl bg-[#FA742B] hover:bg-[#E05A18] text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#FA742B]/20 transition-all active:scale-[0.98]"
+                  className="h-12 px-6 rounded-xl bg-[#0084FF] hover:bg-[#006FE6] text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0084FF]/20 transition-all active:scale-[0.98]"
                 >
                   <Download className="w-4 h-4 stroke-[3]" />
                   <span>Claim Free Plugin</span>
@@ -195,7 +195,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
         </div>
       ) : (
         <div className="w-full bg-[#18181c] border border-[#26262a] rounded-2xl p-6 sm:p-12 shadow-2xl overflow-hidden text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FA742B]/10 border border-[#FA742B]/20 text-[#FA742B] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0084FF]/10 border border-[#0084FF]/20 text-[#0084FF] text-xs font-bold uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             Official Free Drops
           </div>
@@ -209,7 +209,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
             <Link
               href="/news"
               prefetch={true}
-              className="h-11 px-6 rounded-xl bg-[#FA742B] hover:bg-[#E05A18] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#FA742B]/20 transition-all active:scale-[0.98]"
+              className="h-11 px-6 rounded-xl bg-[#0084FF] hover:bg-[#006FE6] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0084FF]/20 transition-all active:scale-[0.98]"
             >
               <Music className="w-4 h-4" />
               <span>Browse Daily Free VST News</span>
@@ -231,7 +231,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
       {weeklyFreeCards.length > 0 && (
         <div className="space-y-5">
           <div className="flex items-center gap-2.5">
-            <Gift className="w-5 h-5 text-[#FA742B]" />
+            <Gift className="w-5 h-5 text-[#0084FF]" />
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
               Weekly Free Drops
             </h2>
@@ -265,7 +265,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
                       className={`relative z-10 w-full py-2 px-3 text-center text-xs font-black tracking-wider uppercase transition-colors ${
                         isComingSoon
                           ? 'bg-[#000000]/95 text-white border-t border-white/10'
-                          : 'bg-[#FA742B] text-black shadow-md'
+                          : 'bg-[#0084FF] text-black shadow-md'
                       }`}
                     >
                       {isComingSoon ? 'COMING SOON' : 'FREE NOW'}
@@ -274,7 +274,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
 
                   {/* Text Details Below Card */}
                   <div className="mt-3 space-y-0.5">
-                    <h3 className="font-bold text-base sm:text-[17px] text-white group-hover:text-[#FA742B] transition-colors leading-snug line-clamp-1">
+                    <h3 className="font-bold text-base sm:text-[17px] text-white group-hover:text-[#0084FF] transition-colors leading-snug line-clamp-1">
                       {product.name}
                     </h3>
                     <p className="text-xs sm:text-sm text-zinc-400 font-normal">
@@ -326,7 +326,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
                     <span className="bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
                       Free Freeware
                     </span>
-                    <h3 className="text-lg sm:text-2xl font-black text-white group-hover:text-[#FA742B] transition-colors leading-tight">
+                    <h3 className="text-lg sm:text-2xl font-black text-white group-hover:text-[#0084FF] transition-colors leading-tight">
                       {product.name}
                     </h3>
                     <p className="text-xs text-zinc-300 font-medium">
@@ -366,7 +366,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
               }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 selectedType === 'all'
-                  ? 'bg-[#FA742B] text-white shadow-md'
+                  ? 'bg-[#0084FF] text-white shadow-md'
                   : 'text-zinc-400 hover:text-white hover:bg-[#222226]'
               }`}
             >
@@ -393,7 +393,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
                   }}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                     selectedType === type
-                      ? 'bg-[#FA742B] text-white shadow-md'
+                      ? 'bg-[#0084FF] text-white shadow-md'
                       : 'text-zinc-400 hover:text-white hover:bg-[#222226]'
                   }`}
                 >
@@ -461,7 +461,7 @@ export function FreePageClient({ products }: FreePageClientProps) {
                 setSelectedType('all')
                 setSelectedSubcategory('all')
               }}
-              className="text-xs text-[#FA742B] hover:underline font-bold cursor-pointer"
+              className="text-xs text-[#0084FF] hover:underline font-bold cursor-pointer"
             >
               Reset Filters
             </button>

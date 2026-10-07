@@ -222,8 +222,8 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
                         className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
                           isSaved
-                            ? 'bg-[#FC6301] text-white border border-[#FC6301] shadow-[0_0_10px_rgba(252,99,1,0.4)] opacity-100 hover:bg-[#e05700]'
-                            : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#FC6301]/70 hover:text-[#FC6301] hover:bg-[#1c1c20] opacity-0 group-hover:opacity-100 shadow-sm hover:scale-105'
+                            ? 'bg-[#0084FF] text-white border border-[#0084FF] shadow-[0_0_10px_rgba(0, 132, 255,0.4)] opacity-100 hover:bg-[#006fe6]'
+                            : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#0084FF]/70 hover:text-[#0084FF] hover:bg-[#1c1c20] opacity-0 group-hover:opacity-100 shadow-sm hover:scale-105'
                         }`}
                         title={isSaved ? 'Saved in Wishlist' : 'Save to Wishlist'}
                       >
@@ -247,7 +247,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         </div>
                       ) : isDiscount ? (
                         <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                          <span className="bg-[#FC6301] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
+                          <span className="bg-[#0084FF] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
                             {item.statusBadge}
                           </span>
                           <span className="line-through text-zinc-500 text-xs font-normal">
@@ -342,8 +342,8 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                           onClick={(e) => handleBookmarkClick(e, item)}
                           className={`absolute top-1 right-1 w-5 h-5 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-150 z-10 active:scale-95 ${
                             isSaved
-                              ? 'bg-[#FC6301] text-white border border-[#FC6301] opacity-100 shadow-xs'
-                              : 'bg-[#121214]/80 text-zinc-300 border border-white/10 hover:border-[#FC6301]/70 hover:text-[#FC6301] hover:bg-[#1c1c20]'
+                              ? 'bg-[#0084FF] text-white border border-[#0084FF] opacity-100 shadow-xs'
+                              : 'bg-[#121214]/80 text-zinc-300 border border-white/10 hover:border-[#0084FF]/70 hover:text-[#0084FF] hover:bg-[#1c1c20]'
                           }`}
                           title={isSaved ? 'Saved in Wishlist' : 'Save to Wishlist'}
                         >
@@ -363,7 +363,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                           </span>
                         ) : isDiscount ? (
                           <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                            <span className="bg-[#FC6301] text-white font-black text-[10px] px-1.5 py-0.5 rounded">
+                            <span className="bg-[#0084FF] text-white font-black text-[10px] px-1.5 py-0.5 rounded">
                               {item.statusBadge}
                             </span>
                             <span className="line-through text-zinc-500 text-[11px] font-normal">

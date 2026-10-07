@@ -154,7 +154,7 @@ export function openPrintableInvoice(
             color: #0f172a;
           }
           .brand-title span {
-            color: #fc6301;
+            color: #0084ff;
           }
           .brand-subtitle {
             font-size: 9.5px;
@@ -172,7 +172,7 @@ export function openPrintableInvoice(
             font-family: 'JetBrains Mono', monospace;
             font-size: 10px;
             font-weight: 800;
-            color: #fc6301;
+            color: #0084ff;
             background: #fff7ed;
             border: 1px solid #fed7aa;
             padding: 4px 10px;
@@ -310,7 +310,7 @@ export function openPrintableInvoice(
           .sum-total .val {
             font-size: 22px;
             font-weight: 900;
-            color: #fc6301;
+            color: #0084ff;
           }
           .actions-bar {
             display: flex;
@@ -319,7 +319,7 @@ export function openPrintableInvoice(
             margin-top: 28px;
           }
           .btn-print {
-            background: #fc6301;
+            background: #0084ff;
             color: #ffffff;
             border: none;
             padding: 12px 28px;

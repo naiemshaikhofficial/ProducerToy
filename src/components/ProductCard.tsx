@@ -203,8 +203,8 @@ export function ProductCard({ product }: { product: Product }) {
           aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
           className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
             isSaved
-              ? 'bg-[#FC6301] text-white border border-[#FC6301] shadow-[0_0_14px_rgba(252,99,1,0.45)] opacity-100 hover:bg-[#e05700] hover:scale-105'
-              : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#FC6301]/70 hover:text-[#FC6301] hover:bg-[#1c1c20] opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-md hover:scale-105'
+              ? 'bg-[#0084FF] text-white border border-[#0084FF] shadow-[0_0_14px_rgba(0, 132, 255,0.45)] opacity-100 hover:bg-[#006fe6] hover:scale-105'
+              : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#0084FF]/70 hover:text-[#0084FF] hover:bg-[#1c1c20] opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-md hover:scale-105'
           }`}
           title={isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
         >
@@ -250,7 +250,7 @@ export function ProductCard({ product }: { product: Product }) {
                 type="button"
                 onClick={handleBrandClick}
                 aria-label={`View brand ${brandName}`}
-                className="text-zinc-300 font-semibold hover:text-[#FC6301] transition-colors cursor-pointer inline-block py-1 -my-1"
+                className="text-zinc-300 font-semibold hover:text-[#0084FF] transition-colors cursor-pointer inline-block py-1 -my-1"
               >
                 {brandName}
               </button>
@@ -269,7 +269,7 @@ export function ProductCard({ product }: { product: Product }) {
           ) : (
             <>
               {discountPercent > 0 && (
-                <span className="text-xs bg-[#FC6301] text-white font-extrabold px-1.5 py-0.5 rounded">
+                <span className="text-xs bg-[#0084FF] text-white font-extrabold px-1.5 py-0.5 rounded">
                   -{discountPercent}%
                 </span>
               )}
