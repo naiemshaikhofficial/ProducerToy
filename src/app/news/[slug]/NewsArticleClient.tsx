@@ -272,8 +272,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white relative overflow-hidden">
       {/* 1:1 Epic Games Sharp Atmospheric Product Background: Full clarity at top behind transparent fixed header, smoothly dissolves down into pure #121212 */}
       <div
-        className="absolute top-0 left-0 right-0 w-full overflow-hidden z-0 pointer-events-none select-none"
-        style={{ height: '620px' }}
+        className="absolute top-0 left-0 right-0 w-full overflow-hidden z-0 pointer-events-none select-none h-[420px] sm:h-[620px]"
       >
         <img
           src={bgCoverSrc}
@@ -287,19 +286,19 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
           }}
         />
-        {/* Rich dark atmospheric tint overlay: Ensures all text is 100% crystal clear and high-contrast, even when the cover image is pure white or brightly colored */}
+        {/* Rich dark atmospheric tint overlay: Ensures all text is 100% crystal clear and high-contrast */}
         <div className="absolute inset-0 bg-[#121212]/75 backdrop-blur-[3px]" />
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(18,18,18,0.75) 0%, rgba(18,18,18,0.92) 200px, #121212 520px)',
+              'linear-gradient(to bottom, rgba(18,18,18,0.75) 0%, rgba(18,18,18,0.92) 200px, #121212 420px)',
           }}
         />
       </div>
 
       {/* Main Page Content Layer */}
-      <div className="relative z-10 px-4 sm:px-6 pt-24 sm:pt-32 lg:pt-38 pb-16 sm:pb-24">
+      <div className="relative z-10 px-3.5 sm:px-6 pt-20 sm:pt-32 lg:pt-38 pb-16 sm:pb-24">
         
         {/* 1:1 Epic Games Centered Header Block: Title + Description in the middle of page */}
         <div
@@ -307,8 +306,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           style={{ maxWidth: '820px', marginLeft: 'auto', marginRight: 'auto' }}
         >
           {/* Top Meta Row: Category Pill + Date + Expiry Status */}
-          <div className="flex flex-wrap items-center gap-3 mb-4 sm:mb-5">
-            <span className="px-3 py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-3.5 sm:mb-5">
+            <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5 shadow-sm">
               {article.category || 'News'}
             </span>
             <span className="text-zinc-400 text-xs sm:text-sm font-medium drop-shadow-sm">
@@ -327,10 +326,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           </div>
 
           {/* 1:1 Epic Games Headline */}
-          <h1 className="text-2xl sm:text-4xl lg:text-[46px] font-black text-white leading-[1.12] tracking-tight mb-5 sm:mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+          <h1 className="text-2xl sm:text-4xl lg:text-[46px] font-black text-white leading-tight sm:leading-[1.12] tracking-tight mb-4 sm:mb-6 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
             {cleanHtmlTitle(article.title)}
             {isExpired && (
-              <span className="ml-2.5 sm:ml-3.5 text-zinc-400 font-bold text-lg sm:text-2xl lg:text-3xl tracking-normal inline-block align-baseline select-none">
+              <span className="ml-2 sm:ml-3.5 text-zinc-400 font-bold text-base sm:text-2xl lg:text-3xl tracking-normal inline-block align-baseline select-none">
                 [Expired]
               </span>
             )}
@@ -338,7 +337,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
           {/* Short Description / Excerpt below Title */}
           {article.excerpt && (
-            <p className="text-base sm:text-lg text-zinc-200 leading-relaxed font-normal mb-10 sm:mb-14 drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)]">
+            <p className="text-sm sm:text-base lg:text-lg text-zinc-200 leading-relaxed font-normal mb-8 sm:mb-14 drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)]">
               {article.excerpt}
             </p>
           )}
@@ -346,10 +345,10 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
         {/* 1:1 Epic Games Hero Image Banner: Website-wide (max-w-[1280px]), NO white border */}
         <div
-          className="w-full mx-auto mb-12 sm:mb-16"
+          className="w-full mx-auto mb-8 sm:mb-16"
           style={{ maxWidth: '1280px', marginLeft: 'auto', marginRight: 'auto' }}
         >
-          <div className="relative aspect-video w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
+          <div className="relative aspect-video w-full rounded-xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
             <img
               src={coverSrc}
               onError={() => setCoverSrc(fallbackPrompt)}
@@ -367,7 +366,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         >
           {/* Prominent 1-Click Copy Coupon Box inside story if coupon exists */}
           {couponCode && (
-            <div className="mb-8 p-4 sm:p-5 bg-[#18181c] border border-[#FC6301]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+            <div className="mb-8 p-3.5 sm:p-5 bg-[#18181c] border border-[#FC6301]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 shadow-xl">
               <div className="flex items-center gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-[#FC6301]/10 border border-[#FC6301]/30 flex items-center justify-center shrink-0 text-[#FC6301]">
                   <Tag className="w-5 h-5" />

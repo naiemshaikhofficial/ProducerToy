@@ -300,22 +300,22 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   }
 
   return (
-    <div className="w-full bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white">
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 lg:pt-16 pb-12 sm:pb-16">
+    <div className="w-full bg-[#121212] text-white selection:bg-[#FC6301] selection:text-white overflow-x-hidden">
+      <div className="max-w-[1240px] mx-auto px-3.5 sm:px-6 lg:px-8 pt-5 sm:pt-12 lg:pt-16 pb-12 sm:pb-16">
 
         {/* Featured Hero Story (1:1 with Epic Games Screenshot) */}
         {featuredArticle && (
-          <div className="mb-10 sm:mb-14">
+          <div className="mb-8 sm:mb-14">
             <Link
               href={`/news/${featuredArticle.slug}`}
               prefetch={true}
-              className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center cursor-pointer"
+              className="group grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-10 items-center cursor-pointer touch-manipulation"
             >
               {/* Left Column: 16:9 Image with 1:1 Epic Games Subtle Ambient Glow */}
               <div className="lg:col-span-7 relative isolate">
-                {/* 1:1 Epic Games Ambient Glow: Contained, soft atmospheric halo directly behind the card, never bleeding into the grid below */}
+                {/* Ambient Glow: Hidden on mobile to prevent horizontal overflow and lag, active on desktop */}
                 <div
-                  className="absolute -inset-3 sm:-inset-5 -z-10 pointer-events-none select-none opacity-30 group-hover:opacity-40 transition-opacity duration-300"
+                  className="hidden sm:block absolute -inset-3 sm:-inset-5 -z-10 pointer-events-none select-none opacity-30 group-hover:opacity-40 transition-opacity duration-300"
                   aria-hidden="true"
                 >
                   <img
@@ -325,7 +325,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   />
                 </div>
 
-                <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#18181c] shadow-2xl">
+                <div className="relative aspect-video w-full rounded-xl sm:rounded-2xl overflow-hidden bg-[#18181c] shadow-xl sm:shadow-2xl">
                   <NewsCardImage
                     src={getHighResCoverImage(featuredArticle.cover_image, featuredArticle.title)}
                     alt={`${cleanHtmlTitle(featuredArticle.title)} - Free Plugin & Audio News - Producer Toy`}
@@ -336,7 +336,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     priority
                   />
                   {/* Category Pill in bottom-left */}
-                  <div className="absolute bottom-3.5 left-3.5 px-3 py-0.5 rounded bg-black/75 backdrop-blur-md text-[11px] font-semibold text-white tracking-wide">
+                  <div className="absolute bottom-2.5 left-2.5 sm:bottom-3.5 sm:left-3.5 px-2.5 sm:px-3 py-0.5 rounded bg-black/80 backdrop-blur-md text-[10px] sm:text-[11px] font-semibold text-white tracking-wide">
                     {featuredArticle.category || 'News'}
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   const heroExpiry = detectDealExpiry(featuredArticle)
                   return (
                     <>
-                      <div className="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-semibold text-zinc-300 mb-2.5 tracking-wide">
+                      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-semibold text-zinc-300 mb-2 sm:mb-2.5 tracking-wide">
                         {featuredArticle.badge && (
                           <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
                             ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
@@ -368,10 +368,10 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                           </span>
                         ) : null}
                       </div>
-                      <h1 className="text-2xl sm:text-3xl lg:text-[32px] font-black text-white leading-[1.2] tracking-tight mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
+                      <h1 className="text-xl sm:text-2xl lg:text-[32px] font-black text-white leading-tight sm:leading-[1.2] tracking-tight mb-3.5 sm:mb-5 line-clamp-3 group-hover:text-zinc-200 transition-colors">
                         {cleanHtmlTitle(featuredArticle.title)}
                         {heroExpiry.isExpired && (
-                          <span className="ml-2 text-zinc-400 font-bold text-lg sm:text-2xl tracking-normal inline-block align-baseline select-none">
+                          <span className="ml-2 text-zinc-400 font-bold text-base sm:text-2xl tracking-normal inline-block align-baseline select-none">
                             [Expired]
                           </span>
                         )}
@@ -380,7 +380,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   )
                 })()}
                 <div>
-                  <span className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
+                  <span className="inline-flex w-full sm:w-auto items-center justify-center px-5 py-2.5 rounded-xl bg-[#FC6301] hover:bg-[#e05800] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#FC6301]/30">
                     Read more
                   </span>
                 </div>
@@ -391,7 +391,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
 
         {/* 3-Column Card Grid (1:1 with Epic Games - Compact, Sleek Cards) */}
         {gridArticles.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-14">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5 mb-10 sm:mb-14">
             {gridArticles.map((article, idx) => {
               const cardExpiry = detectDealExpiry(article)
               return (
@@ -399,7 +399,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   key={article.id || idx}
                   href={`/news/${article.slug}`}
                   prefetch={true}
-                  className="group flex flex-col bg-[#1a1a1e] hover:bg-[#222228] rounded-2xl p-2.5 sm:p-3 border-0 transition-all duration-200 cursor-pointer shadow-md"
+                  className="group flex flex-col bg-[#18181c] hover:bg-[#202024] active:bg-[#25252a] rounded-2xl p-2.5 sm:p-3 border border-white/[0.04] transition-all duration-200 cursor-pointer shadow-md touch-manipulation"
                 >
                   {/* 16:9 Inset Image with rounded corners */}
                   <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#141416]">
@@ -431,7 +431,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                         </span>
                       ) : null}
                     </div>
-                    <h2 className="text-[14px] sm:text-[14.5px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
+                    <h2 className="text-[14.5px] sm:text-[14.5px] font-bold text-white group-hover:text-zinc-200 transition-colors leading-snug line-clamp-2">
                       {cleanHtmlTitle(article.title)}
                       {cardExpiry.isExpired && (
                         <span className="ml-1.5 text-zinc-400 font-bold text-xs sm:text-sm tracking-normal inline-block align-baseline select-none">
@@ -451,7 +451,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
           <div className="text-center pt-2 pb-4">
             <button
               onClick={() => setVisibleCount((prev) => prev + 9)}
-              className="px-8 py-3 bg-[#1a1a1e] hover:bg-[#222228] text-white font-bold text-xs sm:text-sm rounded-xl border-0 active:scale-95 transition-all shadow-md cursor-pointer"
+              className="w-full sm:w-auto px-8 py-3.5 sm:py-3 bg-[#18181c] hover:bg-[#222228] active:bg-[#282830] text-white font-bold text-xs sm:text-sm rounded-xl border border-white/[0.06] active:scale-[0.99] transition-all shadow-md cursor-pointer touch-manipulation"
             >
               Load More
             </button>
@@ -459,7 +459,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
         )}
 
         {/* Minimalist Plain Text Telegram Channel Note */}
-        <TelegramNewsBanner className="pt-2 pb-10" />
+        <TelegramNewsBanner className="pt-2 pb-8 sm:pb-10" />
       </div>
     </div>
   )
