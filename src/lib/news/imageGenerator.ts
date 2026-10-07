@@ -99,6 +99,19 @@ export function isForbiddenCoverImageUrl(url?: string | null): boolean {
     return true
   }
 
+  // Strictly block generic store / marketplace logo graphics (Gumroad pink logo, Patreon logo, BuyMeACoffee, etc.)
+  if (
+    lower.includes('assets.gumroad.com/images/opengraph_image.png') ||
+    lower.includes('opengraph_image.png') ||
+    lower.includes('gumroad.com/images/') ||
+    lower.includes('ppy1r0hgbq0o7t4qesbjl7ifihd8') ||
+    lower.includes('patreon.com/user/avatar') ||
+    lower.includes('buymeacoffee.com/assets') ||
+    lower.includes('ko-fi.com')
+  ) {
+    return true
+  }
+
   // Block excluded gift banners & headshots
   if (PB_EXCLUDED_BANNER_HASHES.some(h => lower.includes(h))) {
     return true

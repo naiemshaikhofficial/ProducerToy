@@ -230,7 +230,36 @@ async function createBrandedCoverImage(photoUrl: string): Promise<Buffer | null>
 }
 
 /**
- * Formats a NewsArticle into a high-converting, clean HTML caption for Telegram
+ * Extracts a concise 1-2 sentence description for clean Telegram formatting
+ */
+function extractShortDescription(article: NewsArticle): string {
+  let text = (article.excerpt || article.content || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/###?[^\n]+/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/&#\d+;/g, '')
+    .replace(/&[a-z]+;/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  const sentences = text.match(/[^.!?]+[.!?]+/g)
+  if (sentences && sentences.length > 0) {
+    let result = sentences[0].trim()
+    if (result.length < 90 && sentences[1]) {
+      result += ' ' + sentences[1].trim()
+    }
+    if (result.length > 180) {
+      result = result.slice(0, 175).trim() + '...'
+    }
+    return result
+  }
+
+  return text.slice(0, 150).trim() + (text.length > 150 ? '...' : '')
+}
+
+/**
+ * Formats a NewsArticle into a high-converting, clean HTML caption for Telegram:
+ * Concise title + clean offer summary + short 1-2 sentence description.
  */
 export function formatTelegramCaption(article: NewsArticle): string {
   const lines: string[] = []
@@ -239,7 +268,7 @@ export function formatTelegramCaption(article: NewsArticle): string {
   lines.push(`🔥 <b>${escapeHtml(article.title)}</b>`)
   lines.push('')
 
-  // 2. Pricing & Badge
+  // 2. Clean Offer Line (Short & punchy with price, discount & deadline)
   const hasPaidPrice = Boolean(
     article.deal_price &&
     article.deal_price !== '$0' &&
@@ -253,46 +282,36 @@ export function formatTelegramCaption(article: NewsArticle): string {
     article.deal_price?.toLowerCase() === 'free'
   )
 
+  const discount =
+    (article.specs && typeof article.specs === 'object' && article.specs['Discount']) ||
+    article.title.match(/(\d+%\s*OFF)/i)?.[1]?.toUpperCase() ||
+    (article.badge?.includes('%') ? article.badge : null)
+
+  const validUntil =
+    (article.specs && typeof article.specs === 'object' && (article.specs['Valid Until'] || article.specs['Expiry Date'])) ||
+    null
+
   if (isFree) {
-    lines.push(`🎁 <b>Offer:</b> 100% FREE (Limited Time)`)
+    lines.push(`🎁 <b>Offer:</b> 100% FREE${validUntil ? ` (Until ${escapeHtml(validUntil)})` : ' (Limited Time)'}`)
   } else if (article.deal_price) {
-    const reg = article.deal_regular_price ? ` (Regular ${article.deal_regular_price})` : ''
-    lines.push(`💰 <b>Price:</b> ${article.deal_price}${reg}`)
-  }
-
-  // 3. Key Specs (Discount, Valid Until, Requirement)
-  if (article.specs && typeof article.specs === 'object') {
-    const discount = article.specs['Discount']
-    const validUntil = article.specs['Valid Until'] || article.specs['Expiry Date']
-    const requirement = article.specs['Requirement']
-    const format = article.specs['Format']
-    const license = article.specs['License']
-
-    if (discount && !isFree) lines.push(`🏷️ <b>Discount:</b> ${escapeHtml(discount)}`)
-    if (format) lines.push(`🎛️ <b>Format:</b> ${escapeHtml(format)}`)
-    if (requirement) lines.push(`📋 <b>Requirement:</b> ${escapeHtml(requirement)}`)
-    if (license) lines.push(`🔑 <b>License:</b> ${escapeHtml(license)}`)
-    if (validUntil) lines.push(`⏳ <b>Ends:</b> ${escapeHtml(validUntil)}`)
-  }
-
-  lines.push('')
-
-  // 4. Concise Excerpt / Summary
-  if (article.excerpt) {
-    const cleanExcerpt = article.excerpt
-      .replace(/&#\d+;/g, '')
-      .replace(/&[a-z]+;/gi, '')
-      .trim()
-    if (cleanExcerpt) {
-      lines.push(`${escapeHtml(cleanExcerpt)}`)
-      lines.push('')
+    const reg = article.deal_regular_price ? ` • Regular ${article.deal_regular_price}` : ''
+    const disc = discount ? ` (${discount})` : ''
+    lines.push(`💰 <b>Offer:</b> ${article.deal_price}${disc}${reg}`)
+    if (validUntil) {
+      lines.push(`⏳ <b>Ends:</b> ${escapeHtml(validUntil)}`)
     }
   }
 
-  // 5. Official ProducerToy News & Website Branding
-  lines.push(`📰 <b>Read More Deals:</b> <a href="https://producertoy.com/news">producertoy.com/news</a>`)
-  lines.push(`🌐 <b>Website:</b> <a href="https://producertoy.com">producertoy.com</a>`)
-  lines.push(`📢 <i>Follow @producertoynews for instant audio gear & plugin deals!</i>`)
+  // 3. Short Punchy Description (not overloaded with specs)
+  const shortDesc = extractShortDescription(article)
+  if (shortDesc) {
+    lines.push('')
+    lines.push(escapeHtml(shortDesc))
+  }
+
+  // 4. Subtle Channel Link
+  lines.push('')
+  lines.push(`📢 <i>Join @producertoynews for instant audio gear & plugin deals!</i>`)
 
   let caption = lines.join('\n')
   // Telegram captions are limited to 1024 characters

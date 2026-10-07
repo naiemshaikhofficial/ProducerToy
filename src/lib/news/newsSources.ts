@@ -66,7 +66,13 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     lower.includes('gravatar.com') ||
     lower.includes('wordpress.org') ||
     lower.includes('w3.org') ||
-    lower.includes('schema.org')
+    lower.includes('schema.org') ||
+    lower.includes('bpb.gumroad.com') ||
+    lower.includes('/coffee') ||
+    lower.includes('/donate') ||
+    lower.includes('/license-key-lookup') ||
+    lower.includes('gumroad.com/login') ||
+    lower.includes('gumroad.com/signup')
   ) {
     return null
   }
@@ -1215,9 +1221,34 @@ function parseRssItems(
 
     if (!title || !link) continue
 
-    // PubDate
+    // PubDate & Strict Freshness Check
     const dateMatch = block.match(/<pubDate>([\s\S]*?)<\/pubDate>/i)
     const pubDate = dateMatch ? dateMatch[1].trim() : new Date().toUTCString()
+    const parsedTime = new Date(pubDate).getTime()
+    if (!isNaN(parsedTime)) {
+      const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000
+      if (Date.now() - parsedTime > thirtyDaysMs || new Date(pubDate).getFullYear() < 2026) {
+        // Skip ancient or historical archive items
+        continue
+      }
+    }
+
+    // Strict Rejection: Reject tip-jars, coffee donations, or competitor personal blog pages
+    const lowerLink = link.toLowerCase()
+    const lowerTitle = title.toLowerCase()
+    if (
+      lowerLink.includes('coffee') ||
+      lowerLink.includes('donate') ||
+      lowerLink.includes('license-key-lookup') ||
+      lowerLink.includes('bpb.gumroad') ||
+      lowerTitle.includes('bedroom producers blog') ||
+      lowerTitle.includes('bedroomproducersblog') ||
+      lowerTitle.includes('synthanatomy') ||
+      lowerTitle.includes('noizefield') ||
+      lowerTitle.includes('rekkerd')
+    ) {
+      continue
+    }
 
     // Creator / Author
     const creatorMatch =
