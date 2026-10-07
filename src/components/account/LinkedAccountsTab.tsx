@@ -199,7 +199,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
         profile?.full_name ||
         profile?.display_name ||
         existing.google?.handle ||
-        (googleEmail ? googleEmail.split('@')[0] : 'Naiem Shaikh')
+        (googleEmail ? googleEmail.split('@')[0] : 'User')
 
       merged.google = {
         handle: googleName,
@@ -382,7 +382,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
             profile?.full_name ||
             activeUser?.user_metadata?.full_name ||
             activeUser?.user_metadata?.name ||
-            (activeUser?.email ? activeUser.email.split('@')[0] : 'Naiem Shaikh')
+            (activeUser?.email ? activeUser.email.split('@')[0] : 'User')
 
           const handle = isGoogle
             ? (isLinked ? googleHandle : 'Not connected')
@@ -396,7 +396,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                 day: 'numeric',
                 year: 'numeric',
               })
-            : '12/14/2023'
+            : ''
 
           return (
             <div
@@ -666,7 +666,7 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
                 type="text"
                 value={oauthHandleInput}
                 onChange={(e) => setOauthHandleInput(e.target.value)}
-                placeholder="e.g. @naiemmusic"
+                placeholder="e.g. @producertoy"
                 className="w-full bg-[#202020] border border-[#333333] focus:border-zinc-400 text-white text-sm rounded-xl px-4 py-3 focus:outline-none"
               />
             </div>

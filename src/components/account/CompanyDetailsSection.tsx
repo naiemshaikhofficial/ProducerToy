@@ -35,6 +35,14 @@ export const CompanyDetailsSection: React.FC<CompanyDetailsSectionProps> = ({
       setCompanyCity(profile.company_city || '')
       setCompanyRegion(profile.company_region || '')
       setCompanyPostal(profile.company_postal_code || '')
+    } else {
+      setCompanyName('')
+      setCompanyVat('')
+      setCompanyAddress1('')
+      setCompanyAddress2('')
+      setCompanyCity('')
+      setCompanyRegion('')
+      setCompanyPostal('')
     }
   }, [profile])
 

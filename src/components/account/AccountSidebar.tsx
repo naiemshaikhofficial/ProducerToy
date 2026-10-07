@@ -12,8 +12,10 @@ import {
   Tag,
   Key,
   ChevronDown,
+  LogOut,
 } from 'lucide-react'
 import { ToywardsSparkleIcon } from './RewardsAndWalletTab'
+import { useAuth } from '@/context/AuthContext'
 
 export type AccountTab =
   | 'settings'
@@ -36,6 +38,7 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
   activeTab,
   onSelectTab,
 }) => {
+  const { signOut } = useAuth()
   return (
     <div className="bg-[#161616] border border-[#222222] rounded-[20px] p-4 sm:p-5 space-y-6 select-none">
       
@@ -191,6 +194,18 @@ export const AccountSidebar: React.FC<AccountSidebarProps> = ({
             <span>Redeem code</span>
           </button>
         </div>
+      </div>
+
+      {/* Sign Out Option */}
+      <div className="pt-2 border-t border-[#222222]">
+        <button
+          type="button"
+          onClick={() => signOut()}
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[14px] font-medium text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 transition-all text-left w-full cursor-pointer"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Sign Out</span>
+        </button>
       </div>
 
     </div>

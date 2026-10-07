@@ -18,10 +18,17 @@ import { RedeemCodeTab } from './RedeemCodeTab'
 import { TransactionsTab } from './TransactionsTab'
 import { RewardsAndWalletTab } from './RewardsAndWalletTab'
 import { updatePersonalDetailsAction } from '@/actions/accountActions'
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { useAuth } from '@/context/AuthContext'
 
-export default function EpicAccountClient() {
+interface EpicAccountClientProps {
+  initialUser?: any
+}
+
+export default function EpicAccountClient({ initialUser }: EpicAccountClientProps = {}) {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { user: authUser, profile: authProfile, loading: authLoading } = useAuth()
   
   const validTabs: AccountTab[] = [
     'settings',
@@ -37,14 +44,14 @@ export default function EpicAccountClient() {
   ]
 
   const tabQuery = searchParams.get('tab') as AccountTab
-  const initialTab: AccountTab = (tabQuery && validTabs.includes(tabQuery)) ? tabQuery : 'rewards'
+  const initialTab: AccountTab = (tabQuery && validTabs.includes(tabQuery)) ? tabQuery : 'settings'
 
   const [activeTab, setActiveTabState] = useState<AccountTab>(initialTab)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<any>(initialUser || null)
   const [profile, setProfile] = useState<any>(null)
-  const [displayName, setDisplayName] = useState('Naiem Shaikh')
+  const [displayName, setDisplayName] = useState('')
   const [saveSuccess, setSaveSuccess] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!initialUser)
 
   // Keep activeTab in sync if URL query changes
   useEffect(() => {
@@ -62,21 +69,22 @@ export default function EpicAccountClient() {
     }
   }
 
+  // Load and synchronize user and profile data
   const loadUserData = React.useCallback(async () => {
     try {
       const supabase = getSupabaseBrowserClient()
       const {
-        data: { user },
+        data: { user: currentUser },
       } = await supabase.auth.getUser()
 
-      if (user) {
-        setUser(user)
+      if (currentUser) {
+        setUser(currentUser)
 
         // Fetch full profile from Supabase
         const { data: prof } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
+          .eq('id', currentUser.id)
           .maybeSingle()
 
         if (prof) {
@@ -84,8 +92,8 @@ export default function EpicAccountClient() {
           const name =
             prof.display_name ||
             prof.full_name ||
-            user.user_metadata?.full_name ||
-            (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
+            currentUser.user_metadata?.full_name ||
+            (currentUser.email ? currentUser.email.split('@')[0] : 'User')
           setDisplayName(name)
           if (typeof window !== 'undefined' && prof.display_name) {
             window.dispatchEvent(
@@ -96,14 +104,21 @@ export default function EpicAccountClient() {
           }
         } else {
           const name =
-            user.user_metadata?.full_name ||
-            user.user_metadata?.display_name ||
-            (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
+            currentUser.user_metadata?.full_name ||
+            currentUser.user_metadata?.display_name ||
+            (currentUser.email ? currentUser.email.split('@')[0] : 'User')
           setDisplayName(name)
         }
+      } else {
+        setUser(null)
+        setProfile(null)
+        setDisplayName('')
       }
     } catch (err) {
       console.warn('Error loading account user:', err)
+      setUser(null)
+      setProfile(null)
+      setDisplayName('')
     } finally {
       setLoading(false)
     }
@@ -112,6 +127,48 @@ export default function EpicAccountClient() {
   useEffect(() => {
     loadUserData()
   }, [loadUserData])
+
+  // Synchronize with AuthContext auth state changes
+  useEffect(() => {
+    if (!authLoading && !authUser) {
+      setUser(null)
+      setProfile(null)
+      setDisplayName('')
+      router.replace('/auth?next=/account')
+    } else if (authUser) {
+      setUser(authUser)
+      if (authProfile) {
+        setProfile(authProfile)
+        setDisplayName(authProfile.display_name || authProfile.full_name || (authUser.email ? authUser.email.split('@')[0] : 'User'))
+      }
+    }
+  }, [authUser, authProfile, authLoading, router])
+
+  // Listen to realtime auth events (e.g. logging out from navbar)
+  useEffect(() => {
+    const handleAuthChanged = (e: any) => {
+      if (!e.detail?.user) {
+        setUser(null)
+        setProfile(null)
+        setDisplayName('')
+        router.replace('/auth')
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pt:auth-changed', handleAuthChanged)
+      return () => {
+        window.removeEventListener('pt:auth-changed', handleAuthChanged)
+      }
+    }
+  }, [router])
+
+  // If user is not authenticated, redirect to /auth
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/auth?next=/account')
+    }
+  }, [loading, user, router])
 
   const handleSaveDisplayName = async (name: string) => {
     setDisplayName(name)
@@ -143,8 +200,9 @@ export default function EpicAccountClient() {
   }
 
   // Masked email representation e.g. n***l@gmail.com
-  const emailRaw = user?.email || 'naiemshaikh@gmail.com'
+  const emailRaw = user?.email || ''
   const maskedEmail = (() => {
+    if (!emailRaw) return ''
     const parts = emailRaw.split('@')
     if (parts.length < 2) return emailRaw
     const name = parts[0]
@@ -154,7 +212,17 @@ export default function EpicAccountClient() {
   })()
 
   // Account ID (deterministic or user ID)
-  const accountId = user?.id?.replace(/-/g, '') || 'aaa2e39926844d188fc5f27e8bc39912'
+  const accountId = user?.id ? user.id.replace(/-/g, '') : ''
+
+  // If loading or unauthenticated, display safe loading state rather than empty/stale account data
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-[#121212] flex flex-col items-center justify-center space-y-4">
+        <ButtonSpinner size={28} variant="light" />
+        <p className="text-xs text-zinc-400 font-medium">Securing account session...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#121212] text-white">

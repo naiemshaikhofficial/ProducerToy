@@ -102,6 +102,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fetchProfile(currentUser.id)
       } else {
         setProfile(null)
+        // Clear all cached profile and user-specific storage when user is signed out
+        if (typeof window !== 'undefined') {
+          try {
+            Object.keys(localStorage).forEach((key) => {
+              if (
+                key.startsWith('pt_profile_') ||
+                key === 'pt_billing_details' ||
+                key === 'pt_user_gifts' ||
+                key === 'pt_pending_gifts' ||
+                key === 'producertoy_user_tickets' ||
+                key === 'producertoy_support_chat_session_v1' ||
+                key.startsWith('sb-') ||
+                key.startsWith('supabase.auth.')
+              ) {
+                localStorage.removeItem(key)
+              }
+            })
+            sessionStorage.clear()
+          } catch {}
+
+          if (event === 'SIGNED_OUT') {
+            window.dispatchEvent(new CustomEvent('pt:profile-updated', { detail: null }))
+            window.dispatchEvent(new CustomEvent('pt:auth-changed', { detail: { user: null } }))
+            const currentPath = window.location.pathname
+            if (currentPath.startsWith('/account') || currentPath.startsWith('/library')) {
+              window.location.replace('/auth')
+            }
+          }
+        }
       }
       setLoading(false)
 
@@ -131,6 +160,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           return updated
         })
+      } else {
+        setProfile(null)
       }
     }
 
@@ -144,14 +175,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     const supabase = createClient()
-    if (user?.id && typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') {
       try {
-        localStorage.removeItem(`pt_profile_${user.id}`)
+        // Thoroughly clear all user-specific data from localStorage and sessionStorage
+        Object.keys(localStorage).forEach((key) => {
+          if (
+            key.startsWith('pt_profile_') ||
+            key === 'pt_billing_details' ||
+            key === 'pt_user_gifts' ||
+            key === 'pt_pending_gifts' ||
+            key === 'producertoy_user_tickets' ||
+            key === 'producertoy_support_chat_session_v1' ||
+            key.startsWith('sb-') ||
+            key.startsWith('supabase.auth.')
+          ) {
+            localStorage.removeItem(key)
+          }
+        })
+        sessionStorage.clear()
       } catch {}
     }
+    
     await supabase.auth.signOut()
     setUser(null)
     setProfile(null)
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('pt:profile-updated', { detail: null }))
+      window.dispatchEvent(new CustomEvent('pt:auth-changed', { detail: { user: null } }))
+
+      // If user logs out while on /account or /library, instantly redirect to /auth
+      const currentPath = window.location.pathname
+      if (currentPath.startsWith('/account') || currentPath.startsWith('/library')) {
+        window.location.replace('/auth')
+      }
+    }
   }
 
   return (

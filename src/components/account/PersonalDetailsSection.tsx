@@ -41,6 +41,15 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
       setRegion(profile.region || profile.state || '')
       setPostalCode(profile.postal_code || '')
       setCountry(profile.country || 'INDIA')
+    } else {
+      setFirstName('')
+      setLastName('')
+      setAddressLine1('')
+      setAddressLine2('')
+      setCity('')
+      setRegion('')
+      setPostalCode('')
+      setCountry('INDIA')
     }
   }, [profile])
 

@@ -21,6 +21,10 @@ export default async function LibraryPage() {
     console.warn('SSR auth check note:', err)
   }
 
+  if (!user) {
+    redirect('/auth?next=/library')
+  }
+
   let purchases: any[] = []
   const downloadTokens: Record<string, string> = {}
 

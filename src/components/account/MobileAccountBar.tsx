@@ -13,9 +13,11 @@ import {
   Key,
   ChevronDown,
   X,
+  LogOut,
 } from 'lucide-react'
 import { ToywardsSparkleIcon } from './RewardsAndWalletTab'
 import { AccountTab } from './AccountSidebar'
+import { useAuth } from '@/context/AuthContext'
 
 interface MobileAccountBarProps {
   activeTab: AccountTab
@@ -40,6 +42,7 @@ export const MobileAccountBar: React.FC<MobileAccountBarProps> = ({
   onSelectTab,
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const { signOut } = useAuth()
 
   const handleSelect = (tab: AccountTab) => {
     onSelectTab(tab)
@@ -134,6 +137,21 @@ export const MobileAccountBar: React.FC<MobileAccountBarProps> = ({
                   )
                 })}
               </div>
+            </div>
+
+            {/* Mobile Sign Out Option */}
+            <div className="pt-3 border-t border-[#1e1e1e]">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false)
+                  signOut()
+                }}
+                className="flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-[14px] font-medium text-[#ff4053] hover:text-white hover:bg-[#ff4053]/15 transition-colors text-left w-full cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign Out</span>
+              </button>
             </div>
           </div>
         </>
