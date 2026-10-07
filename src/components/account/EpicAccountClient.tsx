@@ -87,6 +87,13 @@ export default function EpicAccountClient() {
             user.user_metadata?.full_name ||
             (user.email ? user.email.split('@')[0] : 'Naiem Shaikh')
           setDisplayName(name)
+          if (typeof window !== 'undefined' && prof.display_name) {
+            window.dispatchEvent(
+              new CustomEvent('pt:profile-updated', {
+                detail: { display_name: prof.display_name, full_name: prof.full_name },
+              })
+            )
+          }
         } else {
           const name =
             user.user_metadata?.full_name ||
@@ -109,6 +116,13 @@ export default function EpicAccountClient() {
   const handleSaveDisplayName = async (name: string) => {
     setDisplayName(name)
     if (!user) return
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('pt:profile-updated', {
+          detail: { display_name: name, full_name: name },
+        })
+      )
+    }
     try {
       const supabase = getSupabaseBrowserClient()
       await updatePersonalDetailsAction(user.id, {

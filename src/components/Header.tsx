@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
   const pathname = usePathname()
   const { items, setIsCartOpen } = useCart()
   const { currency, setCurrency } = useCurrency()
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [isScrolled, setIsScrolled] = useState(false)
@@ -220,6 +220,7 @@ export const Header: React.FC = () => {
           currency={currency}
           onToggleCurrency={toggleCurrency}
           user={user}
+          profile={profile}
           onSignOut={signOut}
           itemCount={items.length}
           onOpenCart={() => setIsCartOpen(true)}
@@ -272,6 +273,7 @@ export const Header: React.FC = () => {
         currency={currency}
         onToggleCurrency={toggleCurrency}
         user={user}
+        profile={profile}
         onSignOut={signOut}
         isSiteVariant={isSitePage}
       />

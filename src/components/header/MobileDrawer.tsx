@@ -35,6 +35,7 @@ interface MobileDrawerProps {
   currency: string
   onToggleCurrency: () => void
   user: any
+  profile?: any
   onSignOut?: () => void
   isSiteVariant?: boolean
 }
@@ -45,6 +46,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   currency,
   onToggleCurrency,
   user,
+  profile,
   onSignOut,
   isSiteVariant = false,
 }) => {
@@ -76,13 +78,16 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
     setMobileExpandedCat(mobileExpandedCat === catKey ? null : catKey)
   }
 
-  // Derive initial and display name from user
+  // Derive initial and display name from profile / user (matching Account Settings)
   const displayName = user
-    ? user.user_metadata?.full_name ||
-    user.user_metadata?.name ||
-    (user.email ? user.email.split('@')[0] : 'Producer')
+    ? profile?.display_name ||
+      profile?.full_name ||
+      user.user_metadata?.display_name ||
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      (user.email ? user.email.split('@')[0] : 'Producer')
     : ''
-  const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
+  const initialLetter = displayName ? displayName.trim().charAt(0).toUpperCase() : 'P'
 
   return (
     <div className="fixed inset-x-0 bottom-0 top-[58px] z-[55] bg-[#121212] flex flex-col md:hidden animate-in slide-in-from-right duration-200 overflow-y-auto overscroll-contain">

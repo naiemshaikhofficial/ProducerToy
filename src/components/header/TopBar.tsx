@@ -43,6 +43,7 @@ interface TopBarProps {
   currency: string
   onToggleCurrency: () => void
   user: any
+  profile?: any
   onSignOut?: () => void
   itemCount: number
   onOpenCart: () => void
@@ -55,6 +56,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   currency,
   onToggleCurrency,
   user,
+  profile,
   onSignOut,
   itemCount,
   onOpenCart,
@@ -243,13 +245,16 @@ export const TopBar: React.FC<TopBarProps> = ({
     }
   }, [isAccountMenuOpen, isGlobeMenuOpen, isEcosystemOpen, isDistributeOpen, isAboutOpen])
 
-  // Derive initial and display name only when user is present
+  // Derive initial and display name prioritizing profile display_name (matching Account Settings)
   const displayName = user
-    ? user.user_metadata?.full_name ||
-    user.user_metadata?.name ||
-    (user.email ? user.email.split('@')[0] : 'Producer')
+    ? profile?.display_name ||
+      profile?.full_name ||
+      user.user_metadata?.display_name ||
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      (user.email ? user.email.split('@')[0] : 'Producer')
     : ''
-  const initialLetter = displayName ? displayName[0].toUpperCase() : 'P'
+  const initialLetter = displayName ? displayName.trim().charAt(0).toUpperCase() : 'P'
 
   return (
     <div className="w-full bg-transparent border-none">
