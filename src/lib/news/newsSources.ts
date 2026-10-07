@@ -53,12 +53,12 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     lower.includes('attackmagazine.com') ||
     lower.includes('news.google.com') ||
     lower.includes('producertoy.com') ||
-    lower.includes('t.me') ||
+    /(?:^|\/|\.)t\.me(?:\/|$)/.test(lower) ||
     lower.includes('telegram.org') ||
     lower.includes('telesco.pe') ||
     lower.includes('facebook.com') ||
     lower.includes('twitter.com') ||
-    lower.includes('x.com') ||
+    /(?:^|\/|\.)x\.com(?:\/|$)/.test(lower) ||
     lower.includes('instagram.com') ||
     lower.includes('youtube.com') ||
     lower.includes('youtu.be') ||
@@ -450,6 +450,30 @@ export const MUSIC_NEWS_FEEDS: Array<{
     name: 'Gearnews',
     url: 'https://www.gearnews.com/feed/',
     categoryDefault: 'Tech & Gear',
+    isPrimary: false,
+  },
+  {
+    name: 'BPB (Dedicated Free VSTs & Freeware)',
+    url: 'https://news.google.com/rss/search?q=site:bedroomproducersblog.com+(free+vst+OR+freeware+OR+giveaway)&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Free VSTs',
+    isPrimary: true,
+  },
+  {
+    name: 'Noizefield (Free Plugins & Deals)',
+    url: 'https://news.google.com/rss/search?q=site:noizefield.com+(free+OR+deal+OR+vst)&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Free VSTs',
+    isPrimary: true,
+  },
+  {
+    name: 'Synthanatomy (Synth Deals & Freebies)',
+    url: 'https://news.google.com/rss/search?q=site:synthanatomy.com+(deal+OR+free+OR+sale+OR+vst)&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Deals & Sales',
+    isPrimary: true,
+  },
+  {
+    name: 'KVR Audio (Specials & Deals)',
+    url: 'https://news.google.com/rss/search?q=site:kvraudio.com/news+(deal+OR+sale+OR+discount+OR+free)&hl=en-US&gl=US&ceid=US:en',
+    categoryDefault: 'Deals & Sales',
     isPrimary: false,
   },
 ]
@@ -1134,8 +1158,9 @@ export function calculateItemPriority(item: RawFeedItem): number {
  * Applies priority scoring: FREE plugins rank first, followed by verified top deals.
  */
 export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
-  const [tgResult, pbResult, pdResult, rssResult] = await Promise.allSettled([
+  const [tgResult, tgVstDealsResult, pbResult, pdResult, rssResult] = await Promise.allSettled([
     fetchTelegramChannelFeedItems('legalvst'),
+    fetchTelegramChannelFeedItems('vstdeals'),
     fetchPluginBoutiqueDealsFeedItems(),
     fetchPluginDealsFeedItems(),
     fetchRssFeedsConcurrently(),
@@ -1143,6 +1168,7 @@ export async function fetchMusicNewsFeedItems(): Promise<RawFeedItem[]> {
 
   const allItems: RawFeedItem[] = []
   if (tgResult.status === 'fulfilled') allItems.push(...tgResult.value)
+  if (tgVstDealsResult.status === 'fulfilled') allItems.push(...tgVstDealsResult.value)
   if (pbResult.status === 'fulfilled') allItems.push(...pbResult.value)
   if (pdResult.status === 'fulfilled') allItems.push(...pdResult.value)
   if (rssResult.status === 'fulfilled') allItems.push(...rssResult.value)

@@ -382,7 +382,7 @@ export async function resolveProductBannerImage(
             fullUrl.includes('patreon') ||
             fullUrl.includes('reddit') ||
             fullUrl.includes('youtube') ||
-            fullUrl.includes('x.com') ||
+            /(?:^|\/|\.)x\.com(?:\/|$)/.test(fullUrl) ||
             fullUrl.includes('facebook')
           ) {
             continue
