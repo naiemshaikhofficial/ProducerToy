@@ -18,6 +18,8 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // 60 seconds
 
 let isSyncing = false
+let syncStartTime = 0
+const SYNC_LOCK_TTL_MS = 120_000 // 2 minutes auto-expiration
 
 export async function GET(req: Request) {
   return handleSync(req)
@@ -43,8 +45,9 @@ async function handleSync(req: Request) {
     }
   }
 
-  // Prevent concurrent overlapping sync runs
-  if (isSyncing) {
+  // Prevent concurrent overlapping sync runs (auto-expire after 2 mins if a previous run crashed or timed out)
+  const isCurrentlySyncing = isSyncing && Date.now() - syncStartTime < SYNC_LOCK_TTL_MS
+  if (isCurrentlySyncing) {
     return NextResponse.json({
       success: true,
       status: 'already_syncing',
@@ -56,6 +59,7 @@ async function handleSync(req: Request) {
   // Synchronous mode (if explicitly requested with ?wait=true)
   if (shouldWait) {
     isSyncing = true
+    syncStartTime = Date.now()
     try {
       const result = await executeSyncJob(limitParam)
       return NextResponse.json(result)
@@ -64,6 +68,7 @@ async function handleSync(req: Request) {
       return NextResponse.json({ success: false, error: err?.message || String(err) }, { status: 500 })
     } finally {
       isSyncing = false
+      syncStartTime = 0
     }
   }
 
@@ -71,6 +76,7 @@ async function handleSync(req: Request) {
   // Return instant 200 OK response to browser/Cloudflare to prevent 504 Gateway Timeouts,
   // then execute the full synchronization in Next.js after() background lifecycle.
   isSyncing = true
+  syncStartTime = Date.now()
   after(async () => {
     try {
       await executeSyncJob(limitParam)
@@ -78,6 +84,7 @@ async function handleSync(req: Request) {
       console.error('[Background News Sync Error]:', err)
     } finally {
       isSyncing = false
+      syncStartTime = 0
     }
   })
 

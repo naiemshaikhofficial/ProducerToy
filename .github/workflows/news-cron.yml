@@ -2,8 +2,8 @@ name: ProducerToy News Auto Sync
 
 on:
   schedule:
-    # Runs every 1 hour (At minute 0 of every hour)
-    - cron: '0 * * * *'
+    # Runs at minute 17 and 47 every hour (off-peak avoids GitHub runner queue delays at minute 0)
+    - cron: '17,47 * * * *'
   workflow_dispatch: # Allows 1-click manual trigger from GitHub Actions tab
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Trigger ProducerToy News Sync
         run: |
           echo "Triggering ProducerToy news sync at $(date -u)..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 55 -X GET "https://producertoy.com/api/news/sync?limit=2" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 55 -X GET "https://producertoy.com/api/news/sync?limit=1" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
           HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
 
@@ -25,7 +25,7 @@ jobs:
           echo "$HTTP_BODY"
 
           if [ "$HTTP_STATUS" -ne 200 ]; then
-            echo "⚠️ First attempt received status $HTTP_STATUS. Waiting 5s and retrying with limit=1..."
+            echo "⚠️ First attempt received status $HTTP_STATUS. Waiting 5s and retrying..."
             sleep 5
             RETRY_RESP=$(curl -s -w "\n%{http_code}" --max-time 50 -X GET "https://producertoy.com/api/news/sync?limit=1" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
             RETRY_BODY=$(echo "$RETRY_RESP" | sed '$d')
@@ -41,4 +41,8 @@ jobs:
             fi
           fi
 
-          echo "✅ News sync completed successfully!"
+          if echo "$HTTP_BODY" | grep -q '"already_syncing"'; then
+            echo "⏳ Another sync was in progress; will sync on next cycle."
+          else
+            echo "✅ News sync completed successfully!"
+          fi
