@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { LogoIcon } from '@/components/Logo'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { TurnstileWidget } from '@/components/TurnstileWidget'
+import { validateTurnstileAction } from '@/actions/authActions'
 import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, KeyRound, ChevronLeft, ArrowRight } from 'lucide-react'
 
 function ResetPasswordForm() {
@@ -18,6 +20,7 @@ function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
 
   // Status & Feedback States
   const [isVerifyingSession, setIsVerifyingSession] = useState(true)
@@ -154,10 +157,23 @@ function ResetPasswordForm() {
       return
     }
 
+    if (!turnstileToken) {
+      setError('Security verification required. Please complete Cloudflare Turnstile before updating your password.')
+      return
+    }
+
     try {
       setLoading(true)
       setError('')
       setMessage('')
+
+      const turnstileCheck = await validateTurnstileAction(turnstileToken)
+      if (!turnstileCheck.success) {
+        setError(turnstileCheck.error || 'Security verification failed. Please try again.')
+        setTurnstileToken(null)
+        setLoading(false)
+        return
+      }
 
       const { error: updateError } = await supabase.auth.updateUser({
         password: password,
@@ -428,11 +444,20 @@ function ResetPasswordForm() {
                 )}
               </div>
 
+              {/* Cloudflare Turnstile Verification Widget */}
+              <TurnstileWidget
+                onSuccess={(token) => {
+                  setTurnstileToken(token)
+                  setError('')
+                }}
+                onExpire={() => setTurnstileToken(null)}
+              />
+
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-75 touch-manipulation"
+                disabled={loading || !turnstileToken}
+                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loading ? (
                   <ButtonSpinner size={16} variant="dark" />

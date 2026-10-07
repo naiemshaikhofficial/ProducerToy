@@ -2,13 +2,8 @@
  * Server-side verification for Cloudflare Turnstile tokens
  */
 export async function verifyTurnstileToken(token: string | null | undefined, remoteIp?: string): Promise<boolean> {
-  // If no token is provided
-  if (!token) {
-    // In local development, if secret key is missing, allow bypass
-    if (process.env.NODE_ENV === 'development' && !process.env.TURNSTILE_SECRET_KEY) {
-      console.warn('⚠️ [Turnstile] No secret key set in dev, bypassing validation.')
-      return true
-    }
+  // If no token is provided, strictly deny verification
+  if (!token || typeof token !== 'string' || !token.trim()) {
     return false
   }
 

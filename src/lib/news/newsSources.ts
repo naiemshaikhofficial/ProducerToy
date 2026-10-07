@@ -338,7 +338,7 @@ export async function extractDirectDealInfo(articleUrl: string): Promise<{
           if (u.pathname && u.pathname !== '/' && u.pathname.length > 2) {
             score += 30
           }
-        } catch {}
+        } catch { }
 
         // Trusted developer/marketplace platforms
         if (
@@ -415,81 +415,81 @@ export const MUSIC_NEWS_FEEDS: Array<{
   categoryDefault: string
   isPrimary: boolean
 }> = [
-  {
-    name: 'Rekkerd (Latest Music News & Deals)',
-    url: 'https://rekkerd.org/feed/',
-    fallbackUrl: 'https://news.google.com/rss/search?q=site:rekkerd.org&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: true,
-  },
-  {
-    name: 'AudioPlugin Guy (Latest News & Deals)',
-    url: 'https://www.audiopluginguy.com/feed/',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: true,
-  },
-  {
-    name: 'Bedroom Producers Blog',
-    url: 'https://bedroomproducersblog.com/feed/',
-    categoryDefault: 'Free VSTs',
-    isPrimary: true,
-  },
-  {
-    name: 'Rekkerd (Free VSTs & Freeware)',
-    url: 'https://rekkerd.org/tag/free/feed/',
-    categoryDefault: 'Free VSTs',
-    isPrimary: true,
-  },
-  {
-    name: 'AudioPlugin Guy (Exclusive Deals)',
-    url: 'https://www.audiopluginguy.com/deals/feed/',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: true,
-  },
-  {
-    name: 'KVR Audio',
-    url: 'https://www.kvraudio.com/news/rss.xml',
-    categoryDefault: 'Tech & Gear',
-    isPrimary: false,
-  },
-  {
-    name: 'Gearnews',
-    url: 'https://www.gearnews.com/feed/',
-    categoryDefault: 'Tech & Gear',
-    isPrimary: false,
-  },
-  {
-    name: 'BPB (Dedicated Free VSTs & Freeware)',
-    url: 'https://news.google.com/rss/search?q=site:bedroomproducersblog.com+(free+vst+OR+freeware+OR+giveaway)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Free VSTs',
-    isPrimary: true,
-  },
-  {
-    name: 'Noizefield (Free Plugins & Deals)',
-    url: 'https://news.google.com/rss/search?q=site:noizefield.com+(free+OR+deal+OR+vst)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Free VSTs',
-    isPrimary: true,
-  },
-  {
-    name: 'Synthanatomy (Synth Deals & Freebies)',
-    url: 'https://news.google.com/rss/search?q=site:synthanatomy.com+(deal+OR+free+OR+sale+OR+vst)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: true,
-  },
-  {
-    name: 'KVR Audio (Specials & Deals)',
-    url: 'https://news.google.com/rss/search?q=site:kvraudio.com/news+(deal+OR+sale+OR+discount+OR+free)&hl=en-US&gl=US&ceid=US:en',
-    categoryDefault: 'Deals & Sales',
-    isPrimary: false,
-  },
-]
+    {
+      name: 'Rekkerd (Latest Music News & Deals)',
+      url: 'https://rekkerd.org/feed/',
+      fallbackUrl: 'https://news.google.com/rss/search?q=site:rekkerd.org&hl=en-US&gl=US&ceid=US:en',
+      categoryDefault: 'Deals & Sales',
+      isPrimary: true,
+    },
+    {
+      name: 'AudioPlugin Guy (Latest News & Deals)',
+      url: 'https://www.audiopluginguy.com/feed/',
+      categoryDefault: 'Deals & Sales',
+      isPrimary: true,
+    },
+    {
+      name: 'Bedroom Producers Blog',
+      url: 'https://bedroomproducersblog.com/feed/',
+      categoryDefault: 'Free VSTs',
+      isPrimary: true,
+    },
+    {
+      name: 'Rekkerd (Free VSTs & Freeware)',
+      url: 'https://rekkerd.org/tag/free/feed/',
+      categoryDefault: 'Free VSTs',
+      isPrimary: true,
+    },
+    {
+      name: 'AudioPlugin Guy (Exclusive Deals)',
+      url: 'https://www.audiopluginguy.com/deals/feed/',
+      categoryDefault: 'Deals & Sales',
+      isPrimary: true,
+    },
+    {
+      name: 'KVR Audio',
+      url: 'https://www.kvraudio.com/news/rss.xml',
+      categoryDefault: 'Tech & Gear',
+      isPrimary: false,
+    },
+    {
+      name: 'Gearnews',
+      url: 'https://www.gearnews.com/feed/',
+      categoryDefault: 'Tech & Gear',
+      isPrimary: false,
+    },
+    {
+      name: 'BPB (Dedicated Free VSTs & Freeware)',
+      url: 'https://news.google.com/rss/search?q=site:bedroomproducersblog.com+(free+vst+OR+freeware+OR+giveaway)&hl=en-US&gl=US&ceid=US:en',
+      categoryDefault: 'Free VSTs',
+      isPrimary: true,
+    },
+    {
+      name: 'Noizefield (Free Plugins & Deals)',
+      url: 'https://news.google.com/rss/search?q=site:noizefield.com+(free+OR+deal+OR+vst)&hl=en-US&gl=US&ceid=US:en',
+      categoryDefault: 'Free VSTs',
+      isPrimary: true,
+    },
+    {
+      name: 'Synthanatomy (Synth Deals & Freebies)',
+      url: 'https://news.google.com/rss/search?q=site:synthanatomy.com+(deal+OR+free+OR+sale+OR+vst)&hl=en-US&gl=US&ceid=US:en',
+      categoryDefault: 'Deals & Sales',
+      isPrimary: true,
+    },
+    {
+      name: 'KVR Audio (Specials & Deals)',
+      url: 'https://news.google.com/rss/search?q=site:kvraudio.com/news+(deal+OR+sale+OR+discount+OR+free)&hl=en-US&gl=US&ceid=US:en',
+      categoryDefault: 'Deals & Sales',
+      isPrimary: false,
+    },
+  ]
 
 /**
  * Fetches official deals directly from Plugin Boutique:
  * 1. Hot Deals (https://www.pluginboutique.com/deals) - IRON 2, Roland, MODO BASS 2, etc.
  * 2. Vocal Processing (https://www.pluginboutique.com/categories/54-Vocal-Processing) - Waves Tune Real-Time, Little AlterBoy, etc.
  * Parses exact product name, brand, category, direct deal slug, high-res banner, discount %, pricing, and expiry timeline ("Ends [date]").
- * Automatically appends ProducerToy's referral tag (68affa2b94f43).
+ * Automatically appends Producer Toy's referral tag (68affa2b94f43).
  */
 export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]> {
   const items: RawFeedItem[] = []
@@ -604,22 +604,22 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
         }
 
         if (expiry) {
-          ;(item as any).expiryTimeline = expiry
+          ; (item as any).expiryTimeline = expiry
         }
         if (dealPrice) {
-          ;(item as any).dealPrice = dealPrice
+          ; (item as any).dealPrice = dealPrice
         }
         if (regularPrice) {
-          ;(item as any).regularPrice = regularPrice
+          ; (item as any).regularPrice = regularPrice
         }
         if (brand) {
-          ;(item as any).brand = brand
+          ; (item as any).brand = brand
         }
         if (name) {
-          ;(item as any).productName = name
+          ; (item as any).productName = name
         }
         if (discount) {
-          ;(item as any).discount = discount
+          ; (item as any).discount = discount
         }
 
         items.push(item)
@@ -631,7 +631,7 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
 
 /**
  * Fetches and parses deals from PluginDeals.net via reader proxy.
- * Replaces competitor affiliate tags with ProducerToy's Plugin Boutique affiliate tag (68affa2b94f43).
+ * Replaces competitor affiliate tags with Producer Toy's Plugin Boutique affiliate tag (68affa2b94f43).
  */
 export async function fetchPluginDealsFeedItems(): Promise<RawFeedItem[]> {
   const items: RawFeedItem[] = []
@@ -780,7 +780,7 @@ export async function resolvePluginBoutiqueProductUrl(productName: string): Prom
           }
         }
       }
-    } catch {}
+    } catch { }
   }
 
   // Fallback: direct deals section with referral
@@ -856,7 +856,7 @@ export async function resolveAuthenticProductDealUrl(productName: string, isFree
         }
       }
     }
-  } catch {}
+  } catch { }
 
   return isFree ? 'https://producertoy.com/free-vst-plugins' : `https://www.pluginboutique.com/deals?a_aid=${PLUGIN_BOUTIQUE_AFFILIATE_ID}`
 }

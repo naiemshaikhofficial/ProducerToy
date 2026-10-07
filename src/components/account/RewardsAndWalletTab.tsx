@@ -101,14 +101,14 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-150 font-sans select-none max-w-4xl">
-      
+
       {/* 1. Header Section (Toywards Branding with Clean Typography) */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
           Toywards
         </h1>
         <p className="text-sm sm:text-[15px] text-zinc-400 mt-2 leading-relaxed max-w-3xl">
-          Earn up to 20% back on purchases using ProducerToy's payment system. Plus, enjoy instant rewards
+          Earn up to 20% back on purchases using Producer Toy's payment system. Plus, enjoy instant rewards
           for sound kits, synth presets, and audio plugins.{' '}
           <Link
             href="/features/toywards"
@@ -135,7 +135,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
 
         {/* Pending & Expiring Badges / Status Pills */}
         <div className="flex items-center gap-3 flex-wrap mt-5">
-          
+
           {/* Pending Pill */}
           <div className="relative">
             <button
@@ -226,10 +226,10 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
                 const amountFormatted = Number(tx.amount || 0).toFixed(2)
                 const dateFormatted = tx.created_at
                   ? new Date(tx.created_at).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })
                   : 'Recent'
 
                 return (
@@ -253,9 +253,8 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
 
                     <div className="text-right shrink-0">
                       <span
-                        className={`text-xs sm:text-sm font-bold block ${
-                          isEarned ? 'text-emerald-400' : 'text-zinc-300'
-                        }`}
+                        className={`text-xs sm:text-sm font-bold block ${isEarned ? 'text-emerald-400' : 'text-zinc-300'
+                          }`}
                       >
                         {isEarned ? `+${currencySymbol}${amountFormatted}` : `-${currencySymbol}${amountFormatted}`}
                       </span>

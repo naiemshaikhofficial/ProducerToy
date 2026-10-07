@@ -114,6 +114,10 @@ function AuthForm() {
   // Resend confirmation email
   const handleResendConfirmation = async () => {
     if (!email.trim() || resetCountdown > 0 || resendingEmail) return
+    if (!turnstileToken) {
+      setError('Security verification required. Please complete Cloudflare Turnstile verification first.')
+      return
+    }
     try {
       setResendingEmail(true)
       setError('')
@@ -144,10 +148,24 @@ function AuthForm() {
       return
     }
 
+    // Cloudflare Turnstile bot verification check - MANDATORY
+    if (!turnstileToken) {
+      setError('Security verification required. Please complete Cloudflare Turnstile before requesting a password reset.')
+      return
+    }
+
     try {
       setLoading(true)
       setError('')
       setMessage('')
+
+      const turnstileCheck = await validateTurnstileAction(turnstileToken)
+      if (!turnstileCheck.success) {
+        setError(turnstileCheck.error || 'Security verification failed. Please try again.')
+        setTurnstileToken(null)
+        setLoading(false)
+        return
+      }
 
       // 1. Fast server check if account exists
       const checkData = await checkUserStatusAction(email.trim())
@@ -182,6 +200,10 @@ function AuthForm() {
   // Handle Resending Password Reset Link
   const handleResendResetLink = async () => {
     if (resetCountdown > 0 || !email.trim()) return
+    if (!turnstileToken) {
+      setError('Security verification required. Please complete Cloudflare Turnstile first.')
+      return
+    }
     try {
       setLoading(true)
       setError('')
@@ -211,10 +233,23 @@ function AuthForm() {
       return
     }
 
+    if (!turnstileToken) {
+      setError('Security verification required. Please complete Cloudflare Turnstile before updating your password.')
+      return
+    }
+
     try {
       setLoading(true)
       setError('')
       setMessage('')
+
+      const turnstileCheck = await validateTurnstileAction(turnstileToken)
+      if (!turnstileCheck.success) {
+        setError(turnstileCheck.error || 'Security verification failed. Please try again.')
+        setTurnstileToken(null)
+        setLoading(false)
+        return
+      }
 
       const { error: updateError } = await supabase.auth.updateUser({
         password: password,
@@ -275,7 +310,7 @@ function AuthForm() {
 
   const passwordStrength = getPasswordStrength(password)
 
-  // Handle Google OAuth Login
+  // Handle Google OAuth Login (First page - seamless)
   const handleGoogleLogin = async () => {
     try {
       setLoading(true)
@@ -303,7 +338,7 @@ function AuthForm() {
     }
   }
 
-  // Handle Step 1 Email Continue
+  // Handle Step 1 Email Continue (First page - seamless transition to password)
   const handleEmailContinue = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -342,14 +377,19 @@ function AuthForm() {
       }
     }
 
-    // Cloudflare Turnstile bot verification check
-    if (turnstileToken) {
-      const turnstileCheck = await validateTurnstileAction(turnstileToken)
-      if (!turnstileCheck.success) {
-        setError(turnstileCheck.error || 'Security verification failed. Please try again.')
-        setLoading(false)
-        return
-      }
+    // Cloudflare Turnstile bot verification check - MANDATORY
+    if (!turnstileToken) {
+      setError('Security verification required. Please complete Cloudflare Turnstile before submitting.')
+      setLoading(false)
+      return
+    }
+
+    const turnstileCheck = await validateTurnstileAction(turnstileToken)
+    if (!turnstileCheck.success) {
+      setError(turnstileCheck.error || 'Security verification failed. Please complete the verification again.')
+      setTurnstileToken(null)
+      setLoading(false)
+      return
     }
 
     try {
@@ -658,14 +698,17 @@ function AuthForm() {
 
                   {/* Cloudflare Turnstile Verification Widget */}
                   <TurnstileWidget
-                    onSuccess={(token) => setTurnstileToken(token)}
+                    onSuccess={(token) => {
+                      setTurnstileToken(token)
+                      setError('')
+                    }}
                     onExpire={() => setTurnstileToken(null)}
                   />
 
                   <button
                     type="submit"
-                    disabled={loading}
-                    className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 touch-manipulation"
+                    disabled={loading || !turnstileToken}
+                    className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loading ? (
                       <ButtonSpinner size={16} variant="dark" />
@@ -766,10 +809,10 @@ function AuthForm() {
                         <div
                           key={bar}
                           className={`h-1 flex-1 rounded-full transition-colors ${bar <= passwordStrength
-                              ? passwordStrength <= 2
-                                ? 'bg-zinc-400'
-                                : 'bg-white'
-                              : 'bg-[#2a2a2a]'
+                            ? passwordStrength <= 2
+                              ? 'bg-zinc-400'
+                              : 'bg-white'
+                            : 'bg-[#2a2a2a]'
                             }`}
                         />
                       ))}
@@ -818,10 +861,19 @@ function AuthForm() {
                 </div>
               </div>
 
+              {/* Cloudflare Turnstile Verification Widget */}
+              <TurnstileWidget
+                onSuccess={(token) => {
+                  setTurnstileToken(token)
+                  setError('')
+                }}
+                onExpire={() => setTurnstileToken(null)}
+              />
+
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-75 touch-manipulation"
+                disabled={loading || !turnstileToken}
+                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loading ? (
                   <ButtonSpinner size={16} variant="dark" />
@@ -848,6 +900,7 @@ function AuthForm() {
                   setError('')
                   setMessage('')
                   setAccountAlreadyExists(false)
+                  setTurnstileToken(null)
                 }}
                 className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white font-bold transition-colors uppercase tracking-wider cursor-pointer"
               >
@@ -1169,10 +1222,10 @@ function AuthForm() {
                           <div
                             key={bar}
                             className={`h-1 flex-1 rounded-full transition-colors ${bar <= passwordStrength
-                                ? passwordStrength <= 2
-                                  ? 'bg-zinc-400'
-                                  : 'bg-white'
-                                : 'bg-[#2a2a2a]'
+                              ? passwordStrength <= 2
+                                ? 'bg-zinc-400'
+                                : 'bg-white'
+                              : 'bg-[#2a2a2a]'
                               }`}
                           />
                         ))}
@@ -1225,14 +1278,17 @@ function AuthForm() {
 
                 {/* Cloudflare Turnstile Verification Widget */}
                 <TurnstileWidget
-                  onSuccess={(token) => setTurnstileToken(token)}
+                  onSuccess={(token) => {
+                    setTurnstileToken(token)
+                    setError('')
+                  }}
                   onExpire={() => setTurnstileToken(null)}
                 />
 
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-75 touch-manipulation"
+                  disabled={loading || !turnstileToken}
+                  className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
                 >
                   {loading ? (
                     <ButtonSpinner size={16} variant="dark" />
@@ -1246,7 +1302,7 @@ function AuthForm() {
 
             {/* Bottom Terms Notice */}
             <p className="text-[11px] text-zinc-500 text-center leading-relaxed border-t border-[#262626] pt-4">
-              By continuing, you agree to ProducerToy's Terms of Service and Privacy Policy.
+              By continuing, you agree to Producer Toy's Terms of Service and Privacy Policy.
             </p>
           </>
         )}
