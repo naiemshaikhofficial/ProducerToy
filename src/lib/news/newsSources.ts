@@ -1506,7 +1506,7 @@ export async function verifyArticleQuality(article: {
     }
   }
 
-  // Probe the link to verify it is NOT 404 or dead
+  // Probe the link to verify it is NOT 404 or dead (generous 7s timeout for indie boutique developer servers)
   try {
     const probe = await fetch(dealUrl, {
       method: 'HEAD',
@@ -1514,11 +1514,11 @@ export async function verifyArticleQuality(article: {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
       },
-      signal: AbortSignal.timeout(3500),
+      signal: AbortSignal.timeout(7000),
     })
 
-    if (probe.status === 405) {
-      // Retry with GET if server blocks HEAD
+    if (probe.status === 405 || probe.status === 403) {
+      // Retry with GET if server blocks or restricts HEAD requests
       const getProbe = await fetch(dealUrl, {
         method: 'GET',
         headers: {
@@ -1526,7 +1526,7 @@ export async function verifyArticleQuality(article: {
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
           Range: 'bytes=0-100',
         },
-        signal: AbortSignal.timeout(3500),
+        signal: AbortSignal.timeout(7000),
       })
       if (getProbe.status === 404 || getProbe.status === 410) {
         return { isValid: false, reason: `Deal link returned HTTP ${getProbe.status} (Page Not Found)` }
@@ -1535,7 +1535,7 @@ export async function verifyArticleQuality(article: {
       return { isValid: false, reason: `Deal link returned HTTP ${probe.status} (Page Not Found)` }
     }
   } catch (err: any) {
-    // If external site timed out, log warning but do not hard-crash
+    // If external site timed out, log warning but do not block legitimate deals
     console.warn(`[verifyArticleQuality] Link probe timeout/error for ${dealUrl}:`, err?.message || err)
   }
 
