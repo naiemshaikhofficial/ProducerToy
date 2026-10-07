@@ -6,7 +6,6 @@ import { CollectionPageJsonLd, FAQPageJsonLd, BreadcrumbJsonLd } from '@/compone
 import { generatePageMetadata } from '@/lib/seo/metadata'
 import { FreePageClient } from './FreePageClient'
 
-export const revalidate = false // 🟢 Infinite edge cache
 
 export const metadata: Metadata = generatePageMetadata({
   title: 'Free Toys — Download Free VST Plugins, Samples & Sounds (2026)',
@@ -44,11 +43,12 @@ const FREE_VST_FAQS = [
   },
 ]
 
-import { getCachedActiveProducts } from '@/lib/cache/cachedData'
+import { getHomepageProducts } from '@/lib/data/products'
+
+export const revalidate = 60 // 🟢 Revalidate live every 60 seconds
 
 export default async function FreeVstPluginsHubPage() {
-  // Fetch all active products from persistent cache (0 DB hits)
-  const allProducts = await getCachedActiveProducts()
+  const allProducts = await getHomepageProducts()
   
   // Real DB Free plugins only (price === 0 AND product_type is plugin, excluding sample packs)
   const freePlugins = allProducts.filter((p: any) =>

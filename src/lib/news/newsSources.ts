@@ -44,6 +44,13 @@ export function sanitizeDealUrl(url?: string | null): string | null {
     lower.includes('kvraudio.com') ||
     lower.includes('musictech.com') ||
     lower.includes('cdm.link') ||
+    lower.includes('noizefield.com') ||
+    lower.includes('synthanatomy.com') ||
+    lower.includes('producerspot.com') ||
+    lower.includes('sonicstate.com') ||
+    lower.includes('musicradar.com') ||
+    lower.includes('soundonsound.com') ||
+    lower.includes('attackmagazine.com') ||
     lower.includes('news.google.com') ||
     lower.includes('producertoy.com') ||
     lower.includes('t.me') ||

@@ -207,11 +207,42 @@ function buildInlineKeyboard(article: NewsArticle) {
   )
 
   if (isPbDeal && article.source_url) {
+    // Extract offer discount (e.g. "85% OFF", "50% OFF", "30% OFF")
+    const discount =
+      (article.specs && typeof article.specs === 'object' && article.specs['Discount']) ||
+      article.title.match(/(\d+%\s*OFF)/i)?.[1]?.toUpperCase() ||
+      (article.badge?.includes('%') ? article.badge : null)
+
+    // Extract product name (e.g. "MODO BASS 2", "HyperWarp", "CARBON Q")
+    let productName =
+      (article.specs && typeof article.specs === 'object' && article.specs['Product']) || ''
+    if (!productName) {
+      const brand = (article.specs && typeof article.specs === 'object' && article.specs['Brand']) || ''
+      let clean = article.title
+        .replace(/\s*Deal:.*$/i, '')
+        .replace(/\s*[-–—]\s*.*$/i, '')
+        .replace(/\s*\(\s*\$[0-9].*?\)/g, '')
+        .trim()
+      if (brand && clean.toLowerCase().startsWith(brand.toLowerCase())) {
+        clean = clean.slice(brand.length).trim()
+      }
+      productName = clean || article.title
+    }
+
+    // Format: "[Discount]: [Product Name]" (e.g. "⚡ 85% OFF: MODO BASS 2")
+    let buttonLabel = discount
+      ? `⚡ ${discount}: ${productName}`
+      : `⚡ Get Deal: ${productName}`
+
+    if (buttonLabel.length > 50) {
+      buttonLabel = buttonLabel.slice(0, 48) + '…'
+    }
+
     return {
       inline_keyboard: [
         [
           {
-            text: '⚡ Get Deal on Plugin Boutique',
+            text: buttonLabel,
             url: article.source_url,
           },
         ],
