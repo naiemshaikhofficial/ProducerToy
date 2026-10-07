@@ -435,7 +435,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 href={offerUrl}
                 target={offerUrl.startsWith('/') ? '_self' : '_blank'}
                 rel={offerUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline text-center group"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 !bg-[#0084FF] hover:!bg-[#006fe6] !text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline text-center group"
+                style={{ backgroundColor: '#0084FF', color: '#ffffff' }}
               >
                 <span>
                   {getProductCtaLabel({

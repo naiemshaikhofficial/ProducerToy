@@ -100,10 +100,10 @@ function formatInline(
         return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
       }
 
-      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="text-[#0084FF] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
+      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="!text-[#0084FF] text-[#0084FF] hover:!text-[#38bdf8] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
     })
     // `code`
-    .replace(/`([^`]+)`/g, '<code class="bg-[#242424] text-[#ffb182] px-1.5 py-0.5 rounded border border-[#333] text-sm font-mono">$1</code>')
+    .replace(/`([^`]+)`/g, '<code class="bg-[#0084FF]/10 text-[#38bdf8] px-2 py-0.5 rounded-md border border-[#0084FF]/30 text-sm font-mono font-bold">$1</code>')
 }
 
 export function parseMarkdownToHtml(
@@ -391,7 +391,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content a {
-          color: #0084FF;
+          color: #0084FF !important;
           text-decoration: underline;
           text-underline-offset: 4px;
           font-weight: 600;
@@ -399,7 +399,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content a:hover {
-          color: #ff9153;
+          color: #38bdf8 !important;
         }
 
         .blog-content .deal-cta-wrapper {
@@ -414,16 +414,26 @@ export function BlogContentRenderer({
         }
 
         .blog-content a.deal-cta-btn,
-        .blog-content .deal-cta-btn,
-        .blog-content a.deal-cta-btn span,
-        .blog-content .deal-cta-btn span,
-        .blog-content a.deal-cta-btn:hover,
-        .blog-content .deal-cta-btn:hover {
+        .blog-content .deal-cta-btn {
+          background-color: #0084FF !important;
+          background: #0084FF !important;
           color: #ffffff !important;
           text-decoration: none !important;
           margin-left: auto !important;
           margin-right: auto !important;
           text-align: center !important;
+        }
+
+        .blog-content a.deal-cta-btn span,
+        .blog-content .deal-cta-btn span {
+          color: #ffffff !important;
+        }
+
+        .blog-content a.deal-cta-btn:hover,
+        .blog-content .deal-cta-btn:hover {
+          background-color: #006fe6 !important;
+          background: #006fe6 !important;
+          color: #ffffff !important;
         }
 
         .blog-content .deal-expired-subtext,
@@ -499,13 +509,14 @@ export function BlogContentRenderer({
         }
 
         .blog-content code {
-          background-color: #242424;
-          color: #ffb182;
-          padding: 0.2rem 0.45rem;
+          background-color: rgba(0, 132, 255, 0.12) !important;
+          color: #38bdf8 !important;
+          padding: 0.2rem 0.5rem;
           border-radius: 6px;
           font-size: 0.875em;
+          font-weight: 700;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          border: 1px solid #333333;
+          border: 1px solid rgba(0, 132, 255, 0.35) !important;
         }
 
         .blog-content pre {
