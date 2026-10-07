@@ -299,13 +299,9 @@ export function StoreOrganizationJsonLd() {
     '@id': 'https://producertoy.com/#organization',
     name: 'Producer Toy',
     alternateName: [
-      'Producer Toy',
       'ProducerToy',
       'Producer Toy Store',
-      'producertoy.com',
       'Producer Toy Marketplace',
-      'Producer Toy VST',
-      'Producer Toy Audio',
     ],
     url: 'https://producertoy.com',
     logo: {
@@ -335,10 +331,19 @@ export function StoreOrganizationJsonLd() {
       'Audio Engineering',
     ],
     sameAs: [
-      'https://twitter.com/producertoy',
+      'https://x.com/producertoy',
       'https://instagram.com/producertoy',
       'https://youtube.com/@producertoy',
-      'https://facebook.com/producertoy',
+      'https://t.me/producertoynews',
+    ],
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'support@producertoy.com',
+        availableLanguage: ['English'],
+        areaServed: 'World',
+      },
     ],
   }
 
@@ -356,8 +361,9 @@ export function WebSiteJsonLd() {
     '@type': 'WebSite',
     '@id': 'https://producertoy.com/#website',
     name: 'Producer Toy',
-    alternateName: ['ProducerToy', 'Producer Toy Store', 'producertoy.com'],
+    alternateName: ['ProducerToy', 'Producer Toy Store'],
     url: 'https://producertoy.com',
+    inLanguage: 'en-US',
     publisher: {
       '@type': 'Organization',
       '@id': 'https://producertoy.com/#organization',
@@ -365,14 +371,92 @@ export function WebSiteJsonLd() {
       url: 'https://producertoy.com',
       logo: 'https://producertoy.com/Icon.png',
     },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: 'https://producertoy.com/store?q={search_term_string}',
+    potentialAction: [
+      {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://producertoy.com/store?q={search_term_string}',
+        },
+        'query-input': 'required name=search_term_string',
       },
-      'query-input': 'required name=search_term_string',
-    },
+    ],
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+export function StorefrontJsonLd({
+  url = 'https://producertoy.com',
+  name = 'Producer Toy',
+  description = 'The premier digital marketplace for music creators. Download VST plugins, 100% royalty-free sample packs, synth presets, and DAW templates on Producer Toy.',
+  logo = 'https://producertoy.com/Icon.png',
+}: {
+  url?: string
+  name?: string
+  description?: string
+  logo?: string
+} = {}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${url}/#website`,
+        url: url,
+        name: name,
+        alternateName: ['ProducerToy', 'Producer Toy Store'],
+        description: description,
+        inLanguage: 'en-US',
+        publisher: {
+          '@id': `${url}/#organization`,
+        },
+        potentialAction: [
+          {
+            '@type': 'SearchAction',
+            target: {
+              '@type': 'EntryPoint',
+              urlTemplate: `${url}/store?q={search_term_string}`,
+            },
+            'query-input': 'required name=search_term_string',
+          },
+        ],
+      },
+      {
+        '@type': ['Organization', 'OnlineStore'],
+        '@id': `${url}/#organization`,
+        name: name,
+        alternateName: ['ProducerToy', 'Producer Toy Store', 'Producer Toy Marketplace'],
+        url: url,
+        logo: {
+          '@type': 'ImageObject',
+          url: logo,
+          contentUrl: logo,
+          caption: name,
+        },
+        image: logo,
+        sameAs: [
+          'https://x.com/producertoy',
+          'https://instagram.com/producertoy',
+          'https://youtube.com/@producertoy',
+          'https://t.me/producertoynews',
+        ],
+        contactPoint: [
+          {
+            '@type': 'ContactPoint',
+            contactType: 'customer support',
+            email: 'support@producertoy.com',
+            availableLanguage: ['English'],
+            areaServed: 'World',
+          },
+        ],
+      },
+    ],
   }
 
   return (

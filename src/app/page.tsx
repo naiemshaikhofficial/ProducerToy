@@ -23,12 +23,11 @@ export const revalidate = false
 export const metadata: Metadata = generatePageMetadata({
   title: 'Producer Toy — Official Store for VST Plugins, Sample Packs & Sounds',
   description:
-    'Download premier VST plugins, 100% royalty-free sample packs, synth presets, and DAW templates on Producer Toy (producertoy.com). The official marketplace for modern music creators.',
+    'Download premier VST plugins, 100% royalty-free sample packs, synth presets, and DAW templates on Producer Toy. The official store and marketplace for modern music creators.',
   path: '/',
   keywords: [
     'Producer Toy',
-    'producertoy',
-    'producertoy.com',
+    'ProducerToy',
     'producer toy official',
     'producer toy store',
     'producer toy marketplace',

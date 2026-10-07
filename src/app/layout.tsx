@@ -13,7 +13,7 @@ import { AudioPlayer } from '@/components/AudioPlayer'
 import { CartDrawer } from '@/components/CartDrawer'
 import { ImageProtection } from '@/components/ImageProtection'
 import { ContentProtection } from '@/components/ContentProtection'
-import { StoreOrganizationJsonLd, WebSiteJsonLd } from '@/components/JsonLd'
+import { StorefrontJsonLd } from '@/components/JsonLd'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
@@ -69,6 +69,7 @@ export const metadata: Metadata = {
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
+  manifest: '/manifest.json',
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -129,6 +130,16 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/Icon.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="manifest" href="/manifest.json" />
+        
+        {/* Crawler Directives & Meta Categorization */}
+        <meta name="rating" content="general" />
+        <meta name="distribution" content="global" />
+        <meta name="revisit-after" content="1 day" />
+        <meta name="subject" content="Music Production, VST Plugins, Sample Packs, Audio Tools" />
+        <meta name="topic" content="Music Production Software and Audio Tools" />
+        <meta name="summary" content="Producer Toy - Premier digital marketplace for VST plugins, sample packs, and music production tools." />
+
         <link rel="preconnect" href="https://supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://supabase.co" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
@@ -148,8 +159,7 @@ export default function RootLayout({
         className="bg-[#121212] text-white min-h-screen flex flex-col font-sans antialiased"
         suppressHydrationWarning
       >
-        <StoreOrganizationJsonLd />
-        <WebSiteJsonLd />
+        <StorefrontJsonLd />
         <AuthProvider>
           <CurrencyProvider>
             <CartProvider>

@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 export const BRAND_KEYWORDS = [
   'Producer Toy',
   'producertoy',
-  'producertoy.com',
+  'ProducerToy',
   'producer toys',
   'producers toy',
   'producers toys',
