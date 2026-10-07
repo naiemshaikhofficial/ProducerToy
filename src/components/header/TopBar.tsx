@@ -271,8 +271,8 @@ export const TopBar: React.FC<TopBarProps> = ({
               isMobileMenuOpen
                 ? 'w-0 min-w-0 max-w-0 opacity-0 -translate-x-16 pointer-events-none overflow-hidden mr-0 md:w-auto md:min-w-0 md:max-w-none md:opacity-100 md:translate-x-0 md:pointer-events-auto md:overflow-visible md:mr-8'
                 : isSiteVariant
-                ? 'w-[54px] min-w-[54px] md:w-auto md:min-w-0 opacity-100 translate-x-0 overflow-visible mr-3 sm:mr-4 md:mr-5'
-                : 'w-[54px] min-w-[54px] md:w-auto md:min-w-0 opacity-100 translate-x-0 overflow-visible mr-4 sm:mr-5 md:mr-8'
+                ? 'w-auto min-w-0 md:w-auto opacity-100 translate-x-0 overflow-visible mr-3 sm:mr-4 md:mr-5'
+                : 'w-auto min-w-0 md:w-auto opacity-100 translate-x-0 overflow-visible mr-4 sm:mr-5 md:mr-8'
             }`}
           >
             <button
@@ -284,7 +284,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               className="flex items-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer flex-shrink-0"
               aria-label="Producer Toy Ecosystem Menu"
             >
-              <LogoIcon size={34} />
+              <LogoIcon size={48} />
               <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-200 ${isEcosystemOpen ? 'rotate-180 text-white' : ''}`} />
             </button>
 
@@ -453,7 +453,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                     className="flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer"
                     aria-label="Close Ecosystem Menu"
                   >
-                    <LogoIcon size={34} />
+                    <LogoIcon size={44} />
                     <ChevronUp className="w-3.5 h-3.5 text-zinc-300" />
                   </button>
 

@@ -38,7 +38,7 @@ export function Logo({ size = 36, className = '', showText = true }: LogoProps) 
   )
 }
 
-export function LogoIcon({ size = 36, className = '' }: Omit<LogoProps, 'showText'>) {
+export function LogoIcon({ size = 48, className = '' }: Omit<LogoProps, 'showText'>) {
   return (
     <picture className={`flex-shrink-0 ${className}`}>
       <source srcSet="/Icon.webp" type="image/webp" />
