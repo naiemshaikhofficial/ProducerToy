@@ -355,17 +355,19 @@ async function executeSyncJob(limitParam: number) {
     console.warn('[News Sync Expiry Sweep Warning]:', sweepErr?.message || sweepErr)
   }
 
-  // Automatically submit new article URLs to IndexNow for instantaneous search engine indexing
+  // Automatically submit new article URLs to IndexNow & search engine crawlers for instantaneous indexing
   let indexNowResult: any = null
   if (savedSlugs.length > 0) {
     try {
       const { submitIndexNowUrls } = await import('@/lib/seo/indexing')
       const urlsToPing = [
         'https://producertoy.com/news',
+        'https://producertoy.com/sitemap.xml',
+        'https://producertoy.com/news-sitemap.xml',
         ...savedSlugs.map((s) => `https://producertoy.com/news/${s}`),
       ]
       indexNowResult = await submitIndexNowUrls(urlsToPing)
-      console.log(`[News Sync] Successfully submitted ${urlsToPing.length} URLs to IndexNow`)
+      console.log(`[News Sync] Successfully submitted ${urlsToPing.length} URLs to IndexNow & search engines`)
     } catch (indexErr: any) {
       console.warn('[News Sync] Failed to ping IndexNow:', indexErr?.message || indexErr)
     }
@@ -375,10 +377,12 @@ async function executeSyncJob(limitParam: number) {
   if (processedCount > 0 || expiredSweptCount > 0) {
     try {
       revalidatePath('/news')
+      revalidatePath('/sitemap.xml')
+      revalidatePath('/news-sitemap.xml')
       for (const slug of savedSlugs) {
         revalidatePath(`/news/${slug}`)
       }
-      console.log(`[News Sync] Successfully purged edge cache for /news and ${savedSlugs.length} articles`)
+      console.log(`[News Sync] Successfully purged edge cache for /news, sitemaps, and ${savedSlugs.length} articles`)
     } catch (revErr: any) {
       console.warn('[News Sync] Cache revalidation warning:', revErr?.message || revErr)
     }

@@ -74,19 +74,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     /free|freeware|giveaway|100% off|zero cost|gratuit/i.test(cleanTitle) ||
     /free/i.test(article.deal_price || '')
 
-  // High-Intent Dynamic Title targeting "free plugin", "plugin news", "music plugins", "audio plugins".
-  // (Root layout template '%s | Producer Toy' automatically appends '| Producer Toy' once)
-  let title = ''
-  if (isFree) {
-    if (/free/i.test(cleanTitle)) {
-      title = `${cleanTitle} — Free VST Plugin News`
-    } else {
-      title = `${cleanTitle} — Free VST Download & Plugin News`
-    }
-  } else if (article.category === 'Deals & Sales' || article.deal_price) {
-    title = `${cleanTitle} — Audio Plugin Deals & VST News`
-  } else {
-    title = `${cleanTitle} — Music Plugins & Audio Tech News`
+  const discount =
+    (article.specs && typeof article.specs === 'object' && article.specs['Discount']) ||
+    cleanTitle.match(/(\d+%\s*OFF)/i)?.[1]?.toUpperCase() ||
+    (article.badge?.includes('%') ? article.badge : null)
+
+  const dealPrice = article.deal_price || (isFree ? 'FREE' : null)
+  const regularPrice = article.deal_regular_price || null
+  const validUntil =
+    (article.specs && typeof article.specs === 'object' && (article.specs['Valid Until'] || article.specs['Expiry Date'])) ||
+    null
+
+  // High-Intent Dynamic Title targeting exact search keywords (e.g. "SampleScience Hush Piano Deal", "UJAM Rowdy 2 Deal: 92% OFF")
+  let title = cleanTitle
+  if (isFree && !/free|giveaway/i.test(title)) {
+    title = `${cleanTitle} — Free VST Plugin Download`
+  } else if (!/vst|plugin/i.test(title)) {
+    title = `${cleanTitle} (VST Plugin Deal)`
   }
 
   const baseExcerpt = (article.excerpt || '')
@@ -94,9 +98,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     .replace(/&[a-z]+;/gi, '')
     .trim()
 
-  const description = baseExcerpt
-    ? `${baseExcerpt} Discover free plugins, audio plugin news, music plugins, VST deals, and software on Producer Toy.`
-    : `Get ${cleanTitle}. Read verified audio plugin news, free music plugins, VST deals, and music production gear updates on Producer Toy.`
+  // High-Converting SEO Description containing verified product name, price, discount & DAW compatibility
+  let description = ''
+  if (isFree) {
+    description = `Download ${cleanTitle} for 100% FREE${validUntil ? ` until ${validUntil}` : ''}. Official audio plugin download for FL Studio, Ableton Live, Logic Pro & Studio One on Producer Toy.`
+  } else if (dealPrice) {
+    description = `Get ${cleanTitle} for ${dealPrice}${discount ? ` (${discount})` : ''}${regularPrice ? ` • Reg. ${regularPrice}` : ''}${validUntil ? ` until ${validUntil}` : ''}. Official VST plugin deal and software offer on Producer Toy.`
+  } else {
+    description = baseExcerpt
+      ? `${baseExcerpt} Discover verified free plugins, audio plugin news, music plugins, VST deals, and software on Producer Toy.`
+      : `Get ${cleanTitle}. Read verified audio plugin news, free music plugins, VST deals, and music production gear updates on Producer Toy.`
+  }
 
   const keywords = Array.from(
     new Set([
@@ -289,18 +301,23 @@ export default async function NewsArticlePage({ params }: PageProps) {
         ],
       },
       {
-        '@type': 'SoftwareApplication',
-        '@id': `https://producertoy.com/news/${article.slug}#software`,
+        '@type': ['Product', 'SoftwareApplication'],
+        '@id': `https://producertoy.com/news/${article.slug}#product`,
         name: cleanTitle,
         description: article.excerpt || cleanTitle,
         image: highResImage,
         applicationCategory: 'AudioApplication',
         operatingSystem: 'Windows, macOS',
+        brand: {
+          '@type': 'Brand',
+          name: (article.specs && typeof article.specs === 'object' && article.specs['Brand']) || 'Music Production',
+        },
         offers: {
           '@type': 'Offer',
           price: isFree ? '0' : (article.deal_price ? article.deal_price.replace(/[^0-9.]/g, '') || '0' : '0'),
           priceCurrency: 'USD',
           availability: 'https://schema.org/InStock',
+          itemCondition: 'https://schema.org/NewCondition',
           url: `https://producertoy.com/news/${article.slug}`,
         },
         publisher: {
