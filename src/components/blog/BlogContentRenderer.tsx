@@ -151,78 +151,50 @@ export function parseMarkdownToHtml(
   // 3. Erase any lines that are solely hashes or markdown debris
   text = text.replace(/^[ \t]*#+[ \t]*$/gm, '')
 
-  // 4. Ensure headings have clean block separation before and after
+  // 4. Auto-heal any legacy severed headings from previous buggy splits
+  // e.g. "### Multi\n\n- Bus Tonal Control..." -> "### Multi-Bus Tonal Control..."
+  // e.g. "### 11\n\n- Band Precision..." -> "### 11-Band Precision..."
+  // e.g. "### Limited\n\n- Time..." -> "### Limited-Time..."
+  text = text.replace(/(#{1,6})\s+([A-Za-z0-9&/]+)\s*[\r\n]+\s*-\s+([A-Za-z0-9]+)\b/g, '$1 $2-$3')
+  text = text.replace(/(#{1,6}\s+[^\r\n]+?)\s*[\r\n]+\s*-\s+([A-Za-z0-9]+)\b/g, '$1-$2')
+  text = text.replace(/(#{1,6}\s+.*?Workflow)\s*[\r\n]+\s*Efficiency\s+/g, '$1 Efficiency\n\n')
+  text = text.replace(/(#{1,6}\s+Deal)\s*[\r\n]+\s*Availability/g, '$1 Availability')
+  text = text.replace(/(#{1,6}\s+.*?How to)\s*[\r\n]+\s*Claim\b/g, '$1 Claim')
+
+  // Auto-separate known headings and paragraph bodies that were merged on the same line
+  text = text.replace(/^(#{1,6}\s+Multi-Bus Tonal Control in a Single Window)\s+(Mastering The Mix.+)$/gm, '$1\n\n$2')
+  text = text.replace(/^(#{1,6}\s+11-Band Precision & Frequency Architecture)\s+(The plugin features.+)$/gm, '$1\n\n$2')
+  text = text.replace(/^(#{1,6}\s+Limited-Time Introductory Offer)\s+(This launch comes.+)$/gm, '$1\n\n$2')
+  text = text.replace(/^(#{1,6}\s+The Ultimate Hardware-Emulated Workhorse Compressor)\s+(For decades.+)$/gm, '$1\n\n$2')
+
+  // 5. Ensure headings have clean block separation before and after
   text = text.replace(/([^\n#])\s*(#{1,6}\s+)/g, '$1\n\n$2')
 
-  // Split any merged heading lines where heading title and paragraph body were output without a newline
-  const sentenceStarters = new Set([
-    'the', 'this', 'these', 'that', 'a', 'an',
-    'engineered', 'designed', 'featuring', 'equipped', 'built', 'crafted', 'powered',
-    'whether', 'with', 'without', 'from', 'as', 'in', 'for', 'if', 'when', 'while',
-    'take', 'grab', 'get', 'claim', 'download', 'visit', 'check', 'producers', 'engineers', 'musicians', 'users'
-  ])
-
-  const headingKeywords = new Set([
-    'overview', 'features', 'highlights', 'integration', 'compatibility', 'workflow',
-    'requirements', 'specs', 'specifications', 'architecture', 'engine', 'eq', 'dynamics',
-    'processing', 'metering', 'synthesis', 'sound', 'design', 'controls', 'details',
-    'hardware', 'software', 'discount', 'deal', 'offer', 'pricing', 'summary'
-  ])
-
+  // Safely process any headings that have trailing sentences without chopping compound words
   text = text.replace(/^(#{1,6})\s+(.+)$/gm, (lineMatch, hashes, rest) => {
-    // If line has a list dash right in it: e.g. "### Key Features - **4-Band..." or "### System Requirements - **OS:**"
-    const dashListMatch = rest.match(/^([A-Za-z0-9\s&/,]+?)\s*[-–—]\s*(.+)$/)
-    if (dashListMatch && dashListMatch[1].trim().length <= 40) {
-      const heading = dashListMatch[1].trim()
-      const firstListItem = dashListMatch[2].trim()
-      return `${hashes} ${heading}\n\n- ${firstListItem}`
-    }
+    const trimmedRest = rest.trim()
 
-    if (rest.length <= 50 && !rest.includes('. ')) {
+    // If it's a standard heading (<= 80 chars and no sentence terminal punctuation), leave it intact!
+    if (trimmedRest.length <= 80 && !/[.!?]\s+[A-Z]/.test(trimmedRest)) {
       return lineMatch
     }
 
-    const words = rest.split(/\s+/)
-    let bestSplitIndex = -1
-
-    for (let i = 0; i < Math.min(words.length - 2, 8); i++) {
-      const currentWordClean = words[i].toLowerCase().replace(/[^a-z]/g, '')
-      const nextWord = words[i + 1]
-      const nextWordClean = nextWord.toLowerCase().replace(/[^a-z]/g, '')
-
-      // Never split directly after prepositions, articles, or conjunctions
-      if (['how', 'to', 'for', 'and', 'with', 'in', 'of', 'your', 'the', 'a', 'an'].includes(currentWordClean)) {
-        continue
-      }
-
-      // Check if next word is a list bullet
-      if (/^[-*•]/.test(nextWord)) {
-        bestSplitIndex = i + 1
-        break
-      }
-
-      // Check if next word is an unambiguous sentence starter
-      if (sentenceStarters.has(nextWordClean) && /^[A-Z]/.test(nextWord)) {
-        bestSplitIndex = i + 1
-        break
-      }
-
-      // If next word is also a heading keyword (e.g. "Workflow Integration", "System Requirements"), keep going
-      if (headingKeywords.has(nextWordClean)) {
-        continue
-      }
-
-      // Check if current word is a known heading keyword and next word is capitalized/acronym
-      if (headingKeywords.has(currentWordClean) && /^[A-Z]/.test(nextWord)) {
-        bestSplitIndex = i + 1
-        break
-      }
+    // If heading has an explicit sentence terminator (. ! ?) followed by a new sentence:
+    const terminalMatch = trimmedRest.match(/^(.+?[.!?])\s+([A-Z].+)$/)
+    if (terminalMatch && terminalMatch[1].length <= 80) {
+      return `${hashes} ${terminalMatch[1].replace(/[.!?]$/, '')}\n\n${terminalMatch[2]}`
     }
 
-    if (bestSplitIndex > 0) {
-      const headingTitle = words.slice(0, bestSplitIndex).join(' ')
-      const paragraphBody = words.slice(bestSplitIndex).join(' ')
-      return `${hashes} ${headingTitle}\n\n${paragraphBody}`
+    // If heading line has colon separator followed by a full sentence body:
+    const colonMatch = trimmedRest.match(/^([A-Za-z0-9\s&/,-]{3,50}):\s+([A-Z].+)$/)
+    if (colonMatch) {
+      return `${hashes} ${colonMatch[1].trim()}\n\n${colonMatch[2].trim()}`
+    }
+
+    // If line has a list dash with bold item right inside heading line:
+    const dashBoldListMatch = trimmedRest.match(/^([A-Za-z0-9\s&/,]{3,50})\s+[-–—]\s+(\*\*.+)$/)
+    if (dashBoldListMatch) {
+      return `${hashes} ${dashBoldListMatch[1].trim()}\n\n- ${dashBoldListMatch[2].trim()}`
     }
 
     return lineMatch

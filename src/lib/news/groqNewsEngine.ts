@@ -79,7 +79,10 @@ export function sanitizeScrapedText(text: string): string {
     // Strip trailing source attribution tags like '- studio insights', '- Guitar World', '- MusicTech'
     .replace(/\s*[-–—]\s*(?:studio insights|guitar world|musictech|bedroom producers blog|rekkerd|audiopluginguy|kvr audio|gearnews)\s*$/i, '')
     .replace(/^(News|Deal|Review):\s*/i, '')
-    .replace(/\s{2,}/g, ' ')
+    // Collapse horizontal spaces and tabs without destroying newlines
+    .replace(/[^\S\r\n]{2,}/g, ' ')
+    // Normalize newlines
+    .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
@@ -624,80 +627,43 @@ function slugify(text: string): string {
 
 export function splitMergedHeadings(text: string): string {
   if (!text) return ''
-  const sentenceStarters = new Set([
-    'the', 'this', 'these', 'that', 'a', 'an',
-    'engineered', 'designed', 'featuring', 'equipped', 'built', 'crafted', 'powered',
-    'whether', 'with', 'without', 'from', 'as', 'in', 'for', 'if', 'when', 'while',
-    'take', 'grab', 'get', 'claim', 'download', 'visit', 'check', 'producers', 'engineers', 'musicians', 'users'
-  ])
 
-  const headingKeywords = new Set([
-    'overview', 'features', 'highlights', 'integration', 'compatibility', 'workflow',
-    'requirements', 'specs', 'specifications', 'architecture', 'engine', 'eq', 'dynamics',
-    'processing', 'metering', 'synthesis', 'sound', 'design', 'controls', 'details',
-    'hardware', 'software', 'discount', 'deal', 'offer', 'pricing', 'summary'
-  ])
-
+  // 1. Ensure headings have clean block separation before and after
   let processed = text.replace(/([^\n#])\s*(#{1,6}\s+)/g, '$1\n\n$2')
 
+  // 2. Process heading lines
   processed = processed.replace(/^(#{1,6})\s+(.+)$/gm, (lineMatch, hashes, rest) => {
-    // If line has a list dash right in it: e.g. "### Key Features - **4-Band..." or "### System Requirements - **OS:**"
-    const dashListMatch = rest.match(/^([A-Za-z0-9\s&/,]+?)\s*[-–—]\s*(.+)$/)
-    if (dashListMatch && dashListMatch[1].trim().length <= 40) {
-      const heading = dashListMatch[1].trim()
-      const firstListItem = dashListMatch[2].trim()
-      return `${hashes} ${heading}\n\n- ${firstListItem}`
-    }
+    const trimmedRest = rest.trim()
 
-    if (rest.length <= 50 && !rest.includes('. ')) {
+    // If it's a standard heading (<= 80 chars and no sentence terminal punctuation), leave it intact!
+    if (trimmedRest.length <= 80 && !/[.!?]\s+[A-Z]/.test(trimmedRest)) {
       return lineMatch
     }
 
-    const words = rest.split(/\s+/)
-    let bestSplitIndex = -1
-
-    for (let i = 0; i < Math.min(words.length - 2, 8); i++) {
-      const currentWordClean = words[i].toLowerCase().replace(/[^a-z]/g, '')
-      const nextWord = words[i + 1]
-      const nextWordClean = nextWord.toLowerCase().replace(/[^a-z]/g, '')
-
-      // Never split directly after prepositions, articles, or conjunctions
-      if (['how', 'to', 'for', 'and', 'with', 'in', 'of', 'your', 'the', 'a', 'an'].includes(currentWordClean)) {
-        continue
-      }
-
-      // Check if next word is a list bullet
-      if (/^[-*•]/.test(nextWord)) {
-        bestSplitIndex = i + 1
-        break
-      }
-
-      // Check if next word is an unambiguous sentence starter
-      if (sentenceStarters.has(nextWordClean) && /^[A-Z]/.test(nextWord)) {
-        bestSplitIndex = i + 1
-        break
-      }
-
-      // If next word is also a heading keyword (e.g. "Workflow Integration", "System Requirements"), keep going
-      if (headingKeywords.has(nextWordClean)) {
-        continue
-      }
-
-      // Check if current word is a known heading keyword and next word is capitalized/acronym
-      if (headingKeywords.has(currentWordClean) && /^[A-Z]/.test(nextWord)) {
-        bestSplitIndex = i + 1
-        break
-      }
+    // If heading has an explicit sentence terminator (. ! ?) followed by a new sentence:
+    // e.g. "### Fast Workflow. This plugin lets you..."
+    const terminalMatch = trimmedRest.match(/^(.+?[.!?])\s+([A-Z].+)$/)
+    if (terminalMatch && terminalMatch[1].length <= 80) {
+      return `${hashes} ${terminalMatch[1].replace(/[.!?]$/, '')}\n\n${terminalMatch[2]}`
     }
 
-    if (bestSplitIndex > 0) {
-      const headingTitle = words.slice(0, bestSplitIndex).join(' ')
-      const paragraphBody = words.slice(bestSplitIndex).join(' ')
-      return `${hashes} ${headingTitle}\n\n${paragraphBody}`
+    // If heading line has colon separator followed by a full sentence body:
+    // e.g. "### Synth Engine: This plugin features..."
+    const colonMatch = trimmedRest.match(/^([A-Za-z0-9\s&/,-]{3,50}):\s+([A-Z].+)$/)
+    if (colonMatch) {
+      return `${hashes} ${colonMatch[1].trim()}\n\n${colonMatch[2].trim()}`
+    }
+
+    // If line has a list dash with bold item right inside heading line:
+    // e.g. "### Key Specifications - **OS:** Windows 10+"
+    const dashBoldListMatch = trimmedRest.match(/^([A-Za-z0-9\s&/,]{3,50})\s+[-–—]\s+(\*\*.+)$/)
+    if (dashBoldListMatch) {
+      return `${hashes} ${dashBoldListMatch[1].trim()}\n\n- ${dashBoldListMatch[2].trim()}`
     }
 
     return lineMatch
   })
 
+  // Ensure heading is always followed by a blank line before following text
   return processed.replace(/(#{1,6}[^\n]+)\n([^\n#])/g, '$1\n\n$2')
 }
