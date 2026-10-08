@@ -311,46 +311,41 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     </button>
 
                     {isMobileRegionOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
-                        <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                          Select Region
-                        </div>
-                        <div className="overflow-hidden">
-                          {regions.map((r) => {
-                            const isSelected = region?.id === r.id
-                            return (
-                              <button
-                                key={r.id}
-                                type="button"
-                                onClick={() => {
-                                  setRegion(r.id)
-                                  setIsMobileRegionOpen(false)
-                                }}
-                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${
-                                  isSelected
-                                    ? 'bg-[#262626] text-white font-bold'
-                                    : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                                }`}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <img
-                                    src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
-                                    alt={r.name}
-                                    width={18}
-                                    height={18}
-                                    className="w-[18px] h-[18px] object-contain flex-shrink-0"
-                                    loading="eager"
-                                    decoding="async"
-                                  />
-                                  <span className="truncate">{r.name}</span>
-                                </div>
-                                <span className="text-[10px] text-zinc-400 font-mono">
-                                  {r.currency} ({r.symbol})
-                                </span>
-                              </button>
-                            )
-                          })}
-                        </div>
+                      <div className="absolute right-0 top-full mt-2 w-[195px] bg-[#181818] border border-[#282828] rounded-xl shadow-2xl p-1 z-50 animate-in fade-in duration-150 space-y-0.5">
+                        {regions.map((r) => {
+                          const isSelected = region?.id === r.id
+                          return (
+                            <button
+                              key={r.id}
+                              type="button"
+                              onClick={() => {
+                                setRegion(r.id)
+                                setIsMobileRegionOpen(false)
+                              }}
+                              className={`w-full flex items-center justify-between px-2.5 py-2 text-xs rounded-lg transition-colors text-left cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#252525] text-white font-medium'
+                                  : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <img
+                                  src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
+                                  alt={r.name}
+                                  width={18}
+                                  height={18}
+                                  className="w-[18px] h-[18px] object-contain flex-shrink-0"
+                                  loading="eager"
+                                  decoding="async"
+                                />
+                                <span className="truncate">{r.name}</span>
+                              </div>
+                              <span className="text-[10px] text-zinc-400 font-mono flex-shrink-0 ml-1.5">
+                                {r.currency} ({r.symbol})
+                              </span>
+                            </button>
+                          )
+                        })}
                       </div>
                     )}
                   </div>
@@ -414,45 +409,41 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     </button>
 
                     {isMobileRegionOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-[240px] bg-[#1a1a1a] border border-[#2e2e2e] rounded-xl shadow-2xl py-1 z-50 animate-in fade-in duration-150 divide-y divide-[#262626]">
-                        <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                          Select Region
-                        </div>
-                        <div className="overflow-hidden">
-                          {regions.map((r) => {
-                            const isSelected = region?.id === r.id
-                            return (
-                              <button
-                                key={r.id}
-                                type="button"
-                                onClick={() => {
-                                  setRegion(r.id)
-                                  setIsMobileRegionOpen(false)
-                                }}
-                                className={`w-full flex items-center justify-between px-3 py-2 text-xs transition-colors text-left cursor-pointer ${isSelected
-                                  ? 'bg-[#262626] text-white font-bold'
+                      <div className="absolute right-0 top-full mt-2 w-[195px] bg-[#181818] border border-[#282828] rounded-xl shadow-2xl p-1 z-50 animate-in fade-in duration-150 space-y-0.5">
+                        {regions.map((r) => {
+                          const isSelected = region?.id === r.id
+                          return (
+                            <button
+                              key={r.id}
+                              type="button"
+                              onClick={() => {
+                                setRegion(r.id)
+                                setIsMobileRegionOpen(false)
+                              }}
+                              className={`w-full flex items-center justify-between px-2.5 py-2 text-xs rounded-lg transition-colors text-left cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#252525] text-white font-medium'
                                   : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                                  }`}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <img
-                                    src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
-                                    alt={r.name}
-                                    width={18}
-                                    height={18}
-                                    className="w-[18px] h-[18px] object-contain flex-shrink-0"
-                                    loading="eager"
-                                    decoding="async"
-                                  />
-                                  <span className="truncate">{r.name}</span>
-                                </div>
-                                <span className="text-[10px] text-zinc-400 font-mono">
-                                  {r.currency} ({r.symbol})
-                                </span>
-                              </button>
-                            )
-                          })}
-                        </div>
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <img
+                                  src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
+                                  alt={r.name}
+                                  width={18}
+                                  height={18}
+                                  className="w-[18px] h-[18px] object-contain flex-shrink-0"
+                                  loading="eager"
+                                  decoding="async"
+                                />
+                                <span className="truncate">{r.name}</span>
+                              </div>
+                              <span className="text-[10px] text-zinc-400 font-mono flex-shrink-0 ml-1.5">
+                                {r.currency} ({r.symbol})
+                              </span>
+                            </button>
+                          )
+                        })}
                       </div>
                     )}
                   </div>

@@ -853,58 +853,50 @@ export const TopBar: React.FC<TopBarProps> = ({
               />
             </button>
 
-            {/* Epic Games Region / Currency Dropdown Menu */}
+            {/* Compact Region / Currency Dropdown Menu */}
             {isGlobeMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-[275px] bg-[#181818] border border-[#282828] rounded-2xl shadow-2xl py-2 z-[100] animate-in fade-in zoom-in-95 duration-100 divide-y divide-[#222222]">
-                <div className="px-4 py-2">
-                  <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-                    Select Region & Currency
-                  </p>
-                </div>
+              <div className="absolute right-0 top-full mt-2 w-[205px] bg-[#181818] border border-[#282828] rounded-xl shadow-2xl p-1 z-[100] animate-in fade-in zoom-in-95 duration-100 space-y-0.5">
+                {regions.map((r) => {
+                  const isSelected = region?.id === r.id
+                  return (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => {
+                        setRegion(r.id)
+                        setIsGlobeMenuOpen(false)
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 text-xs rounded-lg transition-colors text-left cursor-pointer ${isSelected
+                        ? 'bg-[#252525] text-white font-medium'
+                        : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
+                        }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <img
+                          src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
+                          alt={r.name}
+                          width={18}
+                          height={18}
+                          className="w-[18px] h-[18px] object-contain flex-shrink-0"
+                          loading="eager"
+                          decoding="async"
+                        />
+                        <span className="truncate">{r.name}</span>
+                      </div>
 
-                <div className="py-1 overflow-hidden">
-                  {regions.map((r) => {
-                    const isSelected = region?.id === r.id
-                    return (
-                      <button
-                        key={r.id}
-                        type="button"
-                        onClick={() => {
-                          setRegion(r.id)
-                          setIsGlobeMenuOpen(false)
-                        }}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-[13px] transition-colors text-left cursor-pointer ${isSelected
-                          ? 'bg-[#242424] text-white font-semibold'
-                          : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
-                          }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
-                            alt={r.name}
-                            width={20}
-                            height={20}
-                            className="w-5 h-5 object-contain flex-shrink-0"
-                            loading="eager"
-                            decoding="async"
-                          />
-                          <span className="truncate">{r.name}</span>
-                        </div>
-
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-[11px] text-zinc-400 font-medium">
-                            {r.currency} ({r.symbol})
-                          </span>
-                          {isSelected ? (
-                            <Check className="w-4 h-4 text-white flex-shrink-0" />
-                          ) : (
-                            <div className="w-4 h-4" />
-                          )}
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                        <span className="text-[10.5px] text-zinc-400 font-mono">
+                          {r.currency} ({r.symbol})
+                        </span>
+                        {isSelected ? (
+                          <Check className="w-3.5 h-3.5 text-white flex-shrink-0" />
+                        ) : (
+                          <div className="w-3.5 h-3.5" />
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>
