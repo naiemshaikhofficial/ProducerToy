@@ -392,20 +392,19 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                     <button
                       type="button"
                       onClick={() => setIsMobileRegionOpen(!isMobileRegionOpen)}
-                      className="px-2.5 py-1 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer bg-[#1c1c1c] border border-[#2c2c2c] rounded-lg"
+                      className="p-1.5 text-zinc-300 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
                       title="Select Region & Currency"
+                      aria-label="Select Region and Currency"
                     >
                       <img
                         src={region?.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp'}
                         alt={region?.name || 'Region'}
-                        width={16}
-                        height={16}
-                        className="w-4 h-4 object-contain"
+                        width={18}
+                        height={18}
+                        className="w-[18px] h-[18px] object-contain"
                         loading="eager"
                         decoding="async"
                       />
-                      <span>{currency}</span>
-                      <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isMobileRegionOpen ? 'rotate-180 text-white' : ''}`} />
                     </button>
 
                     {isMobileRegionOpen && (
