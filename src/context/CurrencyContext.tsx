@@ -6,20 +6,31 @@ export interface RegionOption {
   id: string
   name: string
   flag: string
+  iconUrl: string
   currency: 'INR' | 'USD'
   symbol: string
   tag: string
 }
 
 export const REGIONS: RegionOption[] = [
-  { id: 'IN', name: 'India', flag: '🇮🇳', currency: 'INR', symbol: '₹', tag: 'INR (₹)' },
-  { id: 'US', name: 'United States', flag: '🇺🇸', currency: 'USD', symbol: '$', tag: 'USD ($)' },
-  { id: 'GB', name: 'United Kingdom', flag: '🇬🇧', currency: 'USD', symbol: '$', tag: 'USD ($)' },
-  { id: 'EU', name: 'European Union', flag: '🇪🇺', currency: 'USD', symbol: '$', tag: 'USD ($)' },
-  { id: 'CA', name: 'Canada', flag: '🇨🇦', currency: 'USD', symbol: '$', tag: 'USD ($)' },
-  { id: 'AU', name: 'Australia', flag: '🇦🇺', currency: 'USD', symbol: '$', tag: 'USD ($)' },
-  { id: 'JP', name: 'Japan', flag: '🇯🇵', currency: 'USD', symbol: '$', tag: 'USD ($)' },
-  { id: 'GLOBAL', name: 'International', flag: '🌐', currency: 'USD', symbol: '$', tag: 'USD ($)' },
+  {
+    id: 'IN',
+    name: 'India',
+    flag: '🇮🇳',
+    iconUrl: '/icons/region-india.webp',
+    currency: 'INR',
+    symbol: '₹',
+    tag: 'INR (₹)'
+  },
+  {
+    id: 'GLOBAL',
+    name: 'International',
+    flag: '🌐',
+    iconUrl: '/icons/region-international.webp',
+    currency: 'USD',
+    symbol: '$',
+    tag: 'USD ($)'
+  },
 ]
 
 interface CurrencyContextType {
@@ -116,6 +127,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         if (found) {
           setRegionState(found)
           setCurrencyState(found.currency)
+        } else {
+          // If user previously had US, GB, etc., map gracefully to International (USD)
+          const fallback = savedRegionId === 'IN' ? REGIONS[0] : REGIONS[1]
+          setRegionState(fallback)
+          setCurrencyState(fallback.currency)
         }
       } else if (savedCurrency === 'USD' || savedCurrency === 'INR') {
         const matching = REGIONS.find((r) => r.currency === savedCurrency) || REGIONS[0]
@@ -134,7 +150,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
             lang === 'en-in' ||
             lang === 'hi'
 
-          const initialRegion = isIndia ? REGIONS[0] : REGIONS[7] // India (INR) or International (USD)
+          const initialRegion = isIndia ? REGIONS[0] : REGIONS[1] // India (INR) or International (USD)
           setRegionState(initialRegion)
           setCurrencyState(initialRegion.currency)
           localStorage.setItem('pt_region', initialRegion.id)

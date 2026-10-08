@@ -299,7 +299,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                       title="Select Region & Currency"
                       aria-label="Select Region and Currency"
                     >
-                      <Globe className="w-5 h-5 text-zinc-300 hover:text-white" />
+                      <img
+                        src={region?.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp'}
+                        alt={region?.name || 'Region'}
+                        width={18}
+                        height={18}
+                        className="w-[18px] h-[18px] object-contain"
+                        loading="eager"
+                        decoding="async"
+                      />
                     </button>
 
                     {isMobileRegionOpen && (
@@ -307,7 +315,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                           Select Region
                         </div>
-                        <div className="max-h-[220px] overflow-y-auto">
+                        <div className="overflow-hidden">
                           {regions.map((r) => {
                             const isSelected = region?.id === r.id
                             return (
@@ -325,7 +333,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                                 }`}
                               >
                                 <div className="flex items-center gap-2">
-                                  <span>{r.flag}</span>
+                                  <img
+                                    src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
+                                    alt={r.name}
+                                    width={18}
+                                    height={18}
+                                    className="w-[18px] h-[18px] object-contain flex-shrink-0"
+                                    loading="eager"
+                                    decoding="async"
+                                  />
                                   <span className="truncate">{r.name}</span>
                                 </div>
                                 <span className="text-[10px] text-zinc-400 font-mono">
@@ -384,8 +400,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                       className="px-2.5 py-1 text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer bg-[#1c1c1c] border border-[#2c2c2c] rounded-lg"
                       title="Select Region & Currency"
                     >
-                      <span className="text-[14px]">{region?.flag || '🇮🇳'}</span>
-                      <Globe className="w-3.5 h-3.5 text-zinc-400" />
+                      <img
+                        src={region?.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp'}
+                        alt={region?.name || 'Region'}
+                        width={16}
+                        height={16}
+                        className="w-4 h-4 object-contain"
+                        loading="eager"
+                        decoding="async"
+                      />
                       <span>{currency}</span>
                       <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-150 ${isMobileRegionOpen ? 'rotate-180 text-white' : ''}`} />
                     </button>
@@ -395,7 +418,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         <div className="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                           Select Region
                         </div>
-                        <div className="max-h-[220px] overflow-y-auto">
+                        <div className="overflow-hidden">
                           {regions.map((r) => {
                             const isSelected = region?.id === r.id
                             return (
@@ -412,7 +435,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                                   }`}
                               >
                                 <div className="flex items-center gap-2">
-                                  <span>{r.flag}</span>
+                                  <img
+                                    src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
+                                    alt={r.name}
+                                    width={18}
+                                    height={18}
+                                    className="w-[18px] h-[18px] object-contain flex-shrink-0"
+                                    loading="eager"
+                                    decoding="async"
+                                  />
                                   <span className="truncate">{r.name}</span>
                                 </div>
                                 <span className="text-[10px] text-zinc-400 font-mono">

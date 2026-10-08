@@ -842,7 +842,15 @@ export const TopBar: React.FC<TopBarProps> = ({
               title={`Select Region & Currency (Current: ${region?.name || 'India'} - ${currency})`}
               aria-label="Select Region and Currency"
             >
-              <Globe className="w-[21px] h-[21px]" />
+              <img
+                src={region?.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp'}
+                alt={region?.name || 'Region'}
+                width={20}
+                height={20}
+                className="w-5 h-5 object-contain"
+                loading="eager"
+                decoding="async"
+              />
             </button>
 
             {/* Epic Games Region / Currency Dropdown Menu */}
@@ -854,7 +862,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                   </p>
                 </div>
 
-                <div className="py-1 max-h-[340px] overflow-y-auto custom-scrollbar">
+                <div className="py-1 overflow-hidden">
                   {regions.map((r) => {
                     const isSelected = region?.id === r.id
                     return (
@@ -871,7 +879,15 @@ export const TopBar: React.FC<TopBarProps> = ({
                           }`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-[17px] leading-none">{r.flag}</span>
+                          <img
+                            src={r.iconUrl || (r.id === 'IN' ? '/icons/region-india.webp' : '/icons/region-international.webp')}
+                            alt={r.name}
+                            width={20}
+                            height={20}
+                            className="w-5 h-5 object-contain flex-shrink-0"
+                            loading="eager"
+                            decoding="async"
+                          />
                           <span className="truncate">{r.name}</span>
                         </div>
 
