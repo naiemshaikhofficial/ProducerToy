@@ -27,15 +27,80 @@ interface StorePageProps {
   }>
 }
 
+export function resolveProductType(slug?: string | null): string | null {
+  if (!slug) return null
+  const clean = slug.toLowerCase().trim().replace(/[-_\s]+/g, '_')
+  const map: Record<string, string> = {
+    plugin: 'plugin',
+    plugins: 'plugin',
+    vst: 'plugin',
+    vst_plugin: 'plugin',
+    vst_plugins: 'plugin',
+    vsts: 'plugin',
+    effect: 'plugin',
+    effects: 'plugin',
+    instrument: 'plugin',
+    instruments: 'plugin',
+    sound: 'sample_pack',
+    sounds: 'sample_pack',
+    sample: 'sample_pack',
+    samples: 'sample_pack',
+    sample_pack: 'sample_pack',
+    sample_packs: 'sample_pack',
+    drum_kit: 'sample_pack',
+    drum_kits: 'sample_pack',
+    preset: 'preset',
+    presets: 'preset',
+    template: 'template',
+    templates: 'template',
+    bundle: 'bundle',
+    bundles: 'bundle',
+  }
+  return map[clean] || null
+}
+
+export function matchesCategoryFilter(product: Product, categorySlug: string): boolean {
+  if (!categorySlug) return true
+  const clean = categorySlug.toLowerCase().trim()
+  const mappedType = resolveProductType(clean)
+
+  // 1. Direct or mapped product_type match
+  if (mappedType && product.product_type === mappedType) return true
+  if (product.product_type && product.product_type.toLowerCase() === clean) return true
+
+  // 2. Direct category relation match from DB (e.g. categories table)
+  const catSlug = product.categories?.slug?.toLowerCase()
+  const catName = product.categories?.name?.toLowerCase()
+  if (catSlug === clean || catName === clean) return true
+  if (mappedType && (catSlug === mappedType || catSlug === mappedType.replace('_', '-'))) return true
+
+  // 3. Subcategory relation match from DB (e.g. subcategories table)
+  const subSlug = product.subcategories?.slug?.toLowerCase()
+  const subName = product.subcategories?.name?.toLowerCase()
+  if (subSlug === clean || subName === clean) return true
+
+  // 4. category_slugs array match
+  const inArray = (product.category_slugs || []).some((c) => {
+    const cl = c.toLowerCase().trim()
+    return cl === clean || cl.replace(/[\s_]+/g, '-') === clean || clean.replace(/[\s_]+/g, '-') === cl
+  })
+  if (inArray) return true
+
+  return false
+}
+
 const CATEGORY_TYPE_MAP: Record<string, { productType: string; categorySlugs: string[] }> = {
   'sounds': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs', 'sample-pack', 'drum-kits', '808-bass', 'trap-drums'] },
+  'sound': { productType: 'sample_pack', categorySlugs: ['sounds', 'sound', 'sample-packs', 'sample-pack'] },
+  'sample': { productType: 'sample_pack', categorySlugs: ['sounds', 'samples', 'sample', 'sample-packs', 'sample-pack'] },
+  'samples': { productType: 'sample_pack', categorySlugs: ['sounds', 'samples', 'sample-packs', 'sample-pack'] },
   'sample-pack': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs', 'sample-pack', 'drum-kits'] },
   'sample-packs': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs', 'sample-pack', 'drum-kits'] },
-  'samples': { productType: 'sample_pack', categorySlugs: ['sounds', 'sample-packs', 'sample-pack'] },
-  'plugins': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'instruments', 'saturation', 'tape-saturation', 'eq', 'dynamic-eq', 'reverb', 'delay', 'tape-delay', 'compressor', 'bus-compressor', 'auto-tune', 'vocal-processing'] },
-  'vst': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'instruments'] },
-  'vst-plugins': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'instruments'] },
-  'vst-plugin': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'instruments'] },
+  'plugins': { productType: 'plugin', categorySlugs: ['plugins', 'plugin', 'effects', 'instruments', 'saturation', 'tape-saturation', 'eq', 'dynamic-eq', 'reverb', 'delay', 'tape-delay', 'compressor', 'bus-compressor', 'auto-tune', 'vocal-processing'] },
+  'plugin': { productType: 'plugin', categorySlugs: ['plugins', 'plugin', 'effects', 'instruments', 'reverb', 'delay', 'compressor'] },
+  'vst': { productType: 'plugin', categorySlugs: ['plugins', 'plugin', 'effects', 'instruments'] },
+  'vst-plugins': { productType: 'plugin', categorySlugs: ['plugins', 'plugin', 'effects', 'instruments'] },
+  'vst-plugin': { productType: 'plugin', categorySlugs: ['plugins', 'plugin', 'effects', 'instruments'] },
   'effects': { productType: 'plugin', categorySlugs: ['plugins', 'effects', 'saturation', 'tape-saturation', 'eq', 'dynamic-eq', 'reverb', 'delay', 'tape-delay', 'compressor', 'bus-compressor', 'auto-tune', 'vocal-processing'] },
   'instruments': { productType: 'plugin', categorySlugs: ['plugins', 'instruments', 'synthesizers', 'guitars-bass', 'acoustic-guitar'] },
   'saturation': { productType: 'plugin', categorySlugs: ['saturation', 'tape-saturation', 'harmonic-exciter', 'effects'] },
@@ -101,12 +166,19 @@ export async function generateStaticParams() {
   return [
     { slug: [] },
     { slug: ['plugins'] },
+    { slug: ['plugin'] },
     { slug: ['sounds'] },
+    { slug: ['sound'] },
+    { slug: ['sample-pack'] },
+    { slug: ['sample-packs'] },
     { slug: ['presets'] },
+    { slug: ['preset'] },
     { slug: ['templates'] },
+    { slug: ['template'] },
     { slug: ['effects'] },
     { slug: ['instruments'] },
     { slug: ['bundles'] },
+    { slug: ['bundle'] },
   ]
 }
 
@@ -208,29 +280,6 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       query = query.gt('original_price_usd', 0)
     }
 
-    // Category / Product type filtering
-    if (categorySlug && categorySlug.toLowerCase() !== 'brand' && categorySlug.toLowerCase() !== 'free') {
-      const typeInfo = CATEGORY_TYPE_MAP[categorySlug.toLowerCase()]
-      if (typeInfo) {
-        query = query.eq('product_type', typeInfo.productType)
-      } else {
-        const expandedCats = expandCategoryVariants([categorySlug])
-        query = query.overlaps('category_slugs', expandedCats)
-      }
-    }
-
-    // Subcategory / Tag filter
-    const activeCatString = catParam || subTypeSlug
-    if (activeCatString) {
-      const selectedCats = activeCatString.split(',').map(c => c.trim()).filter(Boolean)
-      // Exclude generic broad type descriptors that simply mean "show all items of this type"
-      const specificCats = selectedCats.filter(c => !['all', 'all-sample-pack', 'all-plugins', 'sounds', 'sample-pack', 'sample-packs', 'samples', 'plugins', 'vst-plugins', 'presets'].includes(c.toLowerCase()))
-      if (specificCats.length > 0) {
-        const expandedCats = expandCategoryVariants(specificCats)
-        query = query.overlaps('category_slugs', expandedCats)
-      }
-    }
-
     // Sort order
     if (sortOption === 'price-low') {
       query = query.order('price_usd', { ascending: true })
@@ -250,6 +299,23 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
     let fetchedProducts = (productsRes.data || []) as Product[]
 
+    // 3. Dynamic Category / Product Type Filtering (DB relation + product_type + category_slugs)
+    if (categorySlug && categorySlug.toLowerCase() !== 'brand' && categorySlug.toLowerCase() !== 'free') {
+      fetchedProducts = fetchedProducts.filter((p) => matchesCategoryFilter(p, categorySlug))
+    }
+
+    // Subcategory / Tag filter
+    const activeCatString = catParam || subTypeSlug
+    if (activeCatString) {
+      const selectedCats = activeCatString.split(',').map((c) => c.trim()).filter(Boolean)
+      const specificCats = selectedCats.filter(
+        (c) => !['all', 'all-sample-pack', 'all-plugins', 'sounds', 'sample-pack', 'sample-packs', 'samples', 'plugins', 'vst-plugins', 'presets'].includes(c.toLowerCase())
+      )
+      if (specificCats.length > 0) {
+        fetchedProducts = fetchedProducts.filter((p) => specificCats.some((sc) => matchesCategoryFilter(p, sc)))
+      }
+    }
+
     const combinedCategories: Array<{ id: string; name: string; slug: string }> = [
       { id: 'reverb', name: 'Reverb', slug: 'reverb' },
       { id: 'delay', name: 'Delay & Echo', slug: 'delay' },
@@ -264,11 +330,11 @@ export default async function StorePage({ params, searchParams }: StorePageProps
       { id: 'drum-kit', name: 'Drum Kit & Loops', slug: 'drum-kit' },
     ]
 
-    dbCatData.forEach(c => {
-      if (!combinedCategories.some(e => e.slug === c.slug)) combinedCategories.push(c)
+    dbCatData.forEach((c) => {
+      if (!combinedCategories.some((e) => e.slug === c.slug)) combinedCategories.push(c)
     })
-    dbSubData.forEach(s => {
-      if (!combinedCategories.some(e => e.slug === s.slug)) combinedCategories.push(s)
+    dbSubData.forEach((s) => {
+      if (!combinedCategories.some((e) => e.slug === s.slug)) combinedCategories.push(s)
     })
 
     categoriesOptions = combinedCategories
@@ -276,14 +342,18 @@ export default async function StorePage({ params, searchParams }: StorePageProps
 
     // Fast in-memory lookup & filter for selected brand (avoid false positives on category words like 'sounds')
     const isBrandRoute = categorySlug.toLowerCase() === 'brand'
-    const isKnownCategory = Boolean(CATEGORY_TYPE_MAP[categorySlug.toLowerCase()] || combinedCategories.some(c => c.slug.toLowerCase() === categorySlug.toLowerCase()))
+    const isKnownCategory = Boolean(
+      resolveProductType(categorySlug) ||
+      CATEGORY_TYPE_MAP[categorySlug.toLowerCase()] ||
+      combinedCategories.some((c) => c.slug.toLowerCase() === categorySlug.toLowerCase())
+    )
     const brandSearchTerm = brandParam || (isBrandRoute ? subTypeSlug : !isKnownCategory ? categorySlug : '')
     if (brandSearchTerm && brandSearchTerm.toLowerCase() !== 'free') {
       const cleanTerm = brandSearchTerm.toLowerCase().trim()
-      selectedBrand = dbBrandData.find(b => b.slug.toLowerCase() === cleanTerm || b.name.toLowerCase() === cleanTerm) || null
+      selectedBrand = dbBrandData.find((b) => b.slug.toLowerCase() === cleanTerm || b.name.toLowerCase() === cleanTerm) || null
 
       if (selectedBrand) {
-        fetchedProducts = fetchedProducts.filter(p => p.brand_id === selectedBrand?.id || p.brands?.slug === selectedBrand?.slug)
+        fetchedProducts = fetchedProducts.filter((p) => p.brand_id === selectedBrand?.id || p.brands?.slug === selectedBrand?.slug)
       }
     }
 

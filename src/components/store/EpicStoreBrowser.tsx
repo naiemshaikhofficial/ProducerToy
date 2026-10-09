@@ -141,8 +141,8 @@ export function EpicStoreBrowser({
   const normalizedCategoryType = useMemo(() => {
     if (!activeCategorySlug) return null
     const lower = activeCategorySlug.toLowerCase()
-    if (['sounds', 'sample-pack', 'sample-packs', 'samples'].includes(lower)) return 'sounds'
-    if (['plugins', 'vst', 'vst-plugins', 'vst-plugin', 'effects', 'instruments'].includes(lower)) return 'plugins'
+    if (['sounds', 'sound', 'sample-pack', 'sample-packs', 'samples', 'sample'].includes(lower)) return 'sounds'
+    if (['plugins', 'plugin', 'vst', 'vst-plugins', 'vst-plugin', 'effects', 'instruments'].includes(lower)) return 'plugins'
     if (['presets', 'preset'].includes(lower)) return 'presets'
     if (['templates', 'template'].includes(lower)) return 'templates'
     if (['bundles', 'bundle'].includes(lower)) return 'bundles'
@@ -285,6 +285,8 @@ export function EpicStoreBrowser({
             p.product_type === expected ||
             (expected === 'sample_pack' && (p.product_type === 'sample_pack' || p.product_type === 'sample-pack')) ||
             (expected === 'plugin' && (p.product_type === 'plugin' || p.product_type === 'vst')) ||
+            p.categories?.slug?.toLowerCase() === typeSlug ||
+            p.categories?.slug?.toLowerCase() === expected ||
             p.category_slugs?.some((c) => c.toLowerCase().includes(typeSlug))
           )
         })
@@ -293,10 +295,21 @@ export function EpicStoreBrowser({
 
       if (selectedGenres.length > 0) {
         const pCats = (p.category_slugs || []).map((c) => c.toLowerCase().replace(/[-_]/g, ' '))
-        const pSub = (p.subcategories?.name || p.subcategory || '').toString().toLowerCase()
+        const pSubName = (p.subcategories?.name || p.subcategory || '').toString().toLowerCase()
+        const pSubSlug = (p.subcategories?.slug || '').toLowerCase()
+        const pCatName = (p.categories?.name || '').toLowerCase()
+        const pCatSlug = (p.categories?.slug || '').toLowerCase()
+
         const matchesGenre = selectedGenres.some((genreSlug) => {
           const target = genreSlug.toLowerCase().replace(/[-_]/g, ' ')
-          return pCats.some((c) => c.includes(target)) || pSub.includes(target)
+          const targetSlug = genreSlug.toLowerCase()
+          return (
+            pCats.some((c) => c.includes(target) || c.includes(targetSlug)) ||
+            pSubName.includes(target) ||
+            pSubSlug === targetSlug ||
+            pCatName.includes(target) ||
+            pCatSlug === targetSlug
+          )
         })
         if (!matchesGenre) return false
       }

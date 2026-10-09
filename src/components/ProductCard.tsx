@@ -18,6 +18,7 @@ export interface Product {
   slug: string
   brand: string
   brand_id?: string
+  category_id?: string
   category_slugs?: string[]
   product_subcategories?: Array<{
     subcategories?: {
@@ -31,6 +32,11 @@ export interface Product {
     name: string
     slug: string
     logo_url?: string | null
+  } | null
+  categories?: {
+    id?: string
+    name: string
+    slug?: string
   } | null
   subcategories?: {
     id?: string

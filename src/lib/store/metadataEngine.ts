@@ -115,6 +115,22 @@ export const CORE_STORE_METADATA: Record<string, StoreHeaderMeta> = {
     title: 'VST Plugins & Audio Effects',
     description: 'Browse premier VST audio plugins, analog tape saturators, surgical equalizers, reverb processors, and mixing dynamics crafted for professional producers.',
   },
+  'plugin': {
+    title: 'VST Plugins & Audio Effects',
+    description: 'Browse premier VST audio plugins, analog tape saturators, surgical equalizers, reverb processors, and mixing dynamics crafted for professional producers.',
+  },
+  'vst': {
+    title: 'VST Plugins & Audio Effects',
+    description: 'Browse premier VST audio plugins, analog tape saturators, surgical equalizers, reverb processors, and mixing dynamics crafted for professional producers.',
+  },
+  'vst-plugins': {
+    title: 'VST Plugins & Audio Effects',
+    description: 'Browse premier VST audio plugins, analog tape saturators, surgical equalizers, reverb processors, and mixing dynamics crafted for professional producers.',
+  },
+  'vst-plugin': {
+    title: 'VST Plugins & Audio Effects',
+    description: 'Browse premier VST audio plugins, analog tape saturators, surgical equalizers, reverb processors, and mixing dynamics crafted for professional producers.',
+  },
   'effects': {
     title: 'Audio Effects & Processors',
     description: 'Explore premier audio effect plugins including reverbs, delays, compressors, saturators, and EQ processors on Producer Toy.',
@@ -130,6 +146,14 @@ export const CORE_STORE_METADATA: Record<string, StoreHeaderMeta> = {
   'sounds': {
     title: 'Sample Packs & Sounds',
     description: '100% royalty-free sample packs, 808 sub basses, trap drum kits, melody loops, and vocal stems with instant download.',
+  },
+  'sound': {
+    title: 'Sample Packs & Sounds',
+    description: '100% royalty-free sample packs, 808 sub basses, trap drum kits, melody loops, and vocal stems with instant download.',
+  },
+  'sample': {
+    title: 'Sample Packs & Sounds',
+    description: '100% royalty-free sample packs, drum one-shots, melodic loops, and sound libraries for music producers.',
   },
   'sample-pack': {
     title: 'Sample Packs & Sounds',
