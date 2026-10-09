@@ -389,7 +389,7 @@ export function EpicStoreBrowser({
                     : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
-                {selectedEvents.discounted && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                {selectedEvents.discounted && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
               </div>
               <input
                 type="checkbox"
@@ -412,7 +412,7 @@ export function EpicStoreBrowser({
                     : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
-                {selectedEvents.free && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                {selectedEvents.free && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
               </div>
               <input
                 type="checkbox"
@@ -435,7 +435,7 @@ export function EpicStoreBrowser({
                     : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
-                {selectedEvents.rentToOwn && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                {selectedEvents.rentToOwn && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
               </div>
               <input
                 type="checkbox"
@@ -470,7 +470,7 @@ export function EpicStoreBrowser({
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
-                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                   </div>
                   <input
                     type="checkbox"
@@ -517,7 +517,7 @@ export function EpicStoreBrowser({
                           : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                       }`}
                     >
-                      {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                      {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                     </div>
                     <input
                       type="checkbox"
@@ -558,7 +558,7 @@ export function EpicStoreBrowser({
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
-                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                   </div>
                   <input
                     type="checkbox"
@@ -599,7 +599,7 @@ export function EpicStoreBrowser({
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
-                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                   </div>
                   <input
                     type="checkbox"
@@ -640,7 +640,7 @@ export function EpicStoreBrowser({
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
-                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                    {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                   </div>
                   <input
                     type="checkbox"
@@ -689,7 +689,7 @@ export function EpicStoreBrowser({
                                 : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                             }`}
                           >
-                            {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-black" />}
+                            {isChecked && <Check className="w-3.5 h-3.5 stroke-[3] text-white" />}
                           </div>
                           <input
                             type="checkbox"

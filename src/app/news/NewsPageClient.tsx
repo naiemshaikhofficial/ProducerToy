@@ -354,10 +354,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                     <>
                       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-semibold text-zinc-300 mb-2 sm:mb-2.5 tracking-wide">
                         {featuredArticle.badge && (
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-[#34363d]/20 text-zinc-200 border border-[#34363d]/30'
-                            }`}>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-[#34363d] text-zinc-100 border border-white/10">
                             {featuredArticle.badge}
                           </span>
                         )}
@@ -367,7 +364,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                             Expired
                           </span>
                         ) : heroExpiry.expiryTimeline ? (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-white/10 text-zinc-300 border border-white/10">
                             {heroExpiry.expiryTimeline}
                           </span>
                         ) : null}
@@ -430,7 +427,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                           Expired
                         </span>
                       ) : cardExpiry.expiryTimeline ? (
-                        <span className="text-amber-400/90 font-medium tracking-wide text-[10px] bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded shrink-0">
+                        <span className="text-zinc-300 font-medium tracking-wide text-[10px] bg-white/[0.08] border border-white/[0.12] px-1.5 py-0.5 rounded shrink-0">
                           {cardExpiry.expiryTimeline}
                         </span>
                       ) : null}

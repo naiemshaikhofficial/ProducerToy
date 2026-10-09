@@ -417,15 +417,15 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 >
                   <Tag className="w-3.5 h-3.5 text-zinc-200" />
                   <span className="text-[11px] text-zinc-400 font-sans tracking-normal font-medium">Coupon:</span>
-                  <span className="text-[#38bdf8] font-bold tracking-widest">{couponCode}</span>
+                  <span className="text-white font-bold tracking-widest">{couponCode}</span>
                   {copiedCoupon ? (
                     <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 font-sans font-semibold ml-1">
                       <Check className="w-3 h-3 text-emerald-400" />
                       Copied!
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 group-hover:text-zinc-200 font-sans ml-1">
-                      <Copy className="w-3 h-3 text-zinc-400 group-hover:text-[#38bdf8]" />
+                    <span className="inline-flex items-center gap-1 text-[11px] text-zinc-400 group-hover:text-white font-sans ml-1">
+                      <Copy className="w-3 h-3 text-zinc-400 group-hover:text-white" />
                       Copy
                     </span>
                   )}
