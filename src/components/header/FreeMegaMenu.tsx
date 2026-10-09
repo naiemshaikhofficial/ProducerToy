@@ -42,7 +42,7 @@ export const FreeMegaMenu: React.FC<FreeMegaMenuProps> = ({
             <Link
               href="/store"
               onClick={onClose}
-              className="text-xs font-bold text-[#0084FF] hover:underline"
+              className="text-xs font-bold text-zinc-300 hover:text-white hover:underline"
             >
               Browse All Store Products &rarr;
             </Link>

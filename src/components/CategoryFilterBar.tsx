@@ -143,7 +143,7 @@ export function CategoryFilterBar({
                       >
                         <div className="flex items-center gap-2.5">
                           <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                            isChecked ? 'bg-[#0084FF] border-[#0084FF] text-white' : 'border-zinc-600 bg-[#202020]'
+                            isChecked ? 'bg-[#34363d] border-[#34363d] text-white' : 'border-zinc-600 bg-[#202020]'
                           }`}>
                             {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -172,7 +172,7 @@ export function CategoryFilterBar({
                 <button
                   type="button"
                   onClick={() => applyFilter('cat', selectedCategories.join(','))}
-                  className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#0084FF] rounded-full transition-colors cursor-pointer shadow-md"
+                  className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#34363d] rounded-full transition-colors cursor-pointer shadow-md"
                 >
                   Apply
                 </button>
@@ -213,7 +213,7 @@ export function CategoryFilterBar({
                         >
                           <div className="flex items-center gap-2.5">
                             <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                              isChecked ? 'bg-[#0084FF] border-[#0084FF] text-white' : 'border-zinc-600 bg-[#202020]'
+                              isChecked ? 'bg-[#34363d] border-[#34363d] text-white' : 'border-zinc-600 bg-[#202020]'
                             }`}>
                               {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                             </div>
@@ -242,7 +242,7 @@ export function CategoryFilterBar({
                   <button
                     type="button"
                     onClick={() => applyFilter('brand', selectedBrands.join(','))}
-                    className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#0084FF] rounded-full transition-colors cursor-pointer shadow-md"
+                    className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#34363d] rounded-full transition-colors cursor-pointer shadow-md"
                   >
                     Apply
                   </button>
@@ -280,7 +280,7 @@ export function CategoryFilterBar({
                     >
                       <div className="flex items-center gap-2.5">
                         <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                          isChecked ? 'bg-[#0084FF] border-[#0084FF] text-white' : 'border-zinc-600 bg-[#202020]'
+                          isChecked ? 'bg-[#34363d] border-[#34363d] text-white' : 'border-zinc-600 bg-[#202020]'
                         }`}>
                           {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
                         </div>
@@ -305,7 +305,7 @@ export function CategoryFilterBar({
                 <button
                   type="button"
                   onClick={() => applyFilter('price', selectedPrice)}
-                  className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#0084FF] rounded-full transition-colors cursor-pointer shadow-md"
+                  className="px-5 py-1.5 text-xs font-bold text-white bg-[#303030] hover:bg-[#34363d] rounded-full transition-colors cursor-pointer shadow-md"
                 >
                   Apply
                 </button>
@@ -345,7 +345,7 @@ export function CategoryFilterBar({
                     applyFilter('sort', opt.id)
                   }}
                   className={`w-full text-left px-3 py-2 rounded-md text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
-                    isSelected ? 'bg-[#0084FF] text-white font-bold' : 'text-zinc-300 hover:bg-[#252525] hover:text-white'
+                    isSelected ? 'bg-[#34363d] text-white font-bold' : 'text-zinc-300 hover:bg-[#252525] hover:text-white'
                   }`}
                 >
                   <span>{opt.name}</span>

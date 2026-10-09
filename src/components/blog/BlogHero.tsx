@@ -53,7 +53,7 @@ export function BlogHero({ post }: BlogHeroProps) {
 
           {/* Large Bold Headline */}
           <Link href={`/blog/${post.slug}`} prefetch={true} className="block group">
-            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-black text-white leading-[1.18] tracking-tight group-hover:text-[#0084FF] transition-colors">
+            <h1 className="text-2xl sm:text-3xl lg:text-[40px] font-black text-white leading-[1.18] tracking-tight group-hover:text-zinc-200 transition-colors">
               {post.title}
             </h1>
           </Link>
@@ -70,7 +70,7 @@ export function BlogHero({ post }: BlogHeroProps) {
             <Link
               href={`/blog/${post.slug}`}
               prefetch={true}
-              className="inline-flex items-center justify-center px-7 py-3 rounded-xl bg-[#0084FF] hover:bg-[#006fe6] text-white font-extrabold text-sm tracking-normal transition-all shadow-lg hover:shadow-[#0084FF]/25 active:scale-95 cursor-pointer uppercase tracking-wider"
+              className="inline-flex items-center justify-center px-7 py-3 rounded-xl bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-extrabold text-sm tracking-normal transition-all shadow-lg shadow-black/40 active:scale-95 cursor-pointer uppercase tracking-wider"
             >
               Read more
             </Link>

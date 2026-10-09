@@ -97,13 +97,13 @@ function formatInline(
           ? `<span class="deal-timeline-subtext mt-1.5 text-xs sm:text-sm text-zinc-400 font-medium tracking-wide block">${expiryTimeline}</span>`
           : ''
 
-        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
+        return `<div class="deal-cta-wrapper my-7 flex flex-col items-center justify-center w-full clear-both"><a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="deal-cta-btn inline-flex items-center justify-center gap-2.5 px-6 py-3 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-bold text-sm sm:text-base rounded-xl transition-all shadow-lg shadow-black/40 active:scale-95 no-underline mx-auto text-center"><span class="text-white">${cleanLinkText}</span><svg class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>${subtext}</div>`
       }
 
-      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="!text-[#0084FF] text-[#0084FF] hover:!text-[#38bdf8] hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
+      return `<a href="${url}" ${isExternal ? 'target="_blank" rel="noopener noreferrer"' : ''} class="!text-zinc-300 text-zinc-300 hover:!text-white hover:underline font-semibold inline-flex items-center gap-1">${cleanLinkText}</a>`
     })
     // `code`
-    .replace(/`([^`]+)`/g, '<code class="bg-[#0084FF]/10 text-[#38bdf8] px-2 py-0.5 rounded-md border border-[#0084FF]/30 text-sm font-mono font-bold">$1</code>')
+    .replace(/`([^`]+)`/g, '<code class="bg-white/5 text-zinc-200 px-2 py-0.5 rounded-md border border-white/10 text-sm font-mono font-bold">$1</code>')
 }
 
 export function parseMarkdownToHtml(
@@ -391,7 +391,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content a {
-          color: #0084FF !important;
+          color: #d4d4d8 !important;
           text-decoration: underline;
           text-underline-offset: 4px;
           font-weight: 600;
@@ -399,7 +399,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content a:hover {
-          color: #38bdf8 !important;
+          color: #ffffff !important;
         }
 
         .blog-content .deal-cta-wrapper {
@@ -415,8 +415,9 @@ export function BlogContentRenderer({
 
         .blog-content a.deal-cta-btn,
         .blog-content .deal-cta-btn {
-          background-color: #0084FF !important;
-          background: #0084FF !important;
+          background-color: #34363d !important;
+          background: #34363d !important;
+          border: 1px solid rgba(255, 255, 255, 0.12) !important;
           color: #ffffff !important;
           text-decoration: none !important;
           margin-left: auto !important;
@@ -431,8 +432,8 @@ export function BlogContentRenderer({
 
         .blog-content a.deal-cta-btn:hover,
         .blog-content .deal-cta-btn:hover {
-          background-color: #006fe6 !important;
-          background: #006fe6 !important;
+          background-color: #42454e !important;
+          background: #42454e !important;
           color: #ffffff !important;
         }
 
@@ -469,7 +470,7 @@ export function BlogContentRenderer({
           position: absolute;
           left: 0.25rem;
           top: 0;
-          color: #0084FF;
+          color: #a1a1aa;
           font-weight: bold;
           font-size: 1.35rem;
           line-height: 1;
@@ -487,7 +488,7 @@ export function BlogContentRenderer({
         }
 
         .blog-content ol li::marker {
-          color: #0084FF;
+          color: #a1a1aa;
           font-weight: bold;
         }
 
@@ -496,7 +497,7 @@ export function BlogContentRenderer({
           margin: 2rem 0;
           padding: 1.25rem 1.5rem;
           background: #181818;
-          border-left: 4px solid #0084FF;
+          border-left: 4px solid #34363d;
           border-radius: 0 12px 12px 0;
           color: #e4e4e7;
           font-style: normal;
@@ -509,14 +510,14 @@ export function BlogContentRenderer({
         }
 
         .blog-content code {
-          background-color: rgba(0, 132, 255, 0.12) !important;
-          color: #38bdf8 !important;
+          background-color: rgba(255, 255, 255, 0.06) !important;
+          color: #e4e4e7 !important;
           padding: 0.2rem 0.5rem;
           border-radius: 6px;
           font-size: 0.875em;
           font-weight: 700;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          border: 1px solid rgba(0, 132, 255, 0.35) !important;
+          border: 1px solid rgba(255, 255, 255, 0.12) !important;
         }
 
         .blog-content pre {
@@ -572,7 +573,7 @@ export function BlogContentRenderer({
         .blog-content .cta-box {
           background: linear-gradient(135deg, #1c1c1c 0%, #151515 100%);
           border: 1px solid #2a2a2a;
-          border-left: 4px solid #0084FF;
+          border-left: 4px solid #34363d;
           border-radius: 14px;
           padding: 1.5rem 1.75rem;
           margin: 2.25rem 0;
@@ -596,7 +597,8 @@ export function BlogContentRenderer({
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          background: #0084FF;
+          background: #34363d;
+          border: 1px solid rgba(255, 255, 255, 0.12);
           color: #ffffff !important;
           font-weight: 700;
           text-decoration: none !important;
@@ -606,11 +608,11 @@ export function BlogContentRenderer({
           text-transform: uppercase;
           letter-spacing: 0.05em;
           transition: all 0.15s ease;
-          box-shadow: 0 4px 14px rgba(0, 132, 255, 0.3);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
         }
 
         .blog-content .cta-btn:hover {
-          background: #006fe6;
+          background: #42454e;
           transform: translateY(-1px);
         }
 

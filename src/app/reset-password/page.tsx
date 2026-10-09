@@ -201,7 +201,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center px-4 py-8 sm:py-14 selection:bg-[#0084FF] selection:text-white">
+    <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center px-4 py-8 sm:py-14 selection:bg-[#34363d] selection:text-white">
       {/* Dark Auth Card Container (#161616 background, border #262626, rounded-2xl) */}
       <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-all">
 
@@ -220,7 +220,7 @@ function ResetPasswordForm() {
           /* SUCCESS SCREEN */
           <div className="flex flex-col items-center text-center space-y-6 py-2 animate-in fade-in">
             <div className="w-16 h-16 rounded-full bg-[#202020] border border-[#2e2e2e] flex items-center justify-center relative">
-              <Lock className="w-8 h-8 text-[#0084FF]" />
+              <Lock className="w-8 h-8 text-zinc-200" />
               <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow-md">
                 <CheckCircle2 className="w-4 h-4 text-black font-bold" />
               </div>
@@ -236,7 +236,7 @@ function ResetPasswordForm() {
             </div>
 
             <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-3 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full shadow-sm">
-              <CheckCircle2 className="w-4 h-4 text-[#0084FF] shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-zinc-200 shrink-0" />
               <span>Redirecting to store in {redirectCountdown}s...</span>
             </div>
 
@@ -331,7 +331,7 @@ function ResetPasswordForm() {
             {/* Success Message Alert */}
             {message && (
               <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
-                <CheckCircle2 className="w-4 h-4 text-[#0084FF] shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-zinc-200 shrink-0" />
                 <span>{message}</span>
               </div>
             )}

@@ -111,8 +111,8 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
         )
       case 'IN_PROGRESS':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-950/50 text-blue-300 border border-blue-800/60">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#34363d]/40 text-zinc-200 border border-[#34363d]">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             In Progress
           </span>
         )
@@ -302,7 +302,7 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                       key={msg.id}
                       className={`p-4 rounded-xl space-y-2 border ${
                         isSupport
-                          ? 'bg-[#1a2130] border-blue-900/40 ml-0 sm:mr-6'
+                          ? 'bg-[#18191c] border-[#34363d] ml-0 sm:mr-6'
                           : 'bg-[#111113] border-zinc-800/80 mr-0 sm:ml-6'
                       }`}
                     >
@@ -310,7 +310,7 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                         <div className="flex items-center gap-2">
                           <div
                             className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                              isSupport ? 'bg-blue-600 text-white' : 'bg-zinc-700 text-zinc-200'
+                              isSupport ? 'bg-[#34363d] text-white border border-white/10' : 'bg-zinc-700 text-zinc-200'
                             }`}
                           >
                             {isSupport ? <Headphones size={11} /> : <User size={11} />}
@@ -319,7 +319,7 @@ export function TrackTicketView({ initialTicketNumber = '', initialEmail = '' }:
                             {isSupport ? 'Producer Toy Support' : msg.sender_name || 'Customer'}
                           </span>
                           {isSupport && (
-                            <span className="bg-blue-500/10 text-blue-300 text-[10px] uppercase font-bold px-1.5 py-0.2 rounded">
+                            <span className="bg-[#34363d]/50 text-zinc-200 border border-white/10 text-[10px] uppercase font-bold px-1.5 py-0.2 rounded">
                               Official
                             </span>
                           )}

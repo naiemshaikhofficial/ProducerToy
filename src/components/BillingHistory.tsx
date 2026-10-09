@@ -137,7 +137,7 @@ export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, use
               color: #0f172a;
             }
             .brand-title span {
-              color: #0084ff;
+              color: #34363d;
             }
             .brand-subtitle {
               font-size: 9.5px;
@@ -156,7 +156,7 @@ export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, use
               font-family: 'JetBrains Mono', monospace;
               font-size: 10px;
               font-weight: 800;
-              color: #0084ff;
+              color: #34363d;
               background: #fff7ed;
               border: 1px solid #fed7aa;
               padding: 4px 10px;
@@ -267,7 +267,7 @@ export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, use
               font-family: 'JetBrains Mono', monospace;
               font-size: 10.5px;
               font-weight: 700;
-              color: #0084ff;
+              color: #34363d;
               background: #fff7ed;
               border: 1px solid #fed7aa;
               padding: 2px 8px;
@@ -364,11 +364,11 @@ export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, use
               height: 34px;
               border-radius: 50%;
               background: #fff7ed;
-              border: 2px solid #0084ff;
+              border: 2px solid #34363d;
               display: flex;
               align-items: center;
               justify-content: center;
-              color: #0084ff;
+              color: #34363d;
               font-weight: 900;
               font-size: 16px;
             }
@@ -417,7 +417,7 @@ export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, use
               box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             }
             .btn-print:hover {
-              background: #0084ff;
+              background: #34363d;
               transform: translateY(-1px);
             }
             .btn-close {
@@ -505,7 +505,7 @@ export function openPrintableInvoice(item: PurchaseItem, userEmail?: string, use
                   </td>
                   <td style="text-align: center; font-size: 11px; font-weight: 700; color: #475569;">
                     DIGITAL VAULT<br>
-                    <span style="font-size: 9.5px; color: #0084ff; font-weight: 800;">INSTANT ACCESS</span>
+                    <span style="font-size: 9.5px; color: #34363d; font-weight: 800;">INSTANT ACCESS</span>
                   </td>
                   <td style="text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b;">
                     0% (Export)
@@ -632,7 +632,7 @@ export function BillingHistory({
             }
             .header { text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 24px; margin-bottom: 32px; }
             .title { font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; color: #0f172a; }
-            .title span { color: #0084ff; }
+            .title span { color: #34363d; }
             .subtitle { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #64748b; margin-top: 6px; }
             
             .meta-grid { 
@@ -647,8 +647,8 @@ export function BillingHistory({
             }
             .meta-label { font-size: 9px; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; }
             .meta-val { font-size: 12.5px; font-weight: 800; text-transform: uppercase; margin-top: 4px; word-break: break-all; }
-            .meta-val.blue { color: #0084ff; }
-            .meta-val.orange { color: #0084ff; }
+            .meta-val.blue { color: #34363d; }
+            .meta-val.orange { color: #34363d; }
 
             .terms { font-size: 11.5px; line-height: 1.75; color: #334155; margin-bottom: 32px; }
             .terms h4 { font-size: 12px; font-weight: 900; text-transform: uppercase; color: #0f172a; margin: 18px 0 6px 0; }
@@ -659,7 +659,7 @@ export function BillingHistory({
             
             .actions-bar { display: flex; justify-content: center; gap: 12px; margin-top: 24px; }
             .btn-print { padding: 12px 32px; background: #0f172a; color: #fff; border: none; border-radius: 8px; font-size: 11.5px; font-weight: 800; text-transform: uppercase; cursor: pointer; letter-spacing: 1.5px; }
-            .btn-print:hover { background: #0084ff; }
+            .btn-print:hover { background: #34363d; }
             .btn-close { padding: 12px 24px; background: #fff; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; }
             @media print { 
               body { padding: 0; background: #fff; }
@@ -715,7 +715,7 @@ export function BillingHistory({
 
             <div class="seal-row">
               <div class="seal">
-                PRODUCER TOY<br><span style="color:#0084ff;">OFFICIAL</span> VERIFIED<br>VAULT SEAL
+                PRODUCER TOY<br><span style="color:#34363d;">OFFICIAL</span> VERIFIED<br>VAULT SEAL
               </div>
               <div>
                 <div class="sig-title">PRODUCER TOY DIGITAL AUTHORIZATION DESK</div>
@@ -786,16 +786,16 @@ export function BillingHistory({
                         <button
                           type="button"
                           onClick={() => handleDownloadInvoice(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white text-xs font-medium border border-[#2e2e2e] hover:border-[#0084FF]/60 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white text-xs font-medium border border-[#2e2e2e] hover:border-[#34363d] rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
                           title="Download GST Tax Invoice"
                         >
-                          <Receipt className="w-3.5 h-3.5 text-[#0084FF]" />
+                          <Receipt className="w-3.5 h-3.5 text-zinc-300" />
                           <span>Invoice</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDownloadLicense(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white text-xs font-medium border border-[#2e2e2e] hover:border-[#0084FF]/60 rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white text-xs font-medium border border-[#2e2e2e] hover:border-[#34363d] rounded-lg transition-all cursor-pointer shadow-xs active:scale-95"
                           title="Download EULA Commercial License"
                         >
                           <FileCheck className="w-3.5 h-3.5 text-zinc-400" />

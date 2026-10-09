@@ -108,7 +108,7 @@ export default async function BlogPostPage({
             prefetch={true}
             className="inline-flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors group w-fit"
           >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-[#0084FF]" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-zinc-300" />
             <span>Back to Blog</span>
           </Link>
 
@@ -126,7 +126,7 @@ export default async function BlogPostPage({
           
           {/* Badges & Read Time Row */}
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="bg-[#0084FF] text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
+            <span className="bg-[#34363d] text-white text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-md border border-white/15 shadow-md">
               {post.category || 'Guides'}
             </span>
 
@@ -252,7 +252,7 @@ export default async function BlogPostPage({
           <div className="space-y-1.5 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-white">{post.author_name}</h3>
-              <span className="text-xs text-[#0084FF] font-semibold">Author</span>
+              <span className="text-xs text-zinc-300 font-semibold">Author</span>
             </div>
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
               {post.author_name === 'Naiem Shaikh'
@@ -276,7 +276,7 @@ export default async function BlogPostPage({
           <section className="pt-10 border-t border-[#262626] space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-[#0084FF]" />
+                <BookOpen className="w-5 h-5 text-zinc-300" />
                 <span>Related Articles</span>
               </h3>
               <Link

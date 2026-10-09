@@ -304,7 +304,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
   }
 
   return (
-    <div className="w-full bg-[#121212] text-white selection:bg-[#0084FF] selection:text-white overflow-x-hidden">
+    <div className="w-full bg-[#121212] text-white selection:bg-[#34363d] selection:text-white overflow-x-hidden">
       <div className="max-w-[1240px] mx-auto px-3.5 sm:px-6 lg:px-8 pt-5 sm:pt-12 lg:pt-16 pb-12 sm:pb-16">
 
         {/* Featured Hero Story (1:1 with Epic Games Screenshot) */}
@@ -356,7 +356,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                         {featuredArticle.badge && (
                           <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${featuredArticle.badge.toUpperCase().includes('SPONSORED') || featuredArticle.badge.toUpperCase().includes('PARTNER')
                             ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-[#0084FF]/20 text-[#0084FF] border border-[#0084FF]/30'
+                            : 'bg-[#34363d]/20 text-zinc-200 border border-[#34363d]/30'
                             }`}>
                             {featuredArticle.badge}
                           </span>
@@ -384,7 +384,7 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
                   )
                 })()}
                 <div>
-                  <span className="inline-flex w-full sm:w-auto items-center justify-center px-5 py-2.5 rounded-xl bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-[#0084FF]/30">
+                  <span className="inline-flex w-full sm:w-auto items-center justify-center px-5 py-2.5 rounded-xl bg-[#34363d] hover:bg-[#42454e] text-white font-bold text-xs sm:text-sm tracking-wide transition-all shadow-md group-hover:shadow-black/40">
                     Read more
                   </span>
                 </div>

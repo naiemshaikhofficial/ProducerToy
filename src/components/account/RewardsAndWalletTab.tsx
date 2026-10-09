@@ -112,7 +112,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
           for sound kits, synth presets, and audio plugins.{' '}
           <Link
             href="/features/toywards"
-            className="text-white underline hover:text-[#0084FF] transition-colors inline-block"
+            className="text-white underline hover:text-zinc-300 transition-colors inline-block"
           >
             Learn More.
           </Link>
@@ -191,7 +191,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
       <div className="pt-2">
         {loading ? (
           <div className="bg-[#181818] border border-[#242424] rounded-2xl min-h-[260px] flex flex-col items-center justify-center p-8 text-center space-y-3">
-            <div className="w-7 h-7 border-2 border-zinc-600 border-t-[#0084FF] rounded-full animate-spin" />
+            <div className="w-7 h-7 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
             <span className="text-xs text-zinc-400">Loading Toywards history...</span>
           </div>
         ) : toywardsData.transactions.length === 0 ? (
@@ -213,7 +213,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
               </h3>
               <Link
                 href="/store"
-                className="text-xs font-bold text-[#0084FF] hover:text-[#ff9960] flex items-center gap-1 transition-colors"
+                className="text-xs font-bold text-zinc-300 hover:text-white flex items-center gap-1 transition-colors"
               >
                 <span>Browse Store</span>
                 <ChevronRight size={14} />
@@ -238,7 +238,7 @@ export const RewardsAndWalletTab: React.FC<RewardsAndWalletTabProps> = ({
                     className="py-3.5 flex items-center justify-between gap-4"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-[#0084FF] shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#242424] flex items-center justify-center text-white shrink-0">
                         <ToywardsSparkleIcon size={16} />
                       </div>
                       <div className="min-w-0 space-y-0.5">

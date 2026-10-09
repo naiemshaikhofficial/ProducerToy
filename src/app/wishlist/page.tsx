@@ -123,9 +123,9 @@ export default function WishlistPage() {
         {/* ========================================================================= */}
         {/* 2. NOTIFICATION BANNER (Exact 1:1 Epic Games Notification Pill)           */}
         {/* ========================================================================= */}
-        <div className="w-full bg-[#181818] border border-[#242424] border-l-4 border-l-[#0084FF] rounded-xl p-4 sm:p-5 flex items-center justify-between shadow-sm transition-all">
+        <div className="w-full bg-[#181818] border border-[#242424] border-l-4 border-l-[#34363d] rounded-xl p-4 sm:p-5 flex items-center justify-between shadow-sm transition-all">
           <div className="flex items-center gap-3.5 min-w-0 pr-4">
-            <Mail className="w-5 h-5 text-[#0084FF] flex-shrink-0" />
+            <Mail className="w-5 h-5 text-zinc-300 flex-shrink-0" />
             <span className="text-[12.5px] sm:text-[13px] text-zinc-300 font-medium leading-snug">
               Get notified when your wishlisted items go on sale, or are available for purchase or pre-purchase.
             </span>
@@ -136,7 +136,7 @@ export default function WishlistPage() {
             type="button"
             onClick={() => setNotificationEnabled(!notificationEnabled)}
             className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              notificationEnabled ? 'bg-[#0084FF]' : 'bg-[#2a2a2a]'
+              notificationEnabled ? 'bg-[#34363d]' : 'bg-[#2a2a2a]'
             }`}
             role="switch"
             aria-checked={notificationEnabled}
@@ -263,7 +263,7 @@ export default function WishlistPage() {
                   <Link
                     href="/store"
                     prefetch={true}
-                    className="inline-flex items-center justify-center px-6 py-2.5 bg-[#0084FF] hover:bg-[#006FE6] text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-md"
+                    className="inline-flex items-center justify-center px-6 py-2.5 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-md shadow-black/30"
                   >
                     Explore Store
                   </Link>
@@ -315,7 +315,7 @@ export default function WishlistPage() {
                           <div className="text-right">
                             <div className="flex items-center gap-2">
                               {isOnSale && (
-                                <span className="bg-[#0084FF] text-white text-[10px] font-black px-1.5 py-0.5 rounded">
+                                <span className="bg-[#34363d] text-white text-[10px] font-black px-1.5 py-0.5 rounded border border-white/15">
                                   -{discountPercent}%
                                 </span>
                               )}
@@ -388,7 +388,7 @@ export default function WishlistPage() {
                           className={`px-6 py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-2 cursor-pointer ${
                             inCart
                               ? 'bg-[#222222] text-zinc-300 border border-[#333333]'
-                              : 'bg-[#0084FF] hover:bg-[#006FE6] text-white'
+                              : 'bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white'
                           }`}
                         >
                           {inCart ? (
@@ -459,7 +459,7 @@ export default function WishlistPage() {
                       }`}
                     >
                       <span className="capitalize">{cat === 'all' ? 'All Categories' : cat.replace('_', ' ')}</span>
-                      {selectedCategory === cat && <Check className="w-3 h-3 text-[#0084FF]" />}
+                      {selectedCategory === cat && <Check className="w-3 h-3 text-white" />}
                     </button>
                   ))}
                 </div>
@@ -495,7 +495,7 @@ export default function WishlistPage() {
                       }`}
                     >
                       <span>{feat.label}</span>
-                      {selectedFeature === feat.key && <Check className="w-3 h-3 text-[#0084FF]" />}
+                      {selectedFeature === feat.key && <Check className="w-3 h-3 text-white" />}
                     </button>
                   ))}
                 </div>
@@ -527,7 +527,7 @@ export default function WishlistPage() {
                       }`}
                     >
                       <span className="capitalize">{plat === 'all' ? 'All Platforms' : plat}</span>
-                      {selectedPlatform === plat && <Check className="w-3 h-3 text-[#0084FF]" />}
+                      {selectedPlatform === plat && <Check className="w-3 h-3 text-white" />}
                     </button>
                   ))}
                 </div>

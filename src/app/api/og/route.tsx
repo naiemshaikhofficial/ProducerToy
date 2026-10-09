@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div
               style={{
-                backgroundColor: '#0084FF',
+                backgroundColor: '#34363d',
                 color: 'white',
                 fontWeight: 900,
                 fontSize: '18px',

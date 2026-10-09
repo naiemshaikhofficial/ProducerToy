@@ -214,7 +214,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   <span>Cart</span>
                 </div>
                 {/* Cart Badge */}
-                <span className="bg-[#0084FF] text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                <span className="bg-[#34363d] text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center border border-white/15">
                   Cart
                 </span>
               </Link>
@@ -470,7 +470,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
-                  className="w-full bg-[#1c1c1f] border border-white/10 rounded-xl pl-10 pr-9 py-2.5 text-sm text-white placeholder-zinc-400 focus:outline-none focus:border-[#0084FF]"
+                  className="w-full bg-[#1c1c1f] border border-white/10 rounded-xl pl-10 pr-9 py-2.5 text-sm text-white placeholder-zinc-400 focus:outline-none focus:border-[#34363d]"
                 />
                 {searchQuery && (
                   <button
@@ -665,7 +665,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   >
                     <span className="flex items-center gap-2">
                       <span>Free Downloads</span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0084FF]/20 text-[#0084FF] uppercase">100% Free</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#34363d]/60 text-zinc-200 border border-white/10 uppercase">100% Free</span>
                     </span>
                     <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isMobileFreeOpen ? 'rotate-180 text-white' : ''}`} />
                   </button>
@@ -680,7 +680,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                               href={cat.exploreUrl}
                               prefetch={true}
                               onClick={onClose}
-                              className="text-xs font-bold text-white hover:text-[#0084FF] py-1 block"
+                              className="text-xs font-bold text-white hover:text-zinc-300 py-1 block"
                             >
                               {cat.name}
                             </Link>
@@ -704,7 +704,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         href="/store?price=free"
                         prefetch={true}
                         onClick={onClose}
-                        className="text-xs font-bold text-[#0084FF] hover:underline pt-1 block"
+                        className="text-xs font-bold text-zinc-300 hover:text-white hover:underline pt-1 block"
                       >
                         Explore All Free Tools →
                       </Link>
@@ -769,7 +769,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                 href={user ? "/library" : "/auth"}
                 prefetch={true}
                 onClick={onClose}
-                className="bg-[#0084FF] hover:bg-[#006fe6] text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
+                className="bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white text-center font-bold text-sm py-3.5 rounded-xl transition-colors block shadow-lg uppercase tracking-wider"
               >
                 {user ? 'Library' : 'Sign In'}
               </Link>

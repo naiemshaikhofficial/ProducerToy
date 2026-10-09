@@ -124,7 +124,7 @@ export function CartPageClient() {
             <Link
               href="/store"
               prefetch={true}
-              className="mt-2 bg-[#0084FF] hover:bg-[#006FE6] text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-lg uppercase tracking-wider transition-all shadow-lg shadow-[#0084FF]/20 active:scale-95 cursor-pointer inline-flex items-center justify-center gap-2"
+              className="mt-2 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-lg uppercase tracking-wider transition-all shadow-lg shadow-black/40 active:scale-95 cursor-pointer inline-flex items-center justify-center gap-2"
             >
               <span>Shop Sound Kits & Plugins</span>
             </Link>
@@ -186,7 +186,7 @@ export function CartPageClient() {
 
                       {/* Inner Box: Rating / License Tag (Screenshot 2 Match) */}
                       <div className="bg-[#141414] border border-[#222222] rounded-xl p-3.5 flex items-center gap-3">
-                        <span className="inline-flex items-center font-black bg-[#0084FF] text-black px-2 py-0.5 rounded text-[11px] uppercase tracking-wider">
+                        <span className="inline-flex items-center font-black bg-[#34363d] text-white border border-white/15 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider">
                           100%
                         </span>
                         <span className="text-xs font-bold text-zinc-200">
@@ -242,7 +242,7 @@ export function CartPageClient() {
 
                       {/* Device Compatibility / Instant Delivery Info Pill (Screenshot 2 Match) */}
                       <div className="bg-[#141414] border border-[#242424] rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-zinc-400">
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#0084FF] flex-shrink-0" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-zinc-400 flex-shrink-0" />
                         <span>Instant digital cloud delivery to your ProducerToy account</span>
                       </div>
 
@@ -286,7 +286,7 @@ export function CartPageClient() {
                   <button
                     type="button"
                     onClick={() => openCheckout()}
-                    className="w-full bg-[#0084FF] hover:bg-[#006FE6] text-white font-black text-base py-4 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#0084FF]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-black text-base py-4 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-black/40 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                   >
                     <span>Check Out</span>
                     <ArrowRight className="w-4 h-4" />
@@ -366,7 +366,7 @@ export function CartPageClient() {
                         {/* Inner Box: Rating/License + Toywards Note */}
                         <div className="bg-[#141414] border border-[#222222] rounded-xl p-3.5 space-y-2.5">
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 font-bold bg-[#0084FF] text-black px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider">
+                            <span className="inline-flex items-center gap-1 font-bold bg-[#34363d] text-white border border-white/15 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider">
                               100%
                             </span>
                             <span className="text-xs font-bold text-zinc-200">
@@ -444,7 +444,7 @@ export function CartPageClient() {
                     <button
                       type="button"
                       onClick={() => openCheckout()}
-                      className="w-full bg-[#0084FF] hover:bg-[#006FE6] text-white font-extrabold text-sm py-4 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-[#0084FF]/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-extrabold text-sm py-4 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-black/40 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                     >
                       <span>Check Out</span>
                       <ArrowRight className="w-4 h-4" />

@@ -99,7 +99,7 @@ export function CartDrawer() {
                       {item.name}
                     </div>
                     {item.is_gift && (
-                      <div className="flex items-center gap-1 text-[10px] text-[#0084FF] font-bold mt-0.5">
+                      <div className="flex items-center gap-1 text-[10px] text-zinc-300 font-bold mt-0.5">
                         <Gift className="w-3 h-3" />
                         <span className="truncate">Gift {item.gift_recipient_email ? `for ${item.gift_recipient_email}` : ''}</span>
                       </div>

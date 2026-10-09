@@ -19,7 +19,7 @@ export const metadata: Metadata = generatePageMetadata({
 
 export default function EulaPage() {
   return (
-    <div className="min-h-screen bg-[#121212] text-white py-12 sm:py-16 px-4 sm:px-8 lg:px-12 selection:bg-[#0084FF]/30 font-sans">
+    <div className="min-h-screen bg-[#121212] text-white py-12 sm:py-16 px-4 sm:px-8 lg:px-12 selection:bg-white/20 font-sans">
       <div className="max-w-4xl mx-auto space-y-10">
         
         {/* ========================================================================= */}
@@ -37,7 +37,7 @@ export default function EulaPage() {
 
           <div>
             <div className="inline-flex items-center gap-2 bg-[#2a170d] border border-[#542813] px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase shadow-sm mb-3">
-              <Scale size={14} className="text-[#0084FF]" />
+              <Scale size={14} className="text-zinc-300" />
               <span className="text-zinc-200">Legal Agreement & Terms</span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
@@ -52,9 +52,9 @@ export default function EulaPage() {
         {/* ========================================================================= */}
         {/* IMPORTANT NOTICE CALLOUT BOX                                              */}
         {/* ========================================================================= */}
-        <div className="bg-[#181818] border border-[#2e2e2e] border-l-4 border-l-[#0084FF] rounded-2xl p-6 sm:p-8 space-y-4 shadow-xl">
+        <div className="bg-[#181818] border border-[#2e2e2e] border-l-4 border-l-[#34363d] rounded-2xl p-6 sm:p-8 space-y-4 shadow-xl">
           <div className="flex items-center gap-3">
-            <ShieldCheck className="w-6 h-6 text-[#0084FF] flex-shrink-0" />
+            <ShieldCheck className="w-6 h-6 text-zinc-300 flex-shrink-0" />
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
               Important Notice & Policies Incorporation
             </h2>
@@ -67,24 +67,24 @@ export default function EulaPage() {
               By accepting this Agreement, you also agree to our incorporated policies:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              <Link href="/privacy" className="flex items-center gap-1.5 text-zinc-300 hover:text-[#0084FF] transition-colors">
-                <FileText size={14} className="text-[#0084FF]" />
+              <Link href="/privacy" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors">
+                <FileText size={14} className="text-zinc-300" />
                 <span className="underline">Privacy Policy</span>
               </Link>
-              <Link href="/terms" className="flex items-center gap-1.5 text-zinc-300 hover:text-[#0084FF] transition-colors">
-                <FileText size={14} className="text-[#0084FF]" />
+              <Link href="/terms" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors">
+                <FileText size={14} className="text-zinc-300" />
                 <span className="underline">Terms of Service</span>
               </Link>
-              <Link href="/licensing" className="flex items-center gap-1.5 text-zinc-300 hover:text-[#0084FF] transition-colors">
-                <FileText size={14} className="text-[#0084FF]" />
+              <Link href="/licensing" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors">
+                <FileText size={14} className="text-zinc-300" />
                 <span className="underline">100% Royalty-Free Sound Licensing</span>
               </Link>
-              <Link href="/features/toywards" className="flex items-center gap-1.5 text-zinc-300 hover:text-[#0084FF] transition-colors">
-                <FileText size={14} className="text-[#0084FF]" />
+              <Link href="/features/toywards" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors">
+                <FileText size={14} className="text-zinc-300" />
                 <span className="underline">Toywards Rewards Program</span>
               </Link>
-              <Link href="/purchase-policy" className="flex items-center gap-1.5 text-zinc-300 hover:text-[#0084FF] transition-colors">
-                <FileText size={14} className="text-[#0084FF]" />
+              <Link href="/purchase-policy" className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors">
+                <FileText size={14} className="text-zinc-300" />
                 <span className="underline">Purchase & Refund Policy</span>
               </Link>
             </div>
@@ -149,7 +149,7 @@ export default function EulaPage() {
               3. Updates, Patches, & Cloud Delivery
             </h2>
             <p className="text-zinc-400">
-              Producer Toy and its developer partners may provide updates, patches, bug fixes, or revised installers that must be installed in order for you to continue using the Software or Services. Digital content is served via high-speed CDN and accessible directly from your personal <Link href="/library" className="text-[#0084FF] underline">Product Library</Link>.
+              Producer Toy and its developer partners may provide updates, patches, bug fixes, or revised installers that must be installed in order for you to continue using the Software or Services. Digital content is served via high-speed CDN and accessible directly from your personal <Link href="/library" className="text-zinc-200 hover:text-white underline font-semibold">Product Library</Link>.
             </p>
           </section>
 
@@ -234,7 +234,7 @@ export default function EulaPage() {
             <div className="space-y-3 text-zinc-400">
               <h3 className="text-base font-bold text-zinc-200">11.1 Program Description & Earning</h3>
               <p>
-                All registered Producer Toy account holders are automatically enrolled in the <Link href="/features/toywards" className="text-[#0084FF] underline font-semibold">Toywards Loyalty Program</Link>. You earn up to 20% back in Toywards on eligible store purchases. Toywards are credited to your active Rewards Balance to spend on future plugins and sound kits at checkout.
+                All registered Producer Toy account holders are automatically enrolled in the <Link href="/features/toywards" className="text-zinc-200 hover:text-white underline font-semibold">Toywards Loyalty Program</Link>. You earn up to 20% back in Toywards on eligible store purchases. Toywards are credited to your active Rewards Balance to spend on future plugins and sound kits at checkout.
               </p>
               
               <h3 className="text-base font-bold text-zinc-200 pt-2">11.2 Redemption, Cap & Expiration</h3>
@@ -243,7 +243,7 @@ export default function EulaPage() {
                 <li>Your maximum Toywards balance is capped at <strong>USD $500</strong> (or local currency equivalent, e.g. INR).</li>
                 <li>Toywards are applied at checkout on a <strong>first-in, first-out</strong> basis and can be combined with store promotions and creator discount coupons.</li>
                 <li>Toywards have no cash value outside of Producer Toy Store and cannot be transferred, traded, or cashed out.</li>
-                <li>If an order is refunded in accordance with our <Link href="/purchase-policy" className="text-[#0084FF] underline">Purchase Policy</Link>, any Toywards earned from that purchase will be deducted from your balance.</li>
+                <li>If an order is refunded in accordance with our <Link href="/purchase-policy" className="text-zinc-200 hover:text-white underline font-semibold">Purchase Policy</Link>, any Toywards earned from that purchase will be deducted from your balance.</li>
               </ul>
             </div>
           </section>
@@ -306,10 +306,10 @@ export default function EulaPage() {
             </h2>
             <p className="text-zinc-400">
               For enterprise licensing, synchronization clearances, or questions regarding this Agreement, contact our legal desk at{' '}
-              <a href="mailto:support@producertoy.com" className="text-[#0084FF] font-semibold hover:underline">
+              <a href="mailto:support@producertoy.com" className="text-zinc-200 font-semibold hover:text-white hover:underline">
                 support@producertoy.com
               </a>{' '}
-              or visit our <Link href="/contact" className="text-[#0084FF] underline">Contact Desk</Link>.
+              or visit our <Link href="/contact" className="text-zinc-200 hover:text-white underline font-semibold">Contact Desk</Link>.
             </p>
           </section>
 

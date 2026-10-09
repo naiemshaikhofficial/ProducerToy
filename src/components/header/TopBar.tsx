@@ -818,7 +818,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 placeholder="Search"
                 value={desktopSearchQuery}
                 onChange={(e) => setDesktopSearchQuery(e.target.value)}
-                className="bg-[#202024] hover:bg-[#28282c] focus:bg-[#28282c] border border-white/10 rounded-full pl-9 pr-7 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none w-[160px] lg:w-[200px] transition-all focus:border-[#0084FF]"
+                className="bg-[#202024] hover:bg-[#28282c] focus:bg-[#28282c] border border-white/10 rounded-full pl-9 pr-7 py-1.5 text-xs text-white placeholder-zinc-400 focus:outline-none w-[160px] lg:w-[200px] transition-all focus:border-[#34363d]"
               />
               {desktopSearchQuery && (
                 <button
@@ -1039,11 +1039,11 @@ export const TopBar: React.FC<TopBarProps> = ({
             </div>
           ) : null}
 
-          {/* Primary Action Button: Dynamic Sign In (if guest) or Library (if logged in) in brand secondary orange */}
+          {/* Primary Action Button: Dynamic Sign In (if guest) or Library (if logged in) */}
           <Link
             href={user ? "/library" : "/auth"}
             prefetch={true}
-            className="bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-md shadow-[#0084FF]/20 flex items-center justify-center cursor-pointer tracking-tight"
+            className="bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-bold text-xs sm:text-sm px-5 py-2 sm:py-2.5 rounded-xl active:scale-95 transition-all shadow-md shadow-black/40 flex items-center justify-center cursor-pointer tracking-tight"
           >
             {user ? 'Library' : 'Sign In'}
           </Link>
@@ -1065,7 +1065,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               <Link
                 href={user ? "/library" : "/auth"}
                 prefetch={true}
-                className="bg-[#0084FF] hover:bg-[#006fe6] text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
+                className="bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg active:scale-95 transition-all shadow-xs flex items-center justify-center tracking-tight"
               >
                 {user ? 'Library' : 'Sign In'}
               </Link>

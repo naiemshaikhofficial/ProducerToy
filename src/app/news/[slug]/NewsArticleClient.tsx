@@ -299,7 +299,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   const fallbackPrompt = '/icon.png'
 
   return (
-    <article className="min-h-screen bg-[#121212] text-white selection:bg-[#0084FF] selection:text-white relative overflow-hidden">
+    <article className="min-h-screen bg-[#121212] text-white selection:bg-[#34363d] selection:text-white relative overflow-hidden">
       {/* 1:1 Epic Games Sharp Atmospheric Product Background: Full clarity at top behind transparent fixed header, smoothly dissolves down into pure #121212 */}
       <div
         className="absolute top-0 left-0 right-0 w-full overflow-hidden z-0 pointer-events-none select-none h-[420px] sm:h-[620px]"
@@ -413,9 +413,9 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                   type="button"
                   onClick={handleCopyCoupon}
                   title="Click to copy coupon code"
-                  className="mb-3.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#18181c] border border-white/10 hover:border-[#0084FF]/60 hover:bg-[#0084FF]/10 text-zinc-300 hover:text-white transition-all text-xs font-mono tracking-wider cursor-pointer group active:scale-95 shadow-sm"
+                  className="mb-3.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-[#18181c] border border-white/10 hover:border-[#34363d]/60 hover:bg-[#34363d]/10 text-zinc-300 hover:text-white transition-all text-xs font-mono tracking-wider cursor-pointer group active:scale-95 shadow-sm"
                 >
-                  <Tag className="w-3.5 h-3.5 text-[#0084FF]" />
+                  <Tag className="w-3.5 h-3.5 text-zinc-200" />
                   <span className="text-[11px] text-zinc-400 font-sans tracking-normal font-medium">Coupon:</span>
                   <span className="text-[#38bdf8] font-bold tracking-widest">{couponCode}</span>
                   {copiedCoupon ? (
@@ -436,8 +436,8 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                 href={offerUrl}
                 target={offerUrl.startsWith('/') ? '_self' : '_blank'}
                 rel={offerUrl.startsWith('/') ? undefined : 'noopener noreferrer'}
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 !bg-[#0084FF] hover:!bg-[#006fe6] !text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-[#0084FF]/30 active:scale-95 no-underline text-center group"
-                style={{ backgroundColor: '#0084FF', color: '#ffffff' }}
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 !bg-[#34363d] hover:!bg-[#42454e] !text-white font-bold text-base rounded-xl transition-all shadow-lg hover:shadow-black/40 active:scale-95 no-underline text-center group"
+                style={{ backgroundColor: '#34363d', color: '#ffffff' }}
               >
                 <span>
                   {getProductCtaLabel({

@@ -81,7 +81,7 @@ export const TransactionsTab: React.FC<TransactionsTabProps> = ({ user }) => {
           <div className="pt-2">
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 bg-[#0084FF] hover:bg-[#006fe6] text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-md active:scale-95"
+              className="inline-flex items-center gap-2 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-md active:scale-95"
             >
               <span>Explore Store Catalog</span>
               <ChevronRight className="w-4 h-4" />

@@ -63,7 +63,7 @@ export function HomeBrandSeoSection() {
 
       {/* Brand Hero & Mission Showcase */}
       <div className="text-center max-w-4xl mx-auto mb-10 sm:mb-12 px-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0084FF]/10 border border-[#0084FF]/30 text-[#0084FF] text-xs font-bold uppercase tracking-wider mb-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#34363d]/40 border border-[#34363d] text-zinc-200 text-xs font-bold uppercase tracking-wider mb-4">
           <Sparkles className="w-3.5 h-3.5" />
           Official Digital Audio Marketplace
         </div>
@@ -88,7 +88,7 @@ export function HomeBrandSeoSection() {
           </Link>
           <Link
             href="/free-vst-plugins"
-            className="px-5 py-2.5 rounded-xl bg-[#0084FF]/15 hover:bg-[#0084FF]/25 text-[#0084FF] border border-[#0084FF]/30 font-bold text-xs sm:text-sm transition-all cursor-pointer"
+            className="px-5 py-2.5 rounded-xl bg-[#34363d] hover:bg-[#42454e] text-white border border-white/10 font-bold text-xs sm:text-sm transition-all cursor-pointer"
           >
             Free VST Plugins
           </Link>
@@ -98,7 +98,7 @@ export function HomeBrandSeoSection() {
       {/* 3-Column Balanced Trust Pillars */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-14 sm:mb-16">
         <div className="p-6 rounded-2xl bg-[#161618] border border-white/5 hover:border-white/10 transition-all shadow-lg flex flex-col justify-between">
-          <div className="w-10 h-10 rounded-xl bg-[#0084FF]/10 border border-[#0084FF]/25 flex items-center justify-center text-[#0084FF] mb-4">
+          <div className="w-10 h-10 rounded-xl bg-[#34363d]/40 border border-[#34363d] flex items-center justify-center text-zinc-200 mb-4">
             <Sliders className="w-5 h-5" />
           </div>
           <div>
@@ -110,7 +110,7 @@ export function HomeBrandSeoSection() {
         </div>
 
         <div className="p-6 rounded-2xl bg-[#161618] border border-white/5 hover:border-white/10 transition-all shadow-lg flex flex-col justify-between">
-          <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-blue-400 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-[#34363d]/40 border border-[#34363d] flex items-center justify-center text-zinc-200 mb-4">
             <Disc3 className="w-5 h-5" />
           </div>
           <div>
@@ -162,7 +162,7 @@ export function HomeBrandSeoSection() {
                   </span>
                   <ChevronDown
                     className={`w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-[#0084FF]' : ''
+                      isOpen ? 'rotate-180 text-white' : ''
                     }`}
                   />
                 </button>

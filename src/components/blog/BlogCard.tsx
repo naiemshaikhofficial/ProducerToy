@@ -53,7 +53,7 @@ export function BlogCard({ post, priority = false }: BlogCardProps) {
 
           {/* Article Headline */}
           <Link href={`/blog/${post.slug}`} prefetch={true} className="block group/title">
-            <h3 className="text-base sm:text-lg font-bold text-white group-hover/title:text-[#0084FF] transition-colors leading-snug line-clamp-2">
+            <h3 className="text-base sm:text-lg font-bold text-white group-hover/title:text-zinc-200 transition-colors leading-snug line-clamp-2">
               {post.title}
             </h3>
           </Link>

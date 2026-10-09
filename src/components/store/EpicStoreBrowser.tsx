@@ -385,7 +385,7 @@ export function EpicStoreBrowser({
               <div
                 className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                   selectedEvents.discounted
-                    ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                    ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                     : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
@@ -408,7 +408,7 @@ export function EpicStoreBrowser({
               <div
                 className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                   selectedEvents.free
-                    ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                    ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                     : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
@@ -431,7 +431,7 @@ export function EpicStoreBrowser({
               <div
                 className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                   selectedEvents.rentToOwn
-                    ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                    ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                     : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                 }`}
               >
@@ -466,7 +466,7 @@ export function EpicStoreBrowser({
                   <div
                     className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                       isChecked
-                        ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                        ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
@@ -513,7 +513,7 @@ export function EpicStoreBrowser({
                     <div
                       className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                         isChecked
-                          ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                          ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                           : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                       }`}
                     >
@@ -554,7 +554,7 @@ export function EpicStoreBrowser({
                   <div
                     className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                       isChecked
-                        ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                        ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
@@ -595,7 +595,7 @@ export function EpicStoreBrowser({
                   <div
                     className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                       isChecked
-                        ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                        ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
@@ -636,7 +636,7 @@ export function EpicStoreBrowser({
                   <div
                     className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                       isChecked
-                        ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                        ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                         : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                     }`}
                   >
@@ -685,7 +685,7 @@ export function EpicStoreBrowser({
                           <div
                             className={`w-[18px] h-[18px] rounded-[4px] border flex items-center justify-center transition-all shrink-0 ${
                               isChecked
-                                ? 'bg-[#0084FF] border-[#0084FF] text-black shadow-sm'
+                                ? 'bg-[#34363d] border-[#34363d] text-white shadow-sm'
                                 : 'border-[#3e3e3e] bg-transparent group-hover:border-zinc-400'
                             }`}
                           >
@@ -830,12 +830,12 @@ export function EpicStoreBrowser({
                         }}
                         className={`w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between cursor-pointer ${
                           selectedSort === opt.id
-                            ? 'text-[#0084FF] font-bold bg-[#222222]'
+                            ? 'text-white font-bold bg-[#34363d]/40'
                             : 'text-zinc-300 hover:text-white hover:bg-[#202020]'
                         }`}
                       >
                         <span>{opt.label}</span>
-                        {selectedSort === opt.id && <Check className="w-3.5 h-3.5 text-[#0084FF]" />}
+                        {selectedSort === opt.id && <Check className="w-3.5 h-3.5 text-white" />}
                       </button>
                     ))}
                   </div>
@@ -961,7 +961,7 @@ export function EpicStoreBrowser({
               <button
                 type="button"
                 onClick={handleResetAll}
-                className="text-xs text-[#0084FF] hover:underline font-semibold ml-2 cursor-pointer"
+                className="text-xs text-zinc-300 hover:text-white hover:underline font-semibold ml-2 cursor-pointer"
               >
                 Clear all
               </button>
@@ -978,7 +978,7 @@ export function EpicStoreBrowser({
               onClick={() => setIsMobileFilterOpen(true)}
               className="bg-[#202020] hover:bg-[#282828] text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 border border-[#303030] cursor-pointer"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#0084FF]" />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-zinc-200" />
               <span>Filters {activeFilterCount > 0 && `(${activeFilterCount})`}</span>
             </button>
           </div>
@@ -1005,7 +1005,7 @@ export function EpicStoreBrowser({
                   <button
                     type="button"
                     onClick={handleResetAll}
-                    className="bg-[#0084FF] hover:bg-[#006FE6] text-white font-bold text-xs py-2.5 px-6 rounded-full inline-block uppercase transition-all shadow-md cursor-pointer"
+                    className="bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-bold text-xs py-2.5 px-6 rounded-full inline-block uppercase transition-all shadow-md cursor-pointer"
                   >
                     Reset Filters
                   </button>
@@ -1105,7 +1105,7 @@ export function EpicStoreBrowser({
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="flex-1 h-12 bg-[#0084FF] hover:bg-[#006FE6] text-white rounded-[10px] font-bold text-[14.5px] shadow-lg shadow-[#0084FF]/20 transition-all cursor-pointer text-center flex items-center justify-center"
+                  className="flex-1 h-12 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white rounded-[10px] font-bold text-[14.5px] shadow-lg shadow-black/40 transition-all cursor-pointer text-center flex items-center justify-center"
                 >
                   Apply
                 </button>
@@ -1202,7 +1202,7 @@ export function EpicStoreBrowser({
             <button
               type="button"
               onClick={() => setIsMobileFilterOpen(false)}
-              className="flex-1 h-12 bg-[#0084FF] hover:bg-[#006FE6] text-white rounded-[10px] font-bold text-[14.5px] shadow-lg shadow-[#0084FF]/20 transition-all cursor-pointer text-center flex items-center justify-center"
+              className="flex-1 h-12 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white rounded-[10px] font-bold text-[14.5px] shadow-lg shadow-black/40 transition-all cursor-pointer text-center flex items-center justify-center"
             >
               Apply
             </button>

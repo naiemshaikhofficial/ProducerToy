@@ -543,7 +543,7 @@ function AuthForm() {
 
             {message && (
               <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
-                <CheckCircle2 className="w-4 h-4 text-[#0084FF] shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-zinc-200 shrink-0" />
                 <span>{message}</span>
               </div>
             )}
@@ -612,7 +612,7 @@ function AuthForm() {
 
                 {message && (
                   <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
-                    <CheckCircle2 className="w-4 h-4 text-[#0084FF] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-zinc-200 shrink-0" />
                     <span>{message}</span>
                   </div>
                 )}
@@ -766,7 +766,7 @@ function AuthForm() {
 
             {message && (
               <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
-                <CheckCircle2 className="w-4 h-4 text-[#0084FF] shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-zinc-200 shrink-0" />
                 <span>{message}</span>
               </div>
             )}
@@ -1026,7 +1026,7 @@ function AuthForm() {
             {/* Info / Success Message Pill */}
             {message && (
               <div className="bg-[#1c1c1f] border border-[#2e2e33] text-zinc-200 px-4 py-2.5 rounded-xl text-xs font-medium flex items-center justify-center gap-2 w-full animate-in fade-in shadow-sm">
-                <CheckCircle2 className="w-4 h-4 text-[#0084FF] shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-zinc-200 shrink-0" />
                 <span>{message}</span>
               </div>
             )}

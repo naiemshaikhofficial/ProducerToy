@@ -226,7 +226,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
                 />
               ) : (
                 <div className="flex flex-col items-center gap-1 text-zinc-400">
-                  <Building2 className="w-8 h-8 text-[#0084FF]" />
+                  <Building2 className="w-8 h-8 text-zinc-200" />
                   <span className="text-xs font-black uppercase">{brand.name.slice(0, 3)}</span>
                 </div>
               )}
@@ -235,7 +235,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
             {/* Brand Meta & Info */}
             <div className="space-y-3 flex-1">
               <div className="flex flex-wrap items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-[#2a170d] text-[#0084FF] border border-[#542813]">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-[#2a170d] text-zinc-200 border border-[#542813]">
                   <CheckCircle2 size={13} />
                   Official Audio Developer
                 </span>
@@ -259,7 +259,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
               <Link
                 href={`/store?brand=${brand.slug}`}
                 prefetch={true}
-                className="bg-[#0084FF] hover:bg-[#006FE6] text-white text-xs font-black px-6 py-3 rounded-xl uppercase tracking-wider text-center transition-all shadow-lg inline-flex items-center justify-center gap-2 group whitespace-nowrap"
+                className="bg-[#34363d] hover:bg-[#42454e] text-white text-xs font-black px-6 py-3 rounded-xl uppercase tracking-wider text-center transition-all shadow-lg inline-flex items-center justify-center gap-2 group whitespace-nowrap"
               >
                 <ShoppingBag size={14} className="transition-transform group-hover:scale-110" />
                 <span>View Products in Store</span>
@@ -273,7 +273,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
                   className="bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-zinc-700/80 text-xs font-bold px-5 py-3 rounded-xl uppercase tracking-wider text-center transition-all inline-flex items-center justify-center gap-2"
                 >
                   <span>Official Website</span>
-                  <ExternalLink size={13} className="text-[#0084FF]" />
+                  <ExternalLink size={13} className="text-zinc-200" />
                 </a>
               )}
             </div>
@@ -360,7 +360,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
             </div>
           ) : (
             <div className="text-center py-16 px-6 rounded-3xl bg-[#161616] border border-[#262626] max-w-3xl mx-auto shadow-2xl space-y-4 my-8">
-              <div className="w-16 h-16 rounded-2xl bg-[#202020] border border-[#2a2a2a] text-[#0084FF] flex items-center justify-center mx-auto shadow-inner">
+              <div className="w-16 h-16 rounded-2xl bg-[#202020] border border-[#2a2a2a] text-zinc-200 flex items-center justify-center mx-auto shadow-inner">
                 <Handshake className="w-8 h-8" />
               </div>
               <p className="text-xs font-extrabold uppercase tracking-widest text-zinc-400">
@@ -405,7 +405,7 @@ export default async function BrandShowcasePage({ params, searchParams }: BrandP
               <Link
                 href="/manufacturers"
                 prefetch={true}
-                className="text-xs font-bold text-[#0084FF] hover:underline uppercase tracking-wider"
+                className="text-xs font-bold text-zinc-200 hover:underline uppercase tracking-wider"
               >
                 View All Developers &rarr;
               </Link>

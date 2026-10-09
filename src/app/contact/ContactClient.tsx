@@ -66,7 +66,7 @@ export function ContactClient() {
             <span>Back to Store</span>
           </Link>
           <div className="space-y-1">
-            <span className="text-xs font-bold text-[#0084FF] tracking-wider uppercase">
+            <span className="text-xs font-bold text-zinc-200 tracking-wider uppercase">
               Customer Support &amp; Grievance Redressal
             </span>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -113,7 +113,7 @@ export function ContactClient() {
 
         {submitted ? (
           <div className="bg-[#181818] border border-zinc-800 rounded-2xl p-8 sm:p-12 text-center space-y-4 shadow-2xl animate-in fade-in duration-200">
-            <div className="w-16 h-16 bg-[#251b14] border border-[#0084ff]/30 rounded-full flex items-center justify-center mx-auto text-[#0084ff]">
+            <div className="w-16 h-16 bg-[#251b14] border border-[#34363d]/30 rounded-full flex items-center justify-center mx-auto text-zinc-200">
               <CheckCircle2 size={32} />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-white">Message Received</h2>
@@ -163,7 +163,7 @@ export function ContactClient() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                  Full Name <span className="text-[#0084ff]">*</span>
+                  Full Name <span className="text-zinc-200">*</span>
                 </label>
                 <input
                   type="text"
@@ -172,13 +172,13 @@ export function ContactClient() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. John Doe"
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#0084ff] transition-colors"
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                  Email Address <span className="text-[#0084ff]">*</span>
+                  Email Address <span className="text-zinc-200">*</span>
                 </label>
                 <input
                   type="email"
@@ -187,7 +187,7 @@ export function ContactClient() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="e.g. producer@gmail.com"
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#0084ff] transition-colors"
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors"
                 />
               </div>
             </div>
@@ -203,19 +203,19 @@ export function ContactClient() {
                   value={formData.orderId}
                   onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
                   placeholder="e.g. PT-M82..."
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#0084ff] transition-colors"
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                  Subject Category <span className="text-[#0084ff]">*</span>
+                  Subject Category <span className="text-zinc-200">*</span>
                 </label>
                 <select
                   name="subject"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#0084ff] transition-colors cursor-pointer"
+                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors cursor-pointer"
                 >
                   <option value="Order & Download Support">Order & Download Support</option>
                   <option value="Toywards Loyalty Points">Toywards Loyalty Points Inquiry</option>
@@ -229,7 +229,7 @@ export function ContactClient() {
 
             <div className="space-y-2">
               <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                Message & Details <span className="text-[#0084ff]">*</span>
+                Message & Details <span className="text-zinc-200">*</span>
               </label>
               <textarea
                 name="message"
@@ -238,14 +238,14 @@ export function ContactClient() {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Please describe your query or issue in detail..."
-                className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#0084ff] transition-colors resize-none"
+                className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors resize-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto bg-[#0084ff] hover:bg-[#006fe6] disabled:opacity-60 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto bg-[#34363d] hover:bg-[#42454e] disabled:opacity-60 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
             >
               {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
@@ -259,7 +259,7 @@ export function ContactClient() {
           {/* Box 1: Registered Merchant Entity */}
           <div className="bg-[#181818] border border-zinc-800 rounded-xl p-5 space-y-3">
             <div className="flex items-center gap-2 text-white font-bold text-sm">
-              <Building2 size={16} className="text-[#0084ff]" />
+              <Building2 size={16} className="text-zinc-200" />
               <span>Registered Business Details</span>
             </div>
             <div className="space-y-2 text-zinc-400">
@@ -269,7 +269,7 @@ export function ContactClient() {
               </p>
               <p className="flex items-center gap-2">
                 <Mail size={14} className="text-zinc-500 flex-shrink-0" />
-                <span><strong>Support Email:</strong> <a href="mailto:support@producertoy.com" className="text-[#0084ff] hover:underline">support@producertoy.com</a></span>
+                <span><strong>Support Email:</strong> <a href="mailto:support@producertoy.com" className="text-zinc-200 hover:underline">support@producertoy.com</a></span>
               </p>
               <p className="flex items-center gap-2">
                 <Clock size={14} className="text-zinc-500 flex-shrink-0" />
@@ -281,7 +281,7 @@ export function ContactClient() {
           {/* Box 2: Statutory Grievance & Nodal Officer */}
           <div className="bg-[#181818] border border-zinc-800 rounded-xl p-5 space-y-3">
             <div className="flex items-center gap-2 text-white font-bold text-sm">
-              <ShieldCheck size={16} className="text-[#0084ff]" />
+              <ShieldCheck size={16} className="text-zinc-200" />
               <span>Grievance Redressal (RBI &amp; IT Act)</span>
             </div>
             <div className="space-y-2 text-zinc-400">
@@ -290,7 +290,7 @@ export function ContactClient() {
               </p>
               <p className="flex items-center gap-2">
                 <Mail size={14} className="text-zinc-500 flex-shrink-0" />
-                <span><strong>Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-[#0084ff] hover:underline">grievance@producertoy.com</a></span>
+                <span><strong>Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:underline">grievance@producertoy.com</a></span>
               </p>
               <p className="text-[11px] text-zinc-500 leading-relaxed">
                 In compliance with Consumer Protection Rules 2020 and RBI Payment Aggregator Directions, grievances are acknowledged within 24 hours and resolved within <strong>D+4 business days</strong>.

@@ -120,20 +120,20 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {/* Prism 1: Top Right Diamond Crystal */}
                 <div 
-                  className="absolute -top-6 -right-6 w-36 h-36 border border-[#0084FF]/40 bg-gradient-to-br from-[#0084FF]/25 via-[#38BDF8]/15 to-transparent rotate-45 backdrop-blur-[2px] shadow-[0_0_30px_rgba(0, 132, 255,0.3)]"
+                  className="absolute -top-6 -right-6 w-36 h-36 border border-white/20 bg-gradient-to-br from-[#34363d]/40 via-white/10 to-transparent rotate-45 backdrop-blur-[2px] shadow-[0_0_30px_rgba(0,0,0,0.5)]"
                   style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}
                 />
                 
                 {/* Prism 2: Bottom Left Reflective Crystal */}
                 <div 
-                  className="absolute -bottom-8 -left-6 w-44 h-44 border border-[#00A3FF]/40 bg-gradient-to-tr from-[#0084FF]/30 via-[#006FE6]/20 to-transparent rotate-12 backdrop-blur-[2px] shadow-[0_0_40px_rgba(0, 132, 255,0.4)]"
+                  className="absolute -bottom-8 -left-6 w-44 h-44 border border-white/20 bg-gradient-to-tr from-[#34363d]/50 via-white/10 to-transparent rotate-12 backdrop-blur-[2px] shadow-[0_0_40px_rgba(0,0,0,0.6)]"
                   style={{ clipPath: 'polygon(30% 0%, 90% 20%, 100% 80%, 20% 100%)' }}
                 />
 
-                {/* Starry Dust & Neon Ambient Lighting */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#0084FF]/20 rounded-full blur-3xl pointer-events-none" />
+                {/* Starry Dust & Ambient Lighting */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/[0.06] rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute top-8 left-1/3 w-1.5 h-1.5 bg-white rounded-full blur-[0.5px] shadow-[0_0_8px_#ffffff]" />
-                <div className="absolute bottom-16 right-1/4 w-2 h-2 bg-[#FFAE74] rounded-full blur-[0.5px] shadow-[0_0_10px_#FFAE74]" />
+                <div className="absolute bottom-16 right-1/4 w-2 h-2 bg-zinc-300 rounded-full blur-[0.5px] shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
               </div>
 
               {/* Typography */}
@@ -205,8 +205,8 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                             aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
                             className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
                               isSaved
-                                ? 'bg-[#0084FF] text-white border border-[#0084FF] shadow-[0_0_10px_rgba(0, 132, 255,0.4)] opacity-100 hover:bg-[#006fe6]'
-                                : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#0084FF]/70 hover:text-[#0084FF] hover:bg-[#1c1c20] opacity-0 group-hover:opacity-100 shadow-sm hover:scale-105'
+                                ? 'bg-[#34363d] text-white border border-white/20 shadow-[0_0_10px_rgba(0,0,0,0.5)] opacity-100 hover:bg-[#42454e]'
+                                : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#34363d] hover:text-white hover:bg-[#1c1c20] opacity-0 group-hover:opacity-100 shadow-sm hover:scale-105'
                             }`}
                             title={isSaved ? 'Saved in Wishlist' : 'Save to Wishlist'}
                           >
@@ -236,7 +236,7 @@ export function EpicNewReleases({ products = [] }: EpicNewReleasesProps) {
                               </span>
                             ) : hasDiscount ? (
                               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                                <span className="bg-[#0084FF] text-white font-extrabold text-xs px-1.5 py-0.5 rounded">
+                                <span className="bg-[#34363d] text-white font-extrabold text-xs px-1.5 py-0.5 rounded border border-white/15">
                                   -{discountPercent}%
                                 </span>
                                 <span className="line-through text-zinc-500 text-xs font-normal">

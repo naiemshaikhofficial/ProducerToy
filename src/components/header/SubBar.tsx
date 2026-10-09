@@ -262,7 +262,7 @@ export const SubBar: React.FC<SubBarProps> = ({
               >
                 <ShoppingCart className="w-[19px] h-[19px] stroke-[1.8]" />
                 {itemCount > 0 && (
-                  <span className="bg-[#0084FF] text-white text-[11px] font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-md leading-none">
+                  <span className="bg-[#34363d] text-white text-[11px] font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-md leading-none border border-white/15">
                     {itemCount}
                   </span>
                 )}
@@ -382,7 +382,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-white truncate group-hover:text-[#0084FF] transition-colors">
+                        <p className="text-[13px] font-medium text-white truncate group-hover:text-zinc-200 transition-colors">
                           {item.name}
                         </p>
                         {ENABLE_BRANDS && item.brand && (
@@ -407,7 +407,7 @@ export const SubBar: React.FC<SubBarProps> = ({
                       setIsSuggestionsOpen(false)
                       onSearchSubmit(e)
                     }}
-                    className="text-[#0084FF] hover:underline font-medium cursor-pointer"
+                    className="text-zinc-300 hover:text-white hover:underline font-medium cursor-pointer"
                   >
                     View All &rarr;
                   </button>
@@ -517,7 +517,7 @@ export const SubBar: React.FC<SubBarProps> = ({
           >
             <span>Cart</span>
             {itemCount > 0 && (
-              <span className="bg-[#0084FF] text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+              <span className="bg-[#34363d] text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full min-w-[20px] text-center border border-white/15">
                 {itemCount}
               </span>
             )}
