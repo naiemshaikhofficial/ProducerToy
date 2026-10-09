@@ -1567,18 +1567,18 @@ export function EpicSupportAssistant({
       {/* SCREEN 1: HERO LANDING STATE (Exact 1:1 Epic Games Style in Orange Shade) */}
       {/* ========================================================================= */}
       {!isChatStarted ? (
-        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#03060a] text-white font-sans selection:bg-[#34363d] selection:text-white overflow-hidden flex flex-col items-center justify-center">
+        <div className="support-page-container relative w-full flex-1 min-h-[calc(100vh-76px)] bg-[#121212] text-white font-sans selection:bg-[#34363d] selection:text-white overflow-hidden flex flex-col items-center justify-center">
           
-          {/* Ambient Glowing Background: Exact Epic Games 3D angled geometry & elements in rich electric blue shade */}
-          {/* Deep Volumetric Atmospheric Blue Glow & Light Cones */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_12%_15%,_rgba(0,132,255,0.40)_0%,_rgba(0,180,255,0.22)_32%,_rgba(0,210,255,0.08)_60%,_transparent_80%)] pointer-events-none z-0" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_90%_25%,_rgba(0,132,255,0.20)_0%,_rgba(0,180,255,0.06)_40%,_transparent_70%)] pointer-events-none z-0" />
+          {/* Ambient Glowing Background: Charcoal #34363d theme */}
+          {/* Deep Volumetric Atmospheric Charcoal Glow & Light Cones */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_12%_15%,_rgba(52,54,61,0.50)_0%,_rgba(40,42,48,0.30)_32%,_rgba(25,26,30,0.15)_60%,_transparent_80%)] pointer-events-none z-0" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_90%_25%,_rgba(52,54,61,0.30)_0%,_rgba(40,42,48,0.12)_40%,_transparent_70%)] pointer-events-none z-0" />
 
           {/* Large Angled Volumetric Light Shaft slicing from top-left across screen */}
           <div className="absolute -top-36 -left-32 w-[900px] h-[650px] -rotate-[38deg] bg-gradient-to-r from-[#34363d]/40 via-zinc-600/22 to-transparent blur-3xl pointer-events-none z-0" />
           <div className="absolute top-1/4 right-[2%] w-[260px] h-[600px] bg-gradient-to-b from-[#34363d]/25 via-zinc-700/12 to-transparent blur-3xl rounded-full pointer-events-none z-0" />
           
-          {/* Epic Games Exact Match: Cinematic Camera Depth-of-Field Blurred Bokeh & Out-of-Focus 3D Stage Beams */}
+          {/* Cinematic Camera Depth-of-Field Blurred Bokeh & Out-of-Focus 3D Stage Beams */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden"
             viewBox="0 0 1440 900"
@@ -1607,44 +1607,44 @@ export function EpicSupportAssistant({
               </filter>
 
               {/* Glowing Beams Gradients */}
-              <linearGradient id="epicBlueBeam" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#80c8ff" stopOpacity="0.9" />
+              <linearGradient id="epicCharcoalBeam" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#71717a" stopOpacity="0.8" />
                 <stop offset="45%" stopColor="#34363d" stopOpacity="0.75" />
-                <stop offset="100%" stopColor="#0047ab" stopOpacity="0.1" />
+                <stop offset="100%" stopColor="#18181b" stopOpacity="0.1" />
               </linearGradient>
 
               <linearGradient id="epicMutedBeam" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.6" />
+                <stop offset="0%" stopColor="#a1a1aa" stopOpacity="0.5" />
                 <stop offset="60%" stopColor="#34363d" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
               <linearGradient id="epicTrussFill" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#34363d" stopOpacity="0.12" />
-                <stop offset="60%" stopColor="#0284c7" stopOpacity="0.04" />
+                <stop offset="60%" stopColor="#27272a" stopOpacity="0.04" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </linearGradient>
 
               {/* Music Notation Gradient */}
               <linearGradient id="musicNoteGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.9" />
-                <stop offset="40%" stopColor="#38bdf8" stopOpacity="0.8" />
+                <stop offset="0%" stopColor="#e4e4e7" stopOpacity="0.9" />
+                <stop offset="40%" stopColor="#a1a1aa" stopOpacity="0.8" />
                 <stop offset="100%" stopColor="#34363d" stopOpacity="0.4" />
               </linearGradient>
 
               {/* Music Wave Gradient */}
               <linearGradient id="musicWaveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.1" />
+                <stop offset="0%" stopColor="#52525b" stopOpacity="0.1" />
                 <stop offset="25%" stopColor="#34363d" stopOpacity="0.7" />
-                <stop offset="50%" stopColor="#7dd3fc" stopOpacity="0.9" />
+                <stop offset="50%" stopColor="#d4d4d8" stopOpacity="0.9" />
                 <stop offset="75%" stopColor="#34363d" stopOpacity="0.7" />
-                <stop offset="100%" stopColor="#0047ab" stopOpacity="0.1" />
+                <stop offset="100%" stopColor="#18181b" stopOpacity="0.1" />
               </linearGradient>
 
               {/* Circular Camera Aperture Bokeh Disc */}
               <radialGradient id="musicBokehCircle" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.55" />
-                <stop offset="45%" stopColor="#38bdf8" stopOpacity="0.32" />
+                <stop offset="0%" stopColor="#f4f4f5" stopOpacity="0.45" />
+                <stop offset="45%" stopColor="#71717a" stopOpacity="0.25" />
                 <stop offset="85%" stopColor="#34363d" stopOpacity="0.14" />
                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
               </radialGradient>
@@ -1675,7 +1675,7 @@ export function EpicSupportAssistant({
             <path
               d="M -80 620 C 220 480, 500 740, 820 590 S 1220 470, 1520 640"
               fill="none"
-              stroke="url(#epicBlueBeam)"
+              stroke="url(#epicCharcoalBeam)"
               strokeWidth="6"
               filter="url(#epicBokehExtreme)"
               opacity="0.35"
@@ -1715,22 +1715,22 @@ export function EpicSupportAssistant({
 
             {/* --- 3. DAW STUDIO AUDIO EQUALIZER SPECTRUM BARS (OUT-OF-FOCUS) --- */}
             <g transform="translate(610, 230)" filter="url(#epicBokehHeavy)" opacity="0.45">
-              <rect x="0" y="45" width="9" height="55" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="18" y="22" width="9" height="78" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="36" y="8" width="9" height="92" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="54" y="32" width="9" height="68" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="72" y="14" width="9" height="86" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="90" y="38" width="9" height="62" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="108" y="55" width="9" height="45" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="126" y="34" width="9" height="66" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="144" y="18" width="9" height="82" rx="4.5" fill="url(#epicBlueBeam)" />
-              <rect x="162" y="48" width="9" height="52" rx="4.5" fill="url(#epicBlueBeam)" />
+              <rect x="0" y="45" width="9" height="55" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="18" y="22" width="9" height="78" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="36" y="8" width="9" height="92" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="54" y="32" width="9" height="68" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="72" y="14" width="9" height="86" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="90" y="38" width="9" height="62" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="108" y="55" width="9" height="45" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="126" y="34" width="9" height="66" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="144" y="18" width="9" height="82" rx="4.5" fill="url(#epicCharcoalBeam)" />
+              <rect x="162" y="48" width="9" height="52" rx="4.5" fill="url(#epicCharcoalBeam)" />
             </g>
 
             {/* --- 4. STUDIO MONITOR ACOUSTIC SOUND RIPPLE RINGS --- */}
             <g transform="translate(230, 470)" filter="url(#epicBokehHeavy)" opacity="0.32">
               <circle cx="0" cy="0" r="75" fill="none" stroke="#34363d" strokeWidth="2.5" strokeDasharray="6 8" />
-              <circle cx="0" cy="0" r="120" fill="none" stroke="#38bdf8" strokeWidth="2" strokeDasharray="10 12" />
+              <circle cx="0" cy="0" r="120" fill="none" stroke="#71717a" strokeWidth="2" strokeDasharray="10 12" />
               <circle cx="0" cy="0" r="165" fill="none" stroke="#34363d" strokeWidth="1.5" strokeDasharray="14 16" />
             </g>
 
@@ -1744,15 +1744,15 @@ export function EpicSupportAssistant({
 
           {/* Floating Glowing Bokeh Dust Particles (Subtle Animation) */}
           <div className="absolute top-1/4 left-[24%] w-3 h-3 rounded-full bg-[#34363d] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
-          <div className="absolute top-[32%] left-[28%] w-1.5 h-1.5 rounded-full bg-cyan-400 opacity-95 pointer-events-none z-0 shadow-[0_0_10px_#06b6d4]" />
-          <div className="absolute bottom-1/3 left-[17%] w-4 h-4 rounded-full bg-[#0284c7] blur-[2px] opacity-75 pointer-events-none z-0" />
-          <div className="absolute top-[22%] right-[23%] w-2 h-2 rounded-full bg-cyan-400 opacity-75 pointer-events-none z-0 shadow-[0_0_8px_#06b6d4]" />
+          <div className="absolute top-[32%] left-[28%] w-1.5 h-1.5 rounded-full bg-zinc-300 opacity-95 pointer-events-none z-0 shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+          <div className="absolute bottom-1/3 left-[17%] w-4 h-4 rounded-full bg-zinc-600 blur-[2px] opacity-75 pointer-events-none z-0" />
+          <div className="absolute top-[22%] right-[23%] w-2 h-2 rounded-full bg-zinc-300 opacity-75 pointer-events-none z-0 shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
           <div className="absolute bottom-1/4 right-[21%] w-3 h-3 rounded-full bg-[#34363d] blur-[1px] opacity-80 pointer-events-none z-0 animate-pulse" />
-          <div className="absolute top-[48%] left-[14%] w-2 h-2 rounded-full bg-sky-300 opacity-85 pointer-events-none z-0 shadow-[0_0_6px_#7dd3fc]" />
-          <div className="absolute top-[60%] right-[32%] w-1.5 h-1.5 rounded-full bg-[#38bdf8] opacity-75 pointer-events-none z-0" />
+          <div className="absolute top-[48%] left-[14%] w-2 h-2 rounded-full bg-zinc-400 opacity-85 pointer-events-none z-0 shadow-[0_0_6px_rgba(255,255,255,0.3)]" />
+          <div className="absolute top-[60%] right-[32%] w-1.5 h-1.5 rounded-full bg-zinc-500 opacity-75 pointer-events-none z-0" />
 
           {/* Center ambient warm aura behind heading */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(0,132,255,0.18),_transparent_70%)] blur-3xl pointer-events-none z-0" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[950px] h-[520px] bg-[radial-gradient(ellipse_70%_55%_at_50%_45%,_rgba(52,54,61,0.35),_transparent_70%)] blur-3xl pointer-events-none z-0" />
 
           {/* Server Status: Exact Epic Games style with green dot & checkmark */}
           <div className="absolute top-5 right-6 sm:top-6 sm:right-10 z-20">
@@ -1772,7 +1772,7 @@ export function EpicSupportAssistant({
           {/* Center Hero Heading & Input (Strictly centered 1:1 with Epic Games) */}
           <main className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 w-full py-8 flex flex-col items-center justify-center text-center my-auto">
             <div className="space-y-3 mb-7 sm:mb-8 flex flex-col items-center">
-              <div className="relative w-20 h-20 sm:w-24 sm:h-24 transition-transform hover:scale-105 duration-300 drop-shadow-[0_0_28px_rgba(0,132,255,0.5)]">
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 transition-transform hover:scale-105 duration-300 drop-shadow-[0_0_28px_rgba(52,54,61,0.85)]">
                 <Image
                   src="/images/support-bot-logo.webp"
                   alt="Producer Toy Support Assistant Mascot"
@@ -1782,7 +1782,7 @@ export function EpicSupportAssistant({
                   className="object-contain"
                 />
               </div>
-              <p className="text-sm sm:text-[15px] font-medium text-sky-400 tracking-wide font-sans">
+              <p className="text-sm sm:text-[15px] font-medium text-zinc-300 tracking-wide font-sans">
                 Producer Toy Support
               </p>
               <h1 className="text-4xl sm:text-[48px] font-bold text-white tracking-tight leading-tight">
@@ -1906,9 +1906,9 @@ export function EpicSupportAssistant({
               }}
             >
               {/* Deep Atmospheric Studio Stage Glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[750px] h-[220px] bg-[radial-gradient(ellipse_75%_50%_at_50%_10%,_rgba(0, 132, 255,0.16)_0%,_rgba(255,123,43,0.06)_45%,_transparent_75%)] blur-3xl" />
-              <div className="absolute -top-16 -left-12 w-[500px] h-[200px] -rotate-[30deg] bg-gradient-to-r from-[#34363d]/16 via-amber-500/08 to-transparent blur-3xl" />
-              <div className="absolute -top-16 -right-12 w-[500px] h-[200px] rotate-[30deg] bg-gradient-to-l from-[#34363d]/14 via-amber-600/06 to-transparent blur-3xl" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[750px] h-[220px] bg-[radial-gradient(ellipse_75%_50%_at_50%_10%,_rgba(52,54,61,0.30)_0%,_rgba(30,32,38,0.15)_45%,_transparent_75%)] blur-3xl" />
+              <div className="absolute -top-16 -left-12 w-[500px] h-[200px] -rotate-[30deg] bg-gradient-to-r from-[#34363d]/16 via-zinc-600/08 to-transparent blur-3xl" />
+              <div className="absolute -top-16 -right-12 w-[500px] h-[200px] rotate-[30deg] bg-gradient-to-l from-[#34363d]/14 via-zinc-700/06 to-transparent blur-3xl" />
 
               {/* Chat Header Musical Bokeh SVG (Center kept completely clean and dark for 100% text contrast) */}
               <svg
@@ -1924,14 +1924,14 @@ export function EpicSupportAssistant({
                     <feGaussianBlur stdDeviation="8" />
                   </filter>
                   <linearGradient id="chatNoteGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#bae6fd" stopOpacity="0.75" />
-                    <stop offset="45%" stopColor="#38bdf8" stopOpacity="0.55" />
+                    <stop offset="0%" stopColor="#e4e4e7" stopOpacity="0.75" />
+                    <stop offset="45%" stopColor="#a1a1aa" stopOpacity="0.55" />
                     <stop offset="100%" stopColor="#34363d" stopOpacity="0.2" />
                   </linearGradient>
                   <linearGradient id="chatWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stopColor="transparent" />
                     <stop offset="20%" stopColor="#34363d" stopOpacity="0.35" />
-                    <stop offset="50%" stopColor="#38bdf8" stopOpacity="0.45" />
+                    <stop offset="50%" stopColor="#71717a" stopOpacity="0.45" />
                     <stop offset="80%" stopColor="#34363d" stopOpacity="0.35" />
                     <stop offset="100%" stopColor="transparent" />
                   </linearGradient>
@@ -1964,14 +1964,14 @@ export function EpicSupportAssistant({
                 </g>
 
                 {/* Outer Camera Aperture Bokeh Orbs (Pushed away from center) */}
-                <circle cx="280" cy="190" r="16" fill="#ffca80" filter="url(#chatBokehHeavy)" opacity="0.25" />
+                <circle cx="280" cy="190" r="16" fill="#71717a" filter="url(#chatBokehHeavy)" opacity="0.25" />
                 <circle cx="920" cy="180" r="18" fill="#34363d" filter="url(#chatBokehHeavy)" opacity="0.2" />
               </svg>
             </div>
 
             {/* Title Text Content with Mascot */}
             <div className="space-y-2 relative z-10 px-4 flex flex-col items-center">
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-1 drop-shadow-[0_0_20px_rgba(0, 132, 255,0.45)]">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 mb-1 drop-shadow-[0_0_20px_rgba(52,54,61,0.8)]">
                 <Image
                   src="/images/support-bot-logo.webp"
                   alt="Producer Toy Support Assistant Mascot"
