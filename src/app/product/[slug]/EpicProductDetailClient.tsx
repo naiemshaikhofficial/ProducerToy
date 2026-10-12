@@ -920,7 +920,7 @@ export function EpicProductDetailClient({
               <div className="space-y-3.5 pt-2">
                 <h2 className="text-xl font-bold text-white tracking-tight">About {product.name}</h2>
                 <div
-                  className={`text-sm text-zinc-300 leading-relaxed space-y-4 whitespace-pre-line font-normal transition-all ${
+                  className={`text-sm text-zinc-300 leading-relaxed font-normal transition-all ${
                     !isDescExpanded ? 'max-h-48 overflow-hidden relative' : ''
                   }`}
                 >
