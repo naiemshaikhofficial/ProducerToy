@@ -12,13 +12,6 @@ export async function POST(req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
-
     const body = await req.json().catch(() => ({}))
     const { activationId, deviceHash, productId } = body
 
@@ -30,17 +23,31 @@ export async function POST(req: NextRequest) {
         is_active: false,
         revoked_at: new Date().toISOString(),
       })
-      .eq('user_id', user.id)
 
-    if (activationId) {
-      query = query.eq('id', activationId)
-    } else if (deviceHash && productId) {
-      query = query.eq('product_id', productId).eq('device_id_hash', sha256(deviceHash))
+    if (user) {
+      // Authenticated web user deactivating from account library
+      query = query.eq('user_id', user.id)
+      if (activationId) {
+        query = query.eq('id', activationId)
+      } else if (deviceHash && productId) {
+        const cleanHash = (deviceHash || '').toLowerCase().trim()
+        query = query.eq('product_id', productId).or(`device_id_hash.eq.${cleanHash},device_id_hash.eq.${sha256(cleanHash)}`)
+      } else {
+        return NextResponse.json(
+          { success: false, error: 'Must provide activationId or (deviceHash and productId)' },
+          { status: 400 }
+        )
+      }
     } else {
-      return NextResponse.json(
-        { success: false, error: 'Must provide activationId or (deviceHash and productId)' },
-        { status: 400 }
-      )
+      // Unauthenticated direct machine deactivation from plugin client
+      if (!deviceHash || !productId) {
+        return NextResponse.json(
+          { success: false, error: 'Authentication required, or specify deviceHash and productId' },
+          { status: 401 }
+        )
+      }
+      const cleanHash = (deviceHash || '').toLowerCase().trim()
+      query = query.eq('product_id', productId).or(`device_id_hash.eq.${cleanHash},device_id_hash.eq.${sha256(cleanHash)}`)
     }
 
     const { error } = await query
