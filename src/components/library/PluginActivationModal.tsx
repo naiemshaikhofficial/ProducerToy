@@ -1,19 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import {
-  ShieldCheck,
-  Laptop,
-  Check,
-  AlertCircle,
-  X,
-  Key,
-  ExternalLink,
-  Trash2,
-  Sparkles,
-  ArrowRight,
-  Monitor
-} from 'lucide-react'
+import { Check, AlertCircle, X, Trash2, ArrowRight } from 'lucide-react'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 
 interface PluginActivationModalProps {
@@ -156,189 +144,148 @@ export function PluginActivationModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800/80 rounded-2xl shadow-2xl overflow-hidden p-6 text-zinc-100">
-        {/* Glow Accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+        onClick={onClose}
+      />
 
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800/60 transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+      {/* Modal Dialog Card */}
+      <div
+        className="relative z-10 w-full max-w-sm bg-[#141414] border border-[#282828] rounded-2xl shadow-2xl p-5 space-y-4 text-white animate-in zoom-in-95 duration-150 select-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white shadow-inner">
-            <Key className="w-5 h-5" />
-          </div>
+        <div className="flex items-center justify-between pb-3 border-b border-[#242424]">
           <div>
-            <h2 className="text-lg font-bold text-white tracking-wide">
-              Plugin Activation & Device Seats
-            </h2>
-            <p className="text-xs text-zinc-400">
-              Producer Toy Secure Hardware Entitlement Service
-            </p>
+            <h3 className="text-base font-bold text-white tracking-tight">Plugin Activation</h3>
+            <p className="text-xs text-zinc-400">Unlock ProVerb on this machine</p>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-zinc-500 hover:text-zinc-300 p-1 rounded-lg transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Success Banner */}
         {successInfo ? (
-          <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 rounded-xl mb-5 space-y-3">
-            <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+          <div className="p-3.5 bg-[#181818] border border-[#262626] rounded-xl space-y-2 text-xs">
+            <div className="flex items-center gap-2 text-emerald-400 font-semibold">
               <Check className="w-4 h-4" />
-              <span>Plugin Successfully Unlocked!</span>
+              <span>Plugin Activated</span>
             </div>
-            <p className="text-xs text-zinc-300">
-              <strong>{successInfo.productName}</strong> has been authorized for{' '}
-              <span className="text-emerald-300 font-mono">
-                "{successInfo.deviceName}"
-              </span>
-              . Your plugin in your DAW will now automatically register and turn active.
+            <p className="text-zinc-300 text-[11px] leading-relaxed">
+              Authorized for <strong className="text-white font-mono">{successInfo.deviceName}</strong>. ProVerb in your DAW will now unlock automatically.
             </p>
-            <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-emerald-800/30">
-              <span>Account: {successInfo.maskedEmail}</span>
-              <span className="text-zinc-300 font-medium">
-                Seats Used: {successInfo.seatsUsed} / {successInfo.maxSeats}
-              </span>
+            <div className="flex items-center justify-between text-[10.5px] text-zinc-500 pt-2 border-t border-[#242424]">
+              <span>{successInfo.maskedEmail}</span>
+              <span>Seats: {successInfo.seatsUsed} / {successInfo.maxSeats}</span>
             </div>
           </div>
         ) : (
           /* Form for Entering Pairing Code */
-          <form onSubmit={handleClaim} className="space-y-4 mb-6">
+          <form onSubmit={handleClaim} className="space-y-3.5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
-                Desktop Pairing Challenge Code
+              <label className="block text-[11px] font-medium text-zinc-400 mb-1.5">
+                Pairing Code
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={pairingCode}
-                  onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
-                  placeholder="e.g. TOY-8942"
-                  className="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-base font-mono font-bold tracking-widest text-white placeholder:text-zinc-600 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all uppercase"
-                  maxLength={12}
-                />
-              </div>
+              <input
+                type="text"
+                value={pairingCode}
+                onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
+                placeholder="e.g. TOY-8942"
+                className="w-full bg-[#181818] border border-[#2c2c2c] rounded-xl px-3.5 py-2 text-sm font-mono font-semibold tracking-wider text-white placeholder:text-zinc-600 focus:outline-none focus:border-white transition-all uppercase"
+                maxLength={12}
+                autoFocus
+              />
               <p className="text-[11px] text-zinc-500 mt-1.5">
-                Open ProVerb in your DAW, click <strong>Activate via Producer Toy</strong>, and enter the code shown.
+                In ProVerb &rarr; Click <strong>Activate via Producer Toy</strong>
               </p>
             </div>
 
             {errorMessage && (
-              <div className="p-3 bg-rose-950/40 border border-rose-500/30 rounded-xl flex items-start gap-2.5 text-xs text-rose-300">
-                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <span>{errorMessage}</span>
-                  {needsPurchaseUrl && (
-                    <div>
-                      <a
-                        href={needsPurchaseUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-white hover:text-zinc-300 underline underline-offset-2 font-semibold mt-1"
-                      >
-                        Buy ProVerb on Producer Toy <ArrowRight className="w-3 h-3" />
-                      </a>
-                    </div>
-                  )}
-                </div>
+              <div className="p-3 bg-[#1e1416] border border-[#3e1f24] rounded-xl text-xs text-rose-300 space-y-1">
+                <div>{errorMessage}</div>
+                {needsPurchaseUrl && (
+                  <a
+                    href={needsPurchaseUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-white hover:underline font-semibold text-[11px]"
+                  >
+                    Buy ProVerb on Producer Toy <ArrowRight className="w-3 h-3" />
+                  </a>
+                )}
               </div>
             )}
 
             <button
               type="submit"
               disabled={isClaiming || !pairingCode.trim()}
-              className="w-full py-3 px-4 rounded-xl font-bold text-sm tracking-wide bg-white hover:bg-zinc-200 text-black shadow-lg shadow-white/5 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-white hover:bg-zinc-200 text-black active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               {isClaiming ? (
                 <>
                   <ButtonSpinner />
-                  <span>Verifying & Signing Entitlement...</span>
+                  <span>Activating...</span>
                 </>
               ) : (
-                <>
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Activate Device Seat</span>
-                </>
+                <span>Activate Device</span>
               )}
             </button>
           </form>
         )}
 
-        {/* Active Device Seats Section */}
-        <div className="pt-4 border-t border-zinc-800/80">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-              <Monitor className="w-3.5 h-3.5 text-zinc-400" />
-              <span>Active Hardware Seats</span>
-            </h3>
-            <span className="text-[11px] text-zinc-500">
-              {activeDevices.length} registered
-            </span>
-          </div>
-
-          {isLoadingDevices ? (
-            <div className="py-4 text-center text-xs text-zinc-500">
-              Loading active devices...
+        {/* Active Device Seats (Clean & Compact) */}
+        {activeDevices.length > 0 && (
+          <div className="pt-3 border-t border-[#242424] space-y-2">
+            <div className="flex items-center justify-between text-[11px] text-zinc-400 font-medium">
+              <span>Active Devices</span>
+              <span>{activeDevices.length} / 3</span>
             </div>
-          ) : activeDevices.length === 0 ? (
-            <div className="py-4 text-center text-xs text-zinc-500 bg-zinc-900/40 rounded-xl border border-zinc-800/40">
-              No devices currently activated. Activate your first device above!
-            </div>
-          ) : (
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
               {activeDevices.map((dev) => (
                 <div
                   key={dev.id}
-                  className="flex items-center justify-between p-2.5 bg-zinc-900/60 border border-zinc-800/80 rounded-xl text-xs hover:border-zinc-700 transition-colors"
+                  className="flex items-center justify-between p-2 bg-[#181818] border border-[#242424] rounded-lg text-xs"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300">
-                      <Laptop className="w-3.5 h-3.5" />
+                  <div className="min-w-0 pr-2">
+                    <div className="font-semibold text-white truncate text-[11px]">
+                      {dev.device_name || 'Studio PC'}
                     </div>
-                    <div>
-                      <div className="font-semibold text-zinc-200">
-                        {dev.device_name || 'Studio PC'}
-                      </div>
-                      <div className="text-[10px] text-zinc-400">
-                        {dev.products?.name ? `${dev.products.name} • ` : ''}
-                        {dev.os || 'Windows'} •{' '}
-                        {new Date(dev.activated_at).toLocaleDateString()}
-                      </div>
+                    <div className="text-[10px] text-zinc-500">
+                      {dev.os || 'Windows'} • {new Date(dev.activated_at).toLocaleDateString()}
                     </div>
                   </div>
-
                   <button
+                    type="button"
                     onClick={() => handleDeactivate(dev.id)}
                     disabled={deactivatingId === dev.id}
-                    title="Deactivate this seat to free it for another machine"
-                    className="p-1.5 text-zinc-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors disabled:opacity-50"
+                    title="Deactivate seat"
+                    className="p-1 text-zinc-500 hover:text-rose-400 rounded transition-colors cursor-pointer"
                   >
-                    {deactivatingId === dev.id ? (
-                      <ButtonSpinner />
-                    ) : (
-                      <Trash2 className="w-3.5 h-3.5" />
-                    )}
+                    {deactivatingId === dev.id ? <ButtonSpinner /> : <Trash2 className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Footer info */}
-        <div className="mt-5 pt-3 border-t border-zinc-800/60 flex items-center justify-between text-[11px] text-zinc-400">
-          <span>Standard: 3 Hardware Seats per License</span>
+        <div className="pt-2 flex items-center justify-between text-[11px] text-zinc-500">
+          <span>3 seats included per license</span>
           <a
             href="https://producertoy.com/support"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-white transition-colors flex items-center gap-1"
+            className="hover:text-zinc-300 transition-colors"
           >
-            Licensing Support <ExternalLink className="w-3 h-3" />
+            Support
           </a>
         </div>
       </div>
