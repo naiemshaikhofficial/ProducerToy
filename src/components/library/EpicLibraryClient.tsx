@@ -28,12 +28,13 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getUserLibraryAction } from '@/actions/libraryActions'
 import { getSecureDownloadUrlAction } from '@/actions/downloadActions'
 import { BillingHistory } from '@/components/BillingHistory'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
 import { LogoIcon } from '@/components/Logo'
+import { PluginActivationModal } from './PluginActivationModal'
 
 interface PurchaseItem {
   id: string
@@ -150,6 +151,19 @@ export function EpicLibraryClient({
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null)
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
   const [installedOnly, setInstalledOnly] = useState(false)
+
+  // Hardware Plugin Activation Modal State
+  const searchParams = useSearchParams()
+  const [isActivationModalOpen, setIsActivationModalOpen] = useState(false)
+  const [claimCode, setClaimCode] = useState('')
+
+  useEffect(() => {
+    const claim = searchParams?.get('claim')
+    if (claim) {
+      setClaimCode(claim)
+      setIsActivationModalOpen(true)
+    }
+  }, [searchParams])
 
   // Download Modal State
   const [installProduct, setInstallProduct] = useState<PurchaseItem | null>(null)
@@ -454,6 +468,19 @@ export function EpicLibraryClient({
             title="Add Custom Collection"
           >
             <Plus className="w-4 h-4" />
+          </button>
+
+          {/* Activate Plugin / Manage Device Seats Button */}
+          <button
+            onClick={() => {
+              setClaimCode('')
+              setIsActivationModalOpen(true)
+            }}
+            className="ml-auto mb-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
+            title="Activate desktop plugins or manage hardware device seats"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-400" />
+            <span>Activate Plugin / Device Seats</span>
           </button>
         </div>
 
@@ -1173,6 +1200,13 @@ export function EpicLibraryClient({
             </div>
           )
         })()}
+
+        {/* Plugin Hardware Device Activation Modal */}
+        <PluginActivationModal
+          isOpen={isActivationModalOpen}
+          initialCode={claimCode}
+          onClose={() => setIsActivationModalOpen(false)}
+        />
 
       </div>
     </div>
