@@ -159,7 +159,7 @@ export function PluginActivationModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       <div className="relative w-full max-w-lg bg-zinc-950 border border-zinc-800/80 rounded-2xl shadow-2xl overflow-hidden p-6 text-zinc-100">
         {/* Glow Accent */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 rounded-full blur-[1px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-full" />
 
         {/* Close Button */}
         <button
@@ -171,7 +171,7 @@ export function PluginActivationModal({
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
+          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white shadow-inner">
             <Key className="w-5 h-5" />
           </div>
           <div>
@@ -200,7 +200,7 @@ export function PluginActivationModal({
             </p>
             <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-emerald-800/30">
               <span>Account: {successInfo.maskedEmail}</span>
-              <span className="text-amber-400 font-medium">
+              <span className="text-zinc-300 font-medium">
                 Seats Used: {successInfo.seatsUsed} / {successInfo.maxSeats}
               </span>
             </div>
@@ -218,7 +218,7 @@ export function PluginActivationModal({
                   value={pairingCode}
                   onChange={(e) => setPairingCode(e.target.value.toUpperCase())}
                   placeholder="e.g. TOY-8942"
-                  className="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-base font-mono font-bold tracking-widest text-amber-400 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all uppercase"
+                  className="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-4 py-3 text-base font-mono font-bold tracking-widest text-white placeholder:text-zinc-600 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all uppercase"
                   maxLength={12}
                 />
               </div>
@@ -238,7 +238,7 @@ export function PluginActivationModal({
                         href={needsPurchaseUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-amber-400 hover:underline font-semibold mt-1"
+                        className="inline-flex items-center gap-1 text-white hover:text-zinc-300 underline underline-offset-2 font-semibold mt-1"
                       >
                         Buy ProVerb on Producer Toy <ArrowRight className="w-3 h-3" />
                       </a>
@@ -251,7 +251,7 @@ export function PluginActivationModal({
             <button
               type="submit"
               disabled={isClaiming || !pairingCode.trim()}
-              className="w-full py-3 px-4 rounded-xl font-bold text-sm tracking-wide bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-lg shadow-amber-500/10 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-xl font-bold text-sm tracking-wide bg-white hover:bg-zinc-200 text-black shadow-lg shadow-white/5 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               {isClaiming ? (
                 <>
@@ -336,7 +336,7 @@ export function PluginActivationModal({
             href="https://producertoy.com/support"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-amber-400 transition-colors flex items-center gap-1"
+            className="hover:text-white transition-colors flex items-center gap-1"
           >
             Licensing Support <ExternalLink className="w-3 h-3" />
           </a>
