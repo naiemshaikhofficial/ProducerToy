@@ -244,8 +244,8 @@ export function PluginActivationModal({
         {activeDevices.length > 0 && (
           <div className="pt-3 border-t border-[#242424] space-y-2">
             <div className="flex items-center justify-between text-[11px] text-zinc-400 font-medium">
-              <span>Active Devices</span>
-              <span>{activeDevices.length} / 3</span>
+              <span>Active Device</span>
+              <span>{activeDevices.length} / 1</span>
             </div>
             <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
               {activeDevices.map((dev) => (
@@ -278,7 +278,7 @@ export function PluginActivationModal({
 
         {/* Footer info */}
         <div className="pt-2 flex items-center justify-between text-[11px] text-zinc-500">
-          <span>3 seats included per license</span>
+          <span>Single device license</span>
           <a
             href="https://producertoy.com/support"
             target="_blank"

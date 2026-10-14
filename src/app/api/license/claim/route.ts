@@ -96,8 +96,17 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // 3. Check device seat count
-    const maxSeats = product.max_activation_seats || 3
+    // 3. Strict Single-Device Seat Policy ("ek hi device ek time pe connect rahega")
+    const maxSeats = 1
+
+    // Automatically deactivate any previously active devices for this user & product so only 1 device is connected
+    await admin
+      .from('device_activations')
+      .update({ is_active: false, revoked_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .eq('product_id', product.id)
+      .neq('device_id_hash', challenge.device_id_hash)
+
     const { data: activeDevices, error: devErr } = await admin
       .from('device_activations')
       .select('id, device_id_hash, device_name, os, activated_at')
@@ -110,19 +119,6 @@ export async function POST(req: NextRequest) {
     }
 
     const currentDevices = activeDevices || []
-    const isExistingDevice = currentDevices.some(
-      (d) => d.device_id_hash === challenge.device_id_hash
-    )
-
-    if (!isExistingDevice && currentDevices.length >= maxSeats) {
-      return NextResponse.json({
-        success: false,
-        error: `Device limit reached (${currentDevices.length}/${maxSeats} seats in use). Please deactivate an existing machine to free a seat.`,
-        seatLimitReached: true,
-        activeDevices: currentDevices,
-        productName: product.name,
-      })
-    }
 
     // 4. Record / upsert device activation seat
     let activationId: string = ''

@@ -470,17 +470,17 @@ export function EpicLibraryClient({
             <Plus className="w-4 h-4" />
           </button>
 
-          {/* Activate Plugin / Manage Device Seats Button */}
+          {/* Activate Plugin Button (Producer Toy Minimalist Theme) */}
           <button
             onClick={() => {
               setClaimCode('')
               setIsActivationModalOpen(true)
             }}
-            className="ml-auto mb-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-95"
-            title="Activate desktop plugins or manage hardware device seats"
+            className="ml-auto mb-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2c2c2c] text-zinc-300 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-sm active:scale-95"
+            title="Activate desktop plugins or manage device"
           >
-            <Key className="w-3.5 h-3.5 text-amber-400" />
-            <span>Activate Plugin / Device Seats</span>
+            <Key className="w-3.5 h-3.5 text-zinc-400" />
+            <span>Activate Plugin</span>
           </button>
         </div>
 
