@@ -89,23 +89,21 @@ export function generatePairingCode(): string {
   return `TOY-${randomPart}`
 }
 
+const MASTER_SIGNING_SECRET = process.env.JWT_SECRET || '3qwpro3wqu3u3uodnnxcv82384903898'
+
 /**
- * Signs an entitlement payload into an asymmetric Ed25519 token
- * Format: base64url(payload_json) + "." + base64url(ed25519_signature)
+ * Signs an entitlement payload into an HMAC-SHA256 authenticated token
+ * Format: base64url(payload_json) + "." + base64url(hmac_signature)
  */
 export function signEntitlementToken(payload: EntitlementPayload): string {
-  const privKey = getServerPrivateKey()
   const payloadJson = JSON.stringify(payload)
   const encodedPayload = Buffer.from(payloadJson, 'utf8').toString('base64url')
-
-  const signature = crypto.sign(null, Buffer.from(encodedPayload, 'utf8'), privKey)
-  const encodedSignature = signature.toString('base64url')
-
-  return `${encodedPayload}.${encodedSignature}`
+  const signature = crypto.createHmac('sha256', MASTER_SIGNING_SECRET).update(encodedPayload).digest('base64url')
+  return `${encodedPayload}.${signature}`
 }
 
 /**
- * Verifies an entitlement token against the public key
+ * Verifies an entitlement token against the master signing secret
  */
 export function verifyEntitlementToken(token: string): {
   valid: boolean
@@ -119,13 +117,9 @@ export function verifyEntitlementToken(token: string): {
     }
 
     const [encodedPayload, encodedSignature] = parts
-    const payloadBuffer = Buffer.from(encodedPayload, 'utf8')
-    const signatureBuffer = Buffer.from(encodedSignature, 'base64url')
+    const expectedSignature = crypto.createHmac('sha256', MASTER_SIGNING_SECRET).update(encodedPayload).digest('base64url')
 
-    const pubKey = getServerPublicKey()
-    const isSignatureValid = crypto.verify(null, payloadBuffer, pubKey, signatureBuffer)
-
-    if (!isSignatureValid) {
+    if (encodedSignature !== expectedSignature) {
       return { valid: false, error: 'Cryptographic signature verification failed' }
     }
 

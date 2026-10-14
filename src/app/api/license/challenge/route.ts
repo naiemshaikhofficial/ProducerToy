@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     // 2. Generate short-lived pairing challenge code
     const pairingCode = generatePairingCode()
     const codeHash = sha256(pairingCode)
-    const cleanDeviceHash = sha256(deviceHash)
+    const cleanDeviceHash = deviceHash.trim().toLowerCase()
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 mins
 
     // 3. Store challenge in activation_challenges

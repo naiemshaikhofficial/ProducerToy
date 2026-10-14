@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     }
 
     const admin = getAdminClient()
-    const cleanDeviceHash = sha256(deviceHash)
+    const cleanDeviceHash = deviceHash.trim().toLowerCase()
 
     const { data: challenge, error } = await admin
       .from('activation_challenges')
