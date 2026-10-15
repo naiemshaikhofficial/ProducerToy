@@ -5,6 +5,52 @@ import { createClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase/admin'
 import crypto from 'crypto'
 
+/**
+ * Dynamic Multi-Brand Plugin Licensing System
+ * Supports ProducerToy first-party plugins and third-party marketplace brands (e.g. Plugin Boutique model)
+ * without hardcoding brand names, product titles, or UUIDs.
+ */
+export function isDedicatedLicensedProduct(prod: any): boolean {
+  if (!prod) return false
+  const delivery = String(prod.delivery_method || '').toLowerCase().trim()
+  if (
+    delivery === 'dedicated_licensing_server' ||
+    delivery === 'dedicated_licensing' ||
+    delivery === 'machine_bound' ||
+    delivery === 'licensing_server'
+  ) {
+    return true
+  }
+  const licType = String(prod.license_type || '').toLowerCase().trim()
+  if (licType === 'dedicated' || licType === 'machine_bound') {
+    return true
+  }
+  if (prod.plugin_identifier && (delivery.includes('dedicated') || delivery.includes('server'))) {
+    return true
+  }
+  // Backward compatibility fallback for legacy ProVerb entries
+  if (
+    prod.id === '92cf2454-2cfc-4db5-b210-2c732457605f' ||
+    (prod.slug && String(prod.slug).toLowerCase().includes('proverb')) ||
+    (prod.name && String(prod.name).toLowerCase().includes('proverb'))
+  ) {
+    return true
+  }
+  return false
+}
+
+export function generateStandardSerialKey(prod: any, prefixOverride?: string): string {
+  const brandOrSlug = prefixOverride || prod?.serial_prefix || prod?.brand || prod?.slug || 'VST'
+  const cleanPrefix = String(brandOrSlug)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 5) || 'VST'
+  const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
+  const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
+  const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
+  return `PT-${cleanPrefix}-${partA}-${partB}-${partC}`
+}
+
 export interface BillingDetailsInput {
   fullName?: string
   email?: string
@@ -276,6 +322,7 @@ export async function processCheckoutAction(
           }
         }
 
+        const isDedicated = isDedicatedLicensedProduct(dbProduct)
         const requiresSerialKey = Boolean(
           dbProduct.delivery_method === 'serial_key' ||
           dbProduct.delivery_method === 'license_key' ||
@@ -284,11 +331,8 @@ export async function processCheckoutAction(
         )
 
         let serialKey: string | null = null
-        if (requiresSerialKey) {
-          const serialPartA = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const serialPartB = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const serialPartC = crypto.randomBytes(3).toString('hex').toUpperCase()
-          serialKey = `PT-VST-${serialPartA}-${serialPartB}-${serialPartC}`
+        if (requiresSerialKey && !isDedicated) {
+          serialKey = generateStandardSerialKey(dbProduct)
         }
 
         const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
@@ -528,7 +572,7 @@ export async function createRazorpayOrderAction(
     const productIds = items.map((i) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, price_inr, price_usd')
+      .select('id, name, slug, price_inr, price_usd, delivery_method, license_type')
       .in('id', productIds)
 
     if (!dbProducts || dbProducts.length === 0) {
@@ -580,6 +624,11 @@ export async function createRazorpayOrderAction(
     const finalTotalInr = Math.max(0, amountAfterCouponInr - verifiedRewardDiscountInr)
     const amountInPaise = Math.round(finalTotalInr * 100)
 
+    const dedicatedPluginItems = items.filter((i) => {
+      const dbP = dbProducts.find((p) => p.id === i.id || p.slug === i.slug) || i
+      return isDedicatedLicensedProduct(dbP)
+    })
+
     const order = await razorpay.orders.create({
       amount: amountInPaise,
       currency: 'INR',
@@ -587,7 +636,14 @@ export async function createRazorpayOrderAction(
       notes: {
         userId: user.id,
         userEmail: user.email || '',
+        userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer',
         itemCount: items.length,
+        hasDedicatedPlugin: dedicatedPluginItems.length > 0 ? 'true' : 'false',
+        hasProVerb: dedicatedPluginItems.some(i => (i.slug || i.name || '').toLowerCase().includes('proverb')) ? 'true' : 'false',
+        dedicatedProductIds: dedicatedPluginItems.map((i) => i.id).filter(Boolean).join(','),
+        dedicatedProductSlugs: dedicatedPluginItems.map((i) => i.slug || i.id).filter(Boolean).join(','),
+        productIds: items.map((i) => i.id).filter(Boolean).join(','),
+        productSlugs: items.map((i) => i.slug || i.id).filter(Boolean).join(','),
         couponDiscountPercent,
         rewardDiscountInr: verifiedRewardDiscountInr,
       },
@@ -766,6 +822,7 @@ export async function verifyRazorpayPaymentAction(params: {
         const dbProduct =
           dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
+        const isDedicated = isDedicatedLicensedProduct(dbProduct)
         const requiresSerialKey = Boolean(
           dbProduct.delivery_method === 'serial_key' ||
           dbProduct.delivery_method === 'license_key' ||
@@ -774,11 +831,8 @@ export async function verifyRazorpayPaymentAction(params: {
         )
 
         let serialKey: string | null = null
-        if (requiresSerialKey) {
-          const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-          serialKey = `PT-VST-${partA}-${partB}-${partC}`
+        if (requiresSerialKey && !isDedicated) {
+          serialKey = generateStandardSerialKey(dbProduct)
         }
 
         const itemInr = Number(dbProduct.price_inr || 0) > 0
@@ -1019,7 +1073,7 @@ export async function createPayPalOrderAction(
     const productIds = items.map((i) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, price_usd, price_inr')
+      .select('id, name, slug, price_usd, price_inr, delivery_method, license_type')
       .in('id', productIds)
 
     if (!dbProducts || dbProducts.length === 0) {
@@ -1160,6 +1214,7 @@ export async function capturePayPalOrderAction(params: {
         const dbProduct =
           dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
+        const isDedicated = isDedicatedLicensedProduct(dbProduct)
         const requiresSerialKey = Boolean(
           dbProduct.delivery_method === 'serial_key' ||
           dbProduct.delivery_method === 'license_key' ||
@@ -1168,11 +1223,8 @@ export async function capturePayPalOrderAction(params: {
         )
 
         let serialKey: string | null = null
-        if (requiresSerialKey) {
-          const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-          serialKey = `PT-VST-${partA}-${partB}-${partC}`
+        if (requiresSerialKey && !isDedicated) {
+          serialKey = generateStandardSerialKey(dbProduct)
         }
 
         const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
@@ -1429,6 +1481,7 @@ export async function claimGiftAction(params: {
           .eq('id', params.productId)
           .maybeSingle()
 
+        const isDedicated = isDedicatedLicensedProduct(prod)
         const requiresSerialKey = Boolean(
           prod?.delivery_method === 'serial_key' ||
           prod?.delivery_method === 'license_key' ||
@@ -1437,11 +1490,8 @@ export async function claimGiftAction(params: {
         )
 
         let serialKey: string | null = null
-        if (requiresSerialKey) {
-          const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-          const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-          serialKey = `PT-GIFT-${partA}-${partB}-${partC}`
+        if (requiresSerialKey && !isDedicated) {
+          serialKey = generateStandardSerialKey(prod, 'GIFT')
         }
 
         await adminSupabase.from('purchases').insert({
