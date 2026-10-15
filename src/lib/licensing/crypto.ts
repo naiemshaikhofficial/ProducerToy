@@ -89,7 +89,7 @@ export function generatePairingCode(): string {
   return `TOY-${randomPart}`
 }
 
-const MASTER_SIGNING_SECRET = process.env.JWT_SECRET || '3qwpro3wqu3u3uodnnxcv82384903898'
+const MASTER_SIGNING_SECRET = process.env.LICENSE_MASTER_SECRET || '3qwpro3wqu3u3uodnnxcv82384903898'
 
 /**
  * Signs an entitlement payload into an HMAC-SHA256 authenticated token

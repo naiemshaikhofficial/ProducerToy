@@ -206,8 +206,9 @@ export async function POST(req: NextRequest) {
       productName: product.name,
       deviceName: challenge.device_name,
       maskedEmail: maskedUserEmail,
-      seatsUsed: isExistingDevice ? currentDevices.length : currentDevices.length + 1,
+      seatsUsed: existingActivation ? currentDevices.length : currentDevices.length + 1,
       maxSeats,
+      entitlementToken: signedToken,
     })
   } catch (err: any) {
     console.error('Claim pairing code exception:', err)
