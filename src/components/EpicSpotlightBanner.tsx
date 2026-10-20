@@ -14,13 +14,12 @@ export function EpicSpotlightBanner() {
 
   return (
     <div
-      className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl min-h-[460px] sm:min-h-[520px] lg:min-h-[580px] bg-white flex items-center select-none shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-white/[0.08]"
+      className="w-full relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white flex flex-col sm:flex-row sm:items-center select-none shadow-[0_20px_50px_rgba(0,0,0,0.85)] border border-black/[0.08] sm:min-h-[520px] lg:min-h-[580px]"
       style={{ position: 'relative', width: '100%', overflow: 'hidden' }}
     >
-      {/* Background Mascot Looping Video (Positioned to center-right so left side stays completely open for text) */}
+      {/* Background Mascot Looping Video (Centered on mobile, positioned center-right on desktop) */}
       <div
-        className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none"
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'hidden', pointerEvents: 'none' }}
+        className="relative w-full h-[220px] xs:h-[260px] sm:h-full sm:absolute sm:inset-0 z-0 overflow-hidden pointer-events-none select-none flex items-center justify-center"
       >
         <video
           ref={videoRef}
@@ -32,43 +31,39 @@ export function EpicSpotlightBanner() {
           preload="auto"
           aria-hidden="true"
           tabIndex={-1}
-          className="w-full h-full object-contain pointer-events-none"
+          className="w-full h-full object-contain pointer-events-none sm:translate-x-[8%]"
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '58%',
-            transform: 'translate(-50%, -50%)',
-            width: '100%',
-            height: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
             pointerEvents: 'none',
           }}
         />
       </div>
 
-      {/* Subtle Soft White Gradient on Left to Guarantee 100% Crisp Black Text */}
-      <div className="absolute inset-y-0 left-0 w-[42%] bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-10" />
+      {/* Subtle Soft White Fade on Desktop Left to Guarantee 100% Crisp Black Text */}
+      <div className="hidden sm:block absolute inset-y-0 left-0 w-[44%] bg-gradient-to-r from-white via-white/85 to-transparent pointer-events-none z-10" />
 
-      {/* Text & Action Block - Strictly Confined to Left Side */}
-      <div className="relative z-20 p-6 sm:p-10 lg:p-14 pl-6 sm:pl-[6%] lg:pl-[7%] max-w-[480px] w-full flex flex-col items-start text-left gap-3 sm:gap-4 pointer-events-auto">
+      {/* Fainted Black Ambient Glow on Bottom for Subtle Depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/[0.03] pointer-events-none z-10" />
+
+      {/* Text & Action Block - Fully Responsive on Mobile & Desktop */}
+      <div className="relative z-20 w-full p-5 pt-1 sm:pt-10 sm:p-10 lg:p-14 pl-5 sm:pl-[6%] lg:pl-[7%] sm:max-w-[480px] flex flex-col items-start text-left gap-2.5 sm:gap-4 pointer-events-auto">
         
-        {/* Eyebrow Badge */}
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-900 border border-zinc-200 text-[10px] sm:text-[11px] font-black uppercase tracking-wider">
+        {/* Eyebrow Badge with Fainted Black Accents */}
+        <span className="inline-flex items-center px-3 py-1 rounded-full bg-black/[0.04] text-black/75 border border-black/[0.09] text-[10px] sm:text-[11px] font-black uppercase tracking-wider backdrop-blur-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-black/40 mr-1.5 animate-pulse" />
           Platform Spotlight
         </span>
 
-        {/* Multi-line Structured Heading (Stacked vertically, never enters the mascot) */}
-        <h2 className="text-[24px] sm:text-[32px] lg:text-[38px] font-black text-black tracking-tight leading-[1.08] font-sans">
+        {/* Multi-line Structured Heading with Fainted Black Hierarchy */}
+        <h2 className="text-[22px] xs:text-[24px] sm:text-[32px] lg:text-[38px] font-black text-black tracking-tight leading-[1.08] font-sans">
           <span className="block text-black">World&apos;s Upcoming Platform</span>
-          <span className="block text-zinc-900 mt-0.5">For Music Producers</span>
-          <span className="block text-[15px] sm:text-[18px] lg:text-[21px] font-bold text-zinc-600 mt-1 sm:mt-1.5 tracking-normal">
+          <span className="block text-black/80 mt-0.5">For Music Producers</span>
+          <span className="block text-[13px] xs:text-[14px] sm:text-[18px] lg:text-[21px] font-bold text-black/60 mt-1 sm:mt-1.5 tracking-normal">
             Tools, Plugins, Software, Preset and Sample Pack
           </span>
         </h2>
 
-        {/* Clean Subtitle */}
-        <p className="text-[13px] sm:text-[14px] lg:text-[15px] text-zinc-700 font-medium leading-relaxed max-w-[380px]">
+        {/* Clean Subtitle in Fainted Black */}
+        <p className="text-[12px] sm:text-[14px] lg:text-[15px] text-black/65 font-medium leading-relaxed max-w-[380px]">
           Explore elite VST plugins, analog saturators, sample packs, 808s, synth presets, and DAW tools with your favorite producers.
         </p>
 
@@ -77,7 +72,7 @@ export function EpicSpotlightBanner() {
           <Link
             href="/store"
             prefetch={true}
-            className="inline-flex items-center justify-center w-full max-w-[220px] sm:max-w-[260px] lg:max-w-[280px] h-[48px] sm:h-[54px] lg:h-[58px] bg-black hover:bg-zinc-800 text-white font-extrabold text-[14px] sm:text-[15px] lg:text-[16px] rounded-xl active:scale-95 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.3)] tracking-wider uppercase cursor-pointer gap-2"
+            className="inline-flex items-center justify-center w-full sm:w-auto min-w-[200px] sm:max-w-[260px] lg:max-w-[280px] h-[48px] sm:h-[54px] lg:h-[58px] bg-black hover:bg-zinc-800 text-white font-extrabold text-[13px] sm:text-[15px] lg:text-[16px] rounded-xl active:scale-95 transition-all shadow-[0_10px_25px_-5px_rgba(0,0,0,0.35)] ring-1 ring-black/10 tracking-wider uppercase cursor-pointer gap-2"
           >
             <span>Browse Now</span>
             <span className="text-[18px]">&rarr;</span>
