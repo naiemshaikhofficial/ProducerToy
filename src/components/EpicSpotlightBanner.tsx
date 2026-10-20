@@ -47,26 +47,25 @@ export function EpicSpotlightBanner() {
       {/* Text & Action Block - Fully Centered & Proportioned */}
       <div className="relative z-20 w-full p-5 sm:p-8 lg:p-10 pl-5 sm:pl-[6%] lg:pl-[7%] sm:max-w-[480px] flex flex-col items-center text-center gap-3 sm:gap-4 pointer-events-auto my-auto">
 
-        {/* Multi-line Structured Heading - Center Aligned */}
-        <h2 className="text-[22px] xs:text-[24px] sm:text-[30px] lg:text-[36px] font-black text-black tracking-tight leading-[1.1] font-sans text-center">
-          <span className="block text-black">World&apos;s Upcoming Platform</span>
-          <span className="block text-zinc-800 mt-0.5">For Music Producers</span>
-          <span className="block text-[13px] xs:text-[14px] sm:text-[17px] lg:text-[20px] font-bold text-zinc-600 mt-1 sm:mt-1.5 tracking-normal">
-            Tools, Plugins, Software, Preset and Sample Pack
+        {/* Minimalist Editorial Heading */}
+        <h2 className="text-[24px] xs:text-[28px] sm:text-[34px] lg:text-[40px] font-black text-black tracking-tight leading-[1.08] font-sans text-center">
+          World&apos;s Upcoming Platform
+          <span className="block text-zinc-500 font-extrabold mt-1 text-[18px] xs:text-[20px] sm:text-[24px] lg:text-[28px]">
+            For Music Producers
           </span>
         </h2>
 
-        {/* Clean Subtitle - Center Aligned */}
-        <p className="text-[12px] sm:text-[13px] lg:text-[14px] text-zinc-700 font-medium leading-relaxed max-w-[380px] text-center">
-          Explore elite VST plugins, analog saturators, sample packs, 808s, synth presets, and DAW tools with your favorite producers.
+        {/* Minimalist Subtitle */}
+        <p className="text-[13px] sm:text-[14px] text-zinc-500 font-medium tracking-wide max-w-[360px] leading-relaxed text-center">
+          Elite VST plugins, analog saturators, synth presets, and royalty-free sample packs.
         </p>
 
-        {/* "Browse Now" Button - Premium Standard Proportions (rounded-xl, 48px height, not an oval egg) */}
-        <div className="pt-1.5 sm:pt-2 w-full flex justify-center">
+        {/* "Browse Now" Button */}
+        <div className="pt-2 sm:pt-3 w-full flex justify-center">
           <Link
             href="/store"
             prefetch={true}
-            className="inline-flex items-center justify-center px-8 sm:px-9 h-[46px] sm:h-[48px] bg-black hover:bg-zinc-800 text-white font-bold text-[13px] sm:text-[14px] rounded-xl active:scale-95 transition-all shadow-[0_6px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.4)] tracking-wider uppercase cursor-pointer gap-2"
+            className="inline-flex items-center justify-center px-8 sm:px-9 h-[46px] sm:h-[48px] bg-black hover:bg-zinc-800 text-white font-bold text-[13px] sm:text-[14px] rounded-xl active:scale-95 transition-all shadow-[0_6px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.35)] tracking-wider uppercase cursor-pointer gap-2"
           >
             <span>Browse Now</span>
             <span className="text-[16px]">&rarr;</span>
