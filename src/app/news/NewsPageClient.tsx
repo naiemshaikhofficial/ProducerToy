@@ -172,6 +172,21 @@ function NewsCardImage({
   const [imgSrc, setImgSrc] = useState(initial)
   const [hasError, setHasError] = useState(false)
 
+  const isVideo = Boolean(imgSrc && /\.mp4(\?.*)?$/i.test(imgSrc))
+
+  if (isVideo) {
+    return (
+      <video
+        src={imgSrc}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={`w-full h-full object-cover ${className || ''}`}
+      />
+    )
+  }
+
   return (
     <Image
       src={hasError ? fallback : imgSrc}

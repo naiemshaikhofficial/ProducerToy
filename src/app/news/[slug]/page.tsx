@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   let highResImage = (article.cover_image || '').replace(/-\d+x\d+(\.[a-zA-Z0-9]+(?:\?.*)?)$/i, '$1')
   if (
     !highResImage ||
+    /\.mp4(\?.*)?$/i.test(highResImage) ||
     highResImage.includes('api/og') ||
     highResImage.includes('Free%20Toys') ||
     highResImage.includes('free-toys') ||

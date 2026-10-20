@@ -297,6 +297,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
   }
 
   const fallbackPrompt = '/icon.png'
+  const isVideo = Boolean(coverSrc && /\.mp4(\?.*)?$/i.test(coverSrc))
 
   return (
     <article className="min-h-screen bg-[#121212] text-white selection:bg-[#34363d] selection:text-white relative overflow-hidden">
@@ -304,18 +305,35 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
       <div
         className="absolute top-0 left-0 right-0 w-full overflow-hidden z-0 pointer-events-none select-none h-[420px] sm:h-[620px]"
       >
-        <img
-          src={bgCoverSrc}
-          onError={() => setBgCoverSrc(fallbackPrompt)}
-          alt=""
-          className="w-full h-full object-cover object-top opacity-100"
-          style={{
-            maskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
-          }}
-        />
+        {isVideo ? (
+          <video
+            src={bgCoverSrc}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover object-top opacity-100"
+            style={{
+              maskImage:
+                'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
+            }}
+          />
+        ) : (
+          <img
+            src={bgCoverSrc}
+            onError={() => setBgCoverSrc(fallbackPrompt)}
+            alt=""
+            className="w-full h-full object-cover object-top opacity-100"
+            style={{
+              maskImage:
+                'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 120px, rgba(0,0,0,0.75) 300px, rgba(0,0,0,0.15) 75%, transparent 100%)',
+            }}
+          />
+        )}
         {/* Rich dark atmospheric tint overlay: Ensures all text is 100% crystal clear and high-contrast */}
         <div className="absolute inset-0 bg-[#121212]/75 backdrop-blur-[3px]" />
         <div
@@ -379,13 +397,25 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           style={{ maxWidth: '1280px', marginLeft: 'auto', marginRight: 'auto' }}
         >
           <div className="relative aspect-video w-full rounded-xl sm:rounded-3xl overflow-hidden bg-[#181818] shadow-[0_24px_60px_rgba(0,0,0,0.95)]">
-            <img
-              src={coverSrc}
-              onError={() => setCoverSrc(fallbackPrompt)}
-              alt={`${cleanHtmlTitle(article.title)} - Producer Toy`}
-              title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
-              className="w-full h-full object-cover"
-            />
+            {isVideo ? (
+              <video
+                src={coverSrc}
+                autoPlay
+                loop
+                muted
+                playsInline
+                controls
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={coverSrc}
+                onError={() => setCoverSrc(fallbackPrompt)}
+                alt={`${cleanHtmlTitle(article.title)} - Producer Toy`}
+                title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
         </div>
 
