@@ -503,7 +503,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
           {/* Article Footer Bar: Author & Share */}
           <div className="my-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-zinc-400">
-            <span>Author: <strong className="text-zinc-200 font-semibold">{article.author_name}</strong></span>
+            <span>Author: <strong className="text-zinc-200 font-semibold">{(article.author_name || 'Producer Toy Editorial').replace(/ProducerToy/gi, 'Producer Toy')}</strong></span>
             <button
               onClick={handleCopyLink}
               className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors cursor-pointer"
