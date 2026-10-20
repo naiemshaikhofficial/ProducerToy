@@ -10,7 +10,7 @@ import crypto from 'crypto'
  * Supports ProducerToy first-party plugins and third-party marketplace brands (e.g. Plugin Boutique model)
  * without hardcoding brand names, product titles, or UUIDs.
  */
-export function isDedicatedLicensedProduct(prod: any): boolean {
+function isDedicatedLicensedProduct(prod: any): boolean {
   if (!prod) return false
   const delivery = String(prod.delivery_method || '').toLowerCase().trim()
   if (
@@ -39,7 +39,7 @@ export function isDedicatedLicensedProduct(prod: any): boolean {
   return false
 }
 
-export function generateStandardSerialKey(prod: any, prefixOverride?: string): string {
+function generateStandardSerialKey(prod: any, prefixOverride?: string): string {
   const brandOrSlug = prefixOverride || prod?.serial_prefix || prod?.brand || prod?.slug || 'VST'
   const cleanPrefix = String(brandOrSlug)
     .toUpperCase()
