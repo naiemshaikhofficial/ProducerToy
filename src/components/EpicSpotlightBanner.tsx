@@ -67,15 +67,15 @@ export function EpicSpotlightBanner() {
           Explore elite VST plugins, analog saturators, sample packs, 808s, synth presets, and DAW tools with your favorite producers.
         </p>
 
-        {/* "Browse Now" Button - Centered in Middle Under Text */}
+        {/* "Browse Now" Button - Compact, Chunky Pill (Not flat, not overly wide) */}
         <div className="pt-2 sm:pt-3 w-full max-w-[380px] flex justify-center">
           <Link
             href="/store"
             prefetch={true}
-            className="inline-flex items-center justify-center w-full max-w-[240px] sm:max-w-[270px] h-[48px] sm:h-[54px] lg:h-[56px] bg-black hover:bg-zinc-800 text-white font-extrabold text-[13px] sm:text-[15px] lg:text-[16px] rounded-xl active:scale-95 transition-all shadow-[0_10px_25px_-5px_rgba(0,0,0,0.35)] ring-1 ring-black/10 tracking-wider uppercase cursor-pointer gap-2"
+            className="inline-flex items-center justify-center min-w-[170px] sm:min-w-[190px] h-[50px] sm:h-[54px] px-8 bg-black hover:bg-zinc-800 text-white font-extrabold text-[13px] sm:text-[14px] rounded-full active:scale-95 transition-all shadow-[0_12px_28px_-6px_rgba(0,0,0,0.35)] ring-1 ring-black/10 tracking-wider uppercase cursor-pointer gap-2.5"
           >
             <span>Browse Now</span>
-            <span className="text-[18px]">&rarr;</span>
+            <span className="text-[17px]">&rarr;</span>
           </Link>
         </div>
 
