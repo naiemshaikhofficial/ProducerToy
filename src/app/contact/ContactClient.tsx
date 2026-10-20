@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { Send, CheckCircle2, ArrowLeft, Building2, ShieldCheck, Mail, Clock, MapPin, Headphones, ArrowRight, Search, Loader2 } from 'lucide-react'
+import { Send, CheckCircle2, ArrowLeft, Building2, ShieldCheck, Mail, Clock, MapPin, Headphones, ArrowRight, Search, Loader2, ChevronDown, FileText } from 'lucide-react'
 import { submitContactFormAction } from '@/actions/contactActions'
 import { FORMS_CONFIG } from '@/config/forms'
 
@@ -15,12 +15,23 @@ export function ContactClient() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [nextUrl, setNextUrl] = useState(`${FORMS_CONFIG.SITE_URL}/contact?submitted=true`)
 
+  const subjectQuery = (searchParams?.get('subject') || searchParams?.get('category') || '').toLowerCase()
+  const isNewsQuery = subjectQuery.includes('news') || subjectQuery.includes('editorial')
+  const articleParam = searchParams?.get('article')
+  const urlParam = searchParams?.get('url')
+
+  const cleanArticleName = articleParam
+    ? articleParam.replace(/\s*[-–—]\s*(?:Producer\s*Toy|100%\s*Free.*).*$/i, '').trim() || articleParam
+    : ''
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     orderId: '',
-    subject: 'Order & Download Support',
-    message: '',
+    subject: isNewsQuery ? 'News & Editorial Correction' : 'Order & Download Support',
+    message: isNewsQuery && cleanArticleName
+      ? `Regarding: ${cleanArticleName}\n\nSuggested Correction / Details:\n`
+      : '',
   })
 
   useEffect(() => {
@@ -34,18 +45,20 @@ export function ContactClient() {
       setSubmitted(true)
     }
 
-    const subjectParam = searchParams?.get('subject')?.toLowerCase()
-    const articleParam = searchParams?.get('article')
-    const urlParam = searchParams?.get('url')
+    const currentSubjectParam = (searchParams?.get('subject') || searchParams?.get('category') || '').toLowerCase()
+    const currentArticle = searchParams?.get('article')
+    const currentCleanArticle = currentArticle
+      ? currentArticle.replace(/\s*[-–—]\s*(?:Producer\s*Toy|100%\s*Free.*).*$/i, '').trim() || currentArticle
+      : ''
 
-    if (subjectParam === 'news' || subjectParam === 'editorial' || subjectParam?.includes('news')) {
+    if (currentSubjectParam.includes('news') || currentSubjectParam.includes('editorial')) {
       setFormData((prev) => ({
         ...prev,
         subject: 'News & Editorial Correction',
         message:
           prev.message ||
-          (articleParam
-            ? `Regarding News Article: "${articleParam}"\nArticle Link: ${urlParam || ''}\n\nCorrection / Report Details:\n`
+          (currentCleanArticle
+            ? `Regarding: ${currentCleanArticle}\n\nSuggested Correction / Details:\n`
             : ''),
       }))
     }
@@ -175,6 +188,8 @@ export function ContactClient() {
               value={`Thank you for contacting Producer Toy!\n\nWe have received your message regarding "${formData.subject}". A member of our support team will review your inquiry and reply to you directly within 2–6 hours.\n\nWarm regards,\nProducer Toy Support Team\nhttps://producertoy.com`}
             />
             <input type="hidden" name="_next" value={nextUrl} />
+            {articleParam && <input type="hidden" name="article_reference" value={articleParam} />}
+            {urlParam && <input type="hidden" name="article_url" value={urlParam} />}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -188,7 +203,7 @@ export function ContactClient() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. John Doe"
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors"
+                  className="w-full bg-[#111113] border border-zinc-800 hover:border-zinc-700 focus:border-zinc-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-600"
                 />
               </div>
 
@@ -203,7 +218,7 @@ export function ContactClient() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="e.g. producer@gmail.com"
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors"
+                  className="w-full bg-[#111113] border border-zinc-800 hover:border-zinc-700 focus:border-zinc-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-600"
                 />
               </div>
             </div>
@@ -219,7 +234,7 @@ export function ContactClient() {
                   value={formData.orderId}
                   onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
                   placeholder="e.g. PT-M82..."
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors"
+                  className="w-full bg-[#111113] border border-zinc-800 hover:border-zinc-700 focus:border-zinc-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-all placeholder:text-zinc-600"
                 />
               </div>
 
@@ -227,22 +242,33 @@ export function ContactClient() {
                 <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
                   Subject Category <span className="text-zinc-200">*</span>
                 </label>
-                <select
-                  name="subject"
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors cursor-pointer"
-                >
-                  <option value="Order & Download Support">Order & Download Support</option>
-                  <option value="Toywards Loyalty Points">Toywards Loyalty Points Inquiry</option>
-                  <option value="Serial Key Issue">Serial / License Key Issue</option>
-                  <option value="Creator & Partnership">Creator & Sound Designer Partnership</option>
-                  <option value="Billing & Refund">Billing or Refund Request</option>
-                  <option value="News & Editorial Correction">News Article Correction / Editorial Report</option>
-                  <option value="Other">Other Inquiry</option>
-                </select>
+                <div className="relative">
+                  <select
+                    name="subject"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    className="w-full appearance-none bg-[#111113] border border-zinc-800 hover:border-zinc-700 focus:border-zinc-500 rounded-xl px-4 py-3 pr-10 text-sm text-white focus:outline-none transition-all cursor-pointer"
+                  >
+                    <option value="Order & Download Support" className="bg-[#18181c] text-white">Order & Download Support</option>
+                    <option value="Toywards Loyalty Points" className="bg-[#18181c] text-white">Toywards Loyalty Points Inquiry</option>
+                    <option value="Serial Key Issue" className="bg-[#18181c] text-white">Serial / License Key Issue</option>
+                    <option value="Creator & Partnership" className="bg-[#18181c] text-white">Creator & Sound Designer Partnership</option>
+                    <option value="Billing & Refund" className="bg-[#18181c] text-white">Billing or Refund Request</option>
+                    <option value="News & Editorial Correction" className="bg-[#18181c] text-white">News Article Correction / Editorial Report</option>
+                    <option value="Other" className="bg-[#18181c] text-white">Other Inquiry</option>
+                  </select>
+                  <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
+                </div>
               </div>
             </div>
+
+            {articleParam && (
+              <div className="flex items-center gap-2.5 px-3.5 py-2 rounded-lg bg-[#141416] border border-white/[0.06] text-xs">
+                <FileText size={14} className="text-zinc-400 shrink-0" />
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider shrink-0">Reference:</span>
+                <span className="text-zinc-200 font-medium truncate flex-1">{cleanArticleName || articleParam}</span>
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="block text-xs font-bold text-zinc-300 uppercase tracking-wider">
@@ -254,17 +280,17 @@ export function ContactClient() {
                 rows={5}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                placeholder="Please describe your query or issue in detail..."
-                className="w-full bg-[#121212] border border-zinc-700/80 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#34363d] transition-colors resize-none"
+                placeholder="Please describe your query or report in detail..."
+                className="w-full bg-[#111113] border border-zinc-800 hover:border-zinc-700 focus:border-zinc-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-all resize-none placeholder:text-zinc-600"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto bg-[#34363d] hover:bg-[#42454e] disabled:opacity-60 text-white font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto bg-white hover:bg-zinc-200 disabled:opacity-60 text-black font-extrabold text-xs py-3.5 px-8 rounded-xl uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              {isSubmitting ? <Loader2 size={16} className="animate-spin text-black" /> : <Send size={16} className="text-black" />}
               <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
             </button>
           </form>
