@@ -45,13 +45,7 @@ export function EpicSpotlightBanner() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/[0.03] pointer-events-none z-10" />
 
       {/* Text & Action Block - Fully Centered & Proportioned */}
-      <div className="relative z-20 w-full p-5 sm:p-8 lg:p-10 pl-5 sm:pl-[6%] lg:pl-[7%] sm:max-w-[480px] flex flex-col items-center text-center gap-2.5 sm:gap-3.5 pointer-events-auto my-auto">
-        
-        {/* Eyebrow Badge - Centered */}
-        <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-zinc-100 text-zinc-900 border border-zinc-300 text-[10px] sm:text-[11px] font-black uppercase tracking-wider shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-black shrink-0 animate-pulse" />
-          Platform Spotlight
-        </span>
+      <div className="relative z-20 w-full p-5 sm:p-8 lg:p-10 pl-5 sm:pl-[6%] lg:pl-[7%] sm:max-w-[480px] flex flex-col items-center text-center gap-3 sm:gap-4 pointer-events-auto my-auto">
 
         {/* Multi-line Structured Heading - Center Aligned */}
         <h2 className="text-[22px] xs:text-[24px] sm:text-[30px] lg:text-[36px] font-black text-black tracking-tight leading-[1.1] font-sans text-center">
