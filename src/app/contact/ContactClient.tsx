@@ -33,6 +33,22 @@ export function ContactClient() {
     if (searchParams?.get('submitted') === 'true') {
       setSubmitted(true)
     }
+
+    const subjectParam = searchParams?.get('subject')?.toLowerCase()
+    const articleParam = searchParams?.get('article')
+    const urlParam = searchParams?.get('url')
+
+    if (subjectParam === 'news' || subjectParam === 'editorial' || subjectParam?.includes('news')) {
+      setFormData((prev) => ({
+        ...prev,
+        subject: 'News & Editorial Correction',
+        message:
+          prev.message ||
+          (articleParam
+            ? `Regarding News Article: "${articleParam}"\nArticle Link: ${urlParam || ''}\n\nCorrection / Report Details:\n`
+            : ''),
+      }))
+    }
   }, [searchParams])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -222,6 +238,7 @@ export function ContactClient() {
                   <option value="Serial Key Issue">Serial / License Key Issue</option>
                   <option value="Creator & Partnership">Creator & Sound Designer Partnership</option>
                   <option value="Billing & Refund">Billing or Refund Request</option>
+                  <option value="News & Editorial Correction">News Article Correction / Editorial Report</option>
                   <option value="Other">Other Inquiry</option>
                 </select>
               </div>

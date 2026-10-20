@@ -9,6 +9,8 @@ import {
   ExternalLink,
   Tag,
   Clock,
+  AlertCircle,
+  ArrowRight,
 } from 'lucide-react'
 import { NewsArticle } from '@/lib/turso/newsDb'
 import {
@@ -509,6 +511,26 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               <span>{copied ? 'Link Copied' : 'Share Story'}</span>
             </button>
+          </div>
+
+          {/* Found an issue / Suggest an Editorial Update */}
+          <div className="my-8 p-4 sm:p-5 rounded-2xl bg-[#18181c] border border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs sm:text-sm shadow-md">
+            <div className="space-y-1">
+              <span className="font-bold text-white flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>Found something wrong in this article?</span>
+              </span>
+              <p className="text-zinc-400 text-xs leading-relaxed">
+                Spotted outdated pricing, broken download link, or trademark/product discrepancy? Let our editorial team know.
+              </p>
+            </div>
+            <Link
+              href={`/contact?subject=news&article=${encodeURIComponent(cleanHtmlTitle(article.title))}&url=${encodeURIComponent(`https://producertoy.com/news/${article.slug}`)}`}
+              className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white font-bold text-xs border border-zinc-700/60 transition-all shadow-sm active:scale-95"
+            >
+              <span>Report Correction</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
 
