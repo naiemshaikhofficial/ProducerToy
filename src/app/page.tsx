@@ -67,8 +67,8 @@ export default async function HomePage() {
         {/* 1st Section: Epic Hero Carousel (Starts immediately at top under SubBar) */}
         <EpicHeroCarousel products={products} />
 
-        {/* 2nd Section: Epic Store Billboard Spotlight Banner (Sitting flush inside 1280px container) */}
-        <section className="hidden lg:block w-full">
+        {/* 2nd Section: Epic Store Billboard Spotlight Video Banner */}
+        <section className="w-full">
           <EpicSpotlightBanner />
         </section>
 
