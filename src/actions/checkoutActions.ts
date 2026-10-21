@@ -188,7 +188,7 @@ export async function processCheckoutAction(
     try {
       const { data, error } = await adminSupabase
         .from('products')
-        .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url')
+        .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
         .in('id', productIds)
 
       if (!error && data && data.length > 0) {
@@ -203,7 +203,7 @@ export async function processCheckoutAction(
         const slugs = items.map((i) => i.slug || i.id)
         const { data: slugData } = await adminSupabase
           .from('products')
-          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url')
+          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
           .in('slug', slugs)
         if (slugData && slugData.length > 0) {
           dbProducts = slugData
@@ -352,6 +352,10 @@ export async function processCheckoutAction(
           productId: validProductId,
           userId: itemUserId,
           product: dbProduct,
+          customerEmail: itemCustomerEmail,
+          customerReference: itemUserId || targetUserId || undefined,
+          orderId: randomOrderId,
+          sellerDataSharingConsented: options?.sellerDataSharingConsentGiven === true,
         })
 
         return {
@@ -774,7 +778,7 @@ export async function verifyRazorpayPaymentAction(params: {
     let dbProducts: any[] = []
     const { data: prodsData } = await adminSupabase
       .from('products')
-      .select('id, name, price_inr, price_usd, product_type, delivery_method, license_type, slug')
+      .select('id, name, price_inr, price_usd, product_type, delivery_method, license_type, slug, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
       .in('id', productIds)
 
     if (!prodsData || prodsData.length === 0) {
@@ -892,6 +896,10 @@ export async function verifyRazorpayPaymentAction(params: {
           productId: targetProdId,
           userId: itemUserId,
           product: dbProduct,
+          customerEmail: itemCustomerEmail,
+          customerReference: itemUserId || targetUserId || undefined,
+          orderId: razorpay_order_id,
+          sellerDataSharingConsented: sellerDataSharingConsentGiven === true,
         })
 
         return {
