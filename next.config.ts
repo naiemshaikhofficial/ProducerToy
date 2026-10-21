@@ -165,6 +165,17 @@ const nextConfig: NextConfig = {
         destination: '/faq',
         permanent: true,
       },
+      // Creator distribution portal redirect
+      {
+        source: '/distribute',
+        destination: 'https://creators.producertoy.com',
+        permanent: false,
+      },
+      {
+        source: '/distribute/:path*',
+        destination: 'https://creators.producertoy.com',
+        permanent: false,
+      },
     ];
   },
   async rewrites() {
