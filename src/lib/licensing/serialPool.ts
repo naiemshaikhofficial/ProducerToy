@@ -128,13 +128,23 @@ export async function checkProductStockStatus(
     }
   }
 
+  const delivery = String(product.delivery_method || '').toLowerCase().trim()
+  const isDirectDownload =
+    delivery === 'direct_download' ||
+    delivery === 'keyless' ||
+    delivery === 'no_serial' ||
+    delivery === 'direct_cloud_zip' ||
+    product.product_type === 'sample_pack' ||
+    product.product_type === 'preset'
+
   const usesSerials =
     !isDedicated &&
+    !isDirectDownload &&
     Boolean(
-      product.delivery_method === 'serial_key' ||
-      product.delivery_method === 'license_key' ||
-      totalCount > 0 ||
-      purchCount > 0
+      delivery === 'serial_key' ||
+      delivery === 'license_key' ||
+      (totalCount > 0 && delivery !== 'direct_download') ||
+      (purchCount > 0 && delivery !== 'direct_download' && product.product_type !== 'sample_pack')
     )
 
   const isDepletedSerials = usesSerials && availCount === 0
