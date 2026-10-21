@@ -56,6 +56,14 @@ export default function FaqPage() {
       },
       {
         '@type': 'Question',
+        name: 'Who handles customer support: Producer Toy or the independent audio seller?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Support follows a Universal Multi-Vendor Model. Producer Toy handles platform accounts, checkout, order records, and CDN library delivery. Independent sellers handle plugin installation, DAW compatibility, license activation, and audio bugs. Both cooperate on failed deliveries, license keys, and refunds.',
+        },
+      },
+      {
+        '@type': 'Question',
         name: 'Where is my wishlist and how do I save products for later?',
         acceptedAnswer: {
           '@type': 'Answer',

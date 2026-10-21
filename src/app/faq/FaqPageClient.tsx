@@ -97,6 +97,22 @@ const FAQ_ITEMS: FAQItem[] = [
     linkText: 'Read Full EULA Agreement',
   },
   {
+    id: 'sell-support-model',
+    category: 'selling',
+    question: 'Who handles customer support: Producer Toy or the independent software/soundware seller?',
+    answer:
+      'Customer support is structured under a clear Universal Multi-Vendor Responsibility Model that clearly divides platform infrastructure from product-specific software support.',
+    details: [
+      'Producer Toy Platform Responsibilities: Customer accounts, authentication, checkout billing, order receipts, download library infrastructure, platform CDN delivery, and gateway refund/chargeback coordination.',
+      'Seller / Brand Responsibilities: Product descriptions, system compatibility (OS/DAW), installation guides, license activation/serial keys, audio DSP glitches, software bug fixes, and product-specific troubleshooting.',
+      'Joint Cooperation: Both parties cooperate on failed digital delivery, license key investigations, refund triage, and security incident response.',
+      'Cause-Based Allocation: Issues are investigated based on cause: Producer Toy resolves platform/delivery failures, while the seller resolves software bugs and activation rules.',
+    ],
+    tags: ['support responsibility', 'multi-vendor', 'customer support', 'troubleshooting', 'developer role', 'platform role'],
+    linkUrl: '/support',
+    linkText: 'Visit Customer Support Desk',
+  },
+  {
     id: 'sell-2',
     category: 'selling',
     question: 'Do you have an affiliate program for producers, YouTubers, and educators?',

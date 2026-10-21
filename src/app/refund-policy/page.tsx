@@ -103,15 +103,15 @@ export default function RefundPolicyPage() {
               3. Defective, Incomplete or Corrupted Downloads
             </h2>
             <p className="text-zinc-400">
-              We guarantee that every product archive on Producer Toy is verified, virus-free, and operational.
+              We guarantee that every product archive distributed on Producer Toy is verified, virus-free, and operational.
             </p>
             <p className="text-zinc-400">
-              If a downloaded archive is incomplete, damaged during download, or a serial key fails to authenticate with the developer&apos;s registration server, Producer Toy will:
+              Under our <strong>Universal Multi-Vendor Responsibility Model</strong>, technical resolution is handled through defined cooperation between Producer Toy (platform infrastructure) and the independent software developer (DSP audio code and license servers):
             </p>
             <ul className="list-disc pl-5 space-y-2 text-zinc-400 pt-1">
-              <li>Provide an alternate direct high-speed download mirror immediately upon notification.</li>
-              <li>Issue a verified replacement serial key or license key within <strong>24 to 48 hours</strong>.</li>
-              <li>In the extremely rare circumstance where a defective product cannot be made operational by our technical engineers or the software manufacturer within 7 business days, a full store credit or monetary refund to the original payment source will be executed.</li>
+              <li><strong className="text-zinc-200">Platform Delivery Issues:</strong> If a file is corrupted during transmission or an archive fails to download, Producer Toy immediately provides an alternate high-speed cloud CDN mirror.</li>
+              <li><strong className="text-zinc-200">License Key Validation:</strong> If a third-party serial key fails to authenticate with the developer&apos;s registration server, Producer Toy coordinates with the software brand to issue a verified replacement key within <strong>24 to 48 hours</strong>.</li>
+              <li><strong className="text-zinc-200">Software Engine Defects:</strong> In the rare circumstance where an irreconcilable software defect is confirmed by the manufacturer&apos;s technical support desk and cannot be made operational within 7 business days, a full monetary refund to the original payment source will be executed.</li>
             </ul>
           </section>
 

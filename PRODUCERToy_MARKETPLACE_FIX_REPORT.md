@@ -123,3 +123,27 @@ Before public launch and execution of the FORGE agreement, the business owner (N
 4. [ ] **Publish Approved Product Listings:** Create product pages with exact stated compatibility: *Apple Silicon, macOS 27.0 or later (AU, VST3, Standalone)*. No legacy macOS 14 or Windows beta.
 5. [ ] **Execute End-to-End Test Purchase in Staging:** Validate customer checkout, license key assignment, download delivery, order receipt email, and seller accounting settlement creation.
 6. [ ] **Go-Live Authorization:** Switch product visibility to live.
+
+---
+
+## 8. UNIVERSAL MULTI-VENDOR SUPPORT MODEL & CREATOR APP GAP ANALYSIS
+
+### A. Universal Multi-Vendor Support Implementation
+The platform documentation, legal templates, and public policy pages have been unified under a **Universal Multi-Vendor Support Responsibility Model**:
+- **`PRODUCERToy_SELLER_AGREEMENT_TEMPLATE.md`:** Master distribution agreement template for all audio software and soundware brands featuring the 70/30 net split, monthly settlements by the 15th, zero threshold, 7-step deduction order, cause-based support allocation, and Schedule A product addendum.
+- **`PRODUCERToy_CUSTOMER_SUPPORT_POLICY.md`:** Comprehensive buyer-facing resolution policy establishing clear routing between ProducerToy Platform Support (`support@producertoy.com`) and Independent Brand Technical Support (`support@brand.com`), with 24h acknowledgement and D+4 resolution SLA.
+- **`PRODUCERToy_SELLER_PAYOUT_POLICY.md`:** Updated Section 4 to universal multi-vendor standard; generalized the illustrative $19.00 USD developer sale example.
+- **Public Website Updates:** Integrated the multi-vendor division across `/faq`, `/distribute`, and `/refund-policy`.
+
+### B. Creator App Profile & Product Listing Capability Gap Analysis
+An audit of the current Toy Creator schema and UI identified the following status:
+
+| Feature / Metadata Field | Current Implementation Status | Location | Notes / Recommendations |
+|---|---|---|---|
+| **Brand Support Email** | **IMPLEMENTED** | `ProfilePage` (`brand.support_email`) | Sellers can configure their public support email; rendered on invoices and receipts. |
+| **Supported OS & Architectures** | **IMPLEMENTED** | `ProductNew` / `ProductEdit` (`operating_systems`) | Configurable per product (macOS, Windows, Apple Silicon native). |
+| **Plugin Formats & DAWs** | **IMPLEMENTED** | `ProductNew` / `ProductEdit` (`vst_format`, `supported_daws`) | Supports VST3, AU, AAX, Standalone, and DAW lists. |
+| **Machine Seats & Offline Days** | **IMPLEMENTED** | `ProductNew` / `ProductEdit` (`max_seats`, `offline_grace_days`) | Stored in database per product. |
+| **Product-Specific Support Email Override** | **GAP IDENTIFIED** | Missing in `products` table | Currently inherits `brand.support_email`. Recommended: add optional `support_email` column to `products` table for multi-developer collaborations. |
+| **Product-Specific EULA URL / Text** | **GAP IDENTIFIED** | Missing in `products` table | Currently inherits platform EULA + brand profile. Recommended: add `eula_url` and `eula_text` columns to `products` table in next migration. |
+| **Update Policy / Custom Refund Policy** | **GAP IDENTIFIED** | Missing in `products` table | Currently governed by universal marketplace refund policy. Recommended: add `update_policy` markdown field to product specs. |

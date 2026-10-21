@@ -85,6 +85,53 @@ export default function DistributePage() {
         </div>
       </section>
 
+      {/* Universal Multi-Vendor Support Responsibility Section */}
+      <section className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 pb-16 sm:pb-24">
+        <div className="bg-[#161616] border border-white/[0.08] rounded-3xl p-8 sm:p-12 space-y-8">
+          <div className="text-center space-y-3 max-w-2xl mx-auto">
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-400">Operational Excellence</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">Universal Multi-Vendor Support Model</h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              We run a clear division of responsibilities so audio developers and sound designers can focus on creating world-class DSP and presets while we handle global marketplace scale.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-[#1c1c1c] p-6 rounded-2xl border border-white/[0.06] space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">PT</div>
+                <h3 className="font-bold text-white text-base">ProducerToy Platform Role</h3>
+              </div>
+              <ul className="text-xs text-zinc-400 space-y-2.5">
+                <li className="flex items-start gap-2">• <span>Customer accounts, authentication, and user profile management</span></li>
+                <li className="flex items-start gap-2">• <span>Multi-currency checkout, fraud screening, and tax invoice generation</span></li>
+                <li className="flex items-start gap-2">• <span>Global cloud CDN download hosting and customer library delivery</span></li>
+                <li className="flex items-start gap-2">• <span>Monthly itemized settlement accounting and wire disbursement records</span></li>
+                <li className="flex items-start gap-2">• <span>Gateway refund and chargeback processing coordination</span></li>
+              </ul>
+            </div>
+
+            <div className="bg-[#1c1c1c] p-6 rounded-2xl border border-white/[0.06] space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">DEV</div>
+                <h3 className="font-bold text-white text-base">Seller / Brand Developer Role</h3>
+              </div>
+              <ul className="text-xs text-zinc-400 space-y-2.5">
+                <li className="flex items-start gap-2">• <span>Accurate product specs, OS requirements, and DAW compatibility</span></li>
+                <li className="flex items-start gap-2">• <span>Installation guides, product manuals, and setup documentation</span></li>
+                <li className="flex items-start gap-2">• <span>Product activation, machine seat policies, and genuine serial keys</span></li>
+                <li className="flex items-start gap-2">• <span>Audio engine defect remediation, software patches, and DSP bug fixes</span></li>
+                <li className="flex items-start gap-2">• <span>Direct customer troubleshooting for product-specific technical inquiries</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="p-4 bg-[#141414] rounded-xl border border-white/[0.06] text-xs text-zinc-400 text-center leading-relaxed">
+            <strong className="text-white">Cause-Based Joint Cooperation:</strong> ProducerToy resolves platform and delivery failures, while the seller resolves software bugs and activation rules. Both parties cooperate on failed deliveries, license key issues, and security.
+          </div>
+        </div>
+      </section>
+
       {/* What You Can Publish */}
       <section className="bg-[#161616] border-y border-white/[0.08] py-16 sm:py-20 px-6 sm:px-10 lg:px-16">
         <div className="max-w-5xl mx-auto space-y-12">

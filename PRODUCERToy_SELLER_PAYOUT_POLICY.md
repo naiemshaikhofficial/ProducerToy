@@ -1,7 +1,7 @@
 # PRODUCERTOY SELLER SETTLEMENT & PAYOUT POLICY
 **Effective Date:** October 2026  
 **Governing Standard:** Standard Third-Party Developer Commercial Agreement  
-**Applies To:** Audio Software Developers, DSP Engineers, Sound Designers, and Studio Partners (including FORGE Multimedia Group LLC)  
+**Applies To:** All Third-Party Audio Software Developers, VST/AU Engineers, Sound Designers, and Studio Partners  
 
 ---
 
@@ -17,7 +17,7 @@ ProducerToy operates as a curated digital marketplace and distribution platform 
 3. **Settlement Due Date:**
    - The **15th calendar day of the following month** (e.g., October sales settle and disburse by November 15th).
 4. **Minimum Payout Threshold:**
-   - **None ($0.00).** Under approved partner agreements (including FORGE), all cleared balances are disbursed on schedule without artificial holding thresholds.
+   - **None ($0.00).** Under standard marketplace commercial agreements, all cleared balances are disbursed on schedule without artificial holding thresholds.
 5. **Settlement Statements:**
    - Itemized digital self-billing settlement statements are generated at the close of every billing period, downloadable via CSV/PDF from the Toy Creator portal.
 6. **Disbursement Mechanism:**
@@ -82,38 +82,56 @@ The following example illustrates the exact deduction breakdown for a single $19
 | **Step 3** | Payment Processor Fee | PayPal (4.40% × $19.00 + $0.30) | **-$1.14** |
 | **Step 4** | Currency Conversion / Refunds | None | -$0.00 |
 | **Step 5** | **Eligible Net Sale Proceeds** | **$19.00 - $1.14** | **$17.86** |
-| **Step 6A** | **FORGE Revenue Share (70%)** | **70% of $17.86** | **$12.50** |
+| **Step 6A** | **Seller Revenue Share (70%)** | **70% of $17.86** | **$12.50** |
 | **Step 6B** | **ProducerToy Commission (30%)** | **30% of $17.86** | **$5.36** |
 | **Step 7** | Outbound Wire Transfer Fee | Disbursed in batch at month end | -$0.00 (per transaction) |
-| **Total** | **Net Amount Due to FORGE** | Cleared for monthly settlement | **$12.50** |
+| **Total** | **Net Amount Due to Seller** | Cleared for monthly settlement | **$12.50** |
 
-*(Note: Payment gateway fee rates are illustrative of standard international merchant processing and will reflect actual transaction logs).*
+*(Note: Payment gateway fee rates are illustrative of standard international merchant processing and reflect actual transaction logs).*
 
 ---
 
-## 4. DIVISION OF CUSTOMER SUPPORT RESPONSIBILITIES
+## 4. UNIVERSAL MULTI-VENDOR SUPPORT RESPONSIBILITY MODEL
 
-To maintain professional service for music producers and prevent customer confusion, support responsibilities are clearly divided:
+To ensure transparent customer service across all participating brands, sound designers, and software manufacturers, customer support and operational responsibilities are allocated according to a universal multi-vendor division:
 
-```
-┌───────────────────────────────────────────────┐    ┌───────────────────────────────────────────────┐
-│           PRODUCERTOY RESPONSIBILITIES         │    │              FORGE RESPONSIBILITIES           │
-├───────────────────────────────────────────────┤    ├───────────────────────────────────────────────┤
-│ • Customer account login & password recovery  │    │ • Audio plugin installation & macOS setup     │
-│ • Checkout processing, payment & card issues  │    │ • Plugin activation & genuine serial keys     │
-│ • Order receipts & invoice generation         │    │ • DAW compatibility (Logic, Ableton, ProTools)│
-│ • Secure installer download & CDN bandwidth   │    │ • Audio engine defects, crashes & DSP bugs    │
-│ • Developer settlement ledgers & wire payouts │    │ • Product updates, presets & user manuals     │
-└───────────────────────────────────────────────┘    └───────────────────────────────────────────────┘
-                     │                                                    │
-                     ▼                                                    ▼
-    ┌───────────────────────────────────────────────────────────────────────────┐
-    │                      JOINT COOPERATION PROTOCOL                           │
-    │  • Resolution of invalid or exhausted license keys within 24 hours        │
-    │  • Investigation of duplicate orders, refund requests, and chargebacks    │
-    │  • Security incident response and intellectual property protection        │
-    └───────────────────────────────────────────────────────────────────────────┘
-```
+### A. ProducerToy Platform Responsibilities
+ProducerToy is solely responsible for marketplace-level infrastructure and customer account administration, including:
+- Customer accounts, authentication, password recovery, and profile security.
+- Checkout workflows, multi-currency processing, and transaction records.
+- Order confirmation, tax invoice generation, and purchase history.
+- ProducerToy customer library and high-speed global CDN download infrastructure.
+- Investigating and remediating platform-side download, network, or delivery failures.
+- Publisher commission accounting, monthly settlement ledgers, and disbursement statements.
+- Platform bugs, security vulnerability reports, and marketplace policy enforcement.
+- Coordinating customer refund and chargeback processing through configured payment gateways.
+
+### B. Seller / Brand Responsibilities
+Each independent seller is solely responsible for the digital products and soundware it supplies, including:
+- Accurate product titles, descriptions, technical specifications, and compatibility claims.
+- Supported operating system versions, CPU architectures, DAW hosts, and plugin formats.
+- Clear installation documentation, user manuals, and product-specific setup instructions.
+- Product activation requirements, genuine license keys, serial numbers, and machine seat management.
+- Audio software defects, DSP glitches, DAW crashes, plugin bugs, and product maintenance updates.
+- Product-specific technical support and direct troubleshooting with end customers.
+- Accuracy, originality, and legality of supplied installers, sample archives, presets, documentation, and artwork.
+- Maintaining valid download packages, updated binary builds, release changelogs, and product-specific license terms.
+
+### C. Shared Responsibilities & Joint Cooperation
+ProducerToy and the relevant seller shall cooperate in good faith on:
+- Failed or incomplete digital delivery investigations.
+- Missing, duplicated, invalid, or incorrectly assigned license keys (24–48 hour turnaround).
+- Refund requests, fraud screening, and chargeback dispute evidence collection.
+- Product security incidents, binary integrity verification, and suspected malware reports.
+- Intellectual property notices and copyright ownership inquiries.
+- Complex customer complaints that span both platform checkout and product software execution.
+- Orderly product withdrawal, version deprecation, and ensuring ongoing library access for existing licensed buyers.
+
+### D. Cause-Based Allocation Principle
+Operational liability and dispute remediation are allocated strictly according to the root cause:
+- **Platform-Side Failures:** ProducerToy investigates and resolves platform outages, payment gateway verification drops, order generation failures, and CDN delivery timeouts.
+- **Product-Side Failures:** The seller investigates and resolves defective binaries, corrupted sample archives, invalid supplied serial keys, activation server failures, and audio engine defects.
+- **Dual-System Incidents:** Both parties coordinate when an issue involves both platform delivery and product software behavior.
 
 ---
 
@@ -122,7 +140,7 @@ To maintain professional service for music producers and prevent customer confus
 1. **Digital Good Disclosure:**
    - Under international eCommerce law, purchases of digital audio plugins and downloadable software are final once the installer download has commenced or a unique license key has been revealed, except where required by mandatory consumer protection law.
 2. **Refund Authorization:**
-   - If a customer experiences an irreconcilable technical defect verified by FORGE support, or if a duplicate payment was charged, ProducerToy issues a direct refund to the original payment method.
+   - If a customer experiences an irreconcilable technical defect verified by the seller's technical support desk, or if a duplicate payment was charged, ProducerToy coordinates a direct refund to the original payment method.
 3. **Reconciliation:**
    - The refunded amount is deducted from the current billing period's gross sales.
    - ProducerToy does not retain its 30% commission on refunded transactions.
