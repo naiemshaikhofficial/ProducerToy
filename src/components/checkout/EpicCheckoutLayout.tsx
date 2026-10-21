@@ -23,6 +23,7 @@ import { BillingDetails, PaymentStatus } from './types'
 import { CheckoutBillingForm } from './CheckoutBillingForm'
 import { PayPalPaymentButton } from './PayPalPaymentButton'
 import { ButtonSpinner } from '@/components/ui/ButtonSpinner'
+import { getCartDataSharingRequirementsAction } from '@/actions/checkoutActions'
 
 interface EpicCheckoutLayoutProps {
   items: CartItem[]
@@ -48,8 +49,8 @@ interface EpicCheckoutLayoutProps {
   useRewards?: boolean
   onToggleRewards?: (val: boolean) => void
   rewardDiscountAmount?: number
-  onRazorpayCheckout: () => void
-  onFreeCheckout: () => void
+  onRazorpayCheckout: (consentGiven?: boolean) => void
+  onFreeCheckout: (consentGiven?: boolean) => void
   onPayPalSuccess: (orderNumber?: string) => void
   onPayPalError: (msg: string) => void
   onPayPalProcessing: () => void
@@ -102,6 +103,37 @@ export function EpicCheckoutLayout({
   const [giftRefundAgreed, setGiftRefundAgreed] = useState(true)
   const hasGiftItems = items.some((i) => i.is_gift || i.gift_recipient_email)
 
+  // Seller Data Sharing Consent State (Default: Privacy-First, Unchecked)
+  const [sharingAudit, setSharingAudit] = useState<{
+    requiresSharing: boolean
+    requiresExplicitConsent: boolean
+    configs: any[]
+  }>({ requiresSharing: false, requiresExplicitConsent: false, configs: [] })
+  const [sellerConsentAgreed, setSellerConsentAgreed] = useState(false)
+  const [consentError, setConsentError] = useState('')
+
+  useEffect(() => {
+    const productIds = items.map((i) => i.id).filter(Boolean)
+    if (productIds.length > 0) {
+      getCartDataSharingRequirementsAction(productIds)
+        .then((audit) => {
+          setSharingAudit(audit)
+          if (!audit.requiresExplicitConsent) {
+            setSellerConsentAgreed(true)
+          } else {
+            setSellerConsentAgreed(false) // Always default unchecked
+          }
+        })
+        .catch(() => {
+          setSharingAudit({ requiresSharing: false, requiresExplicitConsent: false, configs: [] })
+          setSellerConsentAgreed(false)
+        })
+    } else {
+      setSharingAudit({ requiresSharing: false, requiresExplicitConsent: false, configs: [] })
+      setSellerConsentAgreed(false)
+    }
+  }, [items])
+
   // Auto-expand billing if there are form errors
   useEffect(() => {
     if (Object.keys(formErrors).length > 0) {
@@ -138,15 +170,115 @@ export function EpicCheckoutLayout({
     : (billingDetails.fullName?.trim() ? billingDetails.fullName.trim()[0].toUpperCase() : 'G')
 
   const handlePayClick = () => {
+    if (sharingAudit.requiresExplicitConsent && !sellerConsentAgreed) {
+      setConsentError('Please review and accept the Seller Data Sharing Notice to proceed.')
+      return
+    }
+    setConsentError('')
+
     if (isFree) {
-      onFreeCheckout()
+      onFreeCheckout(sellerConsentAgreed)
       return
     }
     if (selectedMethod === 'paypal') {
       return
     }
     // Razorpay (Cards, UPI, GPay, NetBanking)
-    onRazorpayCheckout()
+    onRazorpayCheckout(sellerConsentAgreed)
+  }
+
+  const renderSellerDataSharingNotice = (isMobile: boolean) => {
+    if (!sharingAudit.requiresSharing || sharingAudit.configs.length === 0) {
+      return null
+    }
+
+    return (
+      <div className="p-3.5 bg-[#171717] border border-amber-500/30 rounded-xl space-y-2.5 text-left mb-2 shadow-xs">
+        <div className="flex items-center gap-1.5 text-[11.5px] font-bold text-amber-300">
+          <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>Seller Data Sharing Notice</span>
+        </div>
+
+        <p className="text-[11px] text-zinc-300 leading-relaxed">
+          To provide product licensing, activation, purchase verification, or technical support, Producer Toy may share the information listed below with the product&apos;s verified seller:
+        </p>
+
+        <div className="space-y-2 pt-1">
+          {sharingAudit.configs.map((cfg) => (
+            <div
+              key={cfg.productId}
+              className="text-[10.5px] bg-[#202020] border border-zinc-800 rounded-lg p-2.5 space-y-1"
+            >
+              <div className="text-zinc-100 font-semibold">{cfg.productName}</div>
+              <div className="text-zinc-400">
+                <span className="text-zinc-500 font-medium">Seller:</span>{' '}
+                <strong className="text-zinc-200">{cfg.sellerName}</strong>
+              </div>
+              <div className="text-zinc-400">
+                <span className="text-zinc-500 font-medium">Information shared:</span>{' '}
+                <span className="text-zinc-200">{cfg.sharedFields.join(', ')}</span>
+              </div>
+              <div className="text-zinc-400">
+                <span className="text-zinc-500 font-medium">Purpose:</span>{' '}
+                <span className="text-zinc-200">{cfg.purpose}</span>
+              </div>
+              {cfg.productEulaUrl && (
+                <div className="pt-1">
+                  <Link
+                    href={cfg.productEulaUrl}
+                    target="_blank"
+                    className="text-amber-400 hover:text-amber-300 underline font-medium"
+                  >
+                    View {cfg.sellerName} Product License &amp; Terms &rarr;
+                  </Link>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-[10px] text-zinc-400 leading-normal">
+          Your information will not be shared for unrelated purposes, including marketing, unless separately authorized where required.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-zinc-500 pt-0.5">
+          <Link href="/privacy" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+            Privacy Policy
+          </Link>
+          <span>&bull;</span>
+          <Link href="/eula" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+            Platform EULA
+          </Link>
+        </div>
+
+        {sharingAudit.requiresExplicitConsent && (
+          <div className="flex items-start gap-2.5 pt-2 border-t border-zinc-800/80">
+            <input
+              type="checkbox"
+              id={isMobile ? "mobile-seller-data-sharing-consent" : "desktop-seller-data-sharing-consent"}
+              checked={sellerConsentAgreed}
+              onChange={(e) => {
+                setSellerConsentAgreed(e.target.checked)
+                if (e.target.checked) setConsentError('')
+              }}
+              className="mt-0.5 w-4 h-4 rounded bg-[#242424] border-[#383838] text-amber-500 focus:ring-0 accent-amber-500 cursor-pointer shrink-0"
+            />
+            <label
+              htmlFor={isMobile ? "mobile-seller-data-sharing-consent" : "desktop-seller-data-sharing-consent"}
+              className="text-[11px] text-zinc-200 leading-snug cursor-pointer select-none font-medium"
+            >
+              I consent to Producer Toy sharing my customer email and order reference with the verified seller(s) named above solely for product activation, licensing, and technical support.
+            </label>
+          </div>
+        )}
+
+        {consentError && (
+          <div className="text-[11px] text-red-400 font-medium pt-1">
+            {consentError}
+          </div>
+        )}
+      </div>
+    )
   }
 
   const primaryItem = items[0] || {
@@ -643,6 +775,9 @@ export function EpicCheckoutLayout({
             </div>
           )}
 
+          {/* Seller Data Sharing Notice (Pre-Purchase Disclosure) */}
+          {renderSellerDataSharingNotice(true)}
+
           {/* Software Licensing & Order of Precedence Notice */}
           <div className="p-3 bg-[#181818] border border-zinc-800 rounded-lg space-y-1.5 text-left mb-2">
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-300">
@@ -678,6 +813,8 @@ export function EpicCheckoutLayout({
                   couponCode={coupon}
                   userId={user.id}
                   billingDetails={billingDetails}
+                  sellerDataSharingConsentGiven={sellerConsentAgreed}
+                  requiresConsent={sharingAudit.requiresExplicitConsent}
                   onSuccess={onPayPalSuccess}
                   onError={onPayPalError}
                   onProcessing={onPayPalProcessing}
@@ -694,7 +831,7 @@ export function EpicCheckoutLayout({
               <button
                 type="button"
                 onClick={handlePayClick}
-                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed)}
+                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed) || (sharingAudit.requiresExplicitConsent && !sellerConsentAgreed)}
                 className="w-full h-12 bg-white hover:bg-zinc-200 active:scale-[0.99] text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer disabled:bg-[#282828] disabled:text-[#666666] disabled:cursor-not-allowed"
               >
                 {loading || paymentStatus === 'processing' ? (
@@ -1247,6 +1384,9 @@ export function EpicCheckoutLayout({
               </div>
             )}
 
+            {/* Seller Data Sharing Notice (Pre-Purchase Disclosure) */}
+            {renderSellerDataSharingNotice(false)}
+
             {/* Software Licensing & Order of Precedence Notice */}
             <div className="p-3 bg-[#181818] border border-zinc-800 rounded-lg space-y-1.5 text-left mb-2">
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-300">
@@ -1281,6 +1421,8 @@ export function EpicCheckoutLayout({
                   couponCode={coupon}
                   userId={user.id}
                   billingDetails={billingDetails}
+                  sellerDataSharingConsentGiven={sellerConsentAgreed}
+                  requiresConsent={sharingAudit.requiresExplicitConsent}
                   onSuccess={onPayPalSuccess}
                   onError={onPayPalError}
                   onProcessing={onPayPalProcessing}
@@ -1297,7 +1439,7 @@ export function EpicCheckoutLayout({
               <button
                 type="button"
                 onClick={handlePayClick}
-                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed)}
+                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed) || (sharingAudit.requiresExplicitConsent && !sellerConsentAgreed)}
                 className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer disabled:opacity-60 active:scale-[0.99]"
               >
                 {loading || paymentStatus === 'processing' ? (

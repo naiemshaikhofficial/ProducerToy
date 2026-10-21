@@ -443,7 +443,7 @@ export default function CheckoutPage() {
   }
 
   // --- 1. HANDLE FREE CHECKOUT (Direct High-Speed Server Action) ---
-  const handleFreeCheckout = async () => {
+  const handleFreeCheckout = async (consentGiven?: boolean) => {
     if (!user) {
       router.push('/auth?next=/checkout')
       return
@@ -498,6 +498,7 @@ export default function CheckoutPage() {
           currency: currency,
           applyRewards: useRewards,
           rewardAmountUsed: rewardAmountUsedUsd,
+          sellerDataSharingConsentGiven: Boolean(consentGiven),
         }
       )
 
@@ -518,7 +519,7 @@ export default function CheckoutPage() {
   }
 
   // --- 2. HANDLE RAZORPAY CHECKOUT (INDIA / INR) ---
-  const handleRazorpayCheckout = async () => {
+  const handleRazorpayCheckout = async (consentGiven?: boolean) => {
     if (!user) {
       router.push('/auth?next=/checkout')
       return
@@ -618,6 +619,7 @@ export default function CheckoutPage() {
               couponCode: coupon,
               applyRewards: useRewards,
               rewardAmountUsed: rewardAmountUsedUsd,
+              sellerDataSharingConsentGiven: Boolean(consentGiven),
             })
 
             if (verifyRes.success) {

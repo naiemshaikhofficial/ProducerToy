@@ -310,7 +310,7 @@ export function GlobalCheckoutModal() {
     }
   }
 
-  const handleFreeCheckout = async () => {
+  const handleFreeCheckout = async (consentGiven?: boolean) => {
     if (!validateForm()) return
     setLoading(true)
     setErrorMsg('')
@@ -350,6 +350,7 @@ export function GlobalCheckoutModal() {
           currency: currency,
           applyRewards: useRewards,
           rewardAmountUsed: rewardAmountUsedUsd,
+          sellerDataSharingConsentGiven: Boolean(consentGiven),
         }
       )
       if (res.success) {
@@ -368,7 +369,7 @@ export function GlobalCheckoutModal() {
     }
   }
 
-  const handleRazorpayCheckout = async () => {
+  const handleRazorpayCheckout = async (consentGiven?: boolean) => {
     if (!validateForm()) return
     setLoading(true)
     setErrorMsg('')
@@ -454,6 +455,7 @@ export function GlobalCheckoutModal() {
               couponCode: coupon,
               applyRewards: useRewards,
               rewardAmountUsed: rewardAmountUsedUsd,
+              sellerDataSharingConsentGiven: Boolean(consentGiven),
             })
 
             if (verifyRes.success) {

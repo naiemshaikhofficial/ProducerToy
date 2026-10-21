@@ -12,8 +12,15 @@ import {
   checkProductStockStatus,
   ProductStockStatus,
 } from '@/lib/licensing/serialPool'
+import {
+  evaluateCartDataSharing,
+  recordCustomerDataConsent,
+  CartDataSharingAudit,
+  ProductDataSharingConfig,
+} from '@/lib/privacy/dataSharing'
 
 export { isDedicatedLicensedProduct, generateStandardSerialKey, checkProductStockStatus }
+export type { CartDataSharingAudit, ProductDataSharingConfig }
 
 export interface BillingDetailsInput {
   fullName?: string
@@ -49,6 +56,17 @@ export interface CheckoutOptionsInput {
   newsletterOptIn?: boolean
   applyRewards?: boolean
   rewardAmountUsed?: number
+  sellerDataSharingConsentGiven?: boolean
+}
+
+/**
+ * Server action to inspect cart items and retrieve seller data sharing requirements.
+ */
+export async function getCartDataSharingRequirementsAction(
+  productIds: string[]
+): Promise<CartDataSharingAudit> {
+  const adminSupabase = getAdminClient()
+  return await evaluateCartDataSharing(adminSupabase, productIds)
 }
 
 export interface CheckoutActionResult {
@@ -211,6 +229,15 @@ export async function processCheckoutAction(
       }
     }
 
+    // 3.0 Seller Data Sharing Consent Enforcement
+    const sharingAudit = await evaluateCartDataSharing(adminSupabase, productIds)
+    if (sharingAudit.requiresExplicitConsent && !options?.sellerDataSharingConsentGiven) {
+      return {
+        success: false,
+        error: 'Explicit buyer consent is required to share necessary licensing details with the product seller. Please accept the seller data sharing disclosure to proceed.',
+      }
+    }
+
     // 3.1 Verify server-side total and coupons strictly against database to prevent unpaid bypass
     const rawSubtotalUsd = dbProducts.reduce((sum, p) => sum + Number(p.price_usd || 0), 0)
     const rawSubtotalInr = dbProducts.reduce((sum, p) => sum + Number(p.price_inr || 0), 0)
@@ -345,6 +372,7 @@ export async function processCheckoutAction(
           billing_country: billingDetails?.country || null,
           discount_amount: options?.discountAmount || verifiedRewardDiscountUsd || 0,
           coupon_code: options?.couponCode || null,
+          seller_data_sharing_consented: options?.sellerDataSharingConsentGiven === true,
           purchased_at: new Date().toISOString(),
         }
       })
@@ -399,6 +427,25 @@ export async function processCheckoutAction(
       })
     } catch (orderErr) {
       console.warn('Orders table record note:', orderErr)
+    }
+
+    // Record immutable audit log in customer_data_consents
+    if (sharingAudit.requiresSharing && options?.sellerDataSharingConsentGiven) {
+      for (const config of sharingAudit.configs) {
+        await recordCustomerDataConsent({
+          adminSupabase,
+          userId: targetUserId || null,
+          orderId: orderNumber,
+          productId: config.productId,
+          brandId: config.brandId || null,
+          sellerName: config.sellerName,
+          consentGiven: true,
+          consentedFields: config.sharedFields,
+          statedPurpose: config.purpose,
+          disclosureVersion: config.disclosureVersion,
+          productLicenseVersion: 'v1.0',
+        })
+      }
     }
 
     // Insert Gift records to public.gifts table in Supabase
@@ -655,6 +702,7 @@ export async function verifyRazorpayPaymentAction(params: {
   couponCode?: string
   applyRewards?: boolean
   rewardAmountUsed?: number
+  sellerDataSharingConsentGiven?: boolean
 }) {
   try {
     const {
@@ -667,6 +715,7 @@ export async function verifyRazorpayPaymentAction(params: {
       couponCode,
       applyRewards,
       rewardAmountUsed,
+      sellerDataSharingConsentGiven,
     } = params
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -733,6 +782,15 @@ export async function verifyRazorpayPaymentAction(params: {
     }
 
     dbProducts = prodsData
+
+    // 3.0 Seller Data Sharing Consent Enforcement
+    const sharingAudit = await evaluateCartDataSharing(adminSupabase, productIds)
+    if (sharingAudit.requiresExplicitConsent && !sellerDataSharingConsentGiven) {
+      return {
+        success: false,
+        error: 'Explicit buyer consent is required to share necessary licensing details with the product seller. Please accept the seller data sharing disclosure to proceed.',
+      }
+    }
 
     const { getUsdToInrRate } = await import('@/lib/exchangeRate')
     const liveRate = await getUsdToInrRate()
@@ -853,6 +911,7 @@ export async function verifyRazorpayPaymentAction(params: {
           billing_zip: billingDetails?.zip || null,
           billing_country: billingDetails?.country || null,
           coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
+          seller_data_sharing_consented: sellerDataSharingConsentGiven === true,
           purchased_at: new Date().toISOString(),
         }
       })
@@ -905,6 +964,25 @@ export async function verifyRazorpayPaymentAction(params: {
       items: items,
       created_at: new Date().toISOString(),
     })
+
+    // Record immutable audit log in customer_data_consents
+    if (sharingAudit.requiresSharing && sellerDataSharingConsentGiven) {
+      for (const config of sharingAudit.configs) {
+        await recordCustomerDataConsent({
+          adminSupabase,
+          userId: targetUserId || null,
+          orderId: orderNumber,
+          productId: config.productId,
+          brandId: config.brandId || null,
+          sellerName: config.sellerName,
+          consentGiven: true,
+          consentedFields: config.sharedFields,
+          statedPurpose: config.purpose,
+          disclosureVersion: config.disclosureVersion,
+          productLicenseVersion: 'v1.0',
+        })
+      }
+    }
 
     // Insert Gift records to public.gifts table in Supabase
     const giftItems = items.filter((i) => i.is_gift || i.gift_recipient_email)
@@ -1130,6 +1208,7 @@ export async function capturePayPalOrderAction(params: {
   couponCode?: string
   applyRewards?: boolean
   rewardAmountUsed?: number
+  sellerDataSharingConsentGiven?: boolean
 }) {
   try {
     const {
@@ -1140,6 +1219,7 @@ export async function capturePayPalOrderAction(params: {
       couponCode,
       applyRewards,
       rewardAmountUsed,
+      sellerDataSharingConsentGiven,
     } = params
 
     if (!orderId || !userId || !items || !Array.isArray(items) || items.length === 0) {
@@ -1165,6 +1245,15 @@ export async function capturePayPalOrderAction(params: {
     }
 
     const dbProducts = prodsData
+
+    // 3.0 Seller Data Sharing Consent Enforcement
+    const sharingAudit = await evaluateCartDataSharing(adminSupabase, productIds)
+    if (sharingAudit.requiresExplicitConsent && !sellerDataSharingConsentGiven) {
+      return {
+        success: false,
+        error: 'Explicit buyer consent is required to share necessary licensing details with the product seller. Please accept the seller data sharing disclosure to proceed.',
+      }
+    }
 
     const rawSubtotalUsd = dbProducts.reduce(
       (sum, p) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 85 : 0)),
@@ -1247,6 +1336,7 @@ export async function capturePayPalOrderAction(params: {
           billing_zip: billingDetails?.zip || null,
           billing_country: billingDetails?.country || null,
           coupon_code: verifiedCouponDiscountPercent > 0 ? couponCode : null,
+          seller_data_sharing_consented: sellerDataSharingConsentGiven === true,
           purchased_at: new Date().toISOString(),
         }
       })
@@ -1299,6 +1389,25 @@ export async function capturePayPalOrderAction(params: {
       items: items,
       created_at: new Date().toISOString(),
     })
+
+    // Record immutable audit log in customer_data_consents
+    if (sharingAudit.requiresSharing && sellerDataSharingConsentGiven) {
+      for (const config of sharingAudit.configs) {
+        await recordCustomerDataConsent({
+          adminSupabase,
+          userId: userId || null,
+          orderId: orderNumber,
+          productId: config.productId,
+          brandId: config.brandId || null,
+          sellerName: config.sellerName,
+          consentGiven: true,
+          consentedFields: config.sharedFields,
+          statedPurpose: config.purpose,
+          disclosureVersion: config.disclosureVersion,
+          productLicenseVersion: 'v1.0',
+        })
+      }
+    }
 
     // Insert Gift records to public.gifts table in Supabase
     const giftItems = items.filter((i) => i.is_gift || i.gift_recipient_email)

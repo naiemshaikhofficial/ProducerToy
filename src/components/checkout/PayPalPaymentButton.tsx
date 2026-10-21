@@ -15,6 +15,8 @@ interface PayPalPaymentButtonProps {
   billingDetails: any
   applyRewards?: boolean
   rewardAmountUsed?: number
+  sellerDataSharingConsentGiven?: boolean
+  requiresConsent?: boolean
   onSuccess: (orderNumber: string) => void
   onError: (errorMsg: string) => void
   onProcessing: () => void
@@ -27,6 +29,8 @@ export function PayPalPaymentButton({
   billingDetails,
   applyRewards,
   rewardAmountUsed,
+  sellerDataSharingConsentGiven,
+  requiresConsent,
   onSuccess,
   onError,
   onProcessing,
@@ -55,6 +59,10 @@ export function PayPalPaymentButton({
               tagline: false,
             }}
             createOrder={async () => {
+              if (requiresConsent && !sellerDataSharingConsentGiven) {
+                onError('Please review and accept the Seller Data Sharing Notice before proceeding.')
+                throw new Error('Seller data sharing consent required.')
+              }
               onProcessing()
               try {
                 const res = await createPayPalOrderAction(
@@ -108,6 +116,7 @@ export function PayPalPaymentButton({
                   couponCode: couponCode,
                   applyRewards: Boolean(applyRewards),
                   rewardAmountUsed: Number(rewardAmountUsed || 0),
+                  sellerDataSharingConsentGiven: Boolean(sellerDataSharingConsentGiven),
                 })
 
                 if (captureRes.success) {

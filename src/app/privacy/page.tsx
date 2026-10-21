@@ -113,6 +113,45 @@ export default function PrivacyPolicyPage() {
             </p>
           </section>
 
+          {/* Section 3.1: Third-Party Audio Developer & Seller Data Sharing */}
+          <section className="space-y-3 p-4 sm:p-5 bg-[#171717] border border-zinc-800 rounded-xl">
+            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <ShieldCheck size={18} className="text-amber-400" />
+              3.1 Third-Party Audio Developer &amp; Seller Data Sharing Controls
+            </h2>
+            <p className="text-zinc-400 text-xs sm:text-sm">
+              Producer Toy enforces a strict <strong>privacy-first default</strong>: customer personal contact details are never shared globally or indiscriminately with third-party sellers, sound designers, or creators on our marketplace.
+            </p>
+            <div className="space-y-3 text-xs sm:text-sm text-zinc-400 pt-1">
+              <div>
+                <strong className="text-zinc-200">1. Default Policy (No Sharing):</strong> For standard sample archives, presets, DAW templates, and soundware delivered directly via Producer Toy infrastructure, sellers receive aggregate financial and units data only. Sellers never receive raw customer email addresses, phone numbers, or billing addresses.
+              </div>
+              <div>
+                <strong className="text-zinc-200">2. Documented Activation &amp; Licensing Requirements:</strong> Certain complex audio software products (such as dedicated DSP plugins requiring machine seat assignment or license server registration by verified third-party developers, including FORGE Multimedia Group LLC for Groove Console and BarkerBox) legitimately require buyer details to issue genuine activation keys and deliver technical product support.
+              </div>
+              <div>
+                <strong className="text-zinc-200">3. Transparent Pre-Purchase Disclosure &amp; Explicit Consent:</strong> Whenever a product requires seller-side data sharing:
+                <ul className="list-disc pl-5 space-y-1 pt-1 text-zinc-400">
+                  <li>Producer Toy displays a prominent, product-specific <strong>Seller Data Sharing Notice</strong> before payment on the checkout screen.</li>
+                  <li>The notice clearly identifies the receiving verified developer, the specific fields shared (e.g. verified email address and order number), and the approved technical purpose.</li>
+                  <li>Where required, an <strong>unchecked consent checkbox</strong> must be affirmatively selected by the buyer. Consent is never pre-checked or assumed. If consent is withheld, order completion for that product is securely blocked.</li>
+                </ul>
+              </div>
+              <div>
+                <strong className="text-zinc-200">4. Seller Contractual Safeguards &amp; Non-Marketing Covenants:</strong> Under the Producer Toy Seller Agreement, any developer receiving customer information is legally and contractually obligated to:
+                <ul className="list-disc pl-5 space-y-1 pt-1 text-zinc-400">
+                  <li>Use customer information solely for genuine product licensing, machine seat registration, or product-specific support.</li>
+                  <li>Implement industry-standard security and access controls to prevent unauthorized data leaks.</li>
+                  <li>Refrain from enrolling buyers in unsolicited marketing newsletters or promotional campaigns without separate, independent buyer consent.</li>
+                  <li>Never resell, broker, or onward-transfer customer personal information.</li>
+                </ul>
+              </div>
+              <div>
+                <strong className="text-zinc-200">5. Data Rectification &amp; Erasure:</strong> Customers may request access, correction, or deletion of their shared profile details at any time by contacting our Privacy Desk at <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:text-white underline">grievance@producertoy.com</a>, subject to necessary statutory tax records and active software license verification records.
+              </div>
+            </div>
+          </section>
+
           {/* Section 4: Cookies & Tracking Technologies */}
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white tracking-tight">
