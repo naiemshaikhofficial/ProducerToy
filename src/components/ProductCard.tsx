@@ -60,6 +60,10 @@ export interface Product {
   button_text?: string
   is_featured?: boolean
   is_coming_soon?: boolean
+  is_out_of_stock?: boolean
+  download_url?: string | null
+  download_url_win?: string | null
+  download_url_mac?: string | null
   release_date?: string | null
   created_at?: string | null
   file_size?: string | null
@@ -111,9 +115,15 @@ export function ProductCard({ product }: { product: Product }) {
     })
   }
 
+  const isOutOfStock = Boolean(
+    product.is_out_of_stock ||
+    (!product.download_url && !product.download_url_win && !product.download_url_mac && !product.external_url)
+  )
+
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (isOutOfStock) return
     addItem({
       id: product.id,
       name: product.name,
@@ -269,6 +279,10 @@ export function ProductCard({ product }: { product: Product }) {
           {product.is_coming_soon ? (
             <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
               {product.release_date ? `Available ${product.release_date}` : 'Coming Soon'}
+            </span>
+          ) : isOutOfStock ? (
+            <span className="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded uppercase tracking-wider">
+              Out of Stock
             </span>
           ) : isFree ? (
             <span className="text-sm font-bold text-white">Free</span>

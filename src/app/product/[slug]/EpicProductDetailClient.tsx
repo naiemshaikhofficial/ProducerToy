@@ -21,7 +21,9 @@ import {
   ChevronUp,
   Volume2,
   VolumeX,
+  AlertCircle,
 } from 'lucide-react'
+import type { ProductStockStatus } from '@/lib/licensing/serialPool'
 import { useRouter } from 'next/navigation'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useCart } from '@/context/CartContext'
@@ -67,10 +69,12 @@ export function EpicProductDetailClient({
   product,
   initialRatingStats,
   initialIsOwned = false,
+  initialStockStatus,
 }: {
   product: any
   initialRatingStats?: ProductRatingStats
   initialIsOwned?: boolean
+  initialStockStatus?: ProductStockStatus
 }) {
   const router = useRouter()
   const { user } = useAuth()
@@ -88,6 +92,12 @@ export function EpicProductDetailClient({
   const [isOwned, setIsOwned] = useState<boolean>(initialIsOwned)
   const [isVideoMuted, setIsVideoMuted] = useState<boolean>(false)
   const videoIframeRef = React.useRef<HTMLIFrameElement | null>(null)
+
+  const isOutOfStock = Boolean(
+    initialStockStatus
+      ? !initialStockStatus.inStock
+      : (!product.download_url && !product.download_url_win && !product.download_url_mac && !product.external_url)
+  )
   const [ratingStats, setRatingStats] = useState<ProductRatingStats>(
     initialRatingStats || { averageRating: 0, totalReviews: 0, userCanRate: true }
   )
@@ -540,6 +550,11 @@ export function EpicProductDetailClient({
                   <span className="text-3xl font-bold text-white">
                     {formatPrice(product.price_inr, product.price_usd)}
                   </span>
+                  {isOutOfStock && (
+                    <span className="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded uppercase tracking-wider">
+                      Out of Stock
+                    </span>
+                  )}
                 </>
               )}
             </div>
@@ -573,6 +588,22 @@ export function EpicProductDetailClient({
             >
               <span>COMING SOON</span>
             </button>
+          ) : isOutOfStock ? (
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled
+                className="w-full py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wider bg-[#181818] border border-red-500/30 text-red-400 cursor-not-allowed flex items-center justify-center gap-2 select-none shadow-md"
+              >
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <span>OUT OF STOCK</span>
+              </button>
+              <p className="text-[11px] text-zinc-400 text-center leading-relaxed">
+                {initialStockStatus?.reason === 'depleted_serials'
+                  ? 'All license keys claimed. Purchases are safely locked until creator restock.'
+                  : 'Download deliverables are being updated. Checkouts are safely locked.'}
+              </p>
+            </div>
           ) : (
             <div className="flex items-center gap-3">
               {Number(product.price_usd) === 0 ? (
@@ -1110,6 +1141,17 @@ export function EpicProductDetailClient({
               >
                 <span>COMING SOON</span>
               </button>
+            ) : isOutOfStock ? (
+              <div className="w-full">
+                <button
+                  type="button"
+                  disabled
+                  className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#181818] border border-red-500/30 text-red-400 cursor-not-allowed shadow-md select-none"
+                >
+                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <span>Out of Stock</span>
+                </button>
+              </div>
             ) : (
               <div className="w-full">
                 {Number(product.price_usd) === 0 ? (

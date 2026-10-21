@@ -9,9 +9,11 @@ import {
   claimSerialKeyForPurchase,
   isDedicatedLicensedProduct,
   generateStandardSerialKey,
+  checkProductStockStatus,
+  ProductStockStatus,
 } from '@/lib/licensing/serialPool'
 
-export { isDedicatedLicensedProduct, generateStandardSerialKey }
+export { isDedicatedLicensedProduct, generateStandardSerialKey, checkProductStockStatus }
 
 export interface BillingDetailsInput {
   fullName?: string
@@ -168,7 +170,7 @@ export async function processCheckoutAction(
     try {
       const { data, error } = await adminSupabase
         .from('products')
-        .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug')
+        .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url')
         .in('id', productIds)
 
       if (!error && data && data.length > 0) {
@@ -183,7 +185,7 @@ export async function processCheckoutAction(
         const slugs = items.map((i) => i.slug || i.id)
         const { data: slugData } = await adminSupabase
           .from('products')
-          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug')
+          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url')
           .in('slug', slugs)
         if (slugData && slugData.length > 0) {
           dbProducts = slugData
@@ -196,6 +198,17 @@ export async function processCheckoutAction(
     // Security Enforcement: Reject if products are not found in official database catalog
     if (!dbProducts || dbProducts.length === 0) {
       return { success: false, error: 'Items could not be verified in official product catalog' }
+    }
+
+    // Security & Inventory Enforcement: Reject if any product is out of stock (depleted serials or missing deliverables)
+    for (const p of dbProducts) {
+      const stock = await checkProductStockStatus(adminSupabase, p)
+      if (!stock.inStock) {
+        return {
+          success: false,
+          error: stock.message || `"${p.name}" is currently out of stock. Checkout is paused until restocked.`,
+        }
+      }
     }
 
     // 3.1 Verify server-side total and coupons strictly against database to prevent unpaid bypass
@@ -528,11 +541,22 @@ export async function createRazorpayOrderAction(
     const productIds = items.map((i) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, slug, price_inr, price_usd, delivery_method, license_type')
+      .select('id, name, slug, price_inr, price_usd, delivery_method, license_type, download_url, download_url_win, download_url_mac, external_url')
       .in('id', productIds)
 
     if (!dbProducts || dbProducts.length === 0) {
       return { success: false, error: 'One or more items could not be verified in product catalog' }
+    }
+
+    // Security & Inventory Enforcement: Reject if any product is out of stock (depleted serials or missing deliverables)
+    for (const p of dbProducts) {
+      const stock = await checkProductStockStatus(adminSupabase, p)
+      if (!stock.inStock) {
+        return {
+          success: false,
+          error: stock.message || `"${p.name}" is currently out of stock. Checkout is paused until restocked.`,
+        }
+      }
     }
 
     const prods = dbProducts
@@ -1024,11 +1048,22 @@ export async function createPayPalOrderAction(
     const productIds = items.map((i) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, slug, price_usd, price_inr, delivery_method, license_type')
+      .select('id, name, slug, price_usd, price_inr, delivery_method, license_type, download_url, download_url_win, download_url_mac, external_url')
       .in('id', productIds)
 
     if (!dbProducts || dbProducts.length === 0) {
       return { success: false, error: 'One or more items could not be verified in product catalog' }
+    }
+
+    // Security & Inventory Enforcement: Reject if any product is out of stock (depleted serials or missing deliverables)
+    for (const p of dbProducts) {
+      const stock = await checkProductStockStatus(adminSupabase, p)
+      if (!stock.inStock) {
+        return {
+          success: false,
+          error: stock.message || `"${p.name}" is currently out of stock. Checkout is paused until restocked.`,
+        }
+      }
     }
 
     const prods = dbProducts

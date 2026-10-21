@@ -8,6 +8,7 @@ import { ProductJsonLd, FAQPageJsonLd, VideoObjectJsonLd } from '@/components/Js
 import { generatePageMetadata, generateSmartKeywords, cleanDescriptionText } from '@/lib/seo/metadata'
 import { getProductRatingStatsAction } from '@/actions/ratingActions'
 import { generateProductFaqs } from '@/lib/seo/productFaqs'
+import { checkProductStockStatus } from '@/lib/licensing/serialPool'
 
 function extractYouTubeId(url?: string): string | null {
   if (!url) return null
@@ -94,7 +95,11 @@ export default async function EpicProductDetailPage({
     notFound()
   }
 
-  const ratingStats = await getProductRatingStatsAction(product.id)
+  const admin = getAdminClient()
+  const [ratingStats, stockStatus] = await Promise.all([
+    getProductRatingStatsAction(product.id),
+    checkProductStockStatus(admin, product),
+  ])
   const faqs = generateProductFaqs(product)
   const ytVideoId = extractYouTubeId(product.youtube_url || product.video_url)
 
@@ -137,11 +142,11 @@ export default async function EpicProductDetailPage({
         />
       )}
 
-
       {/* Main Epic Games Product Detail Client View */}
       <EpicProductDetailClient
         product={product}
         initialRatingStats={ratingStats}
+        initialStockStatus={stockStatus}
       />
     </div>
   )

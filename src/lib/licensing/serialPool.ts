@@ -53,6 +53,126 @@ export function generateStandardSerialKey(prod: any, prefixOverride?: string): s
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+export interface ProductStockStatus {
+  inStock: boolean
+  isDepletedSerials: boolean
+  isMissingDownload: boolean
+  availableSerialsCount: number
+  totalSerialsCount: number
+  reason?: 'depleted_serials' | 'missing_download' | 'inactive' | 'invalid_product'
+  message?: string
+}
+
+/**
+ * Validates whether an audio product is genuinely In Stock.
+ * A product is Out of Stock if:
+ * 1. It requires / uses serial keys and its available unused pool is 0 (all claimed).
+ * 2. It has no downloadable archive or installer attached and no external link.
+ */
+export async function checkProductStockStatus(
+  adminSupabase: SupabaseClient,
+  product: any
+): Promise<ProductStockStatus> {
+  const prodId = product?.id
+  if (!prodId) {
+    return {
+      inStock: false,
+      isDepletedSerials: false,
+      isMissingDownload: true,
+      availableSerialsCount: 0,
+      totalSerialsCount: 0,
+      reason: 'invalid_product',
+      message: 'Product could not be identified',
+    }
+  }
+
+  // 1. Check download links / deliverables
+  const hasDownloadUrl = Boolean(
+    (product.download_url && String(product.download_url).trim()) ||
+    (product.download_url_win && String(product.download_url_win).trim()) ||
+    (product.download_url_mac && String(product.download_url_mac).trim()) ||
+    (product.external_url && String(product.external_url).trim())
+  )
+
+  // 2. Check serial key pool status
+  const isDedicated = isDedicatedLicensedProduct(product)
+  let availCount = 0
+  let totalCount = 0
+  let purchCount = 0
+
+  if (!isDedicated) {
+    try {
+      const { count: ac } = await adminSupabase
+        .from('serial_keys')
+        .select('id', { count: 'exact', head: true })
+        .eq('product_id', prodId)
+        .eq('is_used', false)
+      availCount = ac || 0
+
+      const { count: tc } = await adminSupabase
+        .from('serial_keys')
+        .select('id', { count: 'exact', head: true })
+        .eq('product_id', prodId)
+      totalCount = tc || 0
+
+      if (totalCount === 0) {
+        const { count: pc } = await adminSupabase
+          .from('purchases')
+          .select('id', { count: 'exact', head: true })
+          .eq('product_id', prodId)
+          .not('serial_key', 'is', null)
+        purchCount = pc || 0
+      }
+    } catch (err) {
+      console.warn('[checkProductStockStatus] Serial pool count note:', err)
+    }
+  }
+
+  const usesSerials =
+    !isDedicated &&
+    Boolean(
+      product.delivery_method === 'serial_key' ||
+      product.delivery_method === 'license_key' ||
+      totalCount > 0 ||
+      purchCount > 0
+    )
+
+  const isDepletedSerials = usesSerials && availCount === 0
+  const isMissingDownload = !hasDownloadUrl
+
+  if (isDepletedSerials) {
+    return {
+      inStock: false,
+      isDepletedSerials: true,
+      isMissingDownload,
+      availableSerialsCount: availCount,
+      totalSerialsCount: totalCount + purchCount,
+      reason: 'depleted_serials',
+      message: `"${product.name || 'Product'}" is currently out of stock. All serial license keys have been claimed.`,
+    }
+  }
+
+  if (isMissingDownload) {
+    return {
+      inStock: false,
+      isDepletedSerials: false,
+      isMissingDownload: true,
+      availableSerialsCount: availCount,
+      totalSerialsCount: totalCount + purchCount,
+      reason: 'missing_download',
+      message: `"${product.name || 'Product'}" is currently out of stock. Download files are being uploaded.`,
+    }
+  }
+
+  return {
+    inStock: true,
+    isDepletedSerials: false,
+    isMissingDownload: false,
+    availableSerialsCount: availCount,
+    totalSerialsCount: totalCount + purchCount,
+  }
+}
+
 export interface ClaimSerialKeyParams {
   adminSupabase: SupabaseClient
   productId?: string | null
@@ -169,15 +289,13 @@ export async function claimSerialKeyForPurchase({
 
   // 3. Evaluate if product requires standard serial fallback
   const isDedicated = isDedicatedLicensedProduct(prod)
-  const requiresSerialKey = Boolean(
+  const isExplicitPoolDelivery = Boolean(
     prod?.delivery_method === 'serial_key' ||
-    prod?.delivery_method === 'license_key' ||
-    (prod?.license_type && String(prod.license_type).toLowerCase().includes('serial')) ||
-    (prod?.license_type && String(prod.license_type).toLowerCase().includes('key')) ||
-    (prod?.product_type === 'plugin' && !isDedicated)
+    prod?.delivery_method === 'license_key'
   )
 
-  if (requiresSerialKey && !isDedicated) {
+  // Never forge algorithmic dummy keys for products configured for pre-loaded genuine serial pools
+  if (!isDedicated && !isExplicitPoolDelivery && prod?.product_type === 'plugin') {
     return generateStandardSerialKey(prod, prefixOverride)
   }
 
