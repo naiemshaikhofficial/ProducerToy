@@ -92,7 +92,10 @@ export default function LicensingAgreementPage() {
               2. VST & AU Plugin End User License Agreement (EULA)
             </h2>
             <p className="text-zinc-400">
-              For virtual instrument and effect plugins (VST2, VST3, AU, AAX), the license permits activation on up to <strong>two (2) separate personal computer workstations</strong> (e.g., studio desktop + mobile laptop) owned and operated exclusively by the registered account holder.
+              For virtual instrument and effect plugins (VST2, VST3, AU, AAX), standard platform terms permit activation on up to <strong>two (2) separate personal computer workstations</strong> (e.g., studio desktop + mobile laptop) owned and operated exclusively by the registered account holder.
+            </p>
+            <p className="text-xs text-zinc-400 bg-[#161616] p-3.5 rounded-xl border border-white/[0.08]">
+              <strong className="text-white">Product-Specific Developer Terms:</strong> Where a third-party audio developer (such as FORGE Multimedia Group LLC) provides a product-specific EULA specifying custom machine seats, activation keys, or usage terms, those seller-defined terms are presented prior to checkout and govern the operation and activation of that specific plugin.
             </p>
           </section>
 

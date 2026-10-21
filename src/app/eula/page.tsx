@@ -113,9 +113,26 @@ export default function EulaPage() {
                 Producer Toy grants you a personal, non-exclusive, non-transferable, non-sublicensable, worldwide, perpetual commercial license to use the Software and Sound Content for your creative audio productions, commercial music tracks, film scores, broadcasts, and streaming releases (the &ldquo;License&rdquo;). The content is <strong>licensed, not sold</strong>, to you under this License. The License does not grant you any title or ownership in the underlying raw binary files or audio master recordings.
               </p>
 
-              <h3 className="text-base font-bold text-zinc-200 pt-2">1.2 Developer & Vendor Specific Terms</h3>
+              <h3 className="text-base font-bold text-zinc-200 pt-2">1.2 Developer &amp; Product-Specific Terms (Order of Precedence)</h3>
               <p>
-                Certain third-party products and sound developer collections on Producer Toy Store may be subject to additional or alternative license terms between you and the respective developer/brand (&ldquo;Software Specific Terms&rdquo;). In the event of any conflict, the provisions of this Agreement shall govern unless explicitly stated otherwise.
+                Certain third-party products, virtual instruments, and audio developer software on the Producer Toy Store (including products published by developer partners such as FORGE Multimedia Group LLC) are accompanied by developer-authored, product-specific license agreements (&ldquo;Product-Specific EULA&rdquo;).
+              </p>
+              <p>
+                In the event of any conflict or ambiguity between terms, the order of contractual precedence is strictly defined as follows:
+              </p>
+              <ol className="list-decimal pl-5 space-y-2 text-zinc-300 bg-[#161616] p-4 rounded-xl border border-white/[0.08]">
+                <li>
+                  <strong className="text-white">Producer Toy General Terms &amp; Platform EULA:</strong> Governs customer account creation, digital library access, marketplace operations, payment processing, fraud prevention, and checkout services.
+                </li>
+                <li>
+                  <strong className="text-white">Developer Product-Specific EULA:</strong> Directly and explicitly presented prior to purchase, governing permitted software usage, workstation machine seat activation limits, hardware key pairing, copy-protection protocols, and developer-specific intellectual property rights. On matters governing software installation, activation, and developer-specific usage restrictions, the Product-Specific EULA expressly controls and takes precedence.
+                </li>
+                <li>
+                  <strong className="text-white">Mandatory Applicable Law:</strong> Applicable statutory consumer protections, privacy regulations, and non-waivable legal provisions take precedence over contractual terms where legally required.
+                </li>
+              </ol>
+              <p className="text-xs text-zinc-400">
+                Customers are presented with and required to review the applicable Product-Specific EULA and system compatibility statements prior to completing checkout for any third-party audio software.
               </p>
             </div>
           </section>

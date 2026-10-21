@@ -36,13 +36,65 @@ const FAQ_ITEMS: FAQItem[] = [
     answer:
       'We welcome established audio developers, independent DSP engineers, sound designers, and sample label creators. You can distribute your virtual instruments, audio effects, soundbanks, and DAW templates to thousands of music creators worldwide.',
     details: [
-      'Creators retain 70% to 80% net revenue split on digital sales with automated bi-weekly payouts.',
+      'Creators retain a guaranteed 70% net revenue split on digital sales with monthly itemized settlements.',
+      'Settlements are issued by the 15th calendar day of the following month with no minimum payout threshold.',
       'We provide automated license key generation, cloud CDN hosting, and copy-protection delivery.',
-      'To get started, submit your developer profile and product links on our Distribution portal.',
+      'To get started, submit your developer profile and product catalog on our Distribution portal.',
     ],
     tags: ['selling', 'distribute', 'developer', 'vendor', 'sample pack creator'],
     linkUrl: '/distribute',
     linkText: 'Apply to Distribute With Us',
+  },
+  {
+    id: 'sell-pricing',
+    category: 'selling',
+    question: 'What is the commission split, deduction calculation order, and an example $19 sale?',
+    answer:
+      'Producer Toy operates on a transparent 70% Developer / 30% Platform Fee model on eligible net proceeds. Deductions are calculated in a clear, standardized order without hidden markups.',
+    details: [
+      '1. Start with the actual product price paid after any applicable discount.',
+      '2. Exclude separately collected transaction taxes from the revenue-sharing calculation.',
+      '3. Deduct the actual payment-processing fee (e.g. PayPal international 4.40% + $0.30 fixed fee) and any transaction-specific currency conversion charges.',
+      '4. Split the remaining net sale proceeds: 70% to the Developer and 30% to Producer Toy.',
+      '5. Deduct actual outbound bank transfer fees from the developer payout share, itemized separately without markup.',
+      'Illustrative $19.00 Sale Example: Customer pays $19.00 → Payment processing fee (−$1.14) → Net proceeds before payout fee = $17.86 → Developer 70% share = $12.50 | Producer Toy 30% share = $5.36.',
+      'For refunds or chargebacks, the relevant sale and commission are reversed or adjusted according to provider rules.',
+    ],
+    tags: ['commission', 'pricing structure', 'deductions', '70/30 split', 'revenue share', 'fees', 'example sale'],
+    linkUrl: '/distribute',
+    linkText: 'View Distribution Terms',
+  },
+  {
+    id: 'sell-payout-methods',
+    category: 'selling',
+    question: 'When and how are developer payouts and settlements processed?',
+    answer:
+      'Settlements are processed on a regular monthly schedule rather than automated biweekly cycles, ensuring full itemization and reconciliation.',
+    details: [
+      'Settlements are manual, fully itemized monthly disbursements payable by the 15th calendar day of the following month.',
+      'Zero minimum payout threshold — developers receive their exact earnings regardless of transaction volume.',
+      'Payout methods include international bank wire / SWIFT transfer to your nominated corporate business account.',
+      'Detailed monthly CSV accounting statements are provided showing every order, gross amount, processing deduction, and net developer retain.',
+    ],
+    tags: ['payout schedule', 'monthly payouts', 'wire transfer', 'swift', 'bank transfer', 'threshold'],
+    linkUrl: '/distribute',
+    linkText: 'Partner Settlement Details',
+  },
+  {
+    id: 'sell-eula-hierarchy',
+    category: 'selling',
+    question: 'How do developer product licenses work with Producer Toy\'s terms (Order of Precedence)?',
+    answer:
+      'We protect both creators and buyers through a defined legal order of precedence where product-specific developer terms govern the software.',
+    details: [
+      '1. Producer Toy EULA & Platform Terms: Govern user accounts, marketplace access, checkout security, and platform operations.',
+      '2. Developer Product-Specific License (EULA): Directly governs the permitted use of the specific audio plugin, machine activations, computer seats, and developer restrictions, explicitly taking precedence on those product matters.',
+      '3. Mandatory Applicable Law: Takes precedence where required by governing statute.',
+      'Buyers are presented with and accept the developer\'s specific product license and seat activation terms before purchase.',
+    ],
+    tags: ['eula', 'product license', 'order of precedence', 'terms', 'machine seats', 'activations'],
+    linkUrl: '/eula',
+    linkText: 'Read Full EULA Agreement',
   },
   {
     id: 'sell-2',

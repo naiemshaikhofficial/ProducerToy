@@ -271,11 +271,15 @@ export function CheckoutOrderSummary({
             <Link href="/privacy" target="_blank" className="text-zinc-200 hover:text-white underline underline-offset-2">
               Privacy
             </Link>
+            ,{' '}
+            <Link href="/eula" target="_blank" className="text-zinc-200 hover:text-white underline underline-offset-2">
+              EULA
+            </Link>
             , &amp;{' '}
             <Link href="/refund-policy" target="_blank" className="text-zinc-200 hover:text-white underline underline-offset-2">
               Refund Policy
             </Link>
-            .
+            . Third-party software usage is governed by the developer&apos;s product-specific license.
           </p>
           <p className="text-[9.5px] text-zinc-500">
             Encrypted 256-bit TLS • Secured by Razorpay &amp; PayPal • Instant Delivery

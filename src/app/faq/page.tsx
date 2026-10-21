@@ -43,7 +43,15 @@ export default function FaqPage() {
         name: 'How do I sell my VST plugins or sample packs on Producer Toy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'We welcome audio developers, DSP engineers, and sound designers. Creators retain 70% to 80% net revenue split with automated bi-weekly payouts, cloud CDN hosting, and copy-protection delivery.',
+          text: 'We welcome audio developers, DSP engineers, and sound designers. Creators retain a 70% net revenue split with monthly itemized settlements payable by the 15th of each month, zero minimum payout threshold, cloud CDN hosting, and copy-protection delivery.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is the seller commission, deduction structure, and payout schedule?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Producer Toy operates on a 70% Developer / 30% Platform split. Deductions follow a strict order: product price after discounts minus transaction processing fees, split 70/30 on net proceeds. Outbound wire fees are passed through without markup. Settlements are paid monthly by the 15th with no minimum threshold.',
         },
       },
       {

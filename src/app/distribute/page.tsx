@@ -20,11 +20,11 @@ export default function DistributePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white font-sans">
-            Distribute Your Music Tools & Sounds on <span className="text-zinc-200">Producer Toy</span>
+            Distribute Your Audio Software & Sounds on <span className="text-zinc-200">Producer Toy</span>
           </h1>
 
           <p className="text-base sm:text-lg lg:text-xl text-zinc-300 max-w-2xl mx-auto leading-relaxed">
-            Reach thousands of modern beatmakers, sound designers, and mixing engineers worldwide. Keep up to 88% of your revenue with zero upfront fees.
+            Reach thousands of modern music creators, sound designers, and mixing engineers worldwide. Retain 70% of eligible net sales proceeds with transparent monthly itemized settlements.
           </p>
 
           <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
@@ -56,9 +56,9 @@ export default function DistributePage() {
             <div className="w-12 h-12 rounded-xl bg-[#34363d]/10 text-zinc-200 flex items-center justify-center">
               <DollarSign className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">88% Creator Revenue Share</h3>
+            <h3 className="text-xl font-bold text-white">70% Standard Revenue Share</h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              We offer the industry’s most competitive revenue splits. Keep 88% of every dollar earned from your sound libraries and VST tools.
+              ProducerToy&apos;s proposed standard revenue share is 70% to the seller and 30% to ProducerToy, calculated on eligible net sale proceeds. Monthly itemized settlements with no minimum payout threshold.
             </p>
           </div>
 
@@ -66,9 +66,9 @@ export default function DistributePage() {
             <div className="w-12 h-12 rounded-xl bg-[#34363d]/10 text-zinc-200 flex items-center justify-center">
               <Globe2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">Global Distribution</h3>
+            <h3 className="text-xl font-bold text-white">Monthly Manual Settlements</h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Reach producers across 100+ countries with local currency pricing, multi-region CDN delivery, and instant payments.
+              Disbursements are processed manually by the 15th calendar day of the following month via direct international bank transfer / SWIFT with full itemized statements and zero hidden markup.
             </p>
           </div>
 
@@ -76,9 +76,9 @@ export default function DistributePage() {
             <div className="w-12 h-12 rounded-xl bg-[#34363d]/10 text-zinc-200 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-bold text-white">Full License Protection</h3>
+            <h3 className="text-xl font-bold text-white">Full License & EULA Protection</h3>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Automated license key generation, encrypted file hosting, and verified purchaser accounts ensure your audio software is secure.
+              Your product-specific EULA and seat activation rules govern your audio software. Pre-purchase license presentation, serial inventory pools, and authenticated delivery keep assets secure.
             </p>
           </div>
 

@@ -13,7 +13,8 @@ import {
   AlertCircle,
   Plus,
   Trash2,
-  Gift
+  Gift,
+  ShieldCheck,
 } from 'lucide-react'
 import { LogoIcon } from '@/components/Logo'
 import { ToywardsIcon } from '@/components/ui/ToywardsIcon'
@@ -642,6 +643,31 @@ export function EpicCheckoutLayout({
             </div>
           )}
 
+          {/* Software Licensing & Order of Precedence Notice */}
+          <div className="p-3 bg-[#181818] border border-zinc-800 rounded-lg space-y-1.5 text-left mb-2">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-300">
+              <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Software License &amp; Order of Precedence</span>
+            </div>
+            <p className="text-[10.5px] text-zinc-400 leading-relaxed">
+              By purchasing, you agree that your use of the audio software is governed primarily by the{' '}
+              <strong className="text-zinc-200">Developer&apos;s Product-Specific EULA</strong> (including machine seat limits and activation terms), while ProducerToy terms govern checkout, billing, and platform account access.
+            </p>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-zinc-500 pt-0.5">
+              <Link href="/eula" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                ProducerToy EULA
+              </Link>
+              <span>&bull;</span>
+              <Link href="/purchase-policy" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                Purchase Policy
+              </Link>
+              <span>&bull;</span>
+              <Link href="/refund-policy" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                Refund Rules
+              </Link>
+            </div>
+          </div>
+
           {/* Main Action Button (Pay Now) */}
           <div className="pt-2">
             {selectedMethod === 'paypal' && !isFree ? (
@@ -1220,6 +1246,31 @@ export function EpicCheckoutLayout({
                 </label>
               </div>
             )}
+
+            {/* Software Licensing & Order of Precedence Notice */}
+            <div className="p-3 bg-[#181818] border border-zinc-800 rounded-lg space-y-1.5 text-left mb-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-300">
+                <ShieldCheck className="w-3.5 h-3.5 text-zinc-400" />
+                <span>Software License &amp; Order of Precedence</span>
+              </div>
+              <p className="text-[10.5px] text-zinc-400 leading-relaxed">
+                By purchasing, you agree that your use of the audio software is governed primarily by the{' '}
+                <strong className="text-zinc-200">Developer&apos;s Product-Specific EULA</strong> (including machine seat limits and activation terms), while ProducerToy terms govern checkout, billing, and platform account access.
+              </p>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-zinc-500 pt-0.5">
+                <Link href="/eula" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                  ProducerToy EULA
+                </Link>
+                <span>&bull;</span>
+                <Link href="/purchase-policy" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                  Purchase Policy
+                </Link>
+                <span>&bull;</span>
+                <Link href="/refund-policy" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
+                  Refund Rules
+                </Link>
+              </div>
+            </div>
 
             {/* PayPal or Direct Pay Now */}
             {selectedMethod === 'paypal' && !isFree ? (
