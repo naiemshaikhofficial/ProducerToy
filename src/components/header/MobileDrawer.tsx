@@ -612,12 +612,9 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         href="https://creators.producertoy.com"
                         prefetch={false}
                         onClick={onClose}
-                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] flex items-center justify-between"
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >
-                        <span>Toy Creator Portal</span>
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
-                          70% Split
-                        </span>
+                        Toy Creator Portal
                       </Link>
                       <Link
                         href="https://creators.producertoy.com/signup"

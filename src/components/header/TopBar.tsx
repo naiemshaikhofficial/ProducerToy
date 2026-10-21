@@ -375,15 +375,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="https://creators.producertoy.com"
                       prefetch={false}
                       onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
-                      className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                        <span>Toy Creator Portal</span>
-                      </div>
-                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
-                        70% Split
-                      </span>
+                      <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Toy Creator Portal</span>
                     </Link>
 
                     <Link
@@ -557,15 +552,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="https://creators.producertoy.com"
                         prefetch={false}
                         onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
-                        className="flex items-center justify-between py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
-                        <div className="flex items-center gap-3.5">
-                          <Upload className="w-5 h-5 text-zinc-400 flex-shrink-0" />
-                          <span>Toy Creator Portal</span>
-                        </div>
-                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
-                          70% Split
-                        </span>
+                        <Upload className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                        <span>Toy Creator Portal</span>
                       </Link>
 
                       <Link
@@ -793,15 +783,10 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="https://creators.producertoy.com"
                       prefetch={false}
                       onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
-                      className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                        <span>Toy Creator Portal</span>
-                      </div>
-                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
-                        70% Split
-                      </span>
+                      <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Toy Creator Portal</span>
                     </Link>
 
                     <Link
