@@ -375,16 +375,31 @@ export const TopBar: React.FC<TopBarProps> = ({
                       href="https://creators.producertoy.com"
                       prefetch={false}
                       onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
-                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
+                      className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
-                      <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Distribute on Producer Toy</span>
+                      <div className="flex items-center gap-2.5">
+                        <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                        <span>Toy Creator Portal</span>
+                      </div>
+                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
+                        70% Split
+                      </span>
                     </Link>
 
                     <Link
-                      href="/account"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/account')}
+                      href="https://creators.producertoy.com/signup"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/signup')}
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
+                    >
+                      <Sparkles className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Apply to Distribute</span>
+                    </Link>
+
+                    <Link
+                      href="https://creators.producertoy.com/login"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/login')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Users className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -392,23 +407,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="https://creators.producertoy.com"
+                      href="https://creators.producertoy.com/faq"
                       prefetch={false}
-                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/faq')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
-                      <Radio className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Publish Your Music Packs</span>
-                    </Link>
-
-                    <Link
-                      href="/contact?topic=creator"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/contact?topic=creator')}
-                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
-                    >
-                      <MessageSquare className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Developer Forums</span>
+                      <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Developer FAQ &amp; Payouts</span>
                     </Link>
 
                     <Link
@@ -418,7 +423,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <ShieldCheck className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Licensing & Terms</span>
+                      <span>Licensing &amp; EULA</span>
                     </Link>
 
                     <Link
@@ -428,7 +433,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <BookOpen className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Creator Academy & Guides</span>
+                      <span>Creator Academy &amp; Guides</span>
                     </Link>
 
                     <Link
@@ -437,8 +442,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                       onClick={(e) => handleDropdownNavigate(e, '/support')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
-                      <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
-                      <span>Help & Support Assistant</span>
+                      <MessageSquare className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Help &amp; Support Assistant</span>
                     </Link>
                   </div>
                 </div>
@@ -552,16 +557,31 @@ export const TopBar: React.FC<TopBarProps> = ({
                         href="https://creators.producertoy.com"
                         prefetch={false}
                         onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
-                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                        className="flex items-center justify-between py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
-                        <Upload className="w-5 h-5 text-zinc-400 flex-shrink-0" />
-                        <span>Distribute on Producer Toy</span>
+                        <div className="flex items-center gap-3.5">
+                          <Upload className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                          <span>Toy Creator Portal</span>
+                        </div>
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
+                          70% Split
+                        </span>
                       </Link>
 
                       <Link
-                        href="/account"
-                        prefetch={true}
-                        onClick={(e) => handleDropdownNavigate(e, '/account')}
+                        href="https://creators.producertoy.com/signup"
+                        prefetch={false}
+                        onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/signup')}
+                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
+                      >
+                        <Sparkles className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                        <span>Apply to Distribute</span>
+                      </Link>
+
+                      <Link
+                        href="https://creators.producertoy.com/login"
+                        prefetch={false}
+                        onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/login')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Users className="w-5 h-5 text-white flex-shrink-0" />
@@ -569,23 +589,13 @@ export const TopBar: React.FC<TopBarProps> = ({
                       </Link>
 
                       <Link
-                        href="https://creators.producertoy.com"
+                        href="https://creators.producertoy.com/faq"
                         prefetch={false}
-                        onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
+                        onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/faq')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
-                        <Radio className="w-5 h-5 text-white flex-shrink-0" />
-                        <span>Publish Your Music Packs</span>
-                      </Link>
-
-                      <Link
-                        href="/contact?topic=creator"
-                        prefetch={true}
-                        onClick={(e) => handleDropdownNavigate(e, '/contact?topic=creator')}
-                        className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
-                      >
-                        <MessageSquare className="w-5 h-5 text-white flex-shrink-0" />
-                        <span>Developer Forums</span>
+                        <HelpCircle className="w-5 h-5 text-zinc-400 flex-shrink-0" />
+                        <span>Developer FAQ &amp; Payouts</span>
                       </Link>
 
                       <Link
@@ -595,7 +605,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <ShieldCheck className="w-5 h-5 text-white flex-shrink-0" />
-                        <span>Licensing & Terms</span>
+                        <span>Licensing &amp; EULA</span>
                       </Link>
 
                       <Link
@@ -605,7 +615,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <BookOpen className="w-5 h-5 text-white flex-shrink-0" />
-                        <span>Creator Academy & Guides</span>
+                        <span>Creator Academy &amp; Guides</span>
                       </Link>
 
                       <Link
@@ -614,8 +624,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                         onClick={(e) => handleDropdownNavigate(e, '/support')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
-                        <HelpCircle className="w-5 h-5 text-white flex-shrink-0" />
-                        <span>Help & Support Assistant</span>
+                        <MessageSquare className="w-5 h-5 text-white flex-shrink-0" />
+                        <span>Help &amp; Support Assistant</span>
                       </Link>
                     </div>
                   </div>
@@ -703,7 +713,15 @@ export const TopBar: React.FC<TopBarProps> = ({
                       onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
-                      Distribute
+                      Toy Creator Portal
+                    </Link>
+                    <Link
+                      href="https://creators.producertoy.com/faq"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/faq')}
+                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                    >
+                      Developer FAQ
                     </Link>
                     <Link
                       href="/licensing"
@@ -711,7 +729,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                       onClick={(e) => handleDropdownNavigate(e, '/licensing')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
-                      Licensing
+                      Licensing &amp; EULA
                     </Link>
                     <Link
                       href="/contact"
@@ -770,38 +788,60 @@ export const TopBar: React.FC<TopBarProps> = ({
 
                 {/* Distribute Dropdown Menu */}
                 {isDistributeOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3">
+                  <div className="absolute left-0 top-full mt-2 w-[270px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3">
                     <Link
                       href="https://creators.producertoy.com"
                       prefetch={false}
                       onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                      className="group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
                     >
-                      Distribute on Producer Toy
+                      <div className="flex items-center gap-2.5">
+                        <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                        <span>Toy Creator Portal</span>
+                      </div>
+                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
+                        70% Split
+                      </span>
                     </Link>
+
                     <Link
-                      href="/contact?topic=creator"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/contact?topic=creator')}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                      href="https://creators.producertoy.com/signup"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/signup')}
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
                     >
-                      Developer Forums
+                      <Sparkles className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Apply to Distribute</span>
                     </Link>
+
+                    <Link
+                      href="https://creators.producertoy.com/login"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/login')}
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
+                    >
+                      <Users className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Creator Dashboard</span>
+                    </Link>
+
+                    <Link
+                      href="https://creators.producertoy.com/faq"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com/faq')}
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
+                    >
+                      <HelpCircle className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Developer FAQ &amp; Guides</span>
+                    </Link>
+
                     <Link
                       href="/licensing"
                       prefetch={true}
                       onClick={(e) => handleDropdownNavigate(e, '/licensing')}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
+                      className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors text-left"
                     >
-                      Documentation
-                    </Link>
-                    <Link
-                      href="/blog"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/blog')}
-                      className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
-                    >
-                      Learning
+                      <ShieldCheck className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
+                      <span>Licensing &amp; EULA</span>
                     </Link>
                   </div>
                 )}

@@ -554,7 +554,15 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         onClick={onClose}
                         className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >
-                        Distribute
+                        Toy Creator Portal
+                      </Link>
+                      <Link
+                        href="https://creators.producertoy.com/faq"
+                        prefetch={false}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Developer FAQ
                       </Link>
                       <Link
                         href="/licensing"
@@ -562,7 +570,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         onClick={onClose}
                         className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >
-                        Licensing
+                        Licensing &amp; EULA
                       </Link>
                       <Link
                         href="/contact"
@@ -604,17 +612,36 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         href="https://creators.producertoy.com"
                         prefetch={false}
                         onClick={onClose}
-                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] flex items-center justify-between"
                       >
-                        Distribute on Producer Toy
+                        <span>Toy Creator Portal</span>
+                        <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 border border-white/10">
+                          70% Split
+                        </span>
                       </Link>
                       <Link
-                        href="/contact?topic=creator"
-                        prefetch={true}
+                        href="https://creators.producertoy.com/signup"
+                        prefetch={false}
                         onClick={onClose}
                         className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >
-                        Developer Forums
+                        Apply for Creator Access
+                      </Link>
+                      <Link
+                        href="https://creators.producertoy.com/login"
+                        prefetch={false}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Creator Dashboard
+                      </Link>
+                      <Link
+                        href="https://creators.producertoy.com/faq"
+                        prefetch={false}
+                        onClick={onClose}
+                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
+                      >
+                        Developer FAQ &amp; Payouts
                       </Link>
                       <Link
                         href="/licensing"
@@ -622,15 +649,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         onClick={onClose}
                         className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >
-                        Documentation
-                      </Link>
-                      <Link
-                        href="/blog"
-                        prefetch={true}
-                        onClick={onClose}
-                        className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
-                      >
-                        Learning
+                        Licensing &amp; EULA
                       </Link>
                     </div>
                   )}
