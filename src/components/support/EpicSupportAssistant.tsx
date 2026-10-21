@@ -251,11 +251,16 @@ function getAnswerSources(msg: ChatMessage): AnswerSourceItem[] {
         label: 'Refund Policy',
         href: '/refund-policy',
       })
-    } else if (textCombined.includes('distribute') || textCombined.includes('sell') || textCombined.includes('publish') || textCombined.includes('creator')) {
+    } else if (textCombined.includes('distribute') || textCombined.includes('sell') || textCombined.includes('publish') || textCombined.includes('creator') || textCombined.includes('developer')) {
       sources.push({
-        title: 'Producer Toy Creator & Developer Program',
-        label: 'Distribute on Producer Toy',
+        title: 'Toy Creator • Developer Publishing Portal (70% Split)',
+        label: 'Toy Creator Portal',
         href: 'https://creators.producertoy.com',
+      })
+      sources.push({
+        title: 'Toy Creator Developer Knowledge Base & FAQ',
+        label: 'Developer FAQ',
+        href: 'https://creators.producertoy.com/faq',
       })
     } else if (textCombined.includes('brand') || textCombined.includes('manufacturer') || textCombined.includes('fabfilter') || textCombined.includes('arturia')) {
       sources.push({

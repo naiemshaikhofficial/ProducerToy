@@ -28,7 +28,7 @@ export function getSiteKnowledgeRules(): string {
      - /cart & /checkout: Multi-currency checkout processing USD, EUR, GBP, and INR (via Razorpay, Stripe, PayPal, Cashfree).
      - /auth & /reset-password: User authentication, magic link sign-in, and password recovery.
    - Creator Distribution & Business:
-     - /distribute: Developer publishing portal where audio developers and sound designers distribute products with 70% to 88% revenue share.
+     - https://creators.producertoy.com (Toy Creator): Developer publishing portal where audio developers and sound designers distribute VST plugins, sound kits, and presets with a 70% creator revenue share and monthly settlements. Full developer FAQ at https://creators.producertoy.com/faq.
      - /licensing & /eula: Commercial rights, 100% royalty-free terms, and end-user license agreements.
    - Company & Support:
      - /about: Producer Toy story, founded by music producer & creative director Naiem Shaikh, company mission, core pillars, and sister company SamplesWala (sampleswala.com).
