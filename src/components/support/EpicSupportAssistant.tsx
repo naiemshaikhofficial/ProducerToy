@@ -253,9 +253,9 @@ function getAnswerSources(msg: ChatMessage): AnswerSourceItem[] {
       })
     } else if (textCombined.includes('distribute') || textCombined.includes('sell') || textCombined.includes('publish') || textCombined.includes('creator')) {
       sources.push({
-        title: 'Producer Toy Creator & Developer Program (88% Split)',
+        title: 'Producer Toy Creator & Developer Program',
         label: 'Distribute on Producer Toy',
-        href: '/distribute',
+        href: 'https://creators.producertoy.com',
       })
     } else if (textCombined.includes('brand') || textCombined.includes('manufacturer') || textCombined.includes('fabfilter') || textCombined.includes('arturia')) {
       sources.push({

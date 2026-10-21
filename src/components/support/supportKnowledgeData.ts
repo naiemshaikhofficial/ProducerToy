@@ -79,17 +79,17 @@ export const KNOWLEDGE_BASE: KnowledgeArticle[] = [
     category: 'free_and_licensing',
     categoryLabel: 'Distribution & Creators',
     question: 'How do I distribute and sell my sample packs, plugins, or sound kits on Producer Toy?',
-    shortAnswer: 'You can distribute your sounds and VST plugins through the Producer Toy Creator & Developer Program, keeping 88% of all revenue with zero upfront fees.',
+    shortAnswer: 'You can distribute your sounds and VST plugins through the Producer Toy Creator & Developer Program on eligible net proceeds with zero upfront fees.',
     detailedSteps: [
-      'Join our global developer network: keep 88% revenue share on every sale with instant payouts.',
+      'Join our global developer network: transparent 70% developer revenue share on eligible net proceeds with regular monthly itemized settlements.',
       'We distribute across 100+ countries with local currency pricing, multi-region CDN delivery, and automated license protection.',
       'We accept Sample Packs, Sound Kits, VST Plugins & FX, Synth Presets (Serum, Vital, Massive), and MIDI & Melody Kits.',
-      'Visit our distribution portal at /distribute or apply directly via /contact?topic=distribute.',
+      'Visit our distribution portal at https://creators.producertoy.com or apply directly via /contact?topic=distribute.',
     ],
-    tags: ['distribute', 'distribution', 'sell sounds', 'sell sample pack', 'sell plugin', 'developer program', 'revenue split', '88%', 'publish plugin', 'creator program'],
+    tags: ['distribute', 'distribution', 'sell sounds', 'sell sample pack', 'sell plugin', 'developer program', 'revenue split', '70%', 'publish plugin', 'creator program'],
     actionCta: {
       label: 'Distribute on Producer Toy',
-      href: '/distribute',
+      href: 'https://creators.producertoy.com',
     },
   },
   {

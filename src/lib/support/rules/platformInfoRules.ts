@@ -9,12 +9,12 @@ export function getPlatformInfoRules(): string {
    - Producer Toy is the premier international marketplace for global beatmakers and music producers, specializing in international sound libraries, VST plugins, mixing toolkits, and software in USD ($) and multi-currency.
    - If a user asks "what is SamplesWala", "SamplesWala kya hai", or asks about Indian instruments not on Producer Toy: proudly explain that SamplesWala is our sister platform, and direct them to [SamplesWala](https://sampleswala.com)!
 
-2. CREATOR & DEVELOPER DISTRIBUTION PROGRAM (/distribute):
+2. CREATOR & DEVELOPER DISTRIBUTION PROGRAM (https://creators.producertoy.com):
    - Creators, sound designers, and audio developers can distribute and sell their sound packs, plugins, presets, and MIDI kits on Producer Toy.
-   - 88% Revenue Split: Creators keep 88% of all revenue generated from their products (the highest split in the audio industry). Zero upfront or listing fees.
-   - Global Distribution: Products reach creators in 100+ countries with local currency pricing, multi-region CDN download infrastructure, and instant payouts.
+   - 70% Revenue Share: Creators receive 70% of eligible net sale proceeds with zero upfront or listing fees.
+   - Global Distribution: Products reach creators in 100+ countries with local currency pricing, multi-region CDN download infrastructure, and regular monthly settlements.
    - What can be distributed: Sample Packs, Sound Kits, Drum Kits, VST Plugins & Audio FX, Synth Presets, and MIDI Kits.
-   - How to apply: Visit [Distribute on Producer Toy](/distribute) or apply directly at [Apply to Distribute](/contact?topic=distribute).
+   - How to apply: Visit [Distribute on Producer Toy](https://creators.producertoy.com) or apply directly at [Apply to Distribute](/contact?topic=distribute).
 
 3. BRANDS & DEVELOPERS (/manufacturers):
    - Producer Toy features over 200+ world-class audio plugin manufacturers and developers (FabFilter, Arturia, IK Multimedia, Native Instruments, Brainworx, etc.).

@@ -111,7 +111,11 @@ export const TopBar: React.FC<TopBarProps> = ({
       aboutTimeoutRef.current = null
     }
 
-    router.push(href)
+    if (href.startsWith('http://') || href.startsWith('https://')) {
+      window.location.href = href
+    } else {
+      router.push(href)
+    }
     setIsEcosystemOpen(false)
     setIsDistributeOpen(false)
     setIsAboutOpen(false)
@@ -368,9 +372,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <h4 className="text-[13px] font-bold uppercase tracking-wider text-zinc-400">Create</h4>
                   <div className="space-y-1">
                     <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
+                      href="https://creators.producertoy.com"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Upload className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -388,9 +392,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                     </Link>
 
                     <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
+                      href="https://creators.producertoy.com"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                       className="group flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13.5px] font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all whitespace-nowrap w-full"
                     >
                       <Radio className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors flex-shrink-0" />
@@ -545,9 +549,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <h3 className="text-[13px] font-semibold text-zinc-400">Create</h3>
                     <div className="space-y-1">
                       <Link
-                        href="/distribute"
-                        prefetch={true}
-                        onClick={(e) => handleDropdownNavigate(e, '/distribute')}
+                        href="https://creators.producertoy.com"
+                        prefetch={false}
+                        onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Upload className="w-5 h-5 text-zinc-400 flex-shrink-0" />
@@ -565,9 +569,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                       </Link>
 
                       <Link
-                        href="/distribute"
-                        prefetch={true}
-                        onClick={(e) => handleDropdownNavigate(e, '/distribute')}
+                        href="https://creators.producertoy.com"
+                        prefetch={false}
+                        onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                         className="flex items-center gap-3.5 py-3 text-[15.5px] font-medium text-white hover:text-zinc-300 transition-colors"
                       >
                         <Radio className="w-5 h-5 text-white flex-shrink-0" />
@@ -694,9 +698,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                       About Us
                     </Link>
                     <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
+                      href="https://creators.producertoy.com"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Distribute
@@ -768,9 +772,9 @@ export const TopBar: React.FC<TopBarProps> = ({
                 {isDistributeOpen && (
                   <div className="absolute left-0 top-full mt-2 w-[240px] bg-[#18181c] border border-white/10 rounded-2xl p-2 shadow-[0_20px_50px_rgba(0,0,0,0.85)] z-[100] animate-in fade-in zoom-in-95 duration-100 flex flex-col gap-0.5 select-none before:content-[''] before:absolute before:-top-3 before:inset-x-0 before:h-3">
                     <Link
-                      href="/distribute"
-                      prefetch={true}
-                      onClick={(e) => handleDropdownNavigate(e, '/distribute')}
+                      href="https://creators.producertoy.com"
+                      prefetch={false}
+                      onClick={(e) => handleDropdownNavigate(e, 'https://creators.producertoy.com')}
                       className="px-3.5 py-2.5 rounded-xl text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/[0.08] transition-colors block text-left whitespace-nowrap"
                     >
                       Distribute on Producer Toy

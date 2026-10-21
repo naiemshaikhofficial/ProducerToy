@@ -549,8 +549,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                         About Us
                       </Link>
                       <Link
-                        href="/distribute"
-                        prefetch={true}
+                        href="https://creators.producertoy.com"
+                        prefetch={false}
                         onClick={onClose}
                         className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >
@@ -601,8 +601,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   {isMobileDistributeOpen && (
                     <div className="pl-3 py-2 flex flex-col gap-1.5 bg-[#181818] rounded-xl my-1.5 animate-in fade-in duration-150">
                       <Link
-                        href="/distribute"
-                        prefetch={true}
+                        href="https://creators.producertoy.com"
+                        prefetch={false}
                         onClick={onClose}
                         className="text-xs font-semibold text-zinc-300 hover:text-white py-1.5 px-2 rounded-lg hover:bg-white/[0.06] block"
                       >

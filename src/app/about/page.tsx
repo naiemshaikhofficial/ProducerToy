@@ -101,8 +101,8 @@ export default function AboutPage() {
               </Link>
 
               <Link
-                href="/distribute"
-                prefetch={true}
+                href="https://creators.producertoy.com"
+                prefetch={false}
                 className="px-7 py-3.5 bg-[#202024] hover:bg-[#28282e] text-zinc-200 hover:text-white border border-white/10 font-bold text-sm rounded-xl transition-colors tracking-wide active:scale-95 cursor-pointer"
               >
                 DISTRIBUTE WITH US
@@ -225,8 +225,8 @@ export default function AboutPage() {
                 </Link>
 
                 <Link
-                  href="/distribute"
-                  prefetch={true}
+                  href="https://creators.producertoy.com"
+                  prefetch={false}
                   className="inline-flex items-center justify-center px-6 h-[44px] bg-[#202024] hover:bg-[#28282e] text-zinc-200 hover:text-white border border-white/10 font-bold text-sm rounded-lg active:scale-95 transition-colors cursor-pointer"
                 >
                   Join as Developer

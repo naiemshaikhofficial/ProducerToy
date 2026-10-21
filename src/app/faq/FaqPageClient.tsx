@@ -42,7 +42,7 @@ const FAQ_ITEMS: FAQItem[] = [
       'To get started, submit your developer profile and product catalog on our Distribution portal.',
     ],
     tags: ['selling', 'distribute', 'developer', 'vendor', 'sample pack creator'],
-    linkUrl: '/distribute',
+    linkUrl: 'https://creators.producertoy.com',
     linkText: 'Apply to Distribute With Us',
   },
   {
@@ -61,7 +61,7 @@ const FAQ_ITEMS: FAQItem[] = [
       'For refunds or chargebacks, the relevant sale and commission are reversed or adjusted according to provider rules.',
     ],
     tags: ['commission', 'pricing structure', 'deductions', '70/30 split', 'revenue share', 'fees', 'example sale'],
-    linkUrl: '/distribute',
+    linkUrl: 'https://creators.producertoy.com',
     linkText: 'View Distribution Terms',
   },
   {
@@ -77,7 +77,7 @@ const FAQ_ITEMS: FAQItem[] = [
       'Detailed monthly CSV accounting statements are provided showing every order, gross amount, processing deduction, and net developer retain.',
     ],
     tags: ['payout schedule', 'monthly payouts', 'wire transfer', 'swift', 'bank transfer', 'threshold'],
-    linkUrl: '/distribute',
+    linkUrl: 'https://creators.producertoy.com',
     linkText: 'Partner Settlement Details',
   },
   {
@@ -134,7 +134,7 @@ const FAQ_ITEMS: FAQItem[] = [
     answer:
       'Every approved release on Producer Toy is featured across our curated storefront, weekly newsletter blasts, dedicated news articles, social media channels, and eligible free gift promotions to give your audio brand maximum visibility.',
     tags: ['promotion', 'marketing', 'newsletter', 'developer spotlight'],
-    linkUrl: '/distribute',
+    linkUrl: 'https://creators.producertoy.com',
     linkText: 'Learn About Creator Promotion',
   },
 
