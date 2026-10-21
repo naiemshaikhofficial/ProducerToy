@@ -5,51 +5,13 @@ import { createClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase/admin'
 import crypto from 'crypto'
 
-/**
- * Dynamic Multi-Brand Plugin Licensing System
- * Supports ProducerToy first-party plugins and third-party marketplace brands (e.g. Plugin Boutique model)
- * without hardcoding brand names, product titles, or UUIDs.
- */
-function isDedicatedLicensedProduct(prod: any): boolean {
-  if (!prod) return false
-  const delivery = String(prod.delivery_method || '').toLowerCase().trim()
-  if (
-    delivery === 'dedicated_licensing_server' ||
-    delivery === 'dedicated_licensing' ||
-    delivery === 'machine_bound' ||
-    delivery === 'licensing_server'
-  ) {
-    return true
-  }
-  const licType = String(prod.license_type || '').toLowerCase().trim()
-  if (licType === 'dedicated' || licType === 'machine_bound') {
-    return true
-  }
-  if (prod.plugin_identifier && (delivery.includes('dedicated') || delivery.includes('server'))) {
-    return true
-  }
-  // Backward compatibility fallback for legacy ProVerb entries
-  if (
-    prod.id === '92cf2454-2cfc-4db5-b210-2c732457605f' ||
-    (prod.slug && String(prod.slug).toLowerCase().includes('proverb')) ||
-    (prod.name && String(prod.name).toLowerCase().includes('proverb'))
-  ) {
-    return true
-  }
-  return false
-}
+import {
+  claimSerialKeyForPurchase,
+  isDedicatedLicensedProduct,
+  generateStandardSerialKey,
+} from '@/lib/licensing/serialPool'
 
-function generateStandardSerialKey(prod: any, prefixOverride?: string): string {
-  const brandOrSlug = prefixOverride || prod?.serial_prefix || prod?.brand || prod?.slug || 'VST'
-  const cleanPrefix = String(brandOrSlug)
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .slice(0, 5) || 'VST'
-  const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-  const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-  const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-  return `PT-${cleanPrefix}-${partA}-${partB}-${partC}`
-}
+export { isDedicatedLicensedProduct, generateStandardSerialKey }
 
 export interface BillingDetailsInput {
   fullName?: string
@@ -322,19 +284,6 @@ export async function processCheckoutAction(
           }
         }
 
-        const isDedicated = isDedicatedLicensedProduct(dbProduct)
-        const requiresSerialKey = Boolean(
-          dbProduct.delivery_method === 'serial_key' ||
-          dbProduct.delivery_method === 'license_key' ||
-          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
-          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
-        )
-
-        let serialKey: string | null = null
-        if (requiresSerialKey && !isDedicated) {
-          serialKey = generateStandardSerialKey(dbProduct)
-        }
-
         const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
         let itemUserId: string | null = targetUserId
         let itemCustomerEmail = targetEmail
@@ -357,6 +306,13 @@ export async function processCheckoutAction(
             console.warn('Recipient lookup note:', err)
           }
         }
+
+        const serialKey = await claimSerialKeyForPurchase({
+          adminSupabase,
+          productId: validProductId,
+          userId: itemUserId,
+          product: dbProduct,
+        })
 
         return {
           user_id: itemUserId,
@@ -822,19 +778,6 @@ export async function verifyRazorpayPaymentAction(params: {
         const dbProduct =
           dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
-        const isDedicated = isDedicatedLicensedProduct(dbProduct)
-        const requiresSerialKey = Boolean(
-          dbProduct.delivery_method === 'serial_key' ||
-          dbProduct.delivery_method === 'license_key' ||
-          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
-          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
-        )
-
-        let serialKey: string | null = null
-        if (requiresSerialKey && !isDedicated) {
-          serialKey = generateStandardSerialKey(dbProduct)
-        }
-
         const itemInr = Number(dbProduct.price_inr || 0) > 0
           ? Number(dbProduct.price_inr)
           : Math.round(Number(dbProduct.price_usd || 0) * liveRate)
@@ -860,6 +803,14 @@ export async function verifyRazorpayPaymentAction(params: {
             console.warn('Recipient lookup note:', err)
           }
         }
+
+        const targetProdId = isUUID(dbProduct.id) ? dbProduct.id : null
+        const serialKey = await claimSerialKeyForPurchase({
+          adminSupabase,
+          productId: targetProdId,
+          userId: itemUserId,
+          product: dbProduct,
+        })
 
         return {
           user_id: itemUserId,
@@ -1214,19 +1165,6 @@ export async function capturePayPalOrderAction(params: {
         const dbProduct =
           dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
-        const isDedicated = isDedicatedLicensedProduct(dbProduct)
-        const requiresSerialKey = Boolean(
-          dbProduct.delivery_method === 'serial_key' ||
-          dbProduct.delivery_method === 'license_key' ||
-          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('serial')) ||
-          (dbProduct.license_type && dbProduct.license_type.toLowerCase().includes('key'))
-        )
-
-        let serialKey: string | null = null
-        if (requiresSerialKey && !isDedicated) {
-          serialKey = generateStandardSerialKey(dbProduct)
-        }
-
         const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
         let itemUserId: string | null = userId
         let itemCustomerEmail = targetEmail
@@ -1248,6 +1186,14 @@ export async function capturePayPalOrderAction(params: {
             console.warn('Recipient lookup note:', err)
           }
         }
+
+        const targetProdId = isUUID(dbProduct.id) ? dbProduct.id : null
+        const serialKey = await claimSerialKeyForPurchase({
+          adminSupabase,
+          productId: targetProdId,
+          userId: itemUserId,
+          product: dbProduct,
+        })
 
         return {
           user_id: itemUserId,
@@ -1481,18 +1427,13 @@ export async function claimGiftAction(params: {
           .eq('id', params.productId)
           .maybeSingle()
 
-        const isDedicated = isDedicatedLicensedProduct(prod)
-        const requiresSerialKey = Boolean(
-          prod?.delivery_method === 'serial_key' ||
-          prod?.delivery_method === 'license_key' ||
-          (prod?.license_type && prod.license_type.toLowerCase().includes('serial')) ||
-          (prod?.license_type && prod.license_type.toLowerCase().includes('key'))
-        )
-
-        let serialKey: string | null = null
-        if (requiresSerialKey && !isDedicated) {
-          serialKey = generateStandardSerialKey(prod, 'GIFT')
-        }
+        const serialKey = await claimSerialKeyForPurchase({
+          adminSupabase,
+          productId: params.productId,
+          userId: user.id,
+          product: prod,
+          prefixOverride: 'GIFT',
+        })
 
         await adminSupabase.from('purchases').insert({
           user_id: user.id,

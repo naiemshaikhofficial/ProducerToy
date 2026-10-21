@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import crypto from 'crypto'
+import { claimSerialKeyForPurchase } from '@/lib/licensing/serialPool'
 
 export interface GiftRecord {
   id: string
@@ -282,20 +283,13 @@ export async function claimUserGiftAction(giftId: string): Promise<{
 
     if (!existingPurchase) {
       const prod = gift.product
-      const requiresSerialKey = Boolean(
-        prod?.delivery_method === 'serial_key' ||
-        prod?.delivery_method === 'license_key' ||
-        (prod?.license_type && prod.license_type.toLowerCase().includes('serial')) ||
-        (prod?.license_type && prod.license_type.toLowerCase().includes('key'))
-      )
-
-      let serialKey: string | null = null
-      if (requiresSerialKey) {
-        const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
-        const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
-        serialKey = `PT-GIFT-${partA}-${partB}-${partC}`
-      }
+      const serialKey = await claimSerialKeyForPurchase({
+        adminSupabase,
+        productId: gift.product_id,
+        userId: user.id,
+        product: prod,
+        prefixOverride: 'GIFT',
+      })
 
       await adminSupabase.from('purchases').insert({
         user_id: user.id,
