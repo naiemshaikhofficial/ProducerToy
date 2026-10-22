@@ -28,7 +28,7 @@ export async function validateCouponAction(code: string): Promise<CouponResult> 
     const adminSupabase = getAdminClient()
     const { data: dbCoupon } = await adminSupabase
       .from('coupons')
-      .select('code, discount_percent, is_active, expires_at')
+      .select('code, discount_percent, is_active, expires_at, discount_type, discount_amount_usd, max_redemptions, times_redeemed, product_id')
       .eq('code', cleanCode)
       .eq('is_active', true)
       .maybeSingle()
@@ -43,11 +43,25 @@ export async function validateCouponAction(code: string): Promise<CouponResult> 
         }
       }
 
+      if (dbCoupon.max_redemptions && (dbCoupon.times_redeemed || 0) >= dbCoupon.max_redemptions) {
+        return {
+          success: false,
+          discountPercent: 0,
+          code: cleanCode,
+          message: 'This coupon has reached its maximum redemption limit.',
+        }
+      }
+
+      const isFixed = dbCoupon.discount_type === 'fixed'
+      const label = isFixed
+        ? `$${Number(dbCoupon.discount_amount_usd || 0).toFixed(2)} OFF`
+        : `${dbCoupon.discount_percent}% OFF`
+
       return {
         success: true,
-        discountPercent: Number(dbCoupon.discount_percent),
+        discountPercent: Number(dbCoupon.discount_percent) || 0,
         code: dbCoupon.code,
-        message: `🎉 Coupon applied! ${dbCoupon.discount_percent}% OFF`,
+        message: `🎉 Coupon applied! ${label}`,
       }
     }
   } catch (err) {
