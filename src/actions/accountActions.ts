@@ -313,6 +313,7 @@ export async function deleteUserAccountAction(userId: string) {
   }
 
   try {
+    await assertAuthenticatedUser(userId)
     const admin = getAdminClient()
     
     // 1. Remove profile and related data
@@ -338,6 +339,7 @@ export async function getUserRewardTransactionsAction(userId: string) {
   }
 
   try {
+    await assertAuthenticatedUser(userId)
     const admin = getAdminClient()
     const { data, error } = await admin
       .from('reward_transactions')
@@ -374,6 +376,7 @@ export async function getToywardsDataAction(userId: string) {
   }
 
   try {
+    await assertAuthenticatedUser(userId)
     const admin = getAdminClient()
 
     // 1. Get profile reward_balance
@@ -428,15 +431,8 @@ export async function getToywardsDataAction(userId: string) {
  */
 export async function getUserTransactionsAction(userId?: string) {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    const targetUserId = userId || user?.id
-
-    if (!targetUserId) {
-      return { success: false, purchases: [], orders: [] }
-    }
+    const user = await assertAuthenticatedUser(userId || '')
+    const targetUserId = user.id
 
     const admin = getAdminClient()
 

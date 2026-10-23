@@ -101,6 +101,12 @@ export async function submitProductRatingAction({
     // Validate rating value (1 to 5)
     const cleanRating = Math.max(1, Math.min(5, Math.round(rating)))
 
+    // Sanitize review text: strip HTML/script tags and limit to 1000 chars
+    const sanitizedReview = reviewText
+      .replace(/<[^>]*>/g, '')
+      .trim()
+      .slice(0, 1000)
+
     // Upsert review record using authenticated client (passes RLS auth.uid() = user_id)
     const { error: upsertError } = await supabase
       .from('product_reviews')
@@ -109,7 +115,7 @@ export async function submitProductRatingAction({
           product_id: productId,
           user_id: user.id,
           rating: cleanRating,
-          review_text: reviewText.trim() || null,
+          review_text: sanitizedReview || null,
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'product_id,user_id' }
@@ -117,7 +123,7 @@ export async function submitProductRatingAction({
 
     if (upsertError) {
       console.error('Failed to save rating:', upsertError)
-      return { success: false, message: `Failed to save rating: ${upsertError.message}` }
+      return { success: false, message: 'Unable to save review at this time. Please try again.' }
     }
 
     // Revalidate product page cache

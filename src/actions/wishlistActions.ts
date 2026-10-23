@@ -1,6 +1,7 @@
 'use server'
 
 import { getAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { convertUsdToInr } from '@/lib/exchangeRate'
 
@@ -33,13 +34,17 @@ export interface WishlistResult {
  * Fetch all wishlisted products for a user
  */
 export async function getWishlistAction(userId?: string): Promise<{ success: boolean; items: WishlistProduct[] }> {
-  if (!userId) {
-    return { success: true, items: [] }
-  }
-
   try {
-    const supabase = getAdminClient()
-    const { data, error } = await supabase
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const targetUserId = user?.id || userId
+
+    if (!targetUserId) {
+      return { success: true, items: [] }
+    }
+
+    const admin = getAdminClient()
+    const { data, error } = await admin
       .from('wishlists')
       .select(`
         id,
@@ -60,7 +65,7 @@ export async function getWishlistAction(userId?: string): Promise<{ success: boo
           brands(name)
         )
       `)
-      .eq('user_id', userId)
+      .eq('user_id', targetUserId)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -110,17 +115,21 @@ export async function toggleWishlistAction(productId: string, userId?: string): 
     return { success: false, isSaved: false, message: 'Invalid product ID' }
   }
 
-  if (!userId) {
-    // Guest optimistic response (handled locally in client context)
-    return { success: true, isSaved: true, message: 'Updated wishlist locally' }
-  }
-
   try {
+    const sessionClient = await createClient()
+    const { data: { user } } = await sessionClient.auth.getUser()
+    const effectiveUserId = user?.id || userId
+
+    if (!effectiveUserId) {
+      // Guest optimistic response (handled locally in client context)
+      return { success: true, isSaved: true, message: 'Updated wishlist locally' }
+    }
+
     const supabase = getAdminClient()
     const { data: existing } = await supabase
       .from('wishlists')
       .select('id')
-      .eq('user_id', userId)
+      .eq('user_id', effectiveUserId)
       .eq('product_id', productId)
       .single()
 
@@ -129,7 +138,7 @@ export async function toggleWishlistAction(productId: string, userId?: string): 
       revalidatePath('/wishlist')
       return { success: true, isSaved: false, message: 'Removed from wishlist' }
     } else {
-      await supabase.from('wishlists').insert({ user_id: userId, product_id: productId })
+      await supabase.from('wishlists').insert({ user_id: effectiveUserId, product_id: productId })
       revalidatePath('/wishlist')
       return { success: true, isSaved: true, message: 'Saved to wishlist!' }
     }
@@ -147,14 +156,18 @@ export async function bulkAddToWishlistAction(productIds: string[], userId?: str
     return { success: false, message: 'No products provided' }
   }
 
-  if (!userId) {
-    return { success: true, message: 'Added to local wishlist' }
-  }
-
   try {
+    const sessionClient = await createClient()
+    const { data: { user } } = await sessionClient.auth.getUser()
+    const effectiveUserId = user?.id || userId
+
+    if (!effectiveUserId) {
+      return { success: true, message: 'Added to local wishlist' }
+    }
+
     const supabase = getAdminClient()
     const rows = productIds.map((id) => ({
-      user_id: userId,
+      user_id: effectiveUserId,
       product_id: id,
     }))
 
