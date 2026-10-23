@@ -1,6 +1,20 @@
 import crypto from 'crypto'
 
-const SECRET = process.env.JWT_SECRET || 'producer-toy-default-secret-2026'
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET?.trim()
+  if (secret && secret.length >= 16) return secret
+
+  // Derive a cryptographically unique secret from server-only service role key if available
+  const fallback = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+  if (fallback && fallback.length >= 20) {
+    return crypto.createHash('sha256').update(`pt-jwt-derived:${fallback}`).digest('hex')
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    console.error('CRITICAL: JWT_SECRET or SUPABASE_SERVICE_ROLE_KEY environment variable is required.')
+  }
+  return 'producer-toy-dev-secret-secure-salt'
+}
 
 /**
  * Checks if two IPs are in the same subnet (IPv4 / IPv6) to allow seamless mobile ISP shifts while blocking cross-user sharing.
@@ -39,7 +53,7 @@ export function signDownloadToken(
   const exp = Math.floor(Date.now() / 1000) + expiresInSeconds
   const fullPayload = Buffer.from(JSON.stringify({ ...payload, exp })).toString('base64url')
 
-  const hmac = crypto.createHmac('sha256', SECRET)
+  const hmac = crypto.createHmac('sha256', getJwtSecret())
   hmac.update(`${header}.${fullPayload}`)
   const signature = hmac.digest('base64url')
 
@@ -61,7 +75,7 @@ export function verifyDownloadToken(token: string): {
     const [header, payload, signature] = token.split('.')
     if (!header || !payload || !signature) return null
 
-    const hmac = crypto.createHmac('sha256', SECRET)
+    const hmac = crypto.createHmac('sha256', getJwtSecret())
     hmac.update(`${header}.${payload}`)
     const expectedSignature = hmac.digest('base64url')
 

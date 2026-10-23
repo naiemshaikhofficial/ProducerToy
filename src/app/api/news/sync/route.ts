@@ -36,13 +36,15 @@ async function handleSync(req: Request) {
   const limitParam = parseInt(url.searchParams.get('limit') || '2', 10)
   const shouldWait = url.searchParams.get('wait') === 'true'
 
-  // Optional auth check: if CRON_SECRET is set, verify either query param or Bearer header
+  // Auth check: verify either query param or Bearer header
   if (process.env.CRON_SECRET) {
     const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
     const providedSecret = secret || bearerSecret
-    if (providedSecret && providedSecret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!providedSecret || providedSecret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized: Valid CRON_SECRET required' }, { status: 401 })
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'News sync endpoint disabled: CRON_SECRET not configured' }, { status: 403 })
   }
 
   // Prevent concurrent overlapping sync runs (auto-expire after 2 mins if a previous run crashed or timed out)

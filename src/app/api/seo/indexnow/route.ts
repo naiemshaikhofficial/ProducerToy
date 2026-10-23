@@ -3,6 +3,16 @@ import { submitIndexNowUrls } from '@/lib/seo/indexing'
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization')
+    const secret = req.nextUrl.searchParams.get('secret')
+    const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+    const provided = secret || bearer
+    const expected = process.env.CRON_SECRET || process.env.REVALIDATE_SECRET
+
+    if (expected && (!provided || provided !== expected)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await req.json().catch(() => ({}))
     const urls = body.urls || [
       'https://producertoy.com',

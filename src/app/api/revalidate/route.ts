@@ -48,9 +48,13 @@ async function handleRevalidation(req: NextRequest) {
 
   // Verify against either REVALIDATE_SECRET or REVALIDATION_TOKEN in environment
   const configuredSecret = process.env.REVALIDATE_SECRET || process.env.REVALIDATION_TOKEN
-  if (configuredSecret && incomingSecret && incomingSecret !== configuredSecret) {
-    console.warn('[Revalidate Webhook] Unauthorized attempt with invalid secret')
-    return NextResponse.json({ error: 'Unauthorized secret' }, { status: 401 })
+  if (configuredSecret) {
+    if (!incomingSecret || incomingSecret !== configuredSecret) {
+      console.warn('[Revalidate Webhook] Unauthorized attempt with missing or invalid secret')
+      return NextResponse.json({ error: 'Unauthorized: Valid revalidation secret required' }, { status: 401 })
+    }
+  } else if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Revalidation endpoint disabled: missing server secret configuration' }, { status: 403 })
   }
 
   const revalidatedItems: string[] = []

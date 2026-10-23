@@ -323,6 +323,22 @@ export function parseMarkdownToHtml(
   return htmlBlocks.join('\n')
 }
 
+function sanitizeBlogHtml(html: string): string {
+  if (!html) return ''
+  return html
+    // 1. Remove dangerous script and frame tags
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
+    // 2. Remove dangerous standalone tags
+    .replace(/<\/?(script|iframe|object|embed|applet|form|input|button|base|meta|link)\b[^>]*>/gi, '')
+    // 3. Remove all inline DOM event handlers (onload, onerror, onclick, etc.)
+    .replace(/\s+on[a-z]+\s*=\s*(?:'[^']*'|"[^"]*"|[^\s>]+)/gi, '')
+    // 4. Disarm javascript:, vbscript:, data: URIs in href and src
+    .replace(/(href|src)\s*=\s*['"]\s*(?:javascript|vbscript|data):[^'"]*['"]/gi, '$1="#"')
+}
+
 export function BlogContentRenderer({
   content,
   isExpired,
@@ -330,7 +346,8 @@ export function BlogContentRenderer({
   fallbackDealUrl,
 }: BlogContentRendererProps) {
   if (!content) return null
-  const htmlContent = parseMarkdownToHtml(content, isExpired, expiryTimeline, fallbackDealUrl)
+  const rawHtml = parseMarkdownToHtml(content, isExpired, expiryTimeline, fallbackDealUrl)
+  const htmlContent = sanitizeBlogHtml(rawHtml)
 
   return (
     <div className="blog-content prose prose-invert max-w-none">

@@ -33,9 +33,16 @@ export async function GET(request: Request) {
   if (code) {
     const isProdDomain = !isLocalEnv && (forwardedHost?.includes('producertoy.com') || requestUrl.hostname.includes('producertoy.com'))
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.redirect(`${origin}/auth?error=Configuration%20Error`)
+    }
+
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://voalgeyexfhfitlyorfl.supabase.co',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_AFTgvwUXdDPCgTny9uDIuQ_NGiDyAJD',
+      supabaseUrl,
+      supabaseKey,
       {
         cookies: {
           getAll() {

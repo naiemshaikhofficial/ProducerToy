@@ -1,8 +1,19 @@
 'use server'
 
 import { getAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getUser } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+
+async function assertAuthenticatedUser(userId: string) {
+  const { data: { user } } = await getUser()
+  if (!user) {
+    throw new Error('Unauthorized: You must be signed in.')
+  }
+  if (user.id !== userId) {
+    throw new Error('Forbidden: You can only modify your own account.')
+  }
+  return user
+}
 
 export interface ProfileUpdateData {
   first_name?: string
@@ -46,6 +57,7 @@ export async function updatePersonalDetailsAction(userId: string, data: ProfileU
   }
 
   try {
+    await assertAuthenticatedUser(userId)
     const payload = {
       id: userId,
       first_name: data.first_name || '',
@@ -104,6 +116,11 @@ export async function saveBillingAddressAction(
   if (!userId) return { success: false, error: 'User ID required' }
 
   try {
+    const { data: { user: sessionUser } } = await getUser()
+    if (sessionUser && sessionUser.id !== userId) {
+      return { success: false, error: 'Forbidden: Cannot modify another user profile' }
+    }
+
     const nameParts = (details.fullName || '').trim().split(' ')
     const firstName = nameParts[0] || ''
     const lastName = nameParts.slice(1).join(' ') || ''
@@ -181,6 +198,7 @@ export async function updateCompanyDetailsAction(userId: string, data: CompanyUp
   }
 
   try {
+    await assertAuthenticatedUser(userId)
     const admin = getAdminClient()
     const { error } = await admin.from('profiles').upsert({
       id: userId,
@@ -213,6 +231,7 @@ export async function updateCommunicationPreferencesAction(userId: string, data:
   }
 
   try {
+    await assertAuthenticatedUser(userId)
     const admin = getAdminClient()
     const { error } = await admin.from('profiles').upsert({
       id: userId,

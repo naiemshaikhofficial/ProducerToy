@@ -137,6 +137,38 @@ export async function middleware(request: NextRequest) {
       const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://store.producertoy.com');
       return NextResponse.redirect(redirectUrl, 308);
     }
+
+    // If visitor attempts to access /admin on storefront, redirect them to the dedicated admin portal
+    if (pathname.startsWith('/admin')) {
+      return NextResponse.redirect('https://app.producertoy.com', 308);
+    }
+  }
+
+  // Handle CORS for /api requests
+  const origin = request.headers.get('origin');
+  const allowedOrigins = [
+    'https://producertoy.com',
+    'https://store.producertoy.com',
+    'https://creators.producertoy.com',
+    'https://app.producertoy.com',
+  ];
+  if (isLocal && origin && (origin.includes('localhost') || origin.includes('127.0.0.1'))) {
+    allowedOrigins.push(origin);
+  }
+
+  const isAllowedOrigin = origin && allowedOrigins.includes(origin);
+
+  if (isApi && request.method === 'OPTIONS') {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': isAllowedOrigin ? origin : allowedOrigins[0],
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, HEAD',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-revalidation-token, x-revalidate-secret',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+      },
+    });
   }
 
   // 3. IP & Rate Limiting on API and sensitive operations
@@ -208,5 +240,6 @@ export const config = {
     '/gifts/:path*',
     '/auth/:path*',
     '/api/:path*',
+    '/admin/:path*',
   ],
 }

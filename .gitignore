@@ -19,10 +19,14 @@
 # Environment Variables & Secrets (CRITICAL SECURITY)
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
 .env*.local
+!.env.example
 
 # Debug / Scratch Scripts & Temporary Raw Assets
 crop-logo.js

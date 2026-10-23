@@ -44,8 +44,12 @@ export async function updateSession(request: NextRequest) {
     return { supabaseResponse, user: null }
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://voalgeyexfhfitlyorfl.supabase.co'
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_AFTgvwUXdDPCgTny9uDIuQ_NGiDyAJD'
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+  if (!url || !key) {
+    return { supabaseResponse, user: null }
+  }
 
   const supabase = createServerClient(
     url,
