@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   ),
   applicationName: 'Producer Toy',
   title: {
-    default: 'Producer Toy — Music Production VST Plugins, Samples & Presets',
+    default: 'Producer Toy | Music Production VST Plugins, Samples & Presets',
     template: '%s | Producer Toy',
   },
   description:

@@ -28,10 +28,10 @@ export function Footer() {
   return (
     <footer className={`w-full bg-[#141414] text-white border-none select-none font-sans ${pathname === '/support' ? 'mt-0' : 'mt-10 sm:mt-14'}`}>
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-14 sm:pb-20">
-        
+
         {/* Main Grid with Consistent Vertical Dividers */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-8 pb-14 sm:pb-18 border-b border-[#26262b]">
-          
+
           {/* Column 1: Discover - Spans 4 cols */}
           <div className="md:col-span-4 md:pr-6 md:border-r md:border-[#26262b] space-y-4">
             <h4 className="text-sm sm:text-base font-bold text-white tracking-tight uppercase tracking-wider">Discover</h4>
@@ -77,7 +77,7 @@ export function Footer() {
 
           {/* Column 4: Producer Toy Rewards & Social - Spans 4 cols */}
           <div className="md:col-span-4 md:pl-6 space-y-6 flex flex-col justify-between">
-            
+
             {/* Follow Us Social Icons (Top Right) */}
             <div className="flex items-center justify-between md:justify-start gap-4">
               <span className="text-xs font-bold text-white tracking-tight">Follow us:</span>
@@ -125,7 +125,7 @@ export function Footer() {
               </div>
             </div>
 
-            {/* Producer Toy Rewards Section */}
+
             {/* <div className="space-y-3">
               <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">Producer Toy Rewards</h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
@@ -161,7 +161,7 @@ export function Footer() {
 
         {/* Bottom Section: Logo + Copyright + Back To Top */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          
+
           {/* Logo on Bottom Left */}
           <Link href="/" prefetch={true} className="inline-block hover:opacity-90 transition-opacity">
             <picture>
@@ -179,7 +179,7 @@ export function Footer() {
           {/* Copyright Text Centered/Balanced with Back to Top */}
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-right">
             <p className="text-xs text-zinc-500 font-normal">
-              Copyright © 2011-2026 Producer Toy. All rights reserved.
+              Copyright © {new Date().getFullYear()} Producer Toy. All rights reserved.
             </p>
 
             <button
