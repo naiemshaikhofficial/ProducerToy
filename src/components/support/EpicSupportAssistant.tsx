@@ -49,6 +49,8 @@ import {
 import { openPrintableInvoice } from '@/lib/invoiceUtils'
 import { createSupportTicketAction } from '@/actions/supportActions'
 import { useAuth } from '@/context/AuthContext'
+import { AITextLoading } from '@/components/kokonutui/ai-text-loading'
+import { PlaceholdersAndVanishInput } from '@/components/ui/placeholders-and-vanish-input'
 
 interface ChatMessage {
   id: string
@@ -88,6 +90,75 @@ const TICKET_PRIORITIES = [
   { id: 'HIGH', label: 'High Priority (4-8h)' },
   { id: 'URGENT', label: 'Urgent Deadline (1-3h)' },
 ]
+
+const SUPPORT_PLACEHOLDERS = [
+  "How do I install ProVerb in FL Studio or Ableton?",
+  "Where can I find my plugin serial license key?",
+  "How do hardware studio seats work?",
+  "Can I re-download my purchases on a new computer?",
+  "How does 70/30 creator revenue share work?",
+  "Need help with DAW plugin scanning or VST3 files...",
+]
+
+function getSupportThinkingPhases(userPrompt?: string): string[] {
+  if (!userPrompt) {
+    return [
+      "Consulting Producer Toy support intelligence...",
+      "Analyzing technical documentation...",
+      "Synthesizing verified solution...",
+      "Almost ready...",
+    ]
+  }
+  const p = userPrompt.toLowerCase()
+  if (p.includes('download') || p.includes('installer') || p.includes('link') || p.includes('zip') || p.includes('file')) {
+    return [
+      "Checking verified cloud license seats...",
+      "Verifying high-speed CDN download servers...",
+      "Retrieving installer packages & checksums...",
+      "Synthesizing direct download instructions...",
+    ]
+  }
+  if (p.includes('serial') || p.includes('key') || p.includes('license') || p.includes('seat') || p.includes('activat')) {
+    return [
+      "Accessing cryptographic DRM license registry...",
+      "Validating hardware studio seat quota...",
+      "Verifying machine activation tokens...",
+      "Preparing step-by-step activation steps...",
+    ]
+  }
+  if (p.includes('daw') || p.includes('fl studio') || p.includes('ableton') || p.includes('logic') || p.includes('cubase') || p.includes('pro tools') || p.includes('vst')) {
+    return [
+      "Checking DAW architecture & VST3/AU compatibility...",
+      "Verifying macOS (Apple Silicon/Intel) & Windows paths...",
+      "Scanning standard plugin directory locations...",
+      "Compiling DAW setup instructions...",
+    ]
+  }
+  if (p.includes('refund') || p.includes('pay') || p.includes('order') || p.includes('money') || p.includes('billing') || p.includes('receipt') || p.includes('invoice')) {
+    return [
+      "Reviewing verified marketplace order records...",
+      "Consulting Producer Toy commerce guidelines...",
+      "Verifying payment processor transaction details...",
+      "Formulating settlement resolution...",
+    ]
+  }
+  if (p.includes('creator') || p.includes('brand') || p.includes('sell') || p.includes('payout') || p.includes('royalty')) {
+    return [
+      "Consulting Toy Creator developer portal docs...",
+      "Calculating 70/30 developer royalty distributions...",
+      "Validating catalog submission requirements...",
+      "Compiling publisher walkthrough...",
+    ]
+  }
+  const cleanSnippet = userPrompt.length > 24 ? userPrompt.slice(0, 24) + '...' : userPrompt
+  return [
+    `Analyzing ${cleanSnippet}...`,
+    "Consulting Producer Toy technical intelligence...",
+    "Synthesizing verified solution...",
+    "Formulating recommendations...",
+    "Almost ready...",
+  ]
+}
 
 interface AnswerSourceItem {
   title: string
@@ -863,6 +934,7 @@ export function EpicSupportAssistant({
         sender: 'assistant',
         timestamp: time,
         isThinking: true,
+        userQuery: query,
       }
 
       setMessages([introMsg, userMsg, thinkingMsg])
@@ -1112,6 +1184,7 @@ export function EpicSupportAssistant({
       sender: 'assistant',
       timestamp: time,
       isThinking: true,
+      userQuery: text,
     }
 
     setMessages((prev) => [...prev, userMsg, thinkingMsg])
@@ -2046,18 +2119,22 @@ export function EpicSupportAssistant({
                       <span className="text-[11px] sm:text-xs text-zinc-500">{msg.timestamp}</span>
                     </div>
 
-                    {/* Thinking Spinner Card with Clean Robot Avatar */}
+                    {/* Thinking Card with Robot Avatar & Kokonut UI Wave Undulation */}
                     {msg.isThinking ? (
-                      <div className="inline-flex items-center gap-3.5 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-xs px-7 py-5 shadow-xl w-fit">
+                      <div className="inline-flex items-center gap-3.5 bg-[#18181c] border border-white/[0.08] text-zinc-300 rounded-2xl rounded-tl-xs px-6 py-4 shadow-xl w-fit">
                         <Image
                           src="/images/support-bot-logo.webp"
-                          alt="Thinking..."
+                          alt="Prody"
                           width={24}
                           height={24}
                           className="w-6 h-6 object-contain shrink-0"
                         />
-                        <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-[#34363d] animate-spin flex-shrink-0" />
-                        <span className="text-zinc-300 text-sm sm:text-[15px] font-normal">Thinking...</span>
+                        <AITextLoading
+                          texts={getSupportThinkingPhases(msg.userQuery)}
+                          interval={1800}
+                          showElapsed
+                          className="font-mono text-xs sm:text-[13px] text-zinc-200"
+                        />
                       </div>
                     ) : (
                       <div className="bg-[#18181c] border border-white/[0.08] text-[#d1d1d6] rounded-2xl sm:rounded-[20px] p-6 sm:p-8 md:p-9 text-[15px] sm:text-[16px] leading-[1.75] space-y-5 shadow-2xl w-full">
@@ -2936,36 +3013,16 @@ export function EpicSupportAssistant({
                   </button>
                 </div>
 
-                {/* Writing Box Input (Exact Epic Games rounded box with subtle border, solid #141417, no glassmorphism) */}
-                <input
-                  ref={chatInputRef}
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder={
-                    isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4
-                      ? 'Chat ended.'
-                      : isTyping || messages.some((m) => m.isThinking)
-                      ? 'Assistant is thinking...'
-                      : 'Write a message...'
-                  }
-                  disabled={isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
-                  className="flex-1 bg-[#141417] hover:bg-[#18181c] focus:bg-[#18181c] border border-white/10 focus:border-[#34363d] rounded-xl px-5 py-3 text-sm sm:text-[14.5px] text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-
-                {/* Circle Arrow Button (Exact Epic Games Dynamic States, Zero Glassmorphism) */}
-                <button
-                  type="submit"
-                  disabled={!chatInput.trim() || isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
-                  aria-label="Send message"
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-95 ${
-                    chatInput.trim().length > 0 && !isTyping && !isChatEnded && policyStrikes < 4 && strikesRef.current < 4 && !messages.some((m) => m.isThinking)
-                      ? 'bg-[#34363d] hover:bg-[#42454e] text-white shadow-lg shadow-black/40 cursor-pointer'
-                      : 'bg-white/[0.06] text-white/20 border border-white/5 cursor-not-allowed pointer-events-none'
-                  }`}
-                >
-                  <ArrowRight size={16} strokeWidth={2.5} />
-                </button>
+                {/* Placeholders And Vanish Input */}
+                <div className="flex-1">
+                  <PlaceholdersAndVanishInput
+                    placeholders={SUPPORT_PLACEHOLDERS}
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onSubmit={(e) => handleChatSubmit(e)}
+                    disabled={isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
+                  />
+                </div>
               </form>
             )}
           </div>
