@@ -2975,10 +2975,7 @@ export function EpicSupportAssistant({
                 </button>
               </div>
             ) : (
-              <form
-                onSubmit={handleChatSubmit}
-                className="flex items-center gap-2.5 sm:gap-3 w-full"
-              >
+              <div className="flex items-center gap-2.5 sm:gap-3 w-full">
                 {/* 3 Dots / Menu Button with End Chat Popover */}
                 <div className="relative" ref={optionsMenuRef}>
                   {/* End Chat Popover Tooltip (Opens directly ABOVE the button) */}
@@ -3023,7 +3020,7 @@ export function EpicSupportAssistant({
                     disabled={isTyping || isChatEnded || policyStrikes >= 4 || strikesRef.current >= 4 || messages.some((m) => m.isThinking)}
                   />
                 </div>
-              </form>
+              </div>
             )}
           </div>
         </div>
