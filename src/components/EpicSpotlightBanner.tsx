@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import Link from 'next/link'
+import { SlideTextButton } from '@/components/kokonutui/slide-text-button'
 
 export function EpicSpotlightBanner() {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -60,16 +60,14 @@ export function EpicSpotlightBanner() {
           Elite VST plugins, analog saturators, synth presets, and royalty-free sample packs.
         </p>
 
-        {/* "Browse Now" Button */}
+        {/* "Browse Now" Kokonut UI Slide Text Button */}
         <div className="pt-2 sm:pt-3 w-full flex justify-center">
-          <Link
+          <SlideTextButton
+            primaryText="Browse Now"
+            slideText="Click here to explore toys"
             href="/store"
-            prefetch={true}
-            className="inline-flex items-center justify-center px-8 sm:px-9 h-[46px] sm:h-[48px] bg-black hover:bg-zinc-800 text-white font-bold text-[13px] sm:text-[14px] rounded-xl active:scale-95 transition-all shadow-[0_6px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.35)] tracking-wider uppercase cursor-pointer gap-2"
-          >
-            <span>Browse Now</span>
-            <span className="text-[16px]">&rarr;</span>
-          </Link>
+            className="bg-black hover:bg-zinc-900 text-white border-black font-extrabold text-[13px] sm:text-[14px] px-8 sm:px-9 h-[46px] sm:h-[48px] shadow-[0_6px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.35)]"
+          />
         </div>
 
       </div>
