@@ -96,7 +96,7 @@ export function EpicProductDetailClient({
   const isOutOfStock = Boolean(
     initialStockStatus
       ? !initialStockStatus.inStock
-      : (!product.download_url && !product.download_url_win && !product.download_url_mac && !product.external_url)
+      : (!product.download_url && !product.download_url_win && !product.download_url_mac && !(product.allow_external_url && product.external_url))
   )
   const [ratingStats, setRatingStats] = useState<ProductRatingStats>(
     initialRatingStats || { averageRating: 0, totalReviews: 0, userCanRate: true }
@@ -138,7 +138,7 @@ export function EpicProductDetailClient({
 
   // Free action for 100% free toys
   const handleFreeAction = () => {
-    if (product.external_url) {
+    if (product.allow_external_url && product.external_url) {
       handleExternalAction(product.external_url)
       return
     }
@@ -563,7 +563,7 @@ export function EpicProductDetailClient({
 
         {/* E. CTA Action Buttons */}
         <div className="space-y-3 pt-1">
-          {product.external_url ? (
+          {(product.allow_external_url && product.external_url) ? (
             <button
               type="button"
               onClick={() => handleExternalAction(product.external_url!)}
@@ -1116,7 +1116,7 @@ export function EpicProductDetailClient({
 
           {/* Desktop CTA Action Buttons (Standardized h-12 Height & Icons) */}
           <div className="space-y-2.5 pt-1">
-            {product.external_url ? (
+            {(product.allow_external_url && product.external_url) ? (
               <button
                 type="button"
                 onClick={() => handleExternalAction(product.external_url!)}

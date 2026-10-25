@@ -58,6 +58,7 @@ export interface Product {
   short_description?: string
   external_url?: string
   button_text?: string
+  allow_external_url?: boolean
   is_featured?: boolean
   is_coming_soon?: boolean
   is_out_of_stock?: boolean
@@ -117,7 +118,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   const isOutOfStock = Boolean(
     product.is_out_of_stock ||
-    (!product.download_url && !product.download_url_win && !product.download_url_mac && !product.external_url)
+    (!product.download_url && !product.download_url_win && !product.download_url_mac && !(product.allow_external_url && product.external_url))
   )
 
   const handleQuickAdd = (e: React.MouseEvent) => {
