@@ -134,13 +134,13 @@ export function PlaceholdersAndVanishInput({
     requestAnimationFrame(step);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement> | React.SyntheticEvent) => {
     e.preventDefault();
     if (!value.trim() || animating || disabled) return;
 
     setAnimating(true);
     animateVanish(0);
-    onSubmit(e);
+    onSubmit(e as any);
     if (controlledValue === undefined) {
       setInternalValue("");
     }
@@ -156,8 +156,7 @@ export function PlaceholdersAndVanishInput({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
+    <div
       className={cn(
         "w-full relative bg-[#141417] h-12 rounded-xl overflow-hidden border border-white/10 focus-within:border-[#34363d] transition duration-200",
         className
@@ -176,6 +175,12 @@ export function PlaceholdersAndVanishInput({
         type="text"
         value={value}
         onChange={handleInputChange}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e);
+          }
+        }}
         disabled={disabled || animating}
         className={cn(
           "w-full relative text-xs sm:text-sm z-10 border-none bg-transparent text-white h-full rounded-xl focus:outline-none focus:ring-0 pl-4 pr-12 font-sans placeholder-transparent",
@@ -186,7 +191,8 @@ export function PlaceholdersAndVanishInput({
       {/* Submit Action Button */}
       <button
         disabled={!value.trim() || animating || disabled}
-        type="submit"
+        type="button"
+        onClick={handleSubmit}
         className="absolute right-2 top-1/2 -translate-y-1/2 z-20 h-8 w-8 rounded-full bg-[#34363d] disabled:bg-white/[0.06] text-white disabled:text-white/20 transition duration-200 flex items-center justify-center cursor-pointer disabled:cursor-not-allowed shadow-sm"
         aria-label="Send message"
       >
@@ -210,7 +216,7 @@ export function PlaceholdersAndVanishInput({
           )}
         </AnimatePresence>
       </div>
-    </form>
+    </div>
   );
 }
 
