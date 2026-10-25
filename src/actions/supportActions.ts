@@ -126,6 +126,31 @@ export async function createSupportTicketAction(data: TicketSubmissionData) {
       created_at: new Date().toISOString(),
     })
 
+    // Intelligent Groq AI Auto-Routing to Developer Brand
+    try {
+      const { analyzeAndRouteTicket } = await import('@/lib/support/ticketRoutingEngine')
+      const routing = await analyzeAndRouteTicket({
+        subject: subject.trim(),
+        description: description.trim(),
+        daw,
+        osPlatform,
+      })
+
+      if (routing.isDeveloperProductIssue && routing.brandId) {
+        await admin
+          .from('support_tickets')
+          .update({
+            brand_id: routing.brandId,
+            product_id: routing.productId,
+            routing_source: routing.routingSource,
+            admin_notes: `Auto-routed: ${routing.reasoning}`,
+          })
+          .eq('id', ticket.id)
+      }
+    } catch (routeErr) {
+      console.warn('[createSupportTicketAction] Routing error:', routeErr)
+    }
+
     // Forward ticket notification to support@producertoy.com via formsubmit.co
     const userEmail = email.trim().toLowerCase()
     try {
