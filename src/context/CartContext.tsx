@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCurrency } from './CurrencyContext'
 import { useAuth } from './AuthContext'
+import { getSupabaseBrowserClient } from '@/lib/supabase/client'
 
 export interface CartItem {
   id: string
@@ -102,6 +103,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
     if (openDrawer) {
       setIsCartOpen(true)
+    }
+
+    // Record real verified cart addition telemetry
+    try {
+      const supabase = getSupabaseBrowserClient()
+      const bId = item.brand_id || item.brands?.id || item.brandId
+      if (item.id && bId) {
+        supabase.from('product_analytics').insert({
+          product_id: item.id,
+          brand_id: bId,
+          event_type: 'cart_add',
+          referrer: typeof window !== 'undefined' ? window.location.pathname : '',
+        }).then(() => {})
+      }
+    } catch {
+      // Non-blocking telemetry
     }
   }
 
