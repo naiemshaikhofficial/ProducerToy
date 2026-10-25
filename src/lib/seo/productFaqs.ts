@@ -12,9 +12,35 @@ export interface ProductFaqInput {
   vst_format?: string
   supported_daws?: string
   operating_system?: string
+  faqs?: Array<{ question?: string; answer?: string; q?: string; a?: string }> | string | null
 }
 
 export function generateProductFaqs(product: ProductFaqInput): ProductFaqData[] {
+  // 1. Check if brand provided custom FAQs (up to 5 max)
+  let customFaqs: any = product.faqs
+  if (typeof customFaqs === 'string') {
+    try {
+      customFaqs = JSON.parse(customFaqs)
+    } catch {
+      customFaqs = null
+    }
+  }
+
+  if (Array.isArray(customFaqs) && customFaqs.length > 0) {
+    const validCustomFaqs: ProductFaqData[] = customFaqs
+      .map((item) => ({
+        question: (item.question || item.q || '').trim(),
+        answer: (item.answer || item.a || '').trim(),
+      }))
+      .filter((item) => item.question.length > 0 && item.answer.length > 0)
+      .slice(0, 5)
+
+    if (validCustomFaqs.length > 0) {
+      return validCustomFaqs
+    }
+  }
+
+  // 2. Default fallback if brand did not provide custom FAQs
   const brandName = product.brands?.name || product.brand || 'Producer Toy'
   const isFree = Number(product.price_usd) === 0
   const type = (product.product_type || 'plugin').toLowerCase()

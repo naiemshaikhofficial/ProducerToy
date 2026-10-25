@@ -19,7 +19,7 @@ export function ToywardsFaqAccordion({ items }: { items: FaqItem[] }) {
       type="multiple"
       variant="filled"
       indicator="plus"
-      defaultValue={['faq-0']}
+      defaultValue={[]}
       className="w-full space-y-2.5"
     >
       {items.map((item, idx) => (

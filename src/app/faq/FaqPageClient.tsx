@@ -344,7 +344,7 @@ const CATEGORIES = [
 export function FaqPageClient() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [openValues, setOpenValues] = useState<string[]>(['ord-1', 'lic-1', 'sell-1'])
+  const [openValues, setOpenValues] = useState<string[]>([])
 
   const expandAll = () => {
     setOpenValues(filteredFaqs.map((f) => f.id))
@@ -375,14 +375,14 @@ export function FaqPageClient() {
     <div className="w-full bg-[#121212] min-h-screen text-white select-none">
       <div className="w-full max-w-[960px] mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16 sm:pb-24 space-y-8 sm:space-y-10">
         
-        {/* Sleek, Framed Mascot Banner */}
+        {/* Sleek, Framed Mascot Banner (Black & White Hero) */}
         <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[3/1] max-h-[220px] sm:max-h-[280px] flex items-center justify-center shadow-2xl">
-          <picture className="w-full h-full flex items-center justify-center">
+          <picture className="w-full h-full flex items-center justify-center grayscale contrast-125">
             <source srcSet="/neon-faq-mascot-banner.webp" type="image/webp" />
             <img
               src="/Neon FAQ Mascot Banner.png"
               alt="Producer Toy FAQ Banner"
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-center grayscale contrast-125"
               loading="eager"
             />
           </picture>

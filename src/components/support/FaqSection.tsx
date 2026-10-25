@@ -165,7 +165,7 @@ interface FaqSectionProps {
 
 export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [openValues, setOpenValues] = useState<string[]>(['ord-1', 'lic-1', 'daw-1'])
+  const [openValues, setOpenValues] = useState<string[]>([])
 
   const filteredFaqs = useMemo(() => {
     return FAQ_DATA.filter((item) => {

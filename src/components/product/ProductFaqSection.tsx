@@ -17,7 +17,7 @@ export interface ProductFaqProps {
 }
 export function ProductFaqSection({ product }: ProductFaqProps) {
   const faqs = generateProductFaqs(product)
-  const [openValues, setOpenValues] = useState<string[]>(['faq-0', 'faq-1'])
+  const [openValues, setOpenValues] = useState<string[]>([])
 
   return (
     <div className="space-y-4 pt-6 select-none">

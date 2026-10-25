@@ -214,18 +214,23 @@ const nextConfig: NextConfig = {
       },
     ];
 
+    const isProd = process.env.NODE_ENV === 'production';
+
     return [
-      // 1. Static Assets & Media CDN Caching (1 Year Immutable Edge Cache)
-      {
-        source: '/:path*.(ico|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|eot|mp3|wav|ogg|json)',
-        headers: cdnCacheHeaders,
-      },
-      // 2. Next.js Static Builds
-      {
-        source: '/_next/static/:path*',
-        headers: cdnCacheHeaders,
-      },
-      // 3. Security Headers for all routes
+      // 1. Static Assets & Next.js Static Builds (Only in production to prevent caching stale CSS in dev)
+      ...(isProd
+        ? [
+            {
+              source: '/:path*.(ico|png|jpg|jpeg|gif|webp|avif|svg|woff|woff2|ttf|eot|mp3|wav|ogg|json)',
+              headers: cdnCacheHeaders,
+            },
+            {
+              source: '/_next/static/:path*',
+              headers: cdnCacheHeaders,
+            },
+          ]
+        : []),
+      // 2. Security Headers for all routes
       {
         source: '/(.*)',
         headers: securityHeaders,
