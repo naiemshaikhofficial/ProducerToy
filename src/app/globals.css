@@ -29,7 +29,7 @@
     color-scheme: dark;
     background-color: #121212;
     color: #ffffff;
-    overflow-x: hidden;
+    overflow-x: visible !important;
   }
 
   body {
@@ -37,7 +37,7 @@
     background-color: #121212;
     color: #ffffff;
     font-family: var(--font-sans);
-    overflow-x: hidden;
+    overflow-x: visible !important;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -346,3 +346,35 @@ input.bg-\[\#202020\]:-webkit-autofill:active,
   box-shadow: 0 0 0 1000px #181818 inset !important;
   -webkit-text-fill-color: #ffffff !important;
 }
+
+/* Spectrum UI Accordion Animations */
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+

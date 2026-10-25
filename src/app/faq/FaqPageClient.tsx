@@ -15,6 +15,12 @@ import {
   UserCheck,
   HelpCircle,
 } from 'lucide-react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 export interface FAQItem {
   id: string
@@ -338,26 +344,14 @@ const CATEGORIES = [
 export function FaqPageClient() {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [openIds, setOpenIds] = useState<Set<string>>(new Set(['ord-1', 'lic-1', 'sell-1']))
-
-  const toggleOpen = (id: string) => {
-    setOpenIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
-  }
+  const [openValues, setOpenValues] = useState<string[]>(['ord-1', 'lic-1', 'sell-1'])
 
   const expandAll = () => {
-    setOpenIds(new Set(filteredFaqs.map((f) => f.id)))
+    setOpenValues(filteredFaqs.map((f) => f.id))
   }
 
   const collapseAll = () => {
-    setOpenIds(new Set())
+    setOpenValues([])
   }
 
   const filteredFaqs = useMemo(() => {
@@ -484,66 +478,52 @@ export function FaqPageClient() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-2.5">
-            {filteredFaqs.map((faq) => {
-              const isOpen = openIds.has(faq.id)
-              return (
-                <div
-                  key={faq.id}
-                  className={`rounded-xl border transition-colors ${
-                    isOpen
-                      ? 'bg-[#18181c] border-white/15'
-                      : 'bg-[#151518] hover:bg-[#18181c] border-white/[0.06]'
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleOpen(faq.id)}
-                    className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-3 cursor-pointer"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="text-sm sm:text-base font-semibold text-white tracking-tight leading-snug">
-                      {faq.question}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-zinc-400 shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180 text-white' : ''
-                      }`}
-                    />
-                  </button>
+          <Accordion
+            type="multiple"
+            variant="filled"
+            indicator="plus"
+            value={openValues}
+            onValueChange={setOpenValues}
+            className="w-full space-y-2.5"
+          >
+            {filteredFaqs.map((faq) => (
+              <AccordionItem
+                key={faq.id}
+                value={faq.id}
+                className="bg-[#16161a] hover:bg-[#1a1a20] transition-colors rounded-xl border border-white/[0.04]"
+              >
+                <AccordionTrigger className="px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm sm:text-base font-semibold text-white tracking-tight leading-snug hover:text-white">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="px-4 sm:px-5 pb-4 pt-1 space-y-3 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-white/[0.04]">
+                  <p className="pt-2 font-normal text-zinc-300">{faq.answer}</p>
 
-                  {isOpen && (
-                    <div className="px-4 sm:px-5 pb-4 pt-1 space-y-3 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-white/[0.05]">
-                      <p className="pt-2 font-normal text-zinc-300">{faq.answer}</p>
+                  {faq.details && faq.details.length > 0 && (
+                    <ul className="space-y-1.5 pt-1 pl-1">
+                      {faq.details.map((detail, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-zinc-400 text-xs sm:text-sm">
+                          <span className="text-zinc-500 mt-0.5">•</span>
+                          <span>{detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
-                      {faq.details && faq.details.length > 0 && (
-                        <ul className="space-y-1.5 pt-1 pl-1">
-                          {faq.details.map((detail, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-zinc-400 text-xs sm:text-sm">
-                              <span className="text-zinc-500 mt-0.5">•</span>
-                              <span>{detail}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {faq.linkUrl && faq.linkText && (
-                        <div className="pt-1">
-                          <Link
-                            href={faq.linkUrl}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-white hover:text-zinc-300 underline underline-offset-4"
-                          >
-                            <span>{faq.linkText}</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        </div>
-                      )}
+                  {faq.linkUrl && faq.linkText && (
+                    <div className="pt-1">
+                      <Link
+                        href={faq.linkUrl}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-white hover:text-zinc-300 underline underline-offset-4"
+                      >
+                        <span>{faq.linkText}</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
                     </div>
                   )}
-                </div>
-              )
-            })}
-          </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         )}
 
         {/* Minimalistic Simple Help Strip */}

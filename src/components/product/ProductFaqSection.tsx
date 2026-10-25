@@ -1,9 +1,14 @@
 'use client'
 
 import React, { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
 import { FAQPageJsonLd } from '@/components/JsonLd'
 import { generateProductFaqs, ProductFaqInput } from '@/lib/seo/productFaqs'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 export { generateProductFaqs }
 
@@ -12,13 +17,7 @@ export interface ProductFaqProps {
 }
 export function ProductFaqSection({ product }: ProductFaqProps) {
   const faqs = generateProductFaqs(product)
-  const [openIndices, setOpenIndices] = useState<number[]>([0, 1])
-
-  const toggleIndex = (index: number) => {
-    setOpenIndices((prev) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
-    )
-  }
+  const [openValues, setOpenValues] = useState<string[]>(['faq-0', 'faq-1'])
 
   return (
     <div className="space-y-4 pt-6 select-none">
@@ -33,38 +32,30 @@ export function ProductFaqSection({ product }: ProductFaqProps) {
         </p>
       </div>
 
-      <div className="space-y-2.5 pt-2">
-        {faqs.map((faq, index) => {
-          const isOpen = openIndices.includes(index)
-          return (
-            <div
-              key={index}
-              className="bg-[#181818] border border-[#262626] rounded-xl overflow-hidden transition-colors"
-            >
-              <button
-                type="button"
-                onClick={() => toggleIndex(index)}
-                className="w-full p-4 flex items-center justify-between gap-4 text-left cursor-pointer hover:bg-[#1f1f1f] transition-colors"
-              >
-                <span className="text-sm font-semibold text-white tracking-tight">
-                  {faq.question}
-                </span>
-                {isOpen ? (
-                  <ChevronUp className="w-4 h-4 text-zinc-400 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="w-4 h-4 text-zinc-400 flex-shrink-0" />
-                )}
-              </button>
-
-              {isOpen && (
-                <div className="px-4 pb-4 pt-1 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-[#222222] bg-[#141414]">
-                  {faq.answer}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
+      <Accordion
+        type="multiple"
+        variant="filled"
+        indicator="plus"
+        value={openValues}
+        onValueChange={setOpenValues}
+        className="space-y-2.5 pt-2"
+      >
+        {faqs.map((faq, index) => (
+          <AccordionItem
+            key={index}
+            value={`faq-${index}`}
+            className="bg-[#181818] hover:bg-[#1f1f1f] transition-colors rounded-xl border border-white/[0.04]"
+          >
+            <AccordionTrigger className="p-4 text-left text-sm font-semibold text-white tracking-tight hover:text-white">
+              {faq.question}
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 pt-1 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-[#222222]">
+              {faq.answer}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
     </div>
   )
 }
+

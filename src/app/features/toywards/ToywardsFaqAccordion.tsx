@@ -1,7 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Plus, Minus } from 'lucide-react'
+import React from 'react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 export interface FaqItem {
   question: string
@@ -9,40 +14,29 @@ export interface FaqItem {
 }
 
 export function ToywardsFaqAccordion({ items }: { items: FaqItem[] }) {
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0)
-
-  const toggleFaq = (index: number) => {
-    setOpenFaqIndex(openFaqIndex === index ? null : index)
-  }
-
   return (
-    <div className="divide-y divide-[#262626] border-t border-b border-[#262626]">
-      {items.map((item, idx) => {
-        const isOpen = openFaqIndex === idx
-        return (
-          <div key={idx} className="py-5 sm:py-6">
-            <button
-              type="button"
-              onClick={() => toggleFaq(idx)}
-              className="w-full flex items-center justify-between text-left gap-4 group cursor-pointer focus:outline-none"
-              aria-expanded={isOpen}
-            >
-              <span className="text-base sm:text-lg font-bold text-white group-hover:text-zinc-200 transition-colors">
-                {item.question}
-              </span>
-              <span className="text-zinc-400 group-hover:text-white transition-colors flex-shrink-0">
-                {isOpen ? <Minus size={20} /> : <Plus size={20} />}
-              </span>
-            </button>
-
-            {isOpen && (
-              <div className="mt-4 text-sm sm:text-[15px] text-zinc-400 leading-relaxed font-normal whitespace-pre-line animate-in fade-in duration-150 pr-4">
-                {item.answer}
-              </div>
-            )}
-          </div>
-        )
-      })}
-    </div>
+    <Accordion
+      type="multiple"
+      variant="filled"
+      indicator="plus"
+      defaultValue={['faq-0']}
+      className="w-full space-y-2.5"
+    >
+      {items.map((item, idx) => (
+        <AccordionItem
+          key={idx}
+          value={`faq-${idx}`}
+          className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors rounded-xl border border-white/[0.04]"
+        >
+          <AccordionTrigger className="px-5 py-4 text-left text-base sm:text-lg font-bold text-white hover:text-white">
+            {item.question}
+          </AccordionTrigger>
+          <AccordionContent className="px-5 pb-5 text-sm sm:text-[15px] text-zinc-400 leading-relaxed font-normal whitespace-pre-line border-t border-white/[0.04] pt-2">
+            {item.answer}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   )
 }
+

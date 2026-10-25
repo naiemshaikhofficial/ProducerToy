@@ -1,7 +1,13 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
-import { ChevronDown, HelpCircle, Layers, Key, Download, Laptop, ShieldCheck, ShoppingBag } from 'lucide-react'
+import { HelpCircle, Layers, Key, Download, Laptop, ShieldCheck, ShoppingBag } from 'lucide-react'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 
 export interface FAQItem {
   id: string
@@ -159,19 +165,7 @@ interface FaqSectionProps {
 
 export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [openIds, setOpenIds] = useState<Set<string>>(new Set(['ord-1', 'lic-1', 'daw-1']))
-
-  const toggleOpen = (id: string) => {
-    setOpenIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
-      }
-      return next
-    })
-  }
+  const [openValues, setOpenValues] = useState<string[]>(['ord-1', 'lic-1', 'daw-1'])
 
   const filteredFaqs = useMemo(() => {
     return FAQ_DATA.filter((item) => {
@@ -235,55 +229,44 @@ export function FaqSection({ searchQuery, onSelectRaiseTicket }: FaqSectionProps
           )}
         </div>
       ) : (
-        <div className="space-y-2">
-          {filteredFaqs.map((faq) => {
-            const isOpen = openIds.has(faq.id)
-            return (
-              <div
-                key={faq.id}
-                className={`bg-[#161618] border transition-all rounded-xl overflow-hidden ${
-                  isOpen ? 'border-zinc-700 bg-[#1a1a1d]' : 'border-zinc-800/80 hover:border-zinc-700'
-                }`}
-              >
-                <button
-                  onClick={() => toggleOpen(faq.id)}
-                  className="w-full px-4.5 py-4 text-left flex items-center justify-between gap-3 transition-colors cursor-pointer"
-                  aria-expanded={isOpen}
-                >
-                  <span className="text-xs sm:text-sm font-semibold text-white tracking-tight flex items-start gap-2.5">
-                    <span className="text-zinc-500 font-mono text-xs mt-0.5">Q.</span>
-                    <span>{faq.question}</span>
-                  </span>
-                  <div
-                    className={`w-6 h-6 rounded-md bg-[#202023] flex items-center justify-center flex-shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180 text-white' : 'text-zinc-400'
-                    }`}
-                  >
-                    <ChevronDown className="w-3.5 h-3.5" />
+        <Accordion
+          type="multiple"
+          variant="filled"
+          indicator="plus"
+          value={openValues}
+          onValueChange={setOpenValues}
+          className="space-y-2"
+        >
+          {filteredFaqs.map((faq) => (
+            <AccordionItem
+              key={faq.id}
+              value={faq.id}
+              className="bg-[#161618] hover:bg-[#1a1a1d] transition-all rounded-xl border border-white/[0.04]"
+            >
+              <AccordionTrigger className="px-4.5 py-4 text-left text-xs sm:text-sm font-semibold text-white tracking-tight hover:text-white">
+                <span className="flex items-start gap-2.5">
+                  <span className="text-zinc-500 font-mono text-xs mt-0.5">Q.</span>
+                  <span>{faq.question}</span>
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="px-4.5 pb-4.5 pt-0 text-xs text-zinc-300 leading-relaxed border-t border-zinc-800/50">
+                <div className="pl-5 pt-3 space-y-2.5">
+                  <p>{faq.answer}</p>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    {faq.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-[#202023] border border-zinc-800 text-[10px] text-zinc-400 px-2 py-0.5 rounded uppercase font-medium"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
                   </div>
-                </button>
-
-                {isOpen && (
-                  <div className="px-4.5 pb-4.5 pt-0 text-xs text-zinc-300 leading-relaxed border-t border-zinc-800/50">
-                    <div className="pl-5 pt-3 space-y-2.5">
-                      <p>{faq.answer}</p>
-                      <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                        {faq.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="bg-[#202023] border border-zinc-800 text-[10px] text-zinc-400 px-2 py-0.5 rounded uppercase font-medium"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       )}
     </div>
   )
