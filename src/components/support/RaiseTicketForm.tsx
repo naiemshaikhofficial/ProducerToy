@@ -250,8 +250,8 @@ export function RaiseTicketForm({
       </div>
 
       {errorMessage && (
-        <div className="bg-rose-950/30 border border-rose-900/60 rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-rose-300">
-          <AlertCircle size={15} className="text-rose-400 flex-shrink-0" />
+        <div className="bg-[#ff4053] text-black font-extrabold rounded-xl p-3 flex items-center gap-2.5 text-xs shadow-md animate-in fade-in">
+          <AlertCircle size={15} className="text-black flex-shrink-0 stroke-[2.5]" />
           <span>{errorMessage}</span>
         </div>
       )}

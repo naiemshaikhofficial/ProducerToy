@@ -551,7 +551,7 @@ export function EpicProductDetailClient({
                     {formatPrice(product.price_inr, product.price_usd)}
                   </span>
                   {isOutOfStock && (
-                    <span className="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded uppercase tracking-wider">
+                    <span className="text-xs font-extrabold text-black bg-[#ff4053] px-2.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
                       Out of Stock
                     </span>
                   )}
@@ -589,20 +589,15 @@ export function EpicProductDetailClient({
               <span>COMING SOON</span>
             </button>
           ) : isOutOfStock ? (
-            <div className="space-y-2">
+            <div className="w-full">
               <button
                 type="button"
                 disabled
-                className="w-full py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wider bg-[#181818] border border-red-500/30 text-red-400 cursor-not-allowed flex items-center justify-center gap-2 select-none shadow-md"
+                className="w-full py-4 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wider bg-[#ff4053] text-black cursor-not-allowed flex items-center justify-center gap-2 select-none shadow-lg animate-in fade-in"
               >
-                <AlertCircle className="w-4 h-4 text-red-400" />
+                <AlertCircle className="w-4 h-4 text-black stroke-[2.5]" />
                 <span>OUT OF STOCK</span>
               </button>
-              <p className="text-[11px] text-zinc-400 text-center leading-relaxed">
-                {initialStockStatus?.reason === 'depleted_serials'
-                  ? 'All license keys claimed. Purchases are safely locked until creator restock.'
-                  : 'Download deliverables are being updated. Checkouts are safely locked.'}
-              </p>
             </div>
           ) : (
             <div className="flex items-center gap-3">
@@ -1146,9 +1141,9 @@ export function EpicProductDetailClient({
                 <button
                   type="button"
                   disabled
-                  className="w-full h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#181818] border border-red-500/30 text-red-400 cursor-not-allowed shadow-md select-none"
+                  className="w-full h-12 px-6 text-sm font-extrabold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 bg-[#ff4053] text-black cursor-not-allowed shadow-md select-none"
                 >
-                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <AlertCircle className="w-4 h-4 text-black stroke-[2.5]" />
                   <span>Out of Stock</span>
                 </button>
               </div>

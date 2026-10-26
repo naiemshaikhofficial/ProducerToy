@@ -362,8 +362,8 @@ export const LinkedAccountsTab: React.FC<LinkedAccountsTabProps> = ({
       </div>
 
       {errorMessage && (
-        <div className="bg-[#2a1719] border border-[#4d2428] text-[#ff6b7a] p-4 rounded-2xl flex items-center gap-3 text-xs">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
+        <div className="bg-[#ff4053] text-black font-extrabold p-3.5 rounded-2xl flex items-center gap-2.5 text-xs shadow-md animate-in fade-in">
+          <AlertTriangle className="w-4 h-4 shrink-0 text-black stroke-[2.5]" />
           <span>{errorMessage}</span>
         </div>
       )}

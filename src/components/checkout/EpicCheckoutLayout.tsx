@@ -273,8 +273,9 @@ export function EpicCheckoutLayout({
         )}
 
         {consentError && (
-          <div className="text-[11px] text-red-400 font-medium pt-1">
-            {consentError}
+          <div className="bg-[#ff4053] text-black font-extrabold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1.5 shadow-sm animate-in fade-in">
+            <AlertCircle size={13} className="text-black flex-shrink-0 stroke-[2.5]" />
+            <span>{consentError}</span>
           </div>
         )}
       </div>
@@ -666,8 +667,8 @@ export function EpicCheckoutLayout({
                 </div>
 
                 {couponError && (
-                  <div className="text-[11px] text-red-400 flex items-center gap-1 font-medium">
-                    <AlertCircle size={13} />
+                  <div className="bg-[#ff4053] text-black font-extrabold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1.5 shadow-sm animate-in fade-in">
+                    <AlertCircle size={13} className="text-black flex-shrink-0 stroke-[2.5]" />
                     <span>{couponError}</span>
                   </div>
                 )}
@@ -1322,8 +1323,8 @@ export function EpicCheckoutLayout({
                   </div>
 
                   {couponError && (
-                    <div className="text-[10.5px] text-red-400 flex items-center gap-1 font-medium">
-                      <AlertCircle size={12} />
+                    <div className="bg-[#ff4053] text-black font-extrabold px-3 py-2 rounded-xl text-[10.5px] flex items-center gap-1.5 shadow-sm animate-in fade-in">
+                      <AlertCircle size={12} className="text-black flex-shrink-0 stroke-[2.5]" />
                       <span>{couponError}</span>
                     </div>
                   )}

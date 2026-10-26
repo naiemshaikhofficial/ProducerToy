@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
+import { X, AlertCircle } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useCurrency } from '@/context/CurrencyContext'
 import { useAuth } from '@/context/AuthContext'
@@ -513,9 +513,12 @@ export function GlobalCheckoutModal() {
       <div className="relative z-10 w-full max-w-[1080px] lg:max-w-[1120px] h-full max-h-screen flex flex-col items-center justify-center">
         {/* Error Notification */}
         {errorMsg && (
-          <div className="w-full mb-2 bg-[#241515] border border-red-500/20 text-red-300 px-4 py-2 text-xs rounded-lg flex items-center justify-between shadow-lg">
-            <span>{errorMsg}</span>
-            <button onClick={() => setErrorMsg('')} className="text-red-400 hover:text-white font-bold ml-4">
+          <div className="w-full mb-3 bg-[#ff4053] text-black font-extrabold px-4 py-2.5 text-xs rounded-xl flex items-center justify-between shadow-lg animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 stroke-[2.5] text-black" />
+              <span>{errorMsg}</span>
+            </div>
+            <button onClick={() => setErrorMsg('')} className="text-black/80 hover:text-black font-extrabold text-base leading-none ml-4 transition-opacity cursor-pointer">
               &times;
             </button>
           </div>

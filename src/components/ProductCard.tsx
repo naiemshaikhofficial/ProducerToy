@@ -282,7 +282,7 @@ export function ProductCard({ product }: { product: Product }) {
               {product.release_date ? `Available ${product.release_date}` : 'Coming Soon'}
             </span>
           ) : isOutOfStock ? (
-            <span className="text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded uppercase tracking-wider">
+            <span className="text-[11px] font-extrabold text-black bg-[#ff4053] px-2 py-0.5 rounded uppercase tracking-wider shadow-sm">
               Out of Stock
             </span>
           ) : isFree ? (

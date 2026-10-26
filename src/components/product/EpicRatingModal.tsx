@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { X, Check, LogIn } from 'lucide-react'
+import { X, Check, LogIn, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { submitProductRatingAction, ProductRatingStats } from '@/actions/ratingActions'
 import { useAuth } from '@/context/AuthContext'
@@ -160,7 +160,12 @@ export function EpicRatingModal({
               />
             </div>
 
-            {errorMsg && <p className="text-xs text-rose-400 text-center">{errorMsg}</p>}
+            {errorMsg && (
+              <div className="bg-[#ff4053] text-black font-extrabold p-2.5 rounded-xl text-xs text-center w-full animate-in fade-in shadow-sm flex items-center justify-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-black stroke-[2.5] shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex items-center gap-3 pt-1">

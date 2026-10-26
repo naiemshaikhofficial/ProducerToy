@@ -208,16 +208,16 @@ export function PluginActivationModal({
             </div>
 
             {errorMessage && (
-              <div className="p-3 bg-[#1e1416] border border-[#3e1f24] rounded-xl text-xs text-rose-300 space-y-1">
+              <div className="p-3 bg-[#ff4053] text-black font-extrabold rounded-xl text-xs space-y-1 shadow-md animate-in fade-in">
                 <div>{errorMessage}</div>
                 {needsPurchaseUrl && (
                   <a
                     href={needsPurchaseUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-white hover:underline font-semibold text-[11px]"
+                    className="inline-flex items-center gap-1 text-black underline font-extrabold text-[11px]"
                   >
-                    Buy ProVerb on Producer Toy <ArrowRight className="w-3 h-3" />
+                    Buy ProVerb on Producer Toy <ArrowRight className="w-3 h-3 stroke-[2.5]" />
                   </a>
                 )}
               </div>

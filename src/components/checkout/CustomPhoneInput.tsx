@@ -129,7 +129,7 @@ export function CustomPhoneInput({
       <div
         className={`w-full h-10 bg-[#181818] border rounded-md flex items-center px-3 transition-colors shadow-sm ${
           error
-            ? 'border-red-500/70 bg-red-950/10'
+            ? 'border-[#ff4053] bg-[#ff4053]/10'
             : isOpen
             ? 'border-zinc-300 ring-1 ring-zinc-400/20'
             : 'border-[#282828] hover:border-[#383838]'

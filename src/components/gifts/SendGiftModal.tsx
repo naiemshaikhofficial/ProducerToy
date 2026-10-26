@@ -288,8 +288,8 @@ export function SendGiftModal({
                 </div>
 
                 {emailError && (
-                  <div className="text-[11px] text-red-400 flex items-center gap-1.5 pt-0.5">
-                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                  <div className="bg-[#ff4053] text-black font-extrabold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1.5 shadow-sm animate-in fade-in">
+                    <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 stroke-[2.5]" />
                     <span>{emailError}</span>
                   </div>
                 )}

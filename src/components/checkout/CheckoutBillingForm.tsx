@@ -47,11 +47,11 @@ export function CheckoutBillingForm({
             value={billingDetails.fullName}
             onChange={(e) => onBillingChange('fullName', e.target.value)}
             className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.fullName ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
+              formErrors.fullName ? 'border-[#ff4053] bg-[#ff4053]/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.fullName && (
-            <p className="text-[10px] text-red-400 font-medium">{formErrors.fullName}</p>
+            <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.fullName}</p>
           )}
         </div>
 
@@ -89,7 +89,7 @@ export function CheckoutBillingForm({
             defaultCountryCode="IN"
           />
           {formErrors.phone && (
-            <p className="text-[10px] text-red-400 font-medium">{formErrors.phone}</p>
+            <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.phone}</p>
           )}
         </div>
 
@@ -104,11 +104,11 @@ export function CheckoutBillingForm({
             value={billingDetails.address}
             onChange={(e) => onBillingChange('address', e.target.value)}
             className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.address ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
+              formErrors.address ? 'border-[#ff4053] bg-[#ff4053]/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.address && (
-            <p className="text-[10px] text-red-400 font-medium">{formErrors.address}</p>
+            <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.address}</p>
           )}
         </div>
 
@@ -140,11 +140,11 @@ export function CheckoutBillingForm({
             value={billingDetails.city}
             onChange={(e) => onBillingChange('city', e.target.value)}
             className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-              formErrors.city ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
+              formErrors.city ? 'border-[#ff4053] bg-[#ff4053]/10' : 'border-[#282828] hover:border-[#383838]'
             }`}
           />
           {formErrors.city && (
-            <p className="text-[10px] text-red-400 font-medium">{formErrors.city}</p>
+            <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.city}</p>
           )}
         </div>
 
@@ -160,11 +160,11 @@ export function CheckoutBillingForm({
               value={billingDetails.state}
               onChange={(e) => onBillingChange('state', e.target.value)}
               className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-                formErrors.state ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
+                formErrors.state ? 'border-[#ff4053] bg-[#ff4053]/10' : 'border-[#282828] hover:border-[#383838]'
               }`}
             />
             {formErrors.state && (
-              <p className="text-[10px] text-red-400 font-medium">{formErrors.state}</p>
+              <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.state}</p>
             )}
           </div>
 
@@ -178,11 +178,11 @@ export function CheckoutBillingForm({
               value={billingDetails.zip}
               onChange={(e) => onBillingChange('zip', e.target.value)}
               className={`w-full h-10 bg-[#181818] border text-white text-[13px] px-3.5 rounded-md outline-none transition-colors placeholder:text-zinc-500 shadow-sm focus:border-zinc-300 ${
-                formErrors.zip ? 'border-red-500/70 bg-red-950/10' : 'border-[#282828] hover:border-[#383838]'
+                formErrors.zip ? 'border-[#ff4053] bg-[#ff4053]/10' : 'border-[#282828] hover:border-[#383838]'
               }`}
             />
             {formErrors.zip && (
-              <p className="text-[10px] text-red-400 font-medium">{formErrors.zip}</p>
+              <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.zip}</p>
             )}
           </div>
         </div>
@@ -199,7 +199,7 @@ export function CheckoutBillingForm({
             placeholder="Select Country"
           />
           {formErrors.country && (
-            <p className="text-[10px] text-red-400 font-medium">{formErrors.country}</p>
+            <p className="text-[10px] text-[#ff4053] font-semibold">{formErrors.country}</p>
           )}
         </div>
       </div>

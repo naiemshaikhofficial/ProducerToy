@@ -1152,8 +1152,8 @@ export function EpicLibraryClient({
 
                 {/* Download Error Alert */}
                 {downloadError && (
-                  <div className="bg-red-950/40 border border-red-900/60 p-2.5 rounded-lg flex items-center gap-2 text-xs text-red-300">
-                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  <div className="bg-[#ff4053] text-black font-extrabold p-3 rounded-xl flex items-center gap-2 text-xs shadow-md animate-in fade-in">
+                    <AlertCircle className="w-4 h-4 text-black shrink-0 stroke-[2.5]" />
                     <span>{downloadError}</span>
                   </div>
                 )}
