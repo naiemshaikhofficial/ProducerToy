@@ -53,12 +53,13 @@ function PairForm() {
     <div className="min-h-screen flex items-center justify-center bg-[#121212] text-white px-4 py-12 selection:bg-[#34363d] selection:text-white">
       <div className="w-full max-w-[420px] flex flex-col items-center text-center">
         {/* ProducerToy Key Bear Mascot Logo */}
-        <div className="relative w-28 h-28 mb-6 transition-transform duration-300 hover:scale-105">
+        <div className="mb-5 transition-transform duration-300 hover:scale-105">
           <Image
-            src="/images/producertoy-key-bear.png"
+            src="/images/producertoy-key-bear.webp"
             alt="ProducerToy Mascot"
-            fill
-            className="object-contain drop-shadow-2xl"
+            width={120}
+            height={105}
+            className="object-contain drop-shadow-2xl mx-auto"
             priority
           />
         </div>
