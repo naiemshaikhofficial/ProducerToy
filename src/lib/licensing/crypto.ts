@@ -42,7 +42,13 @@ export function getServerPrivateKey(): crypto.KeyObject {
     throw new Error('LICENSE_ED25519_PRIVATE_KEY / PROVERB_ED25519_PRIVATE_KEY_PEM environment variable is not configured.')
   }
 
-  return crypto.createPrivateKey(envKey.replace(/\\n/g, '\n'))
+  let cleanKey = envKey.trim()
+  if (cleanKey.startsWith('"') && cleanKey.endsWith('"')) {
+    cleanKey = cleanKey.slice(1, -1)
+  }
+  cleanKey = cleanKey.replace(/\\n/g, '\n').trim()
+
+  return crypto.createPrivateKey(cleanKey)
 }
 
 export function getServerPublicKey(): crypto.KeyObject {

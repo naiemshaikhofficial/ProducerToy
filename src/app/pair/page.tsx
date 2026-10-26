@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 
 function PairForm() {
   const searchParams = useSearchParams()
@@ -49,102 +50,54 @@ function PairForm() {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#090a0f',
-      color: '#f4f4f5',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-      padding: '24px'
-    }}>
-      <div style={{
-        maxWidth: '460px',
-        width: '100%',
-        background: '#12131a',
-        border: '1px solid #27272a',
-        borderRadius: '16px',
-        padding: '36px 32px',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          width: '56px',
-          height: '56px',
-          borderRadius: '14px',
-          background: 'rgba(0, 240, 255, 0.08)',
-          border: '1px solid rgba(0, 240, 255, 0.25)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 20px auto',
-          color: '#00f0ff',
-          fontSize: '24px'
-        }}>
-          ⚡
+    <div className="min-h-screen flex items-center justify-center bg-[#121212] text-white px-4 py-12 selection:bg-[#34363d] selection:text-white">
+      <div className="w-full max-w-[420px] flex flex-col items-center text-center">
+        {/* ProducerToy Key Bear Mascot Logo */}
+        <div className="relative w-28 h-28 mb-6 transition-transform duration-300 hover:scale-105">
+          <Image
+            src="/images/producertoy-key-bear.png"
+            alt="ProducerToy Mascot"
+            fill
+            className="object-contain drop-shadow-2xl"
+            priority
+          />
         </div>
 
-        <h1 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 8px 0', letterSpacing: '-0.02em' }}>
-          Pair Audio Workstation
+        <h1 className="text-2xl font-bold tracking-tight text-white mb-2">
+          Pair Machine
         </h1>
-        <p style={{ fontSize: '14px', color: '#a1a1aa', margin: '0 0 28px 0', lineHeight: 1.5 }}>
-          Authorize this machine with your ProducerToy account to instantly unlock ProVerb.
+        <p className="text-sm text-[#a0a0a0] mb-8 leading-relaxed max-w-sm">
+          Enter your single-use code to pair your audio workstation with your ProducerToy account.
         </p>
 
         {status === 'success' ? (
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: '12px',
-            padding: '20px',
-            color: '#10b981',
-            fontSize: '15px',
-            lineHeight: 1.5
-          }}>
-            <div style={{ fontSize: '32px', marginBottom: '8px' }}>✓</div>
-            <strong>Machine Successfully Authorized</strong>
-            <p style={{ margin: '8px 0 0 0', color: '#a1a1aa', fontSize: '13px' }}>
-              You can return to ProVerb now. The plugin will activate automatically within seconds.
+          <div className="w-full bg-[#1c1c1e] rounded-2xl p-6 text-center animate-in fade-in zoom-in-95 duration-300">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl mx-auto mb-3">
+              ✓
+            </div>
+            <h2 className="text-base font-semibold text-white mb-1">
+              Machine Authorized
+            </h2>
+            <p className="text-xs text-[#a0a0a0] leading-relaxed">
+              You can return to your DAW now. ProVerb is unlocked and ready to use.
             </p>
           </div>
         ) : (
-          <form onSubmit={handlePair}>
-            <div style={{ marginBottom: '20px' }}>
+          <form onSubmit={handlePair} className="w-full space-y-4">
+            <div>
               <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="PV-XXXX-XXXX"
-                style={{
-                  width: '100%',
-                  background: '#18181b',
-                  border: '1px solid #3f3f46',
-                  borderRadius: '10px',
-                  padding: '14px 16px',
-                  fontSize: '20px',
-                  fontFamily: 'monospace',
-                  textAlign: 'center',
-                  color: '#ffffff',
-                  letterSpacing: '2px',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
+                className="w-full h-14 bg-[#1a1a1c] text-white text-center text-xl font-mono tracking-widest rounded-xl px-4 border border-[#2a2a2d] focus:border-[#52525b] focus:outline-none transition-all placeholder:text-[#52525b] placeholder:tracking-normal"
                 disabled={status === 'loading'}
                 autoFocus
               />
             </div>
 
             {status === 'error' && (
-              <div style={{
-                color: '#ef4444',
-                fontSize: '13px',
-                marginBottom: '16px',
-                background: 'rgba(239, 68, 68, 0.08)',
-                border: '1px solid rgba(239, 68, 68, 0.2)',
-                padding: '10px 14px',
-                borderRadius: '8px'
-              }}>
+              <div className="text-xs text-rose-400 bg-rose-500/10 rounded-lg p-3 leading-relaxed border border-rose-500/20">
                 {message}
               </div>
             )}
@@ -152,27 +105,12 @@ function PairForm() {
             <button
               type="submit"
               disabled={status === 'loading'}
-              style={{
-                width: '100%',
-                background: status === 'loading' ? '#3f3f46' : '#00f0ff',
-                color: '#05070a',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '14px',
-                fontSize: '15px',
-                fontWeight: 600,
-                cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-                transition: 'background 0.2s ease',
-              }}
+              className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shadow-lg shadow-white/5"
             >
               {status === 'loading' ? 'Authorizing Machine...' : 'Authorize Machine'}
             </button>
           </form>
         )}
-
-        <div style={{ marginTop: '28px', borderTop: '1px solid #27272a', paddingTop: '16px', fontSize: '12px', color: '#71717a' }}>
-          ProducerToy Dynamic Cryptographic Licensing • Ed25519
-        </div>
       </div>
     </div>
   )
@@ -180,7 +118,7 @@ function PairForm() {
 
 export default function PairPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#090a0f' }} />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#121212]" />}>
       <PairForm />
     </Suspense>
   )
