@@ -1,20 +1,9 @@
 'use client'
 
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
-import {
-  Search,
-  ChevronDown,
-  ArrowRight,
-  ShieldCheck,
-  Award,
-  Sliders,
-  Layers,
-  Key,
-  ShoppingBag,
-  UserCheck,
-  HelpCircle,
-} from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import {
   Accordion,
   AccordionContent,
@@ -331,49 +320,20 @@ const FAQ_ITEMS: FAQItem[] = [
   },
 ]
 
-const CATEGORIES = [
-  { id: 'all', label: 'All FAQs', icon: Layers },
-  { id: 'selling', label: 'Working & Selling', icon: Award },
-  { id: 'orders', label: 'Orders & Wishlist', icon: ShoppingBag },
-  { id: 'licenses', label: 'Licenses & Downloads', icon: Key },
-  { id: 'refunds', label: 'Refunds & Guarantee', icon: ShieldCheck },
-  { id: 'account', label: 'Account & Verification', icon: UserCheck },
-  { id: 'daw', label: 'DAW & Technical Setup', icon: Sliders },
-]
-
 export function FaqPageClient() {
-  const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState<string>('')
   const [openValues, setOpenValues] = useState<string[]>([])
 
   const expandAll = () => {
-    setOpenValues(filteredFaqs.map((f) => f.id))
+    setOpenValues(FAQ_ITEMS.map((f) => f.id))
   }
 
   const collapseAll = () => {
     setOpenValues([])
   }
 
-  const filteredFaqs = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim()
-    return FAQ_ITEMS.filter((item) => {
-      const matchesCategory = activeCategory === 'all' || item.category === activeCategory
-      if (!matchesCategory) return false
-
-      if (!q) return true
-
-      const inQuestion = item.question.toLowerCase().includes(q)
-      const inAnswer = item.answer.toLowerCase().includes(q)
-      const inTags = item.tags.some((t) => t.toLowerCase().includes(q))
-      const inDetails = item.details?.some((d) => d.toLowerCase().includes(q))
-
-      return inQuestion || inAnswer || inTags || inDetails
-    })
-  }, [activeCategory, searchQuery])
-
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none">
-      <div className="w-full max-w-[960px] mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16 sm:pb-24 space-y-8 sm:space-y-10">
+      <div className="w-full max-w-[960px] mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16 sm:pb-24 space-y-6 sm:space-y-8">
         
         {/* Sleek, Framed Mascot Banner (Black & White Hero) */}
         <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[3/1] max-h-[220px] sm:max-h-[280px] flex items-center justify-center shadow-2xl">
@@ -388,63 +348,17 @@ export function FaqPageClient() {
           </picture>
         </div>
 
-        {/* Minimal Hero Header */}
-        <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+        {/* Centered Minimalist Title */}
+        <div className="text-center pt-2 sm:pt-4">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
             Frequently Asked Questions
           </h1>
-          <p className="text-sm sm:text-base text-zinc-400 font-normal">
-            Quick answers to common questions about orders, licenses, DAW setup, and selling.
-          </p>
-
-          {/* Minimalist Search Bar */}
-          <div className="relative pt-2 max-w-xl mx-auto">
-            <div className="relative flex items-center">
-              <Search className="w-4 h-4 absolute left-3.5 text-zinc-400 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search questions or keywords..."
-                className="w-full bg-[#18181c] hover:bg-[#1c1c22] focus:bg-[#1c1c22] border border-white/10 focus:border-white text-white text-sm rounded-xl pl-10 pr-9 py-2.5 outline-none transition-all placeholder:text-zinc-500"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 text-xs text-zinc-400 hover:text-white px-1.5 py-0.5 rounded bg-white/10 transition-colors"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Minimal Category Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeCategory === cat.id
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-white text-black font-semibold'
-                    : 'bg-[#18181c] text-zinc-400 hover:text-white hover:bg-[#202024] border border-white/[0.06]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            )
-          })}
         </div>
 
         {/* Expand / Collapse & Question Count */}
         <div className="flex items-center justify-between text-xs text-zinc-400 px-1 border-b border-white/[0.06] pb-3">
           <span>
-            {filteredFaqs.length} {filteredFaqs.length === 1 ? 'question' : 'questions'}
-            {searchQuery ? ` matching "${searchQuery}"` : ''}
+            {FAQ_ITEMS.length} questions
           </span>
           <div className="flex items-center gap-3">
             <button
@@ -464,86 +378,86 @@ export function FaqPageClient() {
         </div>
 
         {/* FAQ Accordions */}
-        {filteredFaqs.length === 0 ? (
-          <div className="border border-white/[0.06] bg-[#16161a] rounded-xl p-8 text-center space-y-3">
-            <p className="text-sm text-zinc-400">
-              No answers found matching &quot;{searchQuery}&quot;.
-            </p>
-            <Link
-              href="/support?tab=raise-ticket"
-              className="inline-flex items-center gap-1.5 text-xs text-white underline underline-offset-4 hover:text-zinc-300"
+        <Accordion
+          type="multiple"
+          variant="filled"
+          indicator="plus"
+          value={openValues}
+          onValueChange={setOpenValues}
+          className="w-full space-y-2.5"
+        >
+          {FAQ_ITEMS.map((faq) => (
+            <AccordionItem
+              key={faq.id}
+              value={faq.id}
+              className="bg-[#16161a] hover:bg-[#1a1a20] transition-colors rounded-xl border border-white/[0.04]"
             >
-              <span>Submit a support ticket</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        ) : (
-          <Accordion
-            type="multiple"
-            variant="filled"
-            indicator="plus"
-            value={openValues}
-            onValueChange={setOpenValues}
-            className="w-full space-y-2.5"
-          >
-            {filteredFaqs.map((faq) => (
-              <AccordionItem
-                key={faq.id}
-                value={faq.id}
-                className="bg-[#16161a] hover:bg-[#1a1a20] transition-colors rounded-xl border border-white/[0.04]"
+              <AccordionTrigger className="px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm sm:text-base font-semibold text-white tracking-tight leading-snug hover:text-white">
+                {faq.question}
+              </AccordionTrigger>
+              <AccordionContent className="px-4 sm:px-5 pb-4 pt-1 space-y-3 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-white/[0.04]">
+                <p className="pt-2 font-normal text-zinc-300">{faq.answer}</p>
+
+                {faq.details && faq.details.length > 0 && (
+                  <ul className="space-y-1.5 pt-1 pl-1">
+                    {faq.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-zinc-400 text-xs sm:text-sm">
+                        <span className="text-zinc-500 mt-0.5">•</span>
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {faq.linkUrl && faq.linkText && (
+                  <div className="pt-1">
+                    <Link
+                      href={faq.linkUrl}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-white hover:text-zinc-300 underline underline-offset-4"
+                    >
+                      <span>{faq.linkText}</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        {/* Minimalistic Ask Our Prody Section */}
+        <div className="pt-10 sm:pt-14 pb-4 border-t border-white/[0.06] text-center">
+          <div className="flex flex-col items-center space-y-3 max-w-md mx-auto">
+            <Image
+              src="/images/support-bot-logo.webp"
+              alt="Prody"
+              width={48}
+              height={48}
+              className="w-12 h-12 object-contain filter drop-shadow-sm opacity-90"
+            />
+            <div className="space-y-1">
+              <h2 className="text-base sm:text-lg font-semibold tracking-tight text-white">
+                Have more questions? Ask Our Prody
+              </h2>
+              <p className="text-xs text-zinc-400 font-normal">
+                Instant AI answers for licenses, orders, DAW setup, and creator support.
+              </p>
+            </div>
+            <div className="pt-1 flex items-center justify-center gap-3">
+              <Link
+                href="/support"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer"
               >
-                <AccordionTrigger className="px-4 sm:px-5 py-3.5 sm:py-4 text-left text-sm sm:text-base font-semibold text-white tracking-tight leading-snug hover:text-white">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="px-4 sm:px-5 pb-4 pt-1 space-y-3 text-xs sm:text-sm text-zinc-300 leading-relaxed border-t border-white/[0.04]">
-                  <p className="pt-2 font-normal text-zinc-300">{faq.answer}</p>
-
-                  {faq.details && faq.details.length > 0 && (
-                    <ul className="space-y-1.5 pt-1 pl-1">
-                      {faq.details.map((detail, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-zinc-400 text-xs sm:text-sm">
-                          <span className="text-zinc-500 mt-0.5">•</span>
-                          <span>{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {faq.linkUrl && faq.linkText && (
-                    <div className="pt-1">
-                      <Link
-                        href={faq.linkUrl}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-white hover:text-zinc-300 underline underline-offset-4"
-                      >
-                        <span>{faq.linkText}</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        )}
-
-        {/* Minimalistic Simple Help Strip */}
-        <div className="pt-6 sm:pt-8 text-center border-t border-white/[0.06] space-y-3">
-          <p className="text-xs sm:text-sm text-zinc-400">
-            Still can’t find what you’re looking for?
-          </p>
-          <div className="flex items-center justify-center gap-3">
-            <Link
-              href="/support?tab=raise-ticket"
-              className="px-4 py-2 bg-white hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors cursor-pointer"
-            >
-              Submit a Ticket
-            </Link>
-            <Link
-              href="/support"
-              className="px-4 py-2 bg-[#18181c] hover:bg-[#202024] text-zinc-300 hover:text-white border border-white/10 text-xs sm:text-sm rounded-lg transition-colors cursor-pointer"
-            >
-              Help Desk
-            </Link>
+                <span>Ask Prody</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                href="/support?tab=raise-ticket"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#18181c] hover:bg-[#202024] text-zinc-300 hover:text-white border border-white/10 text-xs sm:text-sm rounded-lg transition-colors cursor-pointer"
+              >
+                <span>Submit a Ticket</span>
+              </Link>
+            </div>
           </div>
         </div>
 
