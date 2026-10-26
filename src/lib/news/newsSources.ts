@@ -1334,7 +1334,7 @@ function parseRssItems(
       block.match(/<dc:creator><!\[CDATA\[([\s\S]*?)\]\]><\/dc:creator>/i) ||
       block.match(/<dc:creator>([\s\S]*?)<\/dc:creator>/i) ||
       block.match(/<author>([\s\S]*?)<\/author>/i)
-    const creator = cleanText(creatorMatch ? creatorMatch[1] : 'Producer Toy Editorial')
+    const creator = cleanText(creatorMatch ? creatorMatch[1] : 'Producer Toy Editorial - Prody')
 
     // Content or Description snippet
     const contentMatch =

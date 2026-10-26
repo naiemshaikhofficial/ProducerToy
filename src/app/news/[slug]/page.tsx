@@ -161,7 +161,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'article',
       publishedTime: article.published_at,
       modifiedTime: article.published_at,
-      authors: [article.author_name || 'Producer Toy Editorial'],
+      authors: [article.author_name || 'Producer Toy Editorial - Prody'],
       section: article.category,
       tags: keywords,
       images: [
@@ -253,7 +253,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
         author: [
           {
             '@type': 'Person',
-            name: article.author_name || 'Producer Toy Editorial',
+            name: article.author_name || 'Producer Toy Editorial - Prody',
             jobTitle: article.author_role || 'Audio Technology Editor',
           },
         ],

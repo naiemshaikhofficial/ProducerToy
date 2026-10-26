@@ -356,13 +356,17 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
           className="w-full mx-auto"
           style={{ maxWidth: '820px', marginLeft: 'auto', marginRight: 'auto' }}
         >
-          {/* Top Meta Row: Category Pill + Date + Expiry Status */}
+          {/* Top Meta Row: Category Pill + Date + Author + Expiry Status */}
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-3.5 sm:mb-5">
             <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-md bg-[#242426] text-zinc-200 text-xs font-semibold tracking-wide border border-white/5 shadow-sm">
               {displayCategory}
             </span>
             <span className="text-zinc-400 text-xs sm:text-sm font-medium drop-shadow-sm">
               {formattedDate}
+            </span>
+            <span className="text-zinc-600 select-none">•</span>
+            <span className="text-zinc-400 text-xs sm:text-sm font-medium drop-shadow-sm">
+              Author: <strong className="text-zinc-200 font-semibold">{article.author_name || 'Producer Toy Editorial - Prody'}</strong>
             </span>
             {isExpired ? (
               <span className="px-2.5 py-0.5 rounded-md bg-white/5 text-zinc-400 text-xs font-semibold tracking-wide border border-white/10">
@@ -505,7 +509,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
 
           {/* Article Footer Bar: Author & Share */}
           <div className="my-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs sm:text-sm text-zinc-400">
-            <span>Author: <strong className="text-zinc-200 font-semibold">{(article.author_name || 'Producer Toy Editorial').replace(/ProducerToy/gi, 'Producer Toy')}</strong></span>
+            <span>Author: <strong className="text-zinc-200 font-semibold">{article.author_name || 'Producer Toy Editorial - Prody'}</strong></span>
             <button
               onClick={handleCopyLink}
               className="flex items-center gap-1.5 text-zinc-300 hover:text-white transition-colors cursor-pointer"

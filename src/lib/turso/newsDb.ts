@@ -476,7 +476,7 @@ function parseArticleRow(row: any): NewsArticle {
     category: String(row.category || 'Free VSTs'),
     badge: String(row.badge || 'FREEWARE'),
     cover_image: String(row.cover_image || ''),
-    author_name: String(row.author_name || 'Producer Toy Editorial').replace(/ProducerToy/g, 'Producer Toy'),
+    author_name: String(row.author_name || 'Producer Toy Editorial - Prody').replace(/ProducerToy/g, 'Producer Toy'),
     author_role: String(row.author_role || 'Audio Technology Editor'),
     reading_time: String(row.reading_time || '4 MIN READ'),
     source_name: String(row.source_name || 'Bedroom Producers Blog'),
