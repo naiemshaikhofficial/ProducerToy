@@ -13,6 +13,18 @@ export async function POST(req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
+    // 1. Strict Authentication Check: Anonymous pairing is prohibited
+    if (!user || !user.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Please sign in to your ProducerToy account to pair your workstation.',
+          needsAuth: true,
+        },
+        { status: 401 }
+      )
+    }
+
     const body = await req.json().catch(() => ({}))
     const rawCode = body.code || body.pairingCode
 
@@ -27,7 +39,7 @@ export async function POST(req: NextRequest) {
     const codeHash = sha256(cleanCode)
     const admin = getAdminClient()
 
-    // 1. Fetch challenge
+    // 2. Fetch challenge
     const { data: challenge, error: chErr } = await admin
       .from('activation_challenges')
       .select('*, products(id, name, slug, plugin_identifier, max_activation_seats, offline_grace_days)')
@@ -69,30 +81,84 @@ export async function POST(req: NextRequest) {
       offline_grace_days: 14,
     }
 
-    const customerEmail =
-      user?.email ||
-      body.customerEmail ||
-      'customer@producertoy.com'
+    const userEmail = (user.email || '').trim().toLowerCase()
 
+    // 3. Strict Library Entitlement Check:
+    // User MUST own the product in purchases or have claimed it as a gift
+    let matchingPurchase: any = null
+
+    // Check purchases table by user_id
+    const { data: userPurchases } = await admin
+      .from('purchases')
+      .select('id, user_id, product_id, customer_email')
+      .eq('user_id', user.id)
+      .eq('product_id', product.id)
+      .limit(1)
+
+    if (userPurchases && userPurchases.length > 0) {
+      matchingPurchase = userPurchases[0]
+    } else if (userEmail) {
+      // Fallback check purchases table by customer_email (e.g. bought before signing in)
+      const { data: emailPurchases } = await admin
+        .from('purchases')
+        .select('id, user_id, product_id, customer_email')
+        .ilike('customer_email', userEmail)
+        .eq('product_id', product.id)
+        .limit(1)
+
+      if (emailPurchases && emailPurchases.length > 0) {
+        matchingPurchase = emailPurchases[0]
+        // Link user_id to this purchase record if not linked
+        if (!matchingPurchase.user_id) {
+          await admin
+            .from('purchases')
+            .update({ user_id: user.id })
+            .eq('id', matchingPurchase.id)
+        }
+      }
+    }
+
+    // If still not found, check claimed gifts
+    if (!matchingPurchase) {
+      const { data: userGift } = await admin
+        .from('gifts')
+        .select('id, product_id')
+        .eq('status', 'claimed')
+        .eq('product_id', product.id)
+        .or(`recipient_user_id.eq.${user.id}${userEmail ? `,recipient_email.ilike.${userEmail}` : ''}`)
+        .limit(1)
+
+      if (!userGift || userGift.length === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `${product.name} is not in your ProducerToy library. Please add it to your library first.`,
+            needsPurchase: true,
+            productSlug: product.slug || 'proverb',
+            productName: product.name,
+          },
+          { status: 403 }
+        )
+      }
+    }
+
+    const customerEmail = user.email || 'customer@producertoy.com'
     const customerName =
-      user?.user_metadata?.full_name ||
-      user?.user_metadata?.name ||
-      body.customerName ||
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
       customerEmail.split('@')[0] ||
       'Producer'
 
-    // 2. Strict Single-Device / Multi-seat policy enforcement
-    // Automatically revoke old seats for this user & product if single-device
-    if (user?.id) {
-      await admin
-        .from('device_activations')
-        .update({ is_active: false, revoked_at: new Date().toISOString() })
-        .eq('user_id', user.id)
-        .eq('product_id', product.id)
-        .neq('device_id_hash', challenge.device_id_hash)
-    }
+    // 4. Strict Single-Device / Multi-seat policy enforcement
+    // Automatically revoke old seats for this user & product
+    await admin
+      .from('device_activations')
+      .update({ is_active: false, revoked_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .eq('product_id', product.id)
+      .neq('device_id_hash', challenge.device_id_hash)
 
-    // 3. Issue Ed25519 token
+    // 5. Issue Ed25519 token
     const activationId = crypto.randomUUID()
     const entitlement = issueEd25519LicenseToken({
       product: {
@@ -107,13 +173,14 @@ export async function POST(req: NextRequest) {
       activationId,
     })
 
-    // 4. Record device activation
+    // 6. Record device activation
     await admin
       .from('device_activations')
       .upsert({
         id: activationId,
-        user_id: user?.id || null,
+        user_id: user.id,
         product_id: product.id,
+        purchase_id: matchingPurchase?.id || null,
         device_id_hash: challenge.device_id_hash,
         device_name: challenge.device_name || 'Studio Workstation',
         os: challenge.os || 'Windows',
@@ -123,12 +190,12 @@ export async function POST(req: NextRequest) {
         last_seen_at: new Date().toISOString(),
       }, { onConflict: 'id' })
 
-    // 5. Mark challenge as claimed
+    // 7. Mark challenge as claimed
     await admin
       .from('activation_challenges')
       .update({
         status: 'claimed',
-        user_id: user?.id || null,
+        user_id: user.id,
         entitlement_token: entitlement.token,
         claimed_at: new Date().toISOString(),
       })

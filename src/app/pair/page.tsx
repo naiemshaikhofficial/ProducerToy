@@ -1,14 +1,21 @@
 'use client'
 
 import React, { useState, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 
 function PairForm() {
+  const router = useRouter()
   const searchParams = useSearchParams()
+  const { user, loading: authLoading } = useAuth()
+
   const [code, setCode] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const [needsPurchase, setNeedsPurchase] = useState(false)
+  const [productSlug, setProductSlug] = useState('proverb')
 
   useEffect(() => {
     const urlCode = searchParams?.get('code')
@@ -25,8 +32,15 @@ function PairForm() {
       return
     }
 
+    if (!user) {
+      const targetUrl = `/auth?next=${encodeURIComponent('/pair' + (code ? `?code=${code}` : ''))}`
+      router.push(targetUrl)
+      return
+    }
+
     setStatus('loading')
     setMessage('')
+    setNeedsPurchase(false)
 
     try {
       const res = await fetch('/api/v1/license/pair/claim', {
@@ -42,11 +56,22 @@ function PairForm() {
       } else {
         setStatus('error')
         setMessage(data.error || 'Failed to authorize pairing code. Please generate a new code in ProVerb.')
+        if (data.needsPurchase) {
+          setNeedsPurchase(true)
+          if (data.productSlug) {
+            setProductSlug(data.productSlug)
+          }
+        }
       }
     } catch (err: any) {
       setStatus('error')
       setMessage(err.message || 'Network error connecting to licensing engine.')
     }
+  }
+
+  const handleSignInRedirect = () => {
+    const targetUrl = `/auth?next=${encodeURIComponent('/pair' + (code ? `?code=${code}` : ''))}`
+    router.push(targetUrl)
   }
 
   return (
@@ -67,7 +92,7 @@ function PairForm() {
         <h1 className="text-2xl font-bold tracking-tight text-white mb-2">
           Pair Machine
         </h1>
-        <p className="text-sm text-[#a0a0a0] mb-8 leading-relaxed max-w-sm">
+        <p className="text-sm text-[#a0a0a0] mb-6 leading-relaxed max-w-sm">
           Enter your single-use code to pair your audio workstation with your ProducerToy account.
         </p>
 
@@ -85,6 +110,22 @@ function PairForm() {
           </div>
         ) : (
           <form onSubmit={handlePair} className="w-full space-y-4">
+            {/* Account Info Pill */}
+            {!authLoading && user && (
+              <div className="flex items-center justify-between bg-[#18181b] border border-[#27272a] rounded-xl px-3.5 py-2 text-xs text-[#a1a1aa] mb-2">
+                <span className="truncate">
+                  Signed in as <strong className="text-white font-medium">{user.email}</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSignInRedirect}
+                  className="ml-2 text-xs text-[#71717a] hover:text-white transition-colors cursor-pointer flex-shrink-0"
+                >
+                  Switch
+                </button>
+              </div>
+            )}
+
             <div>
               <input
                 type="text"
@@ -97,19 +138,45 @@ function PairForm() {
               />
             </div>
 
+            {/* Error Message with Auth-style subtle rose pill */}
             {status === 'error' && (
-              <div className="text-xs text-rose-400 bg-rose-500/10 rounded-lg p-3 leading-relaxed border border-rose-500/20">
+              <div className="text-xs text-rose-400 bg-rose-500/10 rounded-lg p-3 leading-relaxed border border-rose-500/20 text-left">
                 {message}
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shadow-lg shadow-white/5"
-            >
-              {status === 'loading' ? 'Authorizing Machine...' : 'Authorize Machine'}
-            </button>
+            {/* If user is NOT signed in: enforce sign-in first */}
+            {!authLoading && !user ? (
+              <div className="space-y-3 pt-1">
+                <div className="text-xs text-[#a1a1aa] bg-[#18181b] rounded-xl p-3 leading-relaxed border border-[#27272a] text-center">
+                  Sign in required. Only accounts that have ProVerb in their library can authorize machines.
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSignInRedirect}
+                  className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] transition-all cursor-pointer shadow-lg shadow-white/5"
+                >
+                  Sign In to Authorize
+                </button>
+              </div>
+            ) : needsPurchase ? (
+              /* If user doesn't have the product in library */
+              <Link
+                href={`/product/${productSlug}`}
+                className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] transition-all cursor-pointer shadow-lg shadow-white/5 flex items-center justify-center"
+              >
+                Get ProVerb Free & Add to Library
+              </Link>
+            ) : (
+              /* Authenticated user ready to authorize */
+              <button
+                type="submit"
+                disabled={status === 'loading' || authLoading}
+                className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer shadow-lg shadow-white/5"
+              >
+                {status === 'loading' ? 'Authorizing Machine...' : 'Authorize Machine'}
+              </button>
+            )}
           </form>
         )}
       </div>
