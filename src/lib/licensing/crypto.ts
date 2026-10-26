@@ -22,24 +22,27 @@ export interface EntitlementPayload {
   grace_days: number // Offline grace allowance (days)
 }
 
-// Master Server Ed25519 Private Key in PEM format (or loaded from environment variable)
-// Default development fallback keypair for ProducerToy test environment
-const DEFAULT_DEV_PRIVATE_KEY_PEM = `-----BEGIN PRIVATE KEY-----
-MC4CAQAwBQYDK2VwBCIEICv6sCY5rkoY0vI7L1PLXwXG3Cz1wLOLWP5MqPJPaeDD
------END PRIVATE KEY-----`
-
+// Server Ed25519 Private Key loaded exclusively from environment variables
 export function getServerPrivateKey(): crypto.KeyObject {
-  const envKey = process.env.LICENSE_ED25519_PRIVATE_KEY
-  if (envKey) {
+  let envKey = process.env.LICENSE_ED25519_PRIVATE_KEY || process.env.PROVERB_ED25519_PRIVATE_KEY_PEM
+
+  // Fallback to local machine developer key file if running in local development
+  if (!envKey && process.env.LOCALAPPDATA) {
     try {
-      return crypto.createPrivateKey(envKey.replace(/\\n/g, '\n'))
-    } catch (e) {
-      console.warn('Failed to parse LICENSE_ED25519_PRIVATE_KEY, falling back to default key:', e)
-    }
+      const fs = require('fs')
+      const path = require('path')
+      const localPath = path.join(process.env.LOCALAPPDATA, 'ProducerToy', 'Licensing', 'ProVerb', 'proverb-ed25519-private.pem')
+      if (fs.existsSync(localPath)) {
+        envKey = fs.readFileSync(localPath, 'utf8')
+      }
+    } catch {}
   }
 
-  // Deterministic default development key
-  return crypto.createPrivateKey(DEFAULT_DEV_PRIVATE_KEY_PEM)
+  if (!envKey) {
+    throw new Error('LICENSE_ED25519_PRIVATE_KEY / PROVERB_ED25519_PRIVATE_KEY_PEM environment variable is not configured.')
+  }
+
+  return crypto.createPrivateKey(envKey.replace(/\\n/g, '\n'))
 }
 
 export function getServerPublicKey(): crypto.KeyObject {
@@ -137,3 +140,61 @@ export function verifyEntitlementToken(token: string): {
     return { valid: false, error: err.message || 'Token verification exception' }
   }
 }
+
+export interface IssueLicenseOptions {
+  product: {
+    id: string
+    name: string
+    brand?: string
+    plugin_identifier: string
+  }
+  deviceId: string
+  userName?: string
+  userEmail?: string
+  activationId?: string
+}
+
+/**
+ * Issues a cryptographically signed Ed25519 v2 license token.
+ * Validated by ProVerb C++ JUCE engine via Ed25519Verifier.
+ */
+export function issueEd25519LicenseToken(options: IssueLicenseOptions): {
+  token: string
+  activationId: string
+  payload: any
+} {
+  const now = Math.floor(Date.now() / 1000)
+  const cleanDevId = (options.deviceId || '').trim().toLowerCase().replace(/[^0-9a-f]/g, '')
+  const activationId = options.activationId || crypto.randomUUID()
+  const privKey = getServerPrivateKey()
+
+  const payload = {
+    v: 2,
+    iss: 'producertoy.com',
+    aud: options.product.plugin_identifier || 'com.producertoy.proverb',
+    pid: options.product.id,
+    product_name: options.product.name,
+    brand: options.product.brand || 'Producer Toy',
+    plugin_id: options.product.plugin_identifier || 'com.producertoy.proverb',
+    kid: 'proverb-ed25519-2026-10-v2',
+    status: 'active',
+    aid: activationId,
+    dev_hash: cleanDevId,
+    user_name: options.userName || 'ProducerToy Licensed Artist',
+    user_email_masked: maskEmail(options.userEmail || ''),
+    tier: 'perpetual',
+    iat: now,
+    nbf: now,
+    exp: 0, // Perpetual license
+  }
+
+  const encodedPayload = Buffer.from(JSON.stringify(payload), 'utf8').toString('base64url')
+  const signature = crypto.sign(null, Buffer.from(encodedPayload, 'ascii'), privKey).toString('base64url')
+
+  return {
+    token: `${encodedPayload}.${signature}`,
+    activationId,
+    payload,
+  }
+}
+
