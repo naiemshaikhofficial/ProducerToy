@@ -1,5 +1,6 @@
 'use server'
 
+import crypto from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase/admin'
 import { signDownloadToken } from '@/lib/security'
@@ -48,7 +49,7 @@ export async function getUserLibraryAction(): Promise<LibraryDataResult> {
 
   const downloadTokens: Record<string, string> = {}
   if (purchases && purchases.length > 0) {
-    purchases.forEach((item: any) => {
+    for (const item of purchases as any[]) {
       const product = item.products
       if (product) {
         downloadTokens[product.id] = signDownloadToken(
@@ -60,8 +61,48 @@ export async function getUserLibraryAction(): Promise<LibraryDataResult> {
           },
           3600
         )
+
+        // Automatically generate and persist genuine serial key if missing for any marketplace plugin
+        const isLicensedPlugin =
+          product.product_type === 'plugin' ||
+          Boolean(product.plugin_identifier) ||
+          Boolean(product.license_delivery_type) ||
+          Boolean(product.delivery_method && String(product.delivery_method).toLowerCase().includes('serial')) ||
+          Boolean(product.delivery_method && String(product.delivery_method).toLowerCase().includes('license'))
+
+        if (isLicensedPlugin && (!item.serial_key || typeof item.serial_key !== 'string' || !item.serial_key.trim())) {
+          const rawPrefix =
+            product.serial_prefix ||
+            product.brands?.name ||
+            product.brand ||
+            product.slug ||
+            product.name ||
+            'PLUG'
+
+          const cleanPrefix =
+            String(rawPrefix)
+              .toUpperCase()
+              .replace(/[^A-Z0-9]/g, '')
+              .slice(0, 4) || 'PLUG'
+
+          const partA = crypto.randomBytes(2).toString('hex').toUpperCase()
+          const partB = crypto.randomBytes(2).toString('hex').toUpperCase()
+          const partC = crypto.randomBytes(2).toString('hex').toUpperCase()
+          const partD = crypto.randomBytes(2).toString('hex').toUpperCase()
+          const generatedSerial = `PT-${cleanPrefix}-${partA}-${partB}-${partC}-${partD}`
+
+          try {
+            await adminSupabase
+              .from('purchases')
+              .update({ serial_key: generatedSerial })
+              .eq('id', item.id)
+            item.serial_key = generatedSerial
+          } catch (e) {
+            console.warn(`[LIBRARY] Error auto-persisting serial for ${product.slug || product.id}:`, e)
+          }
+        }
       }
-    })
+    }
   }
 
   const userName =

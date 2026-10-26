@@ -171,6 +171,61 @@ export function EpicLibraryClient({
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
 
+  // Offline License File (.ptlic) State
+  const [offlineDeviceId, setOfflineDeviceId] = useState('')
+  const [showOfflineLicenseInput, setShowOfflineLicenseInput] = useState(false)
+  const [isDownloadingOfflineLicense, setIsDownloadingOfflineLicense] = useState(false)
+  const [offlineLicenseError, setOfflineLicenseError] = useState<string | null>(null)
+  const [offlineLicenseSuccess, setOfflineLicenseSuccess] = useState(false)
+
+  const handleDownloadOfflineLicense = async (productId: string, slug?: string) => {
+    if (!offlineDeviceId.trim()) {
+      setOfflineLicenseError('Please paste your 64-character Device ID from your plugin.')
+      return
+    }
+
+    const clean = offlineDeviceId.trim().toLowerCase().replace(/[^0-9a-f]/g, '')
+    if (clean.length !== 64) {
+      setOfflineLicenseError('Device ID must be exactly 64 hexadecimal characters. Copy it from your plugin under "Offline File" tab.')
+      return
+    }
+
+    setIsDownloadingOfflineLicense(true)
+    setOfflineLicenseError(null)
+
+    try {
+      const res = await fetch('/api/v1/license/offline/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId, deviceId: clean }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setOfflineLicenseError(data.error || 'Failed to generate offline license.')
+        return
+      }
+
+      const blob = await res.blob()
+      const filename = `${(slug || 'license').toLowerCase()}.ptlic`
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+
+      setOfflineLicenseSuccess(true)
+      setTimeout(() => setOfflineLicenseSuccess(false), 5000)
+    } catch (err: any) {
+      setOfflineLicenseError(err.message || 'Error downloading license file.')
+    } finally {
+      setIsDownloadingOfflineLicense(false)
+    }
+  }
+
   const handleStartDownload = async (productId: string, platform: 'windows' | 'mac' | 'universal') => {
     try {
       setIsDownloading(true)
@@ -1068,6 +1123,89 @@ export function EpicLibraryClient({
                         </>
                       )}
                     </button>
+                  </div>
+                )}
+
+                {/* Offline License (.ptlic) Section for any plugin */}
+                {!isSamplePack && (
+                  <div className="bg-[#181818] border border-[#262626] rounded-xl p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="min-w-0 pr-2">
+                        <span className="text-[10px] uppercase tracking-wider text-zinc-400 font-semibold block">
+                          Offline License File (.ptlic)
+                        </span>
+                        <span className="text-[11px] text-zinc-500 block truncate">
+                          For studio workstations without an active internet connection
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowOfflineLicenseInput(!showOfflineLicenseInput)
+                          setOfflineLicenseError(null)
+                        }}
+                        className="text-xs text-zinc-300 hover:text-white font-medium px-2.5 py-1 bg-[#222222] hover:bg-[#282828] border border-[#333333] rounded-lg transition-colors cursor-pointer flex-shrink-0"
+                      >
+                        {showOfflineLicenseInput ? 'Close' : 'Generate .ptlic'}
+                      </button>
+                    </div>
+
+                    {showOfflineLicenseInput && (
+                      <div className="pt-2 border-t border-[#242424] space-y-2 animate-in fade-in">
+                        <p className="text-[10.5px] text-zinc-400 leading-relaxed text-left">
+                          Copy your 64-character Device ID from your plugin (under <strong>Offline File</strong> tab) and paste it below:
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={offlineDeviceId}
+                            onChange={(e) => {
+                              setOfflineDeviceId(e.target.value)
+                              setOfflineLicenseError(null)
+                            }}
+                            placeholder="Paste 64-character Device ID"
+                            className="flex-1 h-9 bg-[#121214] border border-[#2c2c30] rounded-lg px-2.5 text-xs text-white font-mono placeholder:text-zinc-600 focus:outline-none focus:border-zinc-400 transition-all"
+                          />
+                          <button
+                            type="button"
+                            disabled={isDownloadingOfflineLicense}
+                            onClick={() =>
+                              handleDownloadOfflineLicense(
+                                product.id || installProduct.product_id || installProduct.id,
+                                product.slug
+                              )
+                            }
+                            className="h-9 px-3.5 bg-white text-black font-semibold text-xs rounded-lg hover:bg-zinc-200 transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5 flex-shrink-0"
+                          >
+                            {isDownloadingOfflineLicense ? (
+                              <div className="w-3.5 h-3.5 rounded-full border-2 border-zinc-500 border-t-black animate-spin" />
+                            ) : offlineLicenseSuccess ? (
+                              <>
+                                <Check className="w-3.5 h-3.5" />
+                                <span>Downloaded</span>
+                              </>
+                            ) : (
+                              <>
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Download .ptlic</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {offlineLicenseError && (
+                          <div className="text-[11px] text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg p-2 text-left">
+                            {offlineLicenseError}
+                          </div>
+                        )}
+
+                        {offlineLicenseSuccess && (
+                          <div className="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2 text-left">
+                            ✓ License file downloaded! Move the <strong>.ptlic</strong> file to your studio machine and click &quot;Choose License File&quot; in your plugin.
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 

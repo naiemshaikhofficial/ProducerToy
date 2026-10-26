@@ -67,18 +67,26 @@ export async function POST(req: NextRequest) {
         .eq('id', challenge.id)
 
       return NextResponse.json(
-        { success: false, error: 'This pairing code has expired. Please click Start Online Pairing again in ProVerb.' },
+        { success: false, error: 'This pairing code has expired. Please click Start Online Pairing again in your plugin.' },
         { status: 410 }
       )
     }
 
-    const product = challenge.products || {
-      id: challenge.product_id,
-      name: 'ProVerb',
-      slug: 'proverb',
-      plugin_identifier: 'com.producertoy.proverb',
-      max_activation_seats: 3,
-      offline_grace_days: 14,
+    let product = challenge.products
+    if (!product) {
+      const { data: dbProd } = await admin
+        .from('products')
+        .select('id, name, slug, plugin_identifier, max_activation_seats, offline_grace_days')
+        .eq('id', challenge.product_id)
+        .maybeSingle()
+      product = dbProd
+    }
+
+    if (!product) {
+      return NextResponse.json(
+        { success: false, error: 'Product associated with this pairing challenge could not be found.' },
+        { status: 404 }
+      )
     }
 
     const userEmail = (user.email || '').trim().toLowerCase()

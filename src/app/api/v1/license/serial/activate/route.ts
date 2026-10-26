@@ -5,10 +5,6 @@ import { sha256, issueEd25519LicenseToken } from '@/lib/licensing/crypto'
 
 export const dynamic = 'force-dynamic'
 
-const DEFAULT_PRODUCT_ID = '92cf2454-2cfc-4db5-b210-2c732457605f'
-const DEFAULT_PLUGIN_ID = 'com.producertoy.proverb'
-const DEFAULT_PRODUCT_NAME = 'ProVerb'
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
@@ -32,15 +28,13 @@ export async function POST(req: NextRequest) {
     const cleanSerial = serialKey.trim().toUpperCase()
     const admin = getAdminClient()
 
-    // 1. Resolve product
-    const targetId = productId || DEFAULT_PRODUCT_ID
-    let resolvedProductId = DEFAULT_PRODUCT_ID
-    let productName = DEFAULT_PRODUCT_NAME
-    let pluginIdentifier = DEFAULT_PLUGIN_ID
+    // 1. Resolve product dynamically
+    let resolvedProduct: any = null
 
-    try {
+    if (productId && typeof productId === 'string') {
+      const targetId = productId.trim()
       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId)
-      let query = admin.from('products').select('id, name, slug, plugin_identifier').limit(1)
+      let query = admin.from('products').select('id, name, slug, plugin_identifier, max_activation_seats, brands(name)').limit(1)
 
       if (isUUID) {
         query = query.eq('id', targetId)
@@ -50,35 +44,136 @@ export async function POST(req: NextRequest) {
 
       const { data: prods } = await query
       if (prods && prods.length > 0) {
-        resolvedProductId = prods[0].id
-        productName = prods[0].name
-        pluginIdentifier = prods[0].plugin_identifier || DEFAULT_PLUGIN_ID
+        resolvedProduct = prods[0]
       }
-    } catch (e) {
-      console.warn('Product resolution fallback used:', e)
     }
 
-    // 2. Issue Ed25519 token
+    // If productId wasn't provided or didn't match, resolve dynamically from the purchase row by serial_key
+    if (!resolvedProduct) {
+      const { data: directPurchase } = await admin
+        .from('purchases')
+        .select('*, products(id, name, slug, plugin_identifier, max_activation_seats, brands(name))')
+        .ilike('serial_key', cleanSerial)
+        .limit(1)
+        .maybeSingle()
+
+      if (directPurchase?.products) {
+        resolvedProduct = directPurchase.products
+      }
+    }
+
+    if (!resolvedProduct) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid or unregistered serial key. Please copy the genuine serial key from your ProducerToy Library.',
+        },
+        { status: 403 }
+      )
+    }
+
+    const resolvedProductId = resolvedProduct.id
+    const productName = resolvedProduct.name
+    const pluginIdentifier = resolvedProduct.plugin_identifier || `com.producertoy.${resolvedProduct.slug}`
+    const brandName = resolvedProduct.brands?.name || 'Producer Toy'
+
+    // 2. Strict Database Verification: Serial MUST exist in purchases or serial_keys for this product
+    const { data: purchase, error: pErr } = await admin
+      .from('purchases')
+      .select('id, user_id, customer_email, customer_name, product_id, serial_key')
+      .eq('product_id', resolvedProductId)
+      .eq('serial_key', cleanSerial)
+      .limit(1)
+      .maybeSingle()
+
+    let verifiedPurchase = purchase
+
+    if (pErr || !verifiedPurchase) {
+      // Also check case-insensitive match on purchases
+      const { data: ilikePurchase } = await admin
+        .from('purchases')
+        .select('id, user_id, customer_email, customer_name, product_id, serial_key')
+        .eq('product_id', resolvedProductId)
+        .ilike('serial_key', cleanSerial)
+        .limit(1)
+        .maybeSingle()
+
+      if (ilikePurchase) {
+        verifiedPurchase = ilikePurchase
+      }
+    }
+
+    if (!verifiedPurchase) {
+      // Check preloaded serial_keys pool
+      const { data: poolKey } = await admin
+        .from('serial_keys')
+        .select('id, product_id, serial_key, is_used, assigned_to_user_id')
+        .eq('product_id', resolvedProductId)
+        .eq('serial_key', cleanSerial)
+        .limit(1)
+        .maybeSingle()
+
+      if (!poolKey) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Invalid or unregistered serial key. Please check your ProducerToy Library for your official serial key.',
+          },
+          { status: 403 }
+        )
+      }
+    }
+
+    const customerEmail = verifiedPurchase?.customer_email || 'licensed@producertoy.com'
+    const customerName =
+      verifiedPurchase?.customer_name ||
+      customerEmail.split('@')[0] ||
+      'Producer'
+    const ownerUserId = verifiedPurchase?.user_id || null
+
+    // 3. Multi-seat management (max 3 devices per customer)
+    if (ownerUserId) {
+      const { data: activeSeats } = await admin
+        .from('device_activations')
+        .select('id, activated_at')
+        .eq('user_id', ownerUserId)
+        .eq('product_id', resolvedProductId)
+        .eq('is_active', true)
+        .order('activated_at', { ascending: true })
+
+      const maxAllowedSeats = Number(resolvedProduct.max_activation_seats) || 3
+      if (activeSeats && activeSeats.length >= maxAllowedSeats) {
+        // Automatically cycle oldest seat
+        await admin
+          .from('device_activations')
+          .update({ is_active: false, revoked_at: new Date().toISOString() })
+          .eq('id', activeSeats[0].id)
+      }
+    }
+
+    // 4. Issue Ed25519 token
     const activationId = crypto.randomUUID()
     const entitlement = issueEd25519LicenseToken({
       product: {
         id: resolvedProductId,
         name: productName,
-        brand: 'Producer Toy',
+        brand: brandName,
         plugin_identifier: pluginIdentifier,
       },
       deviceId: cleanDevId,
-      userName: 'ProducerToy Verified Artist',
-      userEmail: 'licensed@producertoy.com',
+      userName: customerName,
+      userEmail: customerEmail,
       activationId,
     })
 
-    // 3. Record device activation
+    // 5. Record device activation
     try {
       await admin
         .from('device_activations')
         .upsert({
           id: activationId,
+          user_id: ownerUserId,
+          purchase_id: verifiedPurchase?.id || null,
           product_id: resolvedProductId,
           device_id_hash: cleanDevId,
           device_name: (deviceName || 'Studio Workstation').slice(0, 64),

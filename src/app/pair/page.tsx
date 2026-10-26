@@ -15,7 +15,8 @@ function PairForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [needsPurchase, setNeedsPurchase] = useState(false)
-  const [productSlug, setProductSlug] = useState('proverb')
+  const [productSlug, setProductSlug] = useState('')
+  const [productName, setProductName] = useState('')
 
   useEffect(() => {
     const urlCode = searchParams?.get('code')
@@ -28,7 +29,7 @@ function PairForm() {
     if (e) e.preventDefault()
     if (!code.trim()) {
       setStatus('error')
-      setMessage('Please enter your pairing code from ProVerb.')
+      setMessage('Please enter your pairing code from your plugin.')
       return
     }
 
@@ -52,15 +53,15 @@ function PairForm() {
       const data = await res.json()
       if (res.ok && data.success) {
         setStatus('success')
-        setMessage(data.message || 'Machine successfully paired! ProVerb is now unlocked.')
+        setMessage(data.message || 'Machine successfully paired! Your plugin is now unlocked.')
+        if (data.productName) setProductName(data.productName)
       } else {
         setStatus('error')
-        setMessage(data.error || 'Failed to authorize pairing code. Please generate a new code in ProVerb.')
+        setMessage(data.error || 'Failed to authorize pairing code. Please generate a new code in your plugin.')
         if (data.needsPurchase) {
           setNeedsPurchase(true)
-          if (data.productSlug) {
-            setProductSlug(data.productSlug)
-          }
+          if (data.productSlug) setProductSlug(data.productSlug)
+          if (data.productName) setProductName(data.productName)
         }
       }
     } catch (err: any) {
@@ -105,7 +106,7 @@ function PairForm() {
               Machine Authorized
             </h2>
             <p className="text-xs text-[#a0a0a0] leading-relaxed">
-              You can return to your DAW now. ProVerb is unlocked and ready to use.
+              You can return to your DAW now. {productName ? `${productName} is unlocked and ready to use.` : 'Your plugin is unlocked and ready to use.'}
             </p>
           </div>
         ) : (
@@ -131,7 +132,7 @@ function PairForm() {
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="PV-XXXX-XXXX"
+                placeholder="XX-XXXX-XXXX"
                 className="w-full h-14 bg-[#1a1a1c] text-white text-center text-xl font-mono tracking-widest rounded-xl px-4 border border-[#2a2a2d] focus:border-[#52525b] focus:outline-none transition-all placeholder:text-[#52525b] placeholder:tracking-normal"
                 disabled={status === 'loading'}
                 autoFocus
@@ -149,7 +150,7 @@ function PairForm() {
             {!authLoading && !user ? (
               <div className="space-y-3 pt-1">
                 <div className="text-xs text-[#a1a1aa] bg-[#18181b] rounded-xl p-3 leading-relaxed border border-[#27272a] text-center">
-                  Sign in required. Only accounts that have ProVerb in their library can authorize machines.
+                  Sign in required. Only accounts that own the plugin in their library can authorize machines.
                 </div>
                 <button
                   type="button"
@@ -162,10 +163,10 @@ function PairForm() {
             ) : needsPurchase ? (
               /* If user doesn't have the product in library */
               <Link
-                href={`/product/${productSlug}`}
+                href={productSlug ? `/product/${productSlug}` : '/store'}
                 className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] transition-all cursor-pointer shadow-lg shadow-white/5 flex items-center justify-center"
               >
-                Get ProVerb Free & Add to Library
+                {productName ? `Get ${productName} & Add to Library` : 'Add Plugin to Library'}
               </Link>
             ) : (
               /* Authenticated user ready to authorize */

@@ -5,10 +5,6 @@ import { sha256 } from '@/lib/licensing/crypto'
 
 export const dynamic = 'force-dynamic'
 
-const DEFAULT_PRODUCT_ID = '92cf2454-2cfc-4db5-b210-2c732457605f'
-const DEFAULT_PLUGIN_ID = 'com.producertoy.proverb'
-const DEFAULT_PRODUCT_NAME = 'ProVerb'
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
@@ -24,34 +20,45 @@ export async function POST(req: NextRequest) {
 
     const admin = getAdminClient()
 
-    // 1. Resolve product from Supabase catalog
-    const targetId = productId || DEFAULT_PRODUCT_ID
-    let resolvedProductId = DEFAULT_PRODUCT_ID
-    let productName = DEFAULT_PRODUCT_NAME
-
-    try {
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId)
-      let query = admin.from('products').select('id, name, slug, plugin_identifier').limit(1)
-
-      if (isUUID) {
-        query = query.eq('id', targetId)
-      } else {
-        query = query.or(`slug.eq.${targetId},plugin_identifier.eq.${targetId},name.ilike.${targetId}`)
-      }
-
-      const { data: prods } = await query
-      if (prods && prods.length > 0) {
-        resolvedProductId = prods[0].id
-        productName = prods[0].name
-      }
-    } catch (e) {
-      console.warn('Product resolution fallback used:', e)
+    // 1. Dynamically resolve product from Supabase catalog
+    if (!productId || typeof productId !== 'string') {
+      return NextResponse.json(
+        { success: false, error: 'Product identifier (UUID, slug, or plugin_identifier) is required.' },
+        { status: 400 }
+      )
     }
 
-    // 2. Generate short-lived pairing code (e.g. PV-7B9A-2K4F)
+    const targetId = productId.trim()
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetId)
+    let query = admin.from('products').select('id, name, slug, plugin_identifier').limit(1)
+
+    if (isUUID) {
+      query = query.eq('id', targetId)
+    } else {
+      query = query.or(`slug.eq.${targetId},plugin_identifier.eq.${targetId},name.ilike.${targetId}`)
+    }
+
+    const { data: prods, error: prodErr } = await query
+    if (prodErr || !prods || prods.length === 0) {
+      return NextResponse.json(
+        { success: false, error: `Product "${targetId}" not found in marketplace catalog.` },
+        { status: 404 }
+      )
+    }
+
+    const matchedProduct = prods[0]
+    const resolvedProductId = matchedProduct.id
+    const productName = matchedProduct.name
+
+    // 2. Dynamically generate short-lived pairing code (e.g. PV-7B9A-2K4F, EQ-1A2B-3C4D)
+    const rawPrefix = (matchedProduct.slug || matchedProduct.name || 'PT')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, 2)
+      .toUpperCase() || 'PT'
+
     const part1 = crypto.randomBytes(2).toString('hex').toUpperCase()
     const part2 = crypto.randomBytes(2).toString('hex').toUpperCase()
-    const code = `PV-${part1}-${part2}`
+    const code = `${rawPrefix}-${part1}-${part2}`
     const codeHash = sha256(code)
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 mins TTL
 
