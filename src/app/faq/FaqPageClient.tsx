@@ -334,7 +334,7 @@ export function FaqPageClient() {
   return (
     <div className="w-full bg-[#121212] min-h-screen text-white select-none">
       <div className="w-full max-w-[960px] mx-auto px-4 sm:px-6 pt-6 sm:pt-10 pb-16 sm:pb-24 space-y-6 sm:space-y-8">
-        
+
         {/* Sleek, Framed Mascot Banner (Black & White Hero) */}
         <div className="relative w-full rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[3/1] max-h-[220px] sm:max-h-[280px] flex items-center justify-center shadow-2xl">
           <picture className="w-full h-full flex items-center justify-center grayscale contrast-125">
@@ -439,9 +439,7 @@ export function FaqPageClient() {
               <h2 className="text-base sm:text-lg font-semibold tracking-tight text-white">
                 Have more questions? Ask Our Prody
               </h2>
-              <p className="text-xs text-zinc-400 font-normal">
-                Instant AI answers for licenses, orders, DAW setup, and creator support.
-              </p>
+
             </div>
             <div className="pt-1 flex items-center justify-center gap-3">
               <Link
