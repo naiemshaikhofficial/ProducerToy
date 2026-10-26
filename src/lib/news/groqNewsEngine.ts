@@ -184,11 +184,20 @@ export async function rewriteNewsWithGroq(item: RawFeedItem): Promise<NewsArticl
         // Enforce brand and exact product name integrity (prevent AI from inventing fictional titles)
         const verifiedBrand = (item as any).brand
         const verifiedProductName = (item as any).productName
-        if (verifiedBrand && rewritten.title && !rewritten.title.toUpperCase().includes(verifiedBrand.toUpperCase())) {
-          rewritten.title = `${verifiedBrand} ${rewritten.title}`
+        if (verifiedBrand && rewritten.title) {
+          // Remove duplicate consecutive brand prefix (e.g. "Softube Softube Producer Collection")
+          const dupBrandRegex = new RegExp(`^${verifiedBrand}\\s+${verifiedBrand}\\b`, 'i')
+          rewritten.title = rewritten.title.replace(dupBrandRegex, verifiedBrand).trim()
+          if (!rewritten.title.toUpperCase().includes(verifiedBrand.toUpperCase())) {
+            rewritten.title = `${verifiedBrand} ${rewritten.title}`
+          }
         }
         if (verifiedProductName && rewritten.title && !rewritten.title.toLowerCase().includes(verifiedProductName.toLowerCase())) {
           rewritten.title = `${verifiedBrand ? verifiedBrand + ' ' : ''}${verifiedProductName} Deal: ${verifiedDiscount ? verifiedDiscount + ' ' : ''}(${rewritten.deal_price || 'Special Offer'})`
+        }
+        if (verifiedBrand && rewritten.title) {
+          const dupBrandRegex = new RegExp(`^${verifiedBrand}\\s+${verifiedBrand}\\b`, 'i')
+          rewritten.title = rewritten.title.replace(dupBrandRegex, verifiedBrand).trim()
         }
 
         // Deal Expiry / Validity Timeline detection (feed ground-truth takes highest priority)

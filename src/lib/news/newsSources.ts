@@ -154,22 +154,70 @@ export async function fetchPluginBoutiqueProductLiveDetails(productUrl: string):
     const html = await res.text()
 
     const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
-    const title = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : ''
+    let title = h1Match ? h1Match[1].replace(/<[^>]+>/g, '').trim() : ''
 
     const brandMatch = html.match(/href=["']\/manufacturers\/[^"']+["'][^>]*>(.*?)<\/a>/i)
     const brand = brandMatch ? brandMatch[1].replace(/<[^>]+>/g, '').trim() : ''
 
+    // Prevent duplicate brand in title (e.g. "Softube Softube Producer Collection")
+    if (brand && title.toLowerCase().startsWith(brand.toLowerCase())) {
+      title = title.slice(brand.length).trim()
+    }
+
+    const priceRegex = /\$([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{2})?|[0-9]+(?:\.[0-9]{2})?)/g
+
+    // 1. Line-through regular/original list price (handles multi-line spans)
+    const lineThroughMatch = html.match(
+      /<span[^>]*class=["'][^"']*line-through[^"']*["'][^>]*>([\s\S]*?)<\/span>/i
+    )
+    let regularPrice: string | null = null
+    if (lineThroughMatch) {
+      const pm = lineThroughMatch[1].match(priceRegex)
+      if (pm) regularPrice = pm[0].trim()
+    }
+
+    // 2. Active deal/sale price
     const dealPriceMatch = html.match(
-      /<span[^>]*class=["'][^"']*text-gray-800[^"']*["'][^>]*>\s*(\$[0-9]+(?:\.[0-9]{2})?)\s*<\/span>/i
+      /<span[^>]*class=["'][^"']*(?:text-gray-800|text-gray-100|font-semibold)[^"']*["'][^>]*>([\s\S]*?)<\/span>/i
     )
-    const regularPriceMatch = html.match(
-      /<span[^>]*class=["'][^"']*line-through[^"']*["'][^>]*>\s*(\$[0-9]+(?:\.[0-9]{2})?)\s*<\/span>/i
-    )
+    let dealPrice: string | null = null
+    if (dealPriceMatch) {
+      const pm = dealPriceMatch[1].match(priceRegex)
+      if (pm) dealPrice = pm[0].trim()
+    }
+
+    // 3. Fallback: scan purchase price container if either is missing
+    if (!dealPrice || !regularPrice) {
+      const otpContainerMatch = html.match(/data-product-purchase-options-target="otpPrice"[\s\S]*?<\/div>/i)
+      const scanContext = otpContainerMatch ? otpContainerMatch[0] : html.slice(0, 35000)
+      const foundPrices = [...scanContext.matchAll(priceRegex)].map((m) => m[0])
+      if (foundPrices.length >= 2) {
+        const parsed = foundPrices
+          .map((p) => ({
+            raw: p,
+            num: parseFloat(p.replace(/[^0-9.]/g, '')),
+          }))
+          .filter((p) => p.num > 0 && !isNaN(p.num))
+        parsed.sort((a, b) => a.num - b.num)
+        if (parsed.length >= 2 && parsed[0].num < parsed[parsed.length - 1].num) {
+          dealPrice = parsed[0].raw
+          regularPrice = parsed[parsed.length - 1].raw
+        }
+      }
+    }
+
+    // Ensure dealPrice is strictly the lower amount and regularPrice is higher
+    if (dealPrice && regularPrice) {
+      const dNum = parseFloat(dealPrice.replace(/[^0-9.]/g, ''))
+      const rNum = parseFloat(regularPrice.replace(/[^0-9.]/g, ''))
+      if (dNum > rNum && rNum > 0) {
+        const temp = dealPrice
+        dealPrice = regularPrice
+        regularPrice = temp
+      }
+    }
+
     const discountMatch = html.match(/(\d+%\s*off(?:\s*until\s*[a-zA-Z]+\s+\d{1,2})?)/i)
-
-    const dealPrice = dealPriceMatch ? dealPriceMatch[1] : null
-    const regularPrice = regularPriceMatch ? regularPriceMatch[1] : null
-
     let discount: string | null = null
     let expiryTimeline: string | null = null
 
@@ -181,11 +229,14 @@ export async function fetchPluginBoutiqueProductLiveDetails(productUrl: string):
       }
     }
 
-    if (!discount && dealPrice && regularPrice) {
-      const dNum = parseFloat(dealPrice.replace('$', ''))
-      const rNum = parseFloat(regularPrice.replace('$', ''))
+    if (dealPrice && regularPrice) {
+      const dNum = parseFloat(dealPrice.replace(/[^0-9.]/g, ''))
+      const rNum = parseFloat(regularPrice.replace(/[^0-9.]/g, ''))
       if (rNum > dNum && rNum > 0) {
-        discount = `${Math.round(((rNum - dNum) / rNum) * 100)}% OFF`
+        const computedDiscount = `${Math.round(((rNum - dNum) / rNum) * 100)}% OFF`
+        if (!discount) {
+          discount = computedDiscount
+        }
       }
     }
 
@@ -220,7 +271,11 @@ export async function fetchPluginBoutiqueProductLiveDetails(productUrl: string):
       break
     }
 
-    const isDealActive = Boolean(dealPrice && regularPrice && dealPrice !== regularPrice)
+    const isDealActive = Boolean(
+      dealPrice &&
+      regularPrice &&
+      parseFloat(dealPrice.replace(/[^0-9.]/g, '')) < parseFloat(regularPrice.replace(/[^0-9.]/g, ''))
+    )
 
     return {
       title,
@@ -557,34 +612,48 @@ export async function fetchPluginBoutiqueDealsFeedItems(): Promise<RawFeedItem[]
 
       // Name: appears before 'by' or right after the links
       const nameMatch = block.match(/\n\s*([^\n\[\]]{2,60})\s*\n\s*\[[^\]]+\]\([^\)]+\)\s*by/)
-      const name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
+      let name = nameMatch ? cleanText(nameMatch[1].trim()) : ''
 
-      // Prices & discount: Parse accurately (deal price is ALWAYS the lower amount)
-      const priceMatches = [...block.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
+      // Prevent duplicate brand in title (e.g. if name is "Softube Producer Collection" and brand is "Softube")
+      if (brand && name.toLowerCase().startsWith(brand.toLowerCase())) {
+        name = name.slice(brand.length).trim()
+      }
+
+      // Prices & discount: Parse accurately (supporting comma thousands like $1,359.00)
+      const priceRegex = /\$([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{2})?|[0-9]+(?:\.[0-9]{2})?)/g
+      const rawPriceMatches = [...block.matchAll(priceRegex)].map((m) => m[1])
       const discountMatch = block.match(/(\d+%\s*off)/i)
 
       let regularPrice: string | null = null
       let dealPrice: string | null = null
-      if (priceMatches.length >= 2) {
-        const num0 = parseFloat(priceMatches[0])
-        const num1 = parseFloat(priceMatches[1])
-        if (num0 < num1) {
-          dealPrice = '$' + priceMatches[0]
-          regularPrice = '$' + priceMatches[1]
-        } else {
-          dealPrice = '$' + priceMatches[1]
-          regularPrice = '$' + priceMatches[0]
+      if (rawPriceMatches.length >= 2) {
+        const parsed = rawPriceMatches
+          .map((p) => ({
+            raw: '$' + p,
+            num: parseFloat(p.replace(/,/g, '')),
+          }))
+          .filter((p) => p.num > 0 && !isNaN(p.num))
+
+        parsed.sort((a, b) => a.num - b.num)
+        if (parsed.length >= 2 && parsed[0].num < parsed[parsed.length - 1].num) {
+          dealPrice = parsed[0].raw
+          regularPrice = parsed[parsed.length - 1].raw
+        } else if (parsed.length >= 1) {
+          dealPrice = parsed[0].raw
         }
-      } else if (priceMatches.length === 1) {
-        dealPrice = '$' + priceMatches[0]
+      } else if (rawPriceMatches.length === 1) {
+        dealPrice = '$' + rawPriceMatches[0]
       }
 
       let discount = discountMatch ? discountMatch[1].toUpperCase() : ''
-      if (!discount && dealPrice && regularPrice) {
-        const dVal = parseFloat(dealPrice.replace('$', ''))
-        const rVal = parseFloat(regularPrice.replace('$', ''))
+      if (dealPrice && regularPrice) {
+        const dVal = parseFloat(dealPrice.replace('$', '').replace(/,/g, ''))
+        const rVal = parseFloat(regularPrice.replace('$', '').replace(/,/g, ''))
         if (rVal > dVal && rVal > 0) {
-          discount = `${Math.round(((rVal - dVal) / rVal) * 100)}% OFF`
+          const computedDiscount = `${Math.round(((rVal - dVal) / rVal) * 100)}% OFF`
+          if (!discount) {
+            discount = computedDiscount
+          }
         }
       }
 
@@ -957,19 +1026,25 @@ export async function fetchTelegramChannelFeedItems(channelUsername = 'legalvst'
         discount = discountMatch[1].toUpperCase()
       }
 
-      const priceMatches = [...cleanContent.matchAll(/\$([0-9]+(?:\.[0-9]{2})?)/g)].map((m) => m[1])
-      if (priceMatches.length >= 2) {
-        const p1 = parseFloat(priceMatches[0])
-        const p2 = parseFloat(priceMatches[1])
-        if (p1 < p2) {
-          dealPrice = `$${priceMatches[0]}`
-          regularPrice = `$${priceMatches[1]}`
-        } else {
-          dealPrice = `$${priceMatches[1]}`
-          regularPrice = `$${priceMatches[0]}`
+      const priceRegex = /\$([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]{2})?|[0-9]+(?:\.[0-9]{2})?)/g
+      const rawPriceMatches = [...cleanContent.matchAll(priceRegex)].map((m) => m[1])
+      if (rawPriceMatches.length >= 2) {
+        const parsed = rawPriceMatches
+          .map((p) => ({
+            raw: '$' + p,
+            num: parseFloat(p.replace(/,/g, '')),
+          }))
+          .filter((p) => p.num > 0 && !isNaN(p.num))
+
+        parsed.sort((a, b) => a.num - b.num)
+        if (parsed.length >= 2 && parsed[0].num < parsed[parsed.length - 1].num) {
+          dealPrice = parsed[0].raw
+          regularPrice = parsed[parsed.length - 1].raw
+        } else if (parsed.length >= 1) {
+          dealPrice = parsed[0].raw
         }
-      } else if (priceMatches.length === 1) {
-        dealPrice = `$${priceMatches[0]}`
+      } else if (rawPriceMatches.length === 1) {
+        dealPrice = '$' + rawPriceMatches[0]
       }
 
       const expMatch = cleanContent.match(/(?:until|ends|valid through)\s+([a-zA-Z]+\s+\d{1,2}|\d{1,2}\s+[a-zA-Z]+[^.\n]*)/i)
@@ -1124,7 +1199,7 @@ export function calculateItemPriority(item: RawFeedItem): number {
   } else {
     // For deals, apply strict quality scoring based on real verified discounts
     const discount = (item.discount || '').toUpperCase()
-    const dealPrice = item.dealPrice ? parseFloat(item.dealPrice.replace('$', '')) : null
+    const dealPrice = item.dealPrice ? parseFloat(item.dealPrice.replace('$', '').replace(/,/g, '')) : null
 
     if (
       discount.includes('80%') ||
@@ -1466,8 +1541,20 @@ export async function verifyArticleQuality(article: {
     if (!article.deal_regular_price || !article.deal_regular_price.startsWith('$')) {
       return { isValid: false, reason: 'Deals & Sales article missing verified regular price ($YY.YY)' }
     }
-    if (article.deal_price === article.deal_regular_price) {
-      return { isValid: false, reason: 'Product is at full price, not an active deal' }
+    const dVal = parseFloat(article.deal_price.replace('$', '').replace(/,/g, ''))
+    const rVal = parseFloat(article.deal_regular_price.replace('$', '').replace(/,/g, ''))
+    if (isNaN(dVal) || isNaN(rVal) || dVal <= 0 || rVal <= 0) {
+      return { isValid: false, reason: 'Invalid or zero price amounts' }
+    }
+    if (dVal >= rVal) {
+      return { isValid: false, reason: 'Deal price is not lower than regular price (not an active discount)' }
+    }
+    // Plausibility gate: If regular price is >= $100 and deal price is $1 or less, reject mangled price!
+    if (rVal >= 100 && dVal <= 1) {
+      return {
+        isValid: false,
+        reason: `Suspiciously low deal price ($${dVal}) for a $${rVal} regular product. Likely price parsing discrepancy.`,
+      }
     }
   }
 
