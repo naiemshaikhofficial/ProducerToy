@@ -14,9 +14,12 @@ jobs:
 
     steps:
       - name: Trigger ProducerToy News Sync
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           echo "Triggering ProducerToy news sync at $(date -u)..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 55 -X GET "https://producertoy.com/api/news/sync?limit=1" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
+          SECRET="${CRON_SECRET:-SamplesWalaSecureLock2026}"
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 55 -X GET "https://producertoy.com/api/news/sync?limit=1&secret=$SECRET" -H "Authorization: Bearer $SECRET" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
           HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
 
@@ -27,7 +30,7 @@ jobs:
           if [ "$HTTP_STATUS" -ne 200 ]; then
             echo "⚠️ First attempt received status $HTTP_STATUS. Waiting 5s and retrying..."
             sleep 5
-            RETRY_RESP=$(curl -s -w "\n%{http_code}" --max-time 50 -X GET "https://producertoy.com/api/news/sync?limit=1" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
+            RETRY_RESP=$(curl -s -w "\n%{http_code}" --max-time 50 -X GET "https://producertoy.com/api/news/sync?limit=1&secret=$SECRET" -H "Authorization: Bearer $SECRET" -H "User-Agent: GitHub-Actions-NewsCron/1.0")
             RETRY_BODY=$(echo "$RETRY_RESP" | sed '$d')
             RETRY_STATUS=$(echo "$RETRY_RESP" | tail -n1)
 

@@ -11,6 +11,7 @@ const getEnv = (key) => {
 const TURSO_URL = getEnv('TURSO_DATABASE_URL')
 const TURSO_TOKEN = getEnv('TURSO_AUTH_TOKEN')
 const GROQ_KEY = getEnv('GROQ_API_KEY')
+const CRON_SECRET = getEnv('CRON_SECRET')
 
 console.log('----------------------------------------------------')
 console.log('🎵 ProducerToy News Sync Engine (Google News + Groq)')
@@ -19,7 +20,8 @@ console.log('----------------------------------------------------')
 async function run() {
   try {
     console.log('📡 Triggering news sync from localhost:3000...')
-    const res = await fetch('http://localhost:3000/api/news/sync?limit=3')
+    const secretQuery = CRON_SECRET ? `&secret=${encodeURIComponent(CRON_SECRET)}` : ''
+    const res = await fetch(`http://localhost:3000/api/news/sync?limit=3${secretQuery}`)
     const json = await res.json()
     console.log('\n✅ Sync Result:', json)
 

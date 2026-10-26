@@ -37,11 +37,16 @@ async function handleSync(req: Request) {
   const shouldWait = url.searchParams.get('wait') === 'true'
 
   // Auth check: verify either query param or Bearer header
+  const isDev = process.env.NODE_ENV !== 'production'
+  const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
+  const providedSecret = secret || bearerSecret
+
   if (process.env.CRON_SECRET) {
-    const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
-    const providedSecret = secret || bearerSecret
-    if (!providedSecret || providedSecret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized: Valid CRON_SECRET required' }, { status: 401 })
+    // In production, require valid CRON_SECRET. In development, allow testing if secret is omitted.
+    if (!isDev || providedSecret) {
+      if (!providedSecret || providedSecret !== process.env.CRON_SECRET) {
+        return NextResponse.json({ error: 'Unauthorized: Valid CRON_SECRET required' }, { status: 401 })
+      }
     }
   } else if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'News sync endpoint disabled: CRON_SECRET not configured' }, { status: 403 })
