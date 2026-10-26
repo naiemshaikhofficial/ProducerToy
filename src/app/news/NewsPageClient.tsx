@@ -196,6 +196,7 @@ function NewsCardImage({
       priority={priority}
       sizes={sizes}
       className={className}
+      referrerPolicy="no-referrer"
       onError={() => {
         if (!hasError) {
           setHasError(true)
@@ -245,10 +246,30 @@ export function NewsPageClient({ initialArticles }: NewsPageClientProps) {
     [articlesList]
   )
 
-  // Producer Toy strictly showcases 100% authentic, active, unexpired deals & audio news
+  // Producer Toy strictly showcases 100% authentic, active, unexpired deals & audio news with mandatory genuine plugin images
   const articles = React.useMemo(() => {
-    const unexpired = rawArticles.filter((a) => !detectDealExpiry(a).isExpired)
-    return unexpired.length > 0 ? unexpired : rawArticles
+    const valid = rawArticles.filter((a) => {
+      if (detectDealExpiry(a).isExpired) return false
+      // Strict rule: image is compulsory and cannot be a generic fallback/placeholder
+      if (!a.cover_image || typeof a.cover_image !== 'string' || a.cover_image.trim().length < 15) return false
+      const lower = a.cover_image.toLowerCase()
+      if (
+        lower.includes('icon.png') ||
+        lower.includes('placeholder') ||
+        lower.includes('localhost') ||
+        lower.includes('127.0.0.1') ||
+        lower.includes('dead-bear') ||
+        lower.includes('api/og') ||
+        lower.includes('spacer') ||
+        lower.includes('1x1') ||
+        lower.includes('transparent') ||
+        EXCLUDED_BANNER_PATTERNS.some((pat) => lower.includes(pat))
+      ) {
+        return false
+      }
+      return true
+    })
+    return valid
   }, [rawArticles])
 
   // 1 Featured Hero Article (Priority: Sponsored -> Sabse Tagda Brand Deal)

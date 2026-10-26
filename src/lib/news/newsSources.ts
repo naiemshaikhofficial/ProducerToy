@@ -1501,8 +1501,18 @@ export async function verifyArticleQuality(article: {
     }
   }
 
-  // 2. Strict Genuine HD Image Verification (Zero AI, Zero Stock Fallbacks, Zero Spacers)
-  const img = article.cover_image
+  // 2. Strict Genuine HD Image Verification (Zero AI, Zero Stock Fallbacks, Zero Spacers, Compulsory Genuine Plugin Image)
+  let img = article.cover_image
+
+  // Auto-repair accidental localhost references from developer sites (e.g. SampleRoll)
+  if (img && (img.includes('localhost') || img.includes('127.0.0.1')) && article.source_url) {
+    try {
+      const origin = new URL(article.source_url).origin
+      img = img.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, origin)
+      article.cover_image = img
+    } catch { }
+  }
+
   if (
     !img ||
     typeof img !== 'string' ||
@@ -1513,6 +1523,10 @@ export async function verifyArticleQuality(article: {
     img.toLowerCase().includes('empty') ||
     img.toLowerCase().includes('logo_black') ||
     img.toLowerCase().includes('logo_dark') ||
+    img.toLowerCase().includes('icon.png') ||
+    img.toLowerCase().includes('dead-bear') ||
+    img.toLowerCase().includes('localhost') ||
+    img.toLowerCase().includes('127.0.0.1') ||
     img.includes('placeholder') ||
     img.includes('api/og') ||
     img.includes('Free%20Toys') ||
@@ -1530,7 +1544,27 @@ export async function verifyArticleQuality(article: {
     img.includes('62597tdwpbuqa4wb3ytyr780r83o') ||
     img.includes('8703u6x0lrzyjlnucnb396u4m6qb')
   ) {
-    return { isValid: false, reason: 'Invalid, low-res, placeholder, spacer, internal OG banner, telegram watermarked, or non-authentic image URL' }
+    return {
+      isValid: false,
+      reason: 'Mandatory genuine plugin image requirement failed: missing, placeholder, icon, or non-authentic image URL',
+    }
+  }
+
+  // Active HTTP Probe to verify the image is alive and not 404/410
+  try {
+    const imgProbe = await fetch(img, {
+      method: 'HEAD',
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+      signal: AbortSignal.timeout(4000),
+    })
+    if (imgProbe.status === 404 || imgProbe.status === 410) {
+      return { isValid: false, reason: `Article cover image returned HTTP ${imgProbe.status} (dead image link)` }
+    }
+  } catch {
+    // Non-fatal if remote boutique server throttles HEAD probe
   }
 
   // 3. Strict Genuine Pricing Verification (Zero Fake Pricing, Zero Inactive Deals)

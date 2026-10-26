@@ -325,6 +325,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
         ) : (
           <img
             src={bgCoverSrc}
+            referrerPolicy="no-referrer"
             onError={() => setBgCoverSrc(fallbackPrompt)}
             alt=""
             className="w-full h-full object-cover object-top opacity-100"
@@ -412,6 +413,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
             ) : (
               <img
                 src={coverSrc}
+                referrerPolicy="no-referrer"
                 onError={() => setCoverSrc(fallbackPrompt)}
                 alt={`${cleanHtmlTitle(article.title)} - Producer Toy`}
                 title={`${cleanHtmlTitle(article.title)} - Producer Toy`}
@@ -552,6 +554,7 @@ export function NewsArticleClient({ article, relatedArticles }: NewsArticleClien
                       alt={cleanHtmlTitle(rel.title)}
                       fill
                       sizes="(max-width: 640px) 100vw, 33vw"
+                      referrerPolicy="no-referrer"
                       className="object-cover group-hover:scale-105 group-hover:brightness-110 transition-all duration-300"
                     />
                   </div>
