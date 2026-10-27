@@ -43,6 +43,12 @@ function formatDisplayBadge(brand?: string | null, productType?: string | null):
   }
 }
 
+function getCleanProductName(fullName?: string | null): string {
+  if (!fullName) return ''
+  const parts = fullName.split(/\s+[-–—:]\s+/)
+  return parts[0]?.trim() || fullName
+}
+
 export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [progress, setProgress] = useState(0)
@@ -320,18 +326,18 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
                     {/* Bottom Content Overlay (1:1 Epic Games Store Layout) */}
                     <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1.5 z-10">
-                      {/* Category / Brand Tag */}
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">
+                      {/* Category / Brand Tag - Minimalist */}
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block">
                         {formatDisplayBadge(product.brand, product.product_type)}
                       </span>
 
-                      {/* Main Product Title */}
-                      <h2 className="text-[17px] sm:text-[18px] font-black uppercase tracking-tight text-white leading-snug line-clamp-2 drop-shadow-md">
-                        {product.name}
+                      {/* Main Product Title - Clean & Balanced */}
+                      <h2 className="text-[17px] sm:text-[18px] font-bold uppercase tracking-tight text-white leading-snug line-clamp-1 drop-shadow-md">
+                        {getCleanProductName(product.name)}
                       </h2>
 
-                      {/* Short Description */}
-                      <p className="text-[12px] sm:text-[13px] text-zinc-300 font-normal leading-relaxed line-clamp-2 drop-shadow-sm pt-0.5">
+                      {/* Short Description - Compact & Subtle */}
+                      <p className="text-[12px] sm:text-[13px] text-zinc-400 font-normal leading-relaxed line-clamp-2 drop-shadow-sm pt-0.5">
                         {product.short_description || 'Professional audio tools and sample packs designed for modern producers.'}
                       </p>
 
@@ -500,34 +506,34 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   </button>
 
                   {/* Hero Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 xl:p-12 max-w-2xl space-y-3.5 z-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 xl:p-12 max-w-2xl space-y-3 z-10">
                     
-                    {/* Brand / Category Tag */}
+                    {/* Brand / Category Tag - Minimalist without border */}
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-300 bg-white/[0.08] backdrop-blur-md px-2.5 py-1 rounded-md border border-white/[0.06]">
+                      <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-zinc-400">
                         {formatDisplayBadge(product.brand, product.product_type)}
                       </span>
                     </div>
 
-                    {/* Main Product Title */}
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-white leading-tight font-sans drop-shadow-2xl">
-                      {product.name}
+                    {/* Main Product Title - Clean, Balanced Size */}
+                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight font-sans drop-shadow-lg">
+                      {getCleanProductName(product.name)}
                     </h2>
 
-                    {/* Short Description */}
-                    <p className="text-sm lg:text-base text-zinc-200 font-normal leading-relaxed line-clamp-2 drop-shadow-md max-w-lg">
+                    {/* Short Description - Compact & Minimalist */}
+                    <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed line-clamp-2 drop-shadow-sm max-w-md">
                       {product.short_description || 'Professional audio tools and VST plugins designed for modern music producers.'}
                     </p>
 
-                    {/* Price & Action Row (1:1 Epic Games Store Layout) */}
-                    <div className="pt-2 space-y-2.5">
-                      <p className="text-xs uppercase tracking-wider font-bold text-zinc-300">
+                    {/* Price & Action Row (Epic Games Store Reference: Same Height & Balanced Proportions) */}
+                    <div className="pt-2 space-y-2">
+                      <p className="text-xs uppercase tracking-wider font-semibold text-zinc-300">
                         {isFree ? 'Free' : formatPrice(priceInr, priceUsd)}
                       </p>
 
-                      <div className="flex items-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-2.5">
                         <span
-                          className="bg-white hover:bg-zinc-200 text-black font-extrabold text-xs sm:text-sm px-7 py-3 rounded-xl transition-colors uppercase tracking-wider shadow-xl active:scale-95 inline-flex items-center justify-center min-w-[130px]"
+                          className="h-10 px-6 rounded-lg bg-white hover:bg-zinc-200 text-black font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center justify-center shadow-md active:scale-95 cursor-pointer"
                         >
                           {isFree ? 'Get Free' : 'Buy Now'}
                         </span>
@@ -548,10 +554,10 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                               brand: product.brand
                             })
                           }}
-                          className={`p-3 rounded-xl border transition-all active:scale-95 flex items-center justify-center shadow-lg ${
+                          className={`h-10 w-10 rounded-lg border transition-all active:scale-95 flex items-center justify-center shadow-md ${
                             inCart
                               ? 'bg-white text-black border-white'
-                              : 'bg-[#1e1e1e]/85 hover:bg-[#282828] text-white border-white/15'
+                              : 'bg-white/10 hover:bg-white/20 text-white border-white/15 backdrop-blur-sm'
                           }`}
                           title={inCart ? "In Cart" : "Add to Cart"}
                           aria-label="Add to Cart"
@@ -587,7 +593,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 aria-label={item.name}
                 onClick={() => handleSelect(idx)}
                 style={{ height: 96, minHeight: 96 }}
-                className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-2xl border transition-colors duration-200 text-left overflow-hidden cursor-pointer select-none outline-none focus:outline-none focus-visible:outline-none ${
+                className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-2xl border transition-colors duration-200 text-left overflow-hidden cursor-pointer select-none outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus,rgba(255,255,255,0.6))] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212] ${
                   isActive
                     ? 'bg-[#202020] border-white/10 shadow-md'
                     : 'bg-transparent border-transparent hover:bg-white/[0.05]'
@@ -627,7 +633,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                       ? 'text-white font-semibold'
                       : 'text-zinc-400 group-hover:text-white font-medium'
                   }`}>
-                    {item.name}
+                    {getCleanProductName(item.name)}
                   </p>
                 </div>
               </button>
