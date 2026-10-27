@@ -1059,7 +1059,7 @@ export function EpicLibraryClient({
                           {cleanTitle}
                         </h2>
                         <p className="text-xs text-[#a1a1aa] truncate">
-                          {product.brands?.name || product.brand || 'ProducerToy'} • {isSamplePack ? 'Sample Pack' : '64-Bit Plugin'}
+                          {product.brands?.name || product.brand || 'ProducerToy'} • {isSamplePack ? 'Sample Pack' : 'Audio Plugin'}
                         </p>
                       </div>
                     </div>
