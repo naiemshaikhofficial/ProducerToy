@@ -68,10 +68,11 @@ export const EPIC_TOKENS = {
     '8': '21.44px',
   },
   radius: {
-    xs: '8px',
-    sm: '10px',
-    md: '12px',
-    lg: '9999px',
+    xs: '4px',
+    sm: '6px',
+    md: '8px',
+    lg: '12px',
+    full: '9999px',
   },
   motion: {
     duration: {

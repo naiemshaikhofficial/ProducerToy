@@ -65,10 +65,17 @@
     --color-badge-discount: #34363d;
     --color-feedback-error: #f53838;
 
-    --radius-xs: 8px;
-    --radius-sm: 10px;
-    --radius-md: 12px;
-    --radius-lg: 9999px;
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-full: 9999px;
+
+    --epic-radius-xs: 4px;
+    --epic-radius-sm: 6px;
+    --epic-radius-md: 8px;
+    --epic-radius-lg: 12px;
 
     --motion-duration-instant: 125ms;
     --motion-duration-fast: 200ms;

@@ -1682,4 +1682,41 @@ export async function claimGiftAction(params: {
   }
 }
 
+/**
+ * Server Action to record post-purchase email sharing consent with the product seller.
+ */
+export async function savePostPurchaseEmailShareConsentAction(params: {
+  orderNumber?: string
+  productId?: string
+  sellerName?: string
+  consented: boolean
+}) {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const adminSupabase = getAdminClient()
+    await recordCustomerDataConsent({
+      adminSupabase,
+      userId: user.id,
+      orderId: params.orderNumber || null,
+      productId: params.productId || null,
+      sellerName: params.sellerName || 'ProducerToy Partner',
+      consentGiven: params.consented,
+      consentedFields: ['Customer Email Address', 'Product Updates & Presets'],
+      statedPurpose: 'Developer release news, updates, and presets',
+      disclosureVersion: 'v1.0',
+    })
+
+    return { success: true }
+  } catch (err: any) {
+    console.warn('[SAVE_POST_PURCHASE_CONSENT_NOTE]', err)
+    return { success: false, error: err.message }
+  }
+}
+
 

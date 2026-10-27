@@ -789,7 +789,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               src={
                 ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo)
                   ? product.brands?.logo_url || product.brand_logo
-                  : '/logo-white.png'
+                  : '/Producer Toy Charcoal 3D Logo.webp'
               }
               alt={
                 ENABLE_BRANDS && (product.brands?.name || product.brand)
@@ -799,11 +799,11 @@ export function EpicProductDetailClient({ product }: { product: any }) {
               width={360}
               height={144}
               unoptimized
-              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto drop-shadow-md rounded-lg"
+              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto drop-shadow-md"
               onError={(e) => {
                 const target = e.currentTarget
-                if (!target.src.endsWith('/logo-white.png')) {
-                  target.src = '/logo-white.png'
+                if (!target.src.includes('Producer%20Toy%20Charcoal%203D%20Logo')) {
+                  target.src = '/Producer Toy Charcoal 3D Logo.webp'
                 }
               }}
             />

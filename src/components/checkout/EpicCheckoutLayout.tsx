@@ -156,6 +156,19 @@ export function EpicCheckoutLayout({
   const vatAmount = (finalTotal * 18) / 118
   const discountAmount = Math.max(0, currentSubtotal - finalTotal - rewardDiscountAmount)
 
+  // Address validation check (Must have full billing address for license issuance)
+  const [showAddressForm, setShowAddressForm] = useState(false)
+  const isAddressComplete = Boolean(
+    billingDetails.fullName?.trim() &&
+    billingDetails.email?.trim() &&
+    billingDetails.phone?.trim() &&
+    billingDetails.address?.trim() &&
+    billingDetails.city?.trim() &&
+    billingDetails.state?.trim() &&
+    billingDetails.zip?.trim() &&
+    billingDetails.country?.trim()
+  )
+
   // Derive User Display Name and Initial (Guest vs Authenticated)
   const isGuest = !user
   const displayName = user
@@ -170,117 +183,24 @@ export function EpicCheckoutLayout({
     : (billingDetails.fullName?.trim() ? billingDetails.fullName.trim()[0].toUpperCase() : 'G')
 
   const handlePayClick = () => {
-    if (sharingAudit.requiresExplicitConsent && !sellerConsentAgreed) {
-      setConsentError('Please review and accept the Seller Data Sharing Notice to proceed.')
-      return
-    }
     setConsentError('')
 
     if (isFree) {
-      onFreeCheckout(sellerConsentAgreed)
+      onFreeCheckout(true)
       return
     }
     if (selectedMethod === 'paypal') {
       return
     }
     // Razorpay (Cards, UPI, GPay, NetBanking)
-    onRazorpayCheckout(sellerConsentAgreed)
+    onRazorpayCheckout(true)
   }
 
-  const renderSellerDataSharingNotice = (isMobile: boolean) => {
-    if (!sharingAudit.requiresSharing || sharingAudit.configs.length === 0) {
-      return null
-    }
-
-    return (
-      <div className="p-3.5 bg-[#171717] border border-amber-500/30 rounded-xl space-y-2.5 text-left mb-2 shadow-xs">
-        <div className="flex items-center gap-1.5 text-[11.5px] font-bold text-amber-300">
-          <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
-          <span>Seller Data Sharing Notice</span>
-        </div>
-
-        <p className="text-[11px] text-zinc-300 leading-relaxed">
-          To provide product licensing, activation, purchase verification, or technical support, Producer Toy may share the information listed below with the product&apos;s verified seller:
-        </p>
-
-        <div className="space-y-2 pt-1">
-          {sharingAudit.configs.map((cfg) => (
-            <div
-              key={cfg.productId}
-              className="text-[10.5px] bg-[#202020] border border-zinc-800 rounded-lg p-2.5 space-y-1"
-            >
-              <div className="text-zinc-100 font-semibold">{cfg.productName}</div>
-              <div className="text-zinc-400">
-                <span className="text-zinc-500 font-medium">Seller:</span>{' '}
-                <strong className="text-zinc-200">{cfg.sellerName}</strong>
-              </div>
-              <div className="text-zinc-400">
-                <span className="text-zinc-500 font-medium">Information shared:</span>{' '}
-                <span className="text-zinc-200">{cfg.sharedFields.join(', ')}</span>
-              </div>
-              <div className="text-zinc-400">
-                <span className="text-zinc-500 font-medium">Purpose:</span>{' '}
-                <span className="text-zinc-200">{cfg.purpose}</span>
-              </div>
-              {cfg.productEulaUrl && (
-                <div className="pt-1">
-                  <Link
-                    href={cfg.productEulaUrl}
-                    target="_blank"
-                    className="text-amber-400 hover:text-amber-300 underline font-medium"
-                  >
-                    View {cfg.sellerName} Product License &amp; Terms &rarr;
-                  </Link>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <p className="text-[10px] text-zinc-400 leading-normal">
-          Your information will not be shared for unrelated purposes, including marketing, unless separately authorized where required.
-        </p>
-
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-zinc-500 pt-0.5">
-          <Link href="/privacy" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
-            Privacy Policy
-          </Link>
-          <span>&bull;</span>
-          <Link href="/eula" target="_blank" className="text-zinc-400 hover:text-white underline underline-offset-2">
-            Platform EULA
-          </Link>
-        </div>
-
-        {sharingAudit.requiresExplicitConsent && (
-          <div className="flex items-start gap-2.5 pt-2 border-t border-zinc-800/80">
-            <input
-              type="checkbox"
-              id={isMobile ? "mobile-seller-data-sharing-consent" : "desktop-seller-data-sharing-consent"}
-              checked={sellerConsentAgreed}
-              onChange={(e) => {
-                setSellerConsentAgreed(e.target.checked)
-                if (e.target.checked) setConsentError('')
-              }}
-              className="mt-0.5 w-4 h-4 rounded bg-[#242424] border-[#383838] text-white focus:ring-0 accent-white cursor-pointer shrink-0"
-            />
-            <label
-              htmlFor={isMobile ? "mobile-seller-data-sharing-consent" : "desktop-seller-data-sharing-consent"}
-              className="text-[11px] text-zinc-200 leading-snug cursor-pointer select-none font-medium"
-            >
-              I consent to Producer Toy sharing my customer email and order reference with the verified seller(s) named above solely for product activation, licensing, and technical support.
-            </label>
-          </div>
-        )}
-
-        {consentError && (
-          <div className="bg-[#ff4053] text-black font-extrabold px-3 py-2 rounded-xl text-[11px] flex items-center gap-1.5 shadow-sm animate-in fade-in">
-            <AlertCircle size={13} className="text-black flex-shrink-0 stroke-[2.5]" />
-            <span>{consentError}</span>
-          </div>
-        )}
-      </div>
-    )
+  // Seller data sharing notice is rendered on post-purchase screen per Epic Games Store UX guidelines
+  const renderSellerDataSharingNotice = (_isMobile: boolean) => {
+    return null
   }
+
 
   const primaryItem = items[0] || {
     id: 'item',
@@ -288,6 +208,171 @@ export function EpicCheckoutLayout({
     price_inr: 0,
     price_usd: 0,
     cover_image: '/placeholder.jpg'
+  }
+
+  // 0. DEDICATED EPIC GAMES STORE FREE CHECKOUT MODAL (Screenshot 1)
+  if (isFree) {
+    return (
+      <div className="w-full max-w-[560px] mx-auto bg-[#141414] border border-[#242424] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col p-6 sm:p-8 space-y-5 relative select-none font-sans text-white animate-in zoom-in-95 duration-150 my-auto">
+        {/* Top Header */}
+        <div className="flex items-center justify-between border-b border-[#222222] pb-3.5">
+          <div className="flex items-center gap-2.5">
+            <LogoIcon size={22} />
+            <span className="text-[15px] font-black tracking-wide text-white">Checkout</span>
+          </div>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-[#202024] border border-white/10 flex items-center justify-center text-xs font-bold text-white uppercase">
+                  {initialLetter}
+                </div>
+                <span className="text-xs text-zinc-300 font-medium hidden sm:inline truncate max-w-[150px]">
+                  {displayName}
+                </span>
+              </div>
+            ) : null}
+            {onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+                title="Close checkout"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                href="/store"
+                className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+                title="Close checkout"
+              >
+                <X className="w-5 h-5" />
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Centered Product Box Cover */}
+        <div className="flex flex-col items-center text-center space-y-3.5 pt-1">
+          <div className="relative w-[130px] h-[175px] sm:w-[150px] sm:h-[200px] bg-[#1a1a1a] border border-[#2c2c2c] rounded-xl overflow-hidden shadow-2xl flex-shrink-0">
+            <Image
+              src={primaryItem.cover_image || '/placeholder.jpg'}
+              alt={primaryItem.name}
+              fill
+              sizes="150px"
+              className="object-cover"
+              priority
+            />
+          </div>
+
+          <div className="space-y-1 max-w-sm">
+            <h2 className="text-[16px] sm:text-[18px] font-bold text-white line-clamp-2 leading-snug">
+              {primaryItem.name}
+            </h2>
+            <p className="text-xs font-semibold text-zinc-400">
+              {currencySymbol}0.00
+            </p>
+          </div>
+
+          <h3 className="text-[18px] sm:text-[21px] font-black text-white tracking-tight max-w-md pt-0.5">
+            This is free. Add it to your library to get started.
+          </h3>
+        </div>
+
+        {/* Mandatory Address Verification / Toggle */}
+        <div className="space-y-2 pt-1">
+          {isAddressComplete && !showAddressForm ? (
+            <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#181818] border border-[#242424] text-[11.5px] text-zinc-400">
+              <span className="truncate">
+                Billing Address: <strong className="text-zinc-200 font-semibold">{billingDetails.fullName}</strong> • {billingDetails.city}, {billingDetails.country}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowAddressForm(true)}
+                className="text-zinc-400 hover:text-white underline font-medium ml-2 shrink-0 cursor-pointer text-[11px]"
+              >
+                Edit
+              </button>
+            </div>
+          ) : (
+            <div className="bg-[#181818] border border-[#262626] rounded-xl p-4 text-left space-y-3 max-h-[280px] overflow-y-auto">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white">Billing Address Required</span>
+                {isAddressComplete && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddressForm(false)}
+                    className="text-[11px] text-zinc-400 hover:text-white underline cursor-pointer"
+                  >
+                    Done
+                  </button>
+                )}
+              </div>
+              <CheckoutBillingForm
+                billingDetails={billingDetails}
+                onBillingChange={onBillingChange}
+                formErrors={formErrors}
+                newsletterOptIn={newsletterOptIn}
+                setNewsletterOptIn={setNewsletterOptIn}
+                countryOptions={countryOptions}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Action Button */}
+        <div className="pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              if (!isAddressComplete) {
+                setShowAddressForm(true)
+                const requiredFields: (keyof BillingDetails)[] = [
+                  'fullName',
+                  'email',
+                  'phone',
+                  'address',
+                  'city',
+                  'state',
+                  'zip',
+                  'country',
+                ]
+                for (const field of requiredFields) {
+                  if (!billingDetails[field]?.trim()) {
+                    onBillingChange(field, billingDetails[field] || '')
+                  }
+                }
+                return
+              }
+              onFreeCheckout(true)
+            }}
+            disabled={loading || paymentStatus === 'processing'}
+            className="w-full h-12 bg-white hover:bg-zinc-200 active:scale-[0.99] text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer disabled:opacity-60"
+          >
+            {loading || paymentStatus === 'processing' ? (
+              <div className="relative w-5 h-5 flex items-center justify-center">
+                <div className="w-full h-full rounded-full border-2 border-black/20" />
+                <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-black animate-spin duration-700 ease-linear" />
+              </div>
+            ) : (
+              <span>Add to library</span>
+            )}
+          </button>
+        </div>
+
+        {/* Compliance Footnote */}
+        <p className="text-[10px] text-zinc-400 text-center leading-relaxed select-none pb-1">
+          By selecting &lsquo;Add to library&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
+          <Link href="/eula" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
+            End User License Agreement
+          </Link>. You are acquiring a digital license for this product; for terms, see{' '}
+          <Link href="/purchase-policy" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
+            purchase policy
+          </Link>.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -832,7 +917,7 @@ export function EpicCheckoutLayout({
               <button
                 type="button"
                 onClick={handlePayClick}
-                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed) || (sharingAudit.requiresExplicitConsent && !sellerConsentAgreed)}
+                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed)}
                 className="w-full h-12 bg-white hover:bg-zinc-200 active:scale-[0.99] text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer disabled:bg-[#282828] disabled:text-[#666666] disabled:cursor-not-allowed"
               >
                 {loading || paymentStatus === 'processing' ? (
@@ -1440,7 +1525,7 @@ export function EpicCheckoutLayout({
               <button
                 type="button"
                 onClick={handlePayClick}
-                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed) || (sharingAudit.requiresExplicitConsent && !sellerConsentAgreed)}
+                disabled={loading || paymentStatus === 'processing' || (hasGiftItems && !giftRefundAgreed)}
                 className="w-full h-11 bg-white hover:bg-zinc-200 text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer disabled:opacity-60 active:scale-[0.99]"
               >
                 {loading || paymentStatus === 'processing' ? (

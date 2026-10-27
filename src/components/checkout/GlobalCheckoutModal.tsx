@@ -69,6 +69,10 @@ export function GlobalCheckoutModal() {
     giftRecipientEmail: string
     hasSelfItems: boolean
   } | null>(null)
+  const [completedOrder, setCompletedOrder] = useState<{
+    orderNumber?: string
+    items: any[]
+  } | null>(null)
 
   // Auto-load profile & billing data on mount or open
   useEffect(() => {
@@ -363,6 +367,10 @@ export function GlobalCheckoutModal() {
         }
       )
       if (res.success) {
+        setCompletedOrder({
+          orderNumber: res.orderId,
+          items: [...items],
+        })
         recordCompletedGifts(items)
         clearCart()
         setPaymentStatus('success')
@@ -468,6 +476,10 @@ export function GlobalCheckoutModal() {
             })
 
             if (verifyRes.success) {
+              setCompletedOrder({
+                orderNumber: verifyRes.orderNumber,
+                items: [...items],
+              })
               recordCompletedGifts(items)
               clearCart()
               setPaymentStatus('success')
@@ -497,6 +509,10 @@ export function GlobalCheckoutModal() {
     const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
     setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
 
+    setCompletedOrder({
+      orderNumber: `PT-PAYPAL-${Date.now().toString(36).toUpperCase()}`,
+      items: [...items],
+    })
     recordCompletedGifts(items)
     clearCart()
     setPaymentStatus('success')
@@ -560,13 +576,15 @@ export function GlobalCheckoutModal() {
             </div>
           </div>
         ) : paymentStatus === 'success' ? (
-          <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200">
             <CheckoutSuccessView
               email={billingDetails.email || user?.email}
               hasGifts={lastGiftInfo?.hasGifts}
               giftRecipientEmail={lastGiftInfo?.giftRecipientEmail}
               hasSelfItems={lastGiftInfo?.hasSelfItems}
               onClose={closeCheckout}
+              items={completedOrder?.items || items}
+              orderNumber={completedOrder?.orderNumber}
             />
           </div>
         ) : (
