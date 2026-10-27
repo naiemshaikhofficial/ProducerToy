@@ -116,9 +116,21 @@ export function ProductCard({ product }: { product: Product }) {
     })
   }
 
+  // A product is only out of stock if explicitly flagged in metadata,
+  // or if deliverable download fields are actually loaded and all are empty.
+  // Note: Catalog queries use CATALOG_PRODUCT_SELECT which deliberately omits private download URLs for security.
+  const hasDeliverableFields =
+    product.download_url !== undefined ||
+    product.download_url_win !== undefined ||
+    product.download_url_mac !== undefined
+
   const isOutOfStock = Boolean(
     product.is_out_of_stock ||
-    (!product.download_url && !product.download_url_win && !product.download_url_mac && !(product.allow_external_url && product.external_url))
+    (hasDeliverableFields &&
+      !product.download_url &&
+      !product.download_url_win &&
+      !product.download_url_mac &&
+      !(product.allow_external_url && product.external_url))
   )
 
   const handleQuickAdd = (e: React.MouseEvent) => {
