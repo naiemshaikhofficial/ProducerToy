@@ -31,9 +31,12 @@ export interface SendOrderInvoiceParams {
   paymentMethod?: string
 }
 
+const MASCOT_LOGO_URL = 'https://imagizer.imageshack.com/a/img922/3023/eqSeKm.png'
+const PRODUCER_TOY_LOGO_URL = 'https://imagizer.imageshack.com/a/img922/171/nu2UgR.png'
+
 /**
  * Sends a high-conversion, brand-themed ProducerToy Order Invoice & Receipt email via Resend.
- * Styled in ProducerToy's signature dark monochrome aesthetic (#0d0d0d, #141414, #262626, white accents).
+ * Styled in ProducerToy's signature dark luxury monochrome aesthetic.
  */
 export async function sendOrderInvoiceEmail(
   params: SendOrderInvoiceParams
@@ -63,6 +66,31 @@ export async function sendOrderInvoiceEmail(
     const libraryUrl = `${siteUrl}/library`
     const fromAddress = process.env.EMAIL_FROM || 'ProducerToy Orders <orders@producertoy.com>'
 
+    // 1. Dynamic Subject Formulation based on purchased item + order number (NO license key in subject)
+    const primaryItem = params.items[0]?.name || 'ProducerToy Asset'
+    // Clean product title (remove long marketing descriptions for clean email subject)
+    const shortProductName = primaryItem
+      .split(/[–—\-:]/)[0]
+      .trim() || primaryItem.slice(0, 30).trim()
+
+    let subject = ''
+    if (params.items.length === 1) {
+      subject = isFree
+        ? `Your Free ${shortProductName} - Order #${params.orderNumber}`
+        : `Your ${shortProductName} Order - #${params.orderNumber}`
+    } else {
+      subject = isFree
+        ? `Your Free Downloads (${shortProductName} + ${params.items.length - 1} more) - Order #${params.orderNumber}`
+        : `Your ProducerToy Order #${params.orderNumber} - ${shortProductName} & more`
+    }
+
+    // Format Date: e.g. Oct 27, 2026
+    const formattedDate = new Date(params.orderDate || Date.now()).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+
     // Build items rows
     const itemsHtml = params.items
       .map((item) => {
@@ -78,37 +106,46 @@ export async function sendOrderInvoiceEmail(
             ? 'Audio Plugin • VST3 / AU / AAX'
             : item.product_type === 'sample_pack'
             ? 'Sample Pack • 24-Bit WAV'
-            : 'Sound Tool'
+            : 'Audio Tool • Instant Download'
 
         const serialBox = item.serial_key
           ? `
-            <div style="margin-top: 10px; background-color: #1a1a1a; border: 1px solid #333333; border-radius: 8px; padding: 10px 14px;">
-              <div style="font-size: 10px; font-weight: 700; font-family: monospace; letter-spacing: 0.1em; color: #a1a1aa; text-transform: uppercase;">
-                LICENSE SERIAL KEY
-              </div>
-              <div style="font-size: 13px; font-weight: 700; font-family: 'Courier New', Courier, monospace; color: #ffffff; letter-spacing: 0.1em; margin-top: 4px; word-break: break-all;">
-                ${item.serial_key}
-              </div>
+            <div style="margin-top: 12px; background-color: #141416; border: 1px solid #2c2c30; border-radius: 8px; padding: 12px 14px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <div style="font-size: 10px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: 0.12em; color: #a1a1aa; text-transform: uppercase;">
+                      LICENSE SERIAL KEY
+                    </div>
+                    <div style="font-size: 14px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; color: #ffffff; letter-spacing: 0.08em; margin-top: 5px; word-break: break-all;">
+                      ${item.serial_key}
+                    </div>
+                    <div style="font-size: 11px; color: #71717a; margin-top: 5px; line-height: 1.4;">
+                      Use this key to activate inside your DAW or download the offline license (.ptlic) file in your Library.
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </div>
           `
           : ''
 
         return `
           <tr>
-            <td style="padding: 18px 0; border-bottom: 1px solid #222222;">
+            <td style="padding: 16px 0; border-bottom: 1px solid #1f1f22;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
                   <td style="vertical-align: top;">
                     <div style="font-size: 14px; font-weight: 700; color: #ffffff; line-height: 1.4;">
                       ${item.name}
                     </div>
-                    <div style="font-size: 11px; color: #71717a; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <div style="font-size: 11px; color: #8a8a93; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em;">
                       ${typeLabel}
                     </div>
                     ${serialBox}
                   </td>
                   <td align="right" style="vertical-align: top; padding-left: 16px; white-space: nowrap;">
-                    <div style="font-size: 14px; font-weight: 700; color: #ffffff;">
+                    <div style="font-size: 14px; font-weight: 800; color: #ffffff;">
                       ${itemPrice}
                     </div>
                   </td>
@@ -120,160 +157,305 @@ export async function sendOrderInvoiceEmail(
       })
       .join('')
 
+    const discountRow =
+      params.discount > 0
+        ? `
+          <tr>
+            <td style="padding: 6px 0; font-size: 12px; color: #8a8a93;">Discounts Applied</td>
+            <td align="right" style="padding: 6px 0; font-size: 12px; font-weight: 600; color: #ffffff;">
+              -${currencySymbol}${params.discount.toFixed(2)}
+            </td>
+          </tr>
+        `
+        : ''
+
+    const subtotalFormatted =
+      params.subtotal <= 0
+        ? '$0.00'
+        : `${currencySymbol}${params.subtotal.toFixed(2)}`
+
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Receipt - ${params.orderNumber}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>${subject}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    table { border-collapse: collapse !important; }
+    body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #050505; }
+    @media only screen and (max-width: 600px) {
+      .email-container { width: 100% !important; max-width: 100% !important; }
+      .mobile-p-20 { padding: 24px 20px !important; }
+      .mobile-p-16 { padding: 16px 14px !important; }
+      .mobile-full-btn { display: block !important; width: 100% !important; box-sizing: border-box !important; }
+    }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #e4e4e7; line-height: 1.6;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0a0a0a; min-height: 100vh; padding: 40px 16px;">
+<body style="margin: 0; padding: 0; background-color: #050505; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #ffffff;">
+
+  <!-- Outer Canvas -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #050505; width: 100%; min-height: 100vh;">
     <tr>
-      <td align="center">
-        <table role="presentation" width="100%" style="max-width: 600px; background-color: #141414; border: 1px solid #262626; border-radius: 14px; overflow: hidden; box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);" cellspacing="0" cellpadding="0">
-          
-          <!-- Top Accent Monochrome Line -->
+      <td align="center" style="padding: 32px 12px 48px 12px;">
+
+        <!-- Central 580px Card -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width: 580px; width: 100%; background-color: #0f0f11; border: 1px solid #202024; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75);">
+
+          <!-- ================= HEADER WITH MASCOT ================= -->
           <tr>
-            <td style="height: 3px; background-color: #ffffff;"></td>
+            <td align="center" style="padding: 36px 32px 24px 32px; background-color: #121215; border-bottom: 1px solid #1f1f23;">
+              
+              <!-- Clean Borderless Mascot Bear (Clickable to Site, Drag Off) -->
+              <a href="${siteUrl}" target="_blank" draggable="false" style="text-decoration: none; display: inline-block; border: none; outline: none;">
+                <img
+                  src="${MASCOT_LOGO_URL}"
+                  alt="Producer Toy Mascot"
+                  width="78"
+                  height="72"
+                  draggable="false"
+                  style="display: block; margin: 0 auto 16px auto; border: none; outline: none; -webkit-user-drag: none; user-select: none;"
+                />
+              </a>
+
+              <div style="font-size: 18px; font-weight: 800; letter-spacing: 0.12em; color: #ffffff; text-transform: uppercase;">
+                PRODUCER TOY
+              </div>
+              <div style="font-size: 11px; font-weight: 600; color: #71717a; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px;">
+                OFFICIAL ORDER RECEIPT & LICENSE INVOICE
+              </div>
+            </td>
           </tr>
 
-          <!-- Header -->
+          <!-- ================= ORDER METADATA BAR ================= -->
           <tr>
-            <td style="padding: 32px 36px 24px 36px; border-bottom: 1px solid #202020;">
+            <td style="padding: 16px 32px; background-color: #16161a; border-bottom: 1px solid #1f1f23;" class="mobile-p-16">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td>
-                    <div style="font-size: 18px; font-weight: 900; letter-spacing: 0.1em; color: #ffffff; text-transform: uppercase;">
-                      PRODUCER TOY
+                  <td style="vertical-align: middle;">
+                    <div style="font-size: 10px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em;">
+                      ORDER NUMBER
                     </div>
-                    <div style="font-size: 11px; color: #71717a; letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px;">
-                      Official Order Receipt & License Invoice
+                    <div style="font-size: 13px; font-weight: 700; color: #ffffff; font-family: 'SFMono-Regular', Consolas, monospace; margin-top: 2px;">
+                      #${params.orderNumber}
                     </div>
                   </td>
-                  <td align="right">
-                    <span style="display: inline-block; padding: 4px 10px; background-color: #222222; border: 1px solid #333333; border-radius: 6px; font-size: 11px; font-weight: 700; color: #ffffff; font-family: monospace;">
+                  <td align="center" style="vertical-align: middle; padding: 0 10px;">
+                    <div style="display: inline-block; background-color: #222226; border: 1px solid #333338; color: #ffffff; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">
                       ${isFree ? 'CLAIMED' : 'PAID'}
-                    </span>
+                    </div>
+                  </td>
+                  <td align="right" style="vertical-align: middle;">
+                    <div style="font-size: 10px; font-weight: 700; color: #71717a; text-transform: uppercase; letter-spacing: 0.08em;">
+                      ORDER DATE
+                    </div>
+                    <div style="font-size: 13px; font-weight: 600; color: #ffffff; margin-top: 2px;">
+                      ${formattedDate}
+                    </div>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Order Summary Meta Banner -->
+          <!-- ================= MAIN BODY ================= -->
           <tr>
-            <td style="padding: 24px 36px; background-color: #171717; border-bottom: 1px solid #202020;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td style="vertical-align: top; width: 50%;">
-                    <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em; color: #71717a;">Order Number</div>
-                    <div style="font-size: 13px; font-weight: 700; font-family: monospace; color: #ffffff; margin-top: 3px;">${params.orderNumber}</div>
-                  </td>
-                  <td style="vertical-align: top; width: 50%;">
-                    <div style="font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em; color: #71717a;">Order Date</div>
-                    <div style="font-size: 13px; font-weight: 500; color: #ffffff; margin-top: 3px;">${new Date(params.orderDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Main Content -->
-          <tr>
-            <td style="padding: 32px 36px;">
-              <div style="font-size: 15px; color: #e4e4e7; margin-bottom: 24px;">
-                Hello <strong style="color: #ffffff;">${params.customerName}</strong>,
-                <br /><br />
+            <td style="padding: 32px;" class="mobile-p-20">
+              
+              <!-- Greeting Message -->
+              <div style="font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">
+                Hello ${params.customerName || 'Producer'},
+              </div>
+              <div style="font-size: 13px; color: #a1a1aa; line-height: 1.6; margin-bottom: 28px;">
                 Thank you for your order! Your digital assets and genuine commercial licenses have been verified and added directly to your permanent <strong>ProducerToy Library</strong>.
               </div>
 
-              <!-- Purchased Products List -->
-              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #71717a; margin-bottom: 8px;">
-                Items in This Order
+              <!-- Section: Items In This Order -->
+              <div style="font-size: 11px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">
+                ITEMS IN THIS ORDER
               </div>
-
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
                 ${itemsHtml}
               </table>
 
-              <!-- Financial Totals -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #181818; border: 1px solid #27272a; border-radius: 10px; padding: 16px 20px; margin-bottom: 28px;">
-                <tr>
-                  <td style="font-size: 12px; color: #a1a1aa; padding-bottom: 6px;">Subtotal</td>
-                  <td align="right" style="font-size: 12px; color: #ffffff; font-weight: 600; padding-bottom: 6px;">
-                    ${currencySymbol}${params.subtotal.toFixed(2)}
-                  </td>
-                </tr>
-                ${
-                  params.discount > 0
-                    ? `
+              <!-- Totals Breakdown Table -->
+              <div style="background-color: #141417; border: 1px solid #202024; border-radius: 10px; padding: 18px 20px; margin-bottom: 30px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                   <tr>
-                    <td style="font-size: 12px; color: #a1a1aa; padding-bottom: 6px;">Discount</td>
-                    <td align="right" style="font-size: 12px; color: #ffffff; font-weight: 600; padding-bottom: 6px;">
-                      -${currencySymbol}${params.discount.toFixed(2)}
+                    <td style="padding: 4px 0; font-size: 12px; color: #8a8a93;">Subtotal</td>
+                    <td align="right" style="padding: 4px 0; font-size: 12px; color: #ffffff;">
+                      ${subtotalFormatted}
                     </td>
                   </tr>
-                `
-                    : ''
-                }
+                  ${discountRow}
+                  <tr>
+                    <td style="padding: 12px 0 0 0; border-top: 1px solid #242428; font-size: 14px; font-weight: 800; color: #ffffff; text-transform: uppercase;">
+                      Total Paid
+                    </td>
+                    <td align="right" style="padding: 12px 0 0 0; border-top: 1px solid #242428; font-size: 16px; font-weight: 900; color: #ffffff;">
+                      ${formattedTotal}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Primary CTA Button (High conversion white pill) -->
+              <div style="text-align: center; margin-bottom: 12px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto;">
+                  <tr>
+                    <td align="center" style="background-color: #ffffff; border-radius: 10px;">
+                      <a href="${libraryUrl}" target="_blank" class="mobile-full-btn" style="display: inline-block; background-color: #ffffff; color: #0a0a0c; font-weight: 800; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; padding: 16px 36px; border-radius: 10px; text-decoration: none;">
+                        Open My Library &amp; Download
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <div style="text-align: center; font-size: 11px; color: #71717a; line-height: 1.5; margin-bottom: 32px;">
+                Instant access to your installers, WAV sample packs, and offline license (.ptlic) files.
+              </div>
+
+              <!-- Verified Licensee / Billing Information -->
+              <div style="background-color: #121215; border: 1px solid #1f1f23; border-radius: 10px; padding: 18px 20px;">
+                <div style="font-size: 10px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;">
+                  VERIFIED BILLING &amp; LICENSEE INFORMATION
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">
+                  ${params.customerName}
+                </div>
+                <div style="font-size: 12px; color: #a1a1aa; line-height: 1.5;">
+                  ${params.billingAddress.address}${params.billingAddress.address2 ? ', ' + params.billingAddress.address2 : ''}<br />
+                  ${params.billingAddress.city}, ${params.billingAddress.state} ${params.billingAddress.zip}<br />
+                  ${params.billingAddress.country}
+                </div>
+                <div style="margin-top: 10px; font-size: 11px; color: #71717a;">
+                  ${params.customerPhone ? `Phone: <span style="color: #ffffff;">${params.customerPhone}</span> &bull; ` : ''}
+                  Email: <span style="color: #ffffff;">${cleanEmail}</span>
+                </div>
+              </div>
+
+            </td>
+          </tr>
+
+          <!-- ================= FOOTER SECTION ================= -->
+          <tr>
+            <td style="padding: 36px 32px 32px 32px; background-color: #0b0b0d; border-top: 1px solid #1c1c20; text-align: center;" class="mobile-p-20">
+              
+              <!-- ProducerToy 3D Charcoal Logo (Bottom Centered, Drag Off) -->
+              <div style="margin-bottom: 16px;">
+                <a href="${siteUrl}" target="_blank" draggable="false" style="text-decoration: none; display: inline-block; border: none; outline: none;">
+                  <img
+                    src="${PRODUCER_TOY_LOGO_URL}"
+                    alt="Producer Toy"
+                    width="168"
+                    height="59"
+                    draggable="false"
+                    style="display: block; margin: 0 auto; border: none; outline: none; -webkit-user-drag: none; user-select: none;"
+                  />
+                </a>
+              </div>
+
+              <!-- Minimal Separation Line Underneath Logo -->
+              <div style="width: 48px; height: 1px; background-color: #242428; margin: 0 auto 16px auto;"></div>
+
+              <!-- Producer Toy Brand Description -->
+              <div style="font-size: 11px; color: #71717a; line-height: 1.6; max-width: 420px; margin: 0 auto 20px auto;">
+                The premier digital audio ecosystem for music producers, sound designers, and creators worldwide.
+              </div>
+
+              <!-- Need Help & Support Link -->
+              <div style="margin-bottom: 22px;">
+                <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                  <tr>
+                    <td style="vertical-align: middle; padding-right: 6px;">
+                      <img src="https://img.icons8.com/ios-filled/50/a1a1aa/mail.png" width="14" height="14" alt="Email" draggable="false" style="display: block; -webkit-user-drag: none;" />
+                    </td>
+                    <td style="vertical-align: middle;">
+                      <a href="mailto:support@producertoy.com" style="color: #a1a1aa; text-decoration: none; font-size: 12px; font-weight: 600;">
+                        support@producertoy.com
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- Social Media Links (Instagram, YouTube, Website) -->
+              <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 24px auto;">
                 <tr>
-                  <td style="font-size: 14px; font-weight: 700; color: #ffffff; border-top: 1px solid #2a2a2a; padding-top: 10px;">Total Paid</td>
-                  <td align="right" style="font-size: 16px; font-weight: 800; color: #ffffff; border-top: 1px solid #2a2a2a; padding-top: 10px;">
-                    ${formattedTotal}
+                  <td align="center" style="padding: 0 10px;">
+                    <a href="https://instagram.com/producertoy" target="_blank" draggable="false" style="text-decoration: none; display: inline-block;">
+                      <img
+                        src="https://img.icons8.com/?size=100&id=32292&format=png&color=71717a"
+                        width="20"
+                        height="20"
+                        alt="Instagram"
+                        draggable="false"
+                        style="display: block; width: 20px; height: 20px; border: 0; outline: none; -webkit-user-drag: none;"
+                      />
+                    </a>
+                  </td>
+                  <td align="center" style="padding: 0 10px;">
+                    <a href="https://youtube.com/@producertoy" target="_blank" draggable="false" style="text-decoration: none; display: inline-block;">
+                      <img
+                        src="https://img.icons8.com/?size=100&id=37325&format=png&color=71717a"
+                        width="20"
+                        height="20"
+                        alt="YouTube"
+                        draggable="false"
+                        style="display: block; width: 20px; height: 20px; border: 0; outline: none; -webkit-user-drag: none;"
+                      />
+                    </a>
+                  </td>
+                  <td align="center" style="padding: 0 10px;">
+                    <a href="${siteUrl}" target="_blank" draggable="false" style="text-decoration: none; display: inline-block;">
+                      <img
+                        src="https://img.icons8.com/?size=100&id=3685&format=png&color=71717a"
+                        width="20"
+                        height="20"
+                        alt="Producer Toy Website"
+                        draggable="false"
+                        style="display: block; width: 20px; height: 20px; border: 0; outline: none; -webkit-user-drag: none;"
+                      />
+                    </a>
                   </td>
                 </tr>
               </table>
 
-              <!-- Billing Address Snapshot -->
-              <div style="background-color: #171717; border: 1px solid #242424; border-radius: 10px; padding: 16px 20px; margin-bottom: 32px;">
-                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #71717a; margin-bottom: 6px;">
-                  Verified Billing & Licensee Information
-                </div>
-                <div style="font-size: 12px; color: #e4e4e7; line-height: 1.5;">
-                  <strong>${params.customerName}</strong><br />
-                  ${params.billingAddress.address}${params.billingAddress.address2 ? `, ${params.billingAddress.address2}` : ''}<br />
-                  ${params.billingAddress.city}, ${params.billingAddress.state} ${params.billingAddress.zip}<br />
-                  ${params.billingAddress.country}<br />
-                  ${params.customerPhone ? `<span style="color: #a1a1aa;">Phone: ${params.customerPhone}</span><br />` : ''}
-                  <span style="color: #a1a1aa;">Email: ${cleanEmail}</span>
-                </div>
+              <!-- Copyright & Legal -->
+              <div style="font-size: 11px; color: #52525b; line-height: 1.6;">
+                &copy; ${new Date().getFullYear()} Producer Toy. All rights reserved.<br />
+                Audio plugins and sample packs include 100% royalty-free commercial licenses.
               </div>
 
-              <!-- Primary CTA Button -->
-              <div style="text-align: center; margin-bottom: 24px;">
-                <a href="${libraryUrl}" target="_blank" style="display: inline-block; background-color: #ffffff; color: #0a0a0a; font-weight: 800; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; padding: 16px 36px; border-radius: 10px; text-decoration: none; box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);">
-                  Open My Library & Download
-                </a>
+              <!-- Unique ID to prevent Gmail thread collapsing -->
+              <div style="display: none; max-height: 0px; overflow: hidden; font-size: 1px; color: #050505;">
+                Order Ref: ${params.orderNumber}-${Date.now()}
               </div>
 
-              <div style="text-align: center; font-size: 11px; color: #71717a;">
-                You can also generate offline license files (.ptlic) and access direct installers inside your Library at any time.
-              </div>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 24px 36px; background-color: #0f0f0f; border-top: 1px solid #1f1f1f; text-align: center;">
-              <div style="font-size: 11px; color: #71717a; line-height: 1.6;">
-                © ${new Date().getFullYear()} Producer Toy. All rights reserved.<br />
-                Audio plugins and samples purchased on Producer Toy include 100% royalty-free commercial licenses.<br />
-                Need help? Contact support at <a href="mailto:support@producertoy.com" style="color: #a1a1aa; text-decoration: underline;">support@producertoy.com</a>.
-              </div>
             </td>
           </tr>
 
         </table>
+
       </td>
     </tr>
   </table>
+
 </body>
 </html>`
-
-    const subject = isFree
-      ? `Your Free Download & License - Order ${params.orderNumber}`
-      : `Order Confirmation & Receipt - ${params.orderNumber}`
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -293,29 +475,10 @@ export async function sendOrderInvoiceEmail(
 
     if (!res.ok) {
       console.warn('[ORDER_INVOICE_EMAIL] Resend returned non-200 with fromAddress:', fromAddress, data)
-      // Retry with onboarding@resend.dev if custom domain is not yet verified on Resend
-      if (data?.statusCode === 403 || data?.name === 'validation_error' || data?.message?.includes('domain')) {
-        const fallbackRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'ProducerToy <onboarding@resend.dev>',
-            to: [cleanEmail],
-            subject,
-            html: htmlContent,
-          }),
-        })
-        const fallbackData = await fallbackRes.json().catch(() => ({}))
-        if (fallbackRes.ok) {
-          return { success: true, messageId: fallbackData.id }
-        }
-      }
       return { success: false, error: data.message || 'Failed to dispatch email' }
     }
 
+    console.log('[ORDER_INVOICE_EMAIL] Email successfully dispatched. ID:', data.id)
     return { success: true, messageId: data.id }
   } catch (err: any) {
     console.error('[ORDER_INVOICE_EMAIL] Error dispatching order invoice:', err)
