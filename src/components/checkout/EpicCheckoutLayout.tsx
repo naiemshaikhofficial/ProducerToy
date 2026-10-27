@@ -324,28 +324,33 @@ export function EpicCheckoutLayout({
           </div>
         </div>
 
-        {/* Clean In-Modal Address Required Dialog (Smoothly pops up when address missing) */}
+        {/* Full-Page In-Modal Billing Address Interface (Full Page, No Cutoff) */}
         {showAddressForm && (
-          <div className="absolute inset-0 z-50 bg-[#121214]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 flex flex-col justify-between animate-in fade-in duration-150">
-            <div>
-              <div className="flex items-center justify-between pb-3 border-b border-[#242428] mb-4">
-                <div className="flex items-center gap-2">
-                  <LogoIcon size={18} />
-                  <h3 className="text-[15px] font-bold text-white">Billing Address (Required)</h3>
+          <div className="absolute inset-0 z-50 bg-[#141416] rounded-2xl p-6 sm:p-10 flex flex-col justify-between overflow-y-auto animate-in fade-in duration-150">
+            <div className="w-full max-w-[860px] mx-auto space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3.5 border-b border-[#242428]">
+                <div className="flex items-center gap-2.5">
+                  <LogoIcon size={22} />
+                  <div>
+                    <h3 className="text-[17px] font-bold text-white tracking-wide">Billing Address Required</h3>
+                    <p className="text-[11.5px] text-zinc-400">
+                      ProducerToy requires your billing address to generate your official digital license and tax invoice.
+                    </p>
+                  </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowAddressForm(false)}
-                  className="text-zinc-400 hover:text-white p-1 rounded-md cursor-pointer"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
                   title="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
-                ProducerToy requires your billing address to generate your official digital license and tax invoice.
-              </p>
-              <div className="max-h-[290px] overflow-y-auto pr-1">
+
+              {/* Full Billing Form with natural height (No cutoffs) */}
+              <div className="py-2">
                 <CheckoutBillingForm
                   billingDetails={billingDetails}
                   onBillingChange={onBillingChange}
@@ -355,44 +360,45 @@ export function EpicCheckoutLayout({
                   countryOptions={countryOptions}
                 />
               </div>
-            </div>
 
-            <div className="pt-4 border-t border-[#242428] flex items-center justify-end gap-3 mt-3">
-              <button
-                type="button"
-                onClick={() => setShowAddressForm(false)}
-                className="px-4 h-9.5 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const requiredFields: (keyof BillingDetails)[] = [
-                    'fullName',
-                    'email',
-                    'phone',
-                    'address',
-                    'city',
-                    'state',
-                    'zip',
-                    'country',
-                  ]
-                  let hasErr = false
-                  for (const field of requiredFields) {
-                    if (!billingDetails[field]?.trim()) {
-                      onBillingChange(field, billingDetails[field] || '')
-                      hasErr = true
+              {/* Footer Action Buttons */}
+              <div className="pt-4 border-t border-[#242428] flex items-center justify-end gap-3 pb-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddressForm(false)}
+                  className="px-5 h-11 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const requiredFields: (keyof BillingDetails)[] = [
+                      'fullName',
+                      'email',
+                      'phone',
+                      'address',
+                      'city',
+                      'state',
+                      'zip',
+                      'country',
+                    ]
+                    let hasErr = false
+                    for (const field of requiredFields) {
+                      if (!billingDetails[field]?.trim()) {
+                        onBillingChange(field, billingDetails[field] || '')
+                        hasErr = true
+                      }
                     }
-                  }
-                  if (hasErr) return
-                  setShowAddressForm(false)
-                  onFreeCheckout(true)
-                }}
-                className="px-5 h-9.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-lg transition-all shadow-md cursor-pointer"
-              >
-                Save &amp; Claim License
-              </button>
+                    if (hasErr) return
+                    setShowAddressForm(false)
+                    onFreeCheckout(true)
+                  }}
+                  className="px-7 h-11 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-lg transition-all shadow-md cursor-pointer"
+                >
+                  Save &amp; Claim License
+                </button>
+              </div>
             </div>
           </div>
         )}
