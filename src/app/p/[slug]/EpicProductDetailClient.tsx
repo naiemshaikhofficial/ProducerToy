@@ -79,7 +79,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
   const added = isInCart(product.id)
 
   const handleGetNow = () => {
-    if (product.external_url) {
+    if (product.allow_external_url && product.external_url) {
       window.open(product.external_url, '_blank')
       return
     }
@@ -358,7 +358,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                 onClick={handleGetNow}
                 className="flex-1 py-4 px-6 text-sm font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#34363d] hover:bg-[#42454e] text-white active:scale-[0.98] shadow-lg shadow-black/40"
               >
-                <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
+                <span>{Number(product.price_usd) === 0 ? 'Claim for Free' : 'Buy Now'}</span>
               </button>
 
               <button
@@ -873,7 +873,7 @@ export function EpicProductDetailClient({ product }: { product: any }) {
                   onClick={handleGetNow}
                   className="flex-1 py-3.5 px-6 text-sm font-black uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#34363d] hover:bg-[#42454e] text-white active:scale-[0.99] shadow-lg shadow-black/40"
                 >
-                  <span>{Number(product.price_usd) === 0 ? 'Download Free' : 'Buy Now'}</span>
+                  <span>{Number(product.price_usd) === 0 ? 'Claim for Free' : 'Buy Now'}</span>
                 </button>
 
                 <button
