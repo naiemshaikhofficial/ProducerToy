@@ -510,8 +510,8 @@ export async function claimSerialKeyForPurchase({
     prod?.delivery_method === 'license_key'
   )
 
-  // Never forge algorithmic dummy keys for products configured for pre-loaded genuine serial pools
-  if (!isDedicated && !isExplicitPoolDelivery && prod?.product_type === 'plugin') {
+  // 3. Fallback: Generate genuine algorithmic serial key for plugins and dedicated products
+  if (prod?.product_type === 'plugin' || isDedicated || isExplicitPoolDelivery) {
     return generateStandardSerialKey(prod, prefixOverride)
   }
 

@@ -18,6 +18,7 @@ import {
   CartDataSharingAudit,
   ProductDataSharingConfig,
 } from '@/lib/privacy/dataSharing'
+import { sendOrderInvoiceEmail } from '@/lib/email/orderInvoiceEmail'
 
 export { isDedicatedLicensedProduct, generateStandardSerialKey, checkProductStockStatus }
 export type { CartDataSharingAudit, ProductDataSharingConfig }
@@ -96,6 +97,32 @@ export async function processCheckoutAction(
 
     let targetUserId: string | null = sessionUser?.id || clientUserId || null
     const targetEmail = sessionUser?.email || billingDetails?.email || email || ''
+
+    // Strict Mandatory Billing Address Verification: Nobody can claim or purchase without a valid address
+    const cleanFullName = billingDetails?.fullName?.trim() || ''
+    const cleanEmail = (billingDetails?.email || targetEmail || '').trim()
+    const cleanPhone = billingDetails?.phone?.trim() || ''
+    const cleanAddress = billingDetails?.address?.trim() || ''
+    const cleanCity = billingDetails?.city?.trim() || ''
+    const cleanState = billingDetails?.state?.trim() || ''
+    const cleanZip = billingDetails?.zip?.trim() || ''
+    const cleanCountry = billingDetails?.country?.trim() || ''
+
+    if (
+      !cleanFullName ||
+      !cleanEmail ||
+      !cleanPhone ||
+      !cleanAddress ||
+      !cleanCity ||
+      !cleanState ||
+      !cleanZip ||
+      !cleanCountry
+    ) {
+      return {
+        success: false,
+        error: 'Complete billing address is required (Full Name, Phone Number, Street Address, City, State, Postal Code, Country) to claim or purchase products.',
+      }
+    }
 
     const adminSupabase = getAdminClient()
 
@@ -520,6 +547,45 @@ export async function processCheckoutAction(
       } catch (rewardErr) {
         console.warn('Toywards balance update note:', rewardErr)
       }
+    }
+
+    // 7.5 Dispatch Official Themed Order Receipt & Invoice Email via Resend
+    try {
+      const invoiceItems = purchaseRecords.map((p: any) => {
+        const matchingCart = items.find((i) => i.id === p.product_id)
+        const matchingDb = dbProducts.find((dbp: any) => dbp.id === p.product_id)
+        return {
+          name: matchingCart?.name || matchingDb?.name || 'ProducerToy Asset',
+          slug: matchingCart?.slug || matchingDb?.slug || '',
+          product_type: matchingCart?.product_type || matchingDb?.product_type || 'plugin',
+          price_usd: Number(matchingDb?.price_usd || matchingCart?.price_usd || 0),
+          price_inr: Number(matchingCart?.price_inr || 0),
+          serial_key: p.serial_key || null,
+        }
+      })
+
+      sendOrderInvoiceEmail({
+        orderNumber,
+        orderDate: new Date().toISOString(),
+        customerName: cleanFullName,
+        customerEmail: cleanEmail,
+        customerPhone: cleanPhone,
+        billingAddress: {
+          address: cleanAddress,
+          address2: billingDetails?.address2 || '',
+          city: cleanCity,
+          state: cleanState,
+          zip: cleanZip,
+          country: cleanCountry,
+        },
+        items: invoiceItems,
+        currency: orderCurrency,
+        subtotal: rawSubtotalUsd,
+        discount: couponDiscountUsd + verifiedRewardDiscountUsd,
+        totalAmount: expectedTotalUsd,
+      }).catch((emailErr) => console.warn('Order invoice email dispatch note:', emailErr))
+    } catch (e) {
+      console.warn('Invoice preparation note:', e)
     }
 
     // 8. Purge cache on Library routes so purchases reflect instantly

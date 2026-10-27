@@ -1,4 +1,5 @@
 import React from 'react'
+import crypto from 'crypto'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getAdminClient } from '@/lib/supabase/admin'
@@ -43,9 +44,9 @@ export default async function LibraryPage() {
 
     purchases = userPurchases || []
 
-    // Generate secure download tokens for each product
+    // Generate secure download tokens & auto-issue missing serial keys for plugins
     if (purchases.length > 0) {
-      purchases.forEach((item: any) => {
+      for (const item of purchases as any[]) {
         const product = item.products
         if (product) {
           downloadTokens[product.id] = signDownloadToken(
@@ -57,8 +58,34 @@ export default async function LibraryPage() {
             },
             3600 // 1 hour token
           )
+
+          // Auto-repair missing serial key for plugins so user can activate immediately
+          const isPlugin =
+            product.product_type === 'plugin' ||
+            Boolean(product.plugin_identifier) ||
+            String(product.name || '').toLowerCase().includes('plugin') ||
+            String(product.slug || '').toLowerCase().includes('proverb')
+
+          if (isPlugin && (!item.serial_key || typeof item.serial_key !== 'string' || !item.serial_key.trim())) {
+            const rawPrefix = product.slug || product.name || 'PLUG'
+            const cleanPrefix = String(rawPrefix).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5) || 'PLUG'
+            const partA = crypto.randomBytes(3).toString('hex').toUpperCase()
+            const partB = crypto.randomBytes(3).toString('hex').toUpperCase()
+            const partC = crypto.randomBytes(3).toString('hex').toUpperCase()
+            const generatedKey = `PT-${cleanPrefix}-${partA}-${partB}-${partC}`
+
+            item.serial_key = generatedKey
+            adminSupabase
+              .from('purchases')
+              .update({ serial_key: generatedKey })
+              .eq('id', item.id)
+              .then(
+                () => {},
+                (e) => console.warn('Serial auto-repair update note:', e)
+              )
+          }
         }
-      })
+      }
     }
   }
 

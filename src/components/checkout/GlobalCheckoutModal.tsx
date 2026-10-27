@@ -247,10 +247,19 @@ export function GlobalCheckoutModal() {
     if (!billingDetails.phone.trim()) errors.phone = 'Required'
     if (!billingDetails.address.trim()) errors.address = 'Required'
     if (!billingDetails.city.trim()) errors.city = 'Required'
+    if (!billingDetails.state.trim()) errors.state = 'Required'
     if (!billingDetails.zip.trim()) errors.zip = 'Required'
     if (!billingDetails.country.trim()) errors.country = 'Required'
     setFormErrors(errors)
-    return Object.keys(errors).length === 0
+    if (Object.keys(errors).length > 0) {
+      setErrorMsg('Please fill in all mandatory billing address fields.')
+      const billingSection = document.getElementById('billing-details-section')
+      if (billingSection) {
+        billingSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+      return false
+    }
+    return true
   }
 
   const handleApplyCoupon = async () => {
