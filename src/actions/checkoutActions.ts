@@ -74,6 +74,7 @@ export interface CheckoutActionResult {
   success: boolean
   purchases?: any[]
   orderId?: string
+  orderNumber?: string
   error?: string
 }
 
@@ -602,6 +603,7 @@ export async function processCheckoutAction(
       success: true,
       purchases: insertedPurchases || [],
       orderId: orderNumber,
+      orderNumber: orderNumber,
     }
   } catch (err: any) {
     console.error('Server Action Checkout error:', err)

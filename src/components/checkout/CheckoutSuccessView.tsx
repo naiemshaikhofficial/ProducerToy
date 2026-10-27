@@ -131,35 +131,35 @@ export function CheckoutSuccessView({
           <Link
             href="/gifts"
             onClick={onClose}
-            className="w-full h-11 bg-white hover:bg-zinc-200 active:scale-[0.99] text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full h-11 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[13px] rounded-md border border-[#38383e] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>View Sent Gifts</span>
             <ArrowRight size={14} />
           </Link>
         ) : (
           <>
-            {/* Primary: Download Installer */}
+            {/* Primary: Download Installer (Charcoal Black matching user rules) */}
             <button
               type="button"
               onClick={handleDownloadInstaller}
               disabled={downloadLoading}
-              className="w-full sm:flex-1 h-11 bg-white hover:bg-zinc-200 active:scale-[0.99] text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className="w-full sm:flex-1 h-11 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[13px] rounded-md border border-[#38383e] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
               {downloadLoading ? (
-                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <Download className="w-4 h-4" />
-                  <span>Download Installer</span>
+                  <span>No, get installer</span>
+                  <Download className="w-4 h-4 stroke-[2.5]" />
                 </>
               )}
             </button>
 
-            {/* Secondary: Yes, it's installed */}
+            {/* Secondary: Yes, it's installed (Dark Grey Pill matching Screenshot 2) */}
             <Link
               href="/library"
               onClick={onClose}
-              className="w-full sm:flex-1 h-11 bg-[#202020] hover:bg-[#282828] active:scale-[0.99] text-white font-bold text-xs rounded-lg border border-[#383838] tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full sm:flex-1 h-11 bg-[#18181a] hover:bg-[#222226] active:scale-[0.99] text-zinc-200 hover:text-white font-semibold text-[13px] rounded-md border border-[#2e2e32] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               <span>Yes, it&apos;s installed</span>
               <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
@@ -181,16 +181,16 @@ export function CheckoutSuccessView({
             />
             <label
               htmlFor="share-email-creator"
-              className="text-[11.5px] text-zinc-400 leading-snug cursor-pointer select-none"
+              className="text-[11.5px] text-zinc-300 leading-snug cursor-pointer select-none"
             >
-              Share your email with <strong className="text-zinc-200 font-semibold">{resolvedSellerName}</strong> to get updates, presets, and offers in line with their{' '}
-              <Link href="/privacy" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
-                Privacy Policy
-              </Link>.
+              Share your email with <strong className="text-white font-bold">{resolvedSellerName}</strong> to get updates and offers in line with their{' '}
+              <Link href="/privacy" target="_blank" className="text-zinc-300 hover:text-white underline font-medium inline-flex items-center gap-0.5">
+                Privacy Policy <ExternalLink size={10} className="inline ml-0.5 opacity-70" />
+              </Link>
             </label>
           </div>
           {shareConsentSaved && (
-            <p className="text-[10.5px] text-zinc-400 pl-6.5 pt-1 font-medium">
+            <p className="text-[10.5px] text-emerald-400 pl-6.5 pt-1 font-medium">
               Preference saved for {resolvedSellerName} updates.
             </p>
           )}

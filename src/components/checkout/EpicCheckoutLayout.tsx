@@ -210,32 +210,36 @@ export function EpicCheckoutLayout({
     cover_image: '/placeholder.jpg'
   }
 
-  // 0. DEDICATED EPIC GAMES STORE FREE CHECKOUT MODAL (Screenshot 1)
+  // 0. DEDICATED EPIC GAMES STORE FREE CHECKOUT MODAL (Big Wide Box 1040px, Left Sidebar & Ambient Glow)
   if (isFree) {
     return (
-      <div className="w-full max-w-[560px] mx-auto bg-[#141414] border border-[#242424] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col p-6 sm:p-8 space-y-5 relative select-none font-sans text-white animate-in zoom-in-95 duration-150 my-auto">
-        {/* Top Header */}
-        <div className="flex items-center justify-between border-b border-[#222222] pb-3.5">
-          <div className="flex items-center gap-2.5">
-            <LogoIcon size={22} />
-            <span className="text-[15px] font-black tracking-wide text-white">Checkout</span>
+      <div className="w-full max-w-[1040px] lg:max-w-[1080px] h-auto min-h-[560px] md:h-[600px] mx-auto bg-[#141416] border border-[#242428] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-row relative select-none font-sans text-white animate-in zoom-in-95 duration-150 my-auto">
+        {/* Left Column: Epic Style Logo Sidebar */}
+        <div className="w-[96px] sm:w-[108px] bg-[#18181b] border-r border-[#242428] flex flex-col items-center pt-8 pb-8 select-none flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-[#242428] border border-[#323238] flex items-center justify-center text-white shadow-xs">
+            <LogoIcon size={20} />
           </div>
-          <div className="flex items-center gap-3">
+          <span className="text-[10.5px] font-bold text-zinc-400 tracking-wider uppercase mt-2">Checkout</span>
+        </div>
+
+        {/* Right Panel: Main Content Area */}
+        <div className="flex-1 bg-[#141416] p-8 sm:p-10 flex flex-col justify-between relative">
+          {/* Top Bar: User Badge Pill (Left) & Close Button (Right) */}
+          <div className="flex items-center justify-between">
             {user ? (
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[#202024] border border-white/10 flex items-center justify-center text-xs font-bold text-white uppercase">
+              <div className="flex items-center gap-2.5 px-3 py-1.5 bg-[#1c1c20] border border-[#28282e] rounded-full text-xs text-zinc-300 font-medium">
+                <div className="w-5 h-5 rounded-full bg-[#323238] text-white flex items-center justify-center text-[10px] font-bold uppercase">
                   {initialLetter}
                 </div>
-                <span className="text-xs text-zinc-300 font-medium hidden sm:inline truncate max-w-[150px]">
-                  {displayName}
-                </span>
+                <span className="truncate max-w-[160px] text-[12px]">{displayName}</span>
               </div>
-            ) : null}
+            ) : <div />}
+
             {onClose ? (
               <button
                 type="button"
                 onClick={onClose}
-                className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 title="Close checkout"
                 aria-label="Close"
               >
@@ -244,133 +248,154 @@ export function EpicCheckoutLayout({
             ) : (
               <Link
                 href="/store"
-                className="text-zinc-400 hover:text-white p-1 rounded-md transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 title="Close checkout"
               >
                 <X className="w-5 h-5" />
               </Link>
             )}
           </div>
-        </div>
 
-        {/* Centered Product Box Cover */}
-        <div className="flex flex-col items-center text-center space-y-3.5 pt-1">
-          <div className="relative w-[130px] h-[175px] sm:w-[150px] sm:h-[200px] bg-[#1a1a1a] border border-[#2c2c2c] rounded-xl overflow-hidden shadow-2xl flex-shrink-0">
-            <Image
-              src={primaryItem.cover_image || '/placeholder.jpg'}
-              alt={primaryItem.name}
-              fill
-              sizes="150px"
-              className="object-cover"
-              priority
-            />
-          </div>
+          {/* Center Column: Poster with Ambient Glow + Product Info + Action */}
+          <div className="flex flex-col items-center text-center my-auto py-2">
+            {/* Poster with Ambient Glow Behind */}
+            <div className="relative flex items-center justify-center my-1">
+              {/* Soft Radial Ambient Glow */}
+              <div className="absolute w-[240px] h-[300px] rounded-full bg-white/[0.09] blur-3xl pointer-events-none" />
 
-          <div className="space-y-1 max-w-sm">
-            <h2 className="text-[16px] sm:text-[18px] font-bold text-white line-clamp-2 leading-snug">
+              {/* Vertical Cover Poster */}
+              <div className="relative z-10 w-[140px] h-[190px] sm:w-[155px] sm:h-[210px] bg-[#121212] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex-shrink-0">
+                <Image
+                  src={primaryItem.cover_image || '/placeholder.jpg'}
+                  alt={primaryItem.name}
+                  fill
+                  sizes="160px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Product Name */}
+            <h2 className="text-[16px] sm:text-[18px] font-bold text-white text-center mt-4 line-clamp-2 max-w-md leading-tight">
               {primaryItem.name}
             </h2>
-            <p className="text-xs font-semibold text-zinc-400">
+
+            {/* Price: ₹0.00 */}
+            <p className="text-[13px] font-semibold text-zinc-400 text-center mt-1">
               {currencySymbol}0.00
             </p>
-          </div>
 
-          <h3 className="text-[18px] sm:text-[21px] font-black text-white tracking-tight max-w-md pt-0.5">
-            This is free. Add it to your library to get started.
-          </h3>
+            {/* Epic Prompt Headline */}
+            <h3 className="text-[19px] sm:text-[22px] font-bold text-white text-center mt-4 tracking-tight max-w-lg leading-tight">
+              This is free. Add it to your library to get started.
+            </h3>
+
+            {/* Charcoal Black CTA Button: [ Add to library ] */}
+            <button
+              type="button"
+              onClick={() => {
+                if (!isAddressComplete) {
+                  setShowAddressForm(true)
+                  return
+                }
+                onFreeCheckout(true)
+              }}
+              disabled={loading || paymentStatus === 'processing'}
+              className="w-full max-w-[400px] h-11 sm:h-12 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[13.5px] rounded-lg border border-[#38383e] transition-all shadow-md flex items-center justify-center mt-5 cursor-pointer disabled:opacity-60"
+            >
+              {loading || paymentStatus === 'processing' ? (
+                <div className="relative w-5 h-5 flex items-center justify-center">
+                  <div className="w-full h-full rounded-full border-2 border-white/20" />
+                  <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-white animate-spin duration-700 ease-linear" />
+                </div>
+              ) : (
+                <span>Add to library</span>
+              )}
+            </button>
+
+            {/* Legal Footnote */}
+            <p className="text-[10px] sm:text-[10.5px] text-zinc-400 text-center leading-relaxed mt-3.5 max-w-[420px] select-none">
+              By selecting &lsquo;Add to library&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
+              <Link href="/eula" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
+                End User License Agreement
+              </Link>.
+            </p>
+          </div>
         </div>
 
-        {/* Mandatory Address Verification / Toggle */}
-        <div className="space-y-2 pt-1">
-          {isAddressComplete && !showAddressForm ? (
-            <div className="flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-[#181818] border border-[#242424] text-[11.5px] text-zinc-400">
-              <span className="truncate">
-                Billing Address: <strong className="text-zinc-200 font-semibold">{billingDetails.fullName}</strong> • {billingDetails.city}, {billingDetails.country}
-              </span>
+        {/* Clean In-Modal Address Required Dialog (Smoothly pops up when address missing) */}
+        {showAddressForm && (
+          <div className="absolute inset-0 z-50 bg-[#121214]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 flex flex-col justify-between animate-in fade-in duration-150">
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-[#242428] mb-4">
+                <div className="flex items-center gap-2">
+                  <LogoIcon size={18} />
+                  <h3 className="text-[15px] font-bold text-white">Billing Address (Required)</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddressForm(false)}
+                  className="text-zinc-400 hover:text-white p-1 rounded-md cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-xs text-zinc-400 mb-3 leading-relaxed">
+                ProducerToy requires your billing address to generate your official digital license and tax invoice.
+              </p>
+              <div className="max-h-[290px] overflow-y-auto pr-1">
+                <CheckoutBillingForm
+                  billingDetails={billingDetails}
+                  onBillingChange={onBillingChange}
+                  formErrors={formErrors}
+                  newsletterOptIn={newsletterOptIn}
+                  setNewsletterOptIn={setNewsletterOptIn}
+                  countryOptions={countryOptions}
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-[#242428] flex items-center justify-end gap-3 mt-3">
               <button
                 type="button"
-                onClick={() => setShowAddressForm(true)}
-                className="text-zinc-400 hover:text-white underline font-medium ml-2 shrink-0 cursor-pointer text-[11px]"
+                onClick={() => setShowAddressForm(false)}
+                className="px-4 h-9.5 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white cursor-pointer"
               >
-                Edit
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const requiredFields: (keyof BillingDetails)[] = [
+                    'fullName',
+                    'email',
+                    'phone',
+                    'address',
+                    'city',
+                    'state',
+                    'zip',
+                    'country',
+                  ]
+                  let hasErr = false
+                  for (const field of requiredFields) {
+                    if (!billingDetails[field]?.trim()) {
+                      onBillingChange(field, billingDetails[field] || '')
+                      hasErr = true
+                    }
+                  }
+                  if (hasErr) return
+                  setShowAddressForm(false)
+                  onFreeCheckout(true)
+                }}
+                className="px-5 h-9.5 bg-white hover:bg-zinc-200 text-black font-extrabold text-xs rounded-lg transition-all shadow-md cursor-pointer"
+              >
+                Save &amp; Claim License
               </button>
             </div>
-          ) : (
-            <div className="bg-[#181818] border border-[#262626] rounded-xl p-4 text-left space-y-3 max-h-[280px] overflow-y-auto">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white">Billing Address Required</span>
-                {isAddressComplete && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddressForm(false)}
-                    className="text-[11px] text-zinc-400 hover:text-white underline cursor-pointer"
-                  >
-                    Done
-                  </button>
-                )}
-              </div>
-              <CheckoutBillingForm
-                billingDetails={billingDetails}
-                onBillingChange={onBillingChange}
-                formErrors={formErrors}
-                newsletterOptIn={newsletterOptIn}
-                setNewsletterOptIn={setNewsletterOptIn}
-                countryOptions={countryOptions}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Action Button */}
-        <div className="pt-1">
-          <button
-            type="button"
-            onClick={() => {
-              if (!isAddressComplete) {
-                setShowAddressForm(true)
-                const requiredFields: (keyof BillingDetails)[] = [
-                  'fullName',
-                  'email',
-                  'phone',
-                  'address',
-                  'city',
-                  'state',
-                  'zip',
-                  'country',
-                ]
-                for (const field of requiredFields) {
-                  if (!billingDetails[field]?.trim()) {
-                    onBillingChange(field, billingDetails[field] || '')
-                  }
-                }
-                return
-              }
-              onFreeCheckout(true)
-            }}
-            disabled={loading || paymentStatus === 'processing'}
-            className="w-full h-12 bg-white hover:bg-zinc-200 active:scale-[0.99] text-black font-black uppercase text-xs tracking-wider rounded-lg transition-all shadow-md flex items-center justify-center cursor-pointer disabled:opacity-60"
-          >
-            {loading || paymentStatus === 'processing' ? (
-              <div className="relative w-5 h-5 flex items-center justify-center">
-                <div className="w-full h-full rounded-full border-2 border-black/20" />
-                <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-black animate-spin duration-700 ease-linear" />
-              </div>
-            ) : (
-              <span>Add to library</span>
-            )}
-          </button>
-        </div>
-
-        {/* Compliance Footnote */}
-        <p className="text-[10px] text-zinc-400 text-center leading-relaxed select-none pb-1">
-          By selecting &lsquo;Add to library&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
-          <Link href="/eula" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
-            End User License Agreement
-          </Link>. You are acquiring a digital license for this product; for terms, see{' '}
-          <Link href="/purchase-policy" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
-            purchase policy
-          </Link>.
-        </p>
+          </div>
+        )}
       </div>
     )
   }

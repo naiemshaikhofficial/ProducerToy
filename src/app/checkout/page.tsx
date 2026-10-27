@@ -72,6 +72,10 @@ export default function CheckoutPage() {
     country: '',
   })
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  const [completedOrder, setCompletedOrder] = useState<{
+    orderNumber?: string
+    items: any[]
+  } | null>(null)
 
   // 1. Auto-Load User Data & Billing Details from Supabase & localStorage
   useEffect(() => {
@@ -503,6 +507,10 @@ export default function CheckoutPage() {
       )
 
       if (res.success) {
+        setCompletedOrder({
+          orderNumber: res.orderNumber,
+          items: [...items],
+        })
         recordCompletedGifts(items)
         clearCart()
         setPaymentStatus('success')
@@ -623,6 +631,10 @@ export default function CheckoutPage() {
             })
 
             if (verifyRes.success) {
+              setCompletedOrder({
+                orderNumber: verifyRes.orderNumber,
+                items: [...items],
+              })
               recordCompletedGifts(items)
               clearCart()
               setPaymentStatus('success')
@@ -652,12 +664,16 @@ export default function CheckoutPage() {
   }
 
   // --- 3. HANDLE PAYPAL CHECKOUT (INTERNATIONAL / USD) ---
-  const handlePayPalSuccess = () => {
+  const handlePayPalSuccess = (orderNumber?: string) => {
     const hasGifts = items.some((i) => i.is_gift || i.gift_recipient_email)
     const hasSelfItems = items.some((i) => !i.is_gift && !i.gift_recipient_email)
     const giftRecipientEmail = items.find((i) => i.is_gift || i.gift_recipient_email)?.gift_recipient_email || ''
     setLastGiftInfo({ hasGifts, giftRecipientEmail, hasSelfItems })
 
+    setCompletedOrder({
+      orderNumber,
+      items: [...items],
+    })
     recordCompletedGifts(items)
     clearCart()
     setPaymentStatus('success')
@@ -699,6 +715,8 @@ export default function CheckoutPage() {
             giftRecipientEmail={lastGiftInfo?.giftRecipientEmail}
             hasSelfItems={lastGiftInfo?.hasSelfItems}
             onClose={() => router.push('/store')}
+            items={completedOrder?.items || items}
+            orderNumber={completedOrder?.orderNumber}
           />
         </div>
       </div>
