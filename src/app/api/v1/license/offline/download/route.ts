@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Invalid 64-character hardware Device ID. You can copy it from your plugin under the "Offline File" tab.',
+          error: 'Invalid 64-character hardware Device ID. You can copy it from ProVerb under the "Offline File" tab.',
         },
         { status: 400 }
       )
