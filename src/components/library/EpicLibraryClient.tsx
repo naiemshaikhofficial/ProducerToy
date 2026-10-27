@@ -150,7 +150,6 @@ export function EpicLibraryClient({
   const [searchTitle, setSearchTitle] = useState('')
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null)
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
-  const [installedOnly, setInstalledOnly] = useState(false)
 
   // Hardware Plugin Activation Modal State
   const searchParams = useSearchParams()
@@ -524,19 +523,6 @@ export function EpicLibraryClient({
           >
             <Plus className="w-4 h-4" />
           </button>
-
-          {/* Activate Plugin Button (Producer Toy Minimalist Theme) */}
-          <button
-            onClick={() => {
-              setClaimCode('')
-              setIsActivationModalOpen(true)
-            }}
-            className="ml-auto mb-1.5 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#2c2c2c] text-zinc-300 hover:text-white text-xs font-medium transition-all cursor-pointer shadow-sm active:scale-95"
-            title="Activate desktop plugins or manage device"
-          >
-            <Key className="w-3.5 h-3.5 text-zinc-400" />
-            <span>Activate Plugin</span>
-          </button>
         </div>
 
         {activeTab === 'receipts' ? (
@@ -833,7 +819,6 @@ export function EpicLibraryClient({
                         setSelectedFeatures([])
                         setSelectedTypes([])
                         setSelectedPlatforms([])
-                        setInstalledOnly(false)
                       }}
                       className="text-[11px] text-zinc-400 hover:text-white font-medium transition-colors cursor-pointer"
                     >
@@ -852,19 +837,6 @@ export function EpicLibraryClient({
                     placeholder="Search by title..."
                     className="w-full bg-[#181818] border border-[#262626] text-white text-xs pl-8 pr-3 py-2 rounded-lg focus:outline-none focus:border-zinc-400 placeholder:text-zinc-600 transition-colors"
                   />
-                </div>
-
-                {/* Downloaded Option */}
-                <div className="pt-1">
-                  <label className="flex items-center gap-2 text-xs text-zinc-300 hover:text-white cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={installedOnly}
-                      onChange={(e) => setInstalledOnly(e.target.checked)}
-                      className="rounded bg-[#202020] border-[#333333] text-white accent-white focus:ring-0 cursor-pointer"
-                    />
-                    <span>Downloaded</span>
-                  </label>
                 </div>
 
                 {/* Genre Accordion */}
