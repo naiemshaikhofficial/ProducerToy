@@ -307,25 +307,6 @@ export async function sendOrderInvoiceEmail(
                 </table>
               </div>
 
-              <!-- Verified Licensee / Billing Information -->
-              <div style="background-color: #121215; border: 1px solid #1f1f23; border-radius: 10px; padding: 18px 20px;">
-                <div style="font-size: 10px; font-weight: 800; color: #71717a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;">
-                  VERIFIED BILLING &amp; LICENSEE INFORMATION
-                </div>
-                <div style="font-size: 13px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">
-                  ${params.customerName}
-                </div>
-                <div style="font-size: 12px; color: #a1a1aa; line-height: 1.5;">
-                  ${params.billingAddress.address}${params.billingAddress.address2 ? ', ' + params.billingAddress.address2 : ''}<br />
-                  ${params.billingAddress.city}, ${params.billingAddress.state} ${params.billingAddress.zip}<br />
-                  ${params.billingAddress.country}
-                </div>
-                <div style="margin-top: 10px; font-size: 11px; color: #71717a;">
-                  ${params.customerPhone ? `Phone: <span style="color: #ffffff;">${params.customerPhone}</span> &bull; ` : ''}
-                  Email: <span style="color: #ffffff;">${cleanEmail}</span>
-                </div>
-              </div>
-
             </td>
           </tr>
 
