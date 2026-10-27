@@ -18,11 +18,64 @@
     --epic-bg: #121212;
     --epic-card: #202020;
     --epic-card-hover: #2a2a2a;
-    --epic-accent: #ffffff;
-    --epic-accent-hover: #e4e4e7;
+    --epic-accent: #34363d;
+    --epic-accent-hover: #42454e;
     --epic-border: #2a2a2a;
     --epic-text: #ffffff;
     --epic-muted: #a0a0a0;
+
+    /* Epic Games Store Design Tokens — Charcoal Black Foundations (WCAG 2.2 AA) */
+    --font-size-xs: 10.72px;
+    --font-size-sm: 13.33px;
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 32px;
+
+    --space-1: 4px;
+    --space-2: 5px;
+    --space-3: 6px;
+    --space-4: 10px;
+    --space-5: 13.6px;
+    --space-6: 16px;
+    --space-7: 20px;
+    --space-8: 21.44px;
+
+    --color-surface-base: #000000;
+    --color-surface-raised: #101014;
+    --color-surface-strong: #14181e;
+    --color-charcoal-black: #141416;
+    --color-charcoal-raised: #1c1d22;
+    --color-surface-hover: #20252e;
+    --color-surface-active: #282e38;
+    --color-surface-disabled: #18181c;
+
+    --color-border-subtle: rgba(255, 255, 255, 0.10);
+    --color-border-strong: rgba(255, 255, 255, 0.25);
+    --color-border-focus: rgba(255, 255, 255, 0.60);
+
+    --color-text-primary: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.72);
+    --color-text-muted: rgba(255, 255, 255, 0.50);
+    --color-text-disabled: rgba(255, 255, 255, 0.30);
+
+    --color-brand-accent: #34363d;
+    --color-brand-accent-hover: #42454e;
+    --color-badge-discount: #34363d;
+    --color-feedback-error: #f53838;
+
+    --radius-xs: 8px;
+    --radius-sm: 10px;
+    --radius-md: 12px;
+    --radius-lg: 9999px;
+
+    --motion-duration-instant: 125ms;
+    --motion-duration-fast: 200ms;
+    --motion-timing-base: cubic-bezier(0.2, 0, 0, 1);
+
+    --shadow-surface-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-surface-hover: 0 12px 32px rgba(0, 0, 0, 0.8);
   }
 
   html {
@@ -86,6 +139,20 @@
 
 *:focus {
   outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-border-focus, rgba(255, 255, 255, 0.60)) !important;
+  outline-offset: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Epic Games Store UI Components (Monochrome Dark & White Theme) */

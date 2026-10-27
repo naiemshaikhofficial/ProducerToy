@@ -202,7 +202,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                     key={item.id}
                     href={isComingSoon ? `/store?coming_soon=true` : `/product/${item.slug}`}
                     prefetch={true}
-                    className="group flex items-center gap-4 p-2.5 sm:p-3 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer select-none"
+                    className="group flex items-center gap-4 p-2.5 sm:p-3 rounded-xl hover:bg-white/[0.04] transition-colors duration-150 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[var(--color-border-focus,rgba(255,255,255,0.6))] focus-visible:outline-offset-2"
                   >
                     {/* Square Thumbnail with Bookmark Icon */}
                     <div className="relative w-[62px] h-[62px] sm:w-[66px] sm:h-[66px] rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.08] flex-shrink-0 shadow-sm">
@@ -220,7 +220,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         type="button"
                         onClick={(e) => handleBookmarkClick(e, item)}
                         aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
-                        className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
+                        className={`absolute top-1 right-1 w-6 h-6 sm:w-7 sm:h-7 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none before:absolute before:-inset-1 before:content-[''] ${
                           isSaved
                             ? 'bg-[#34363d] text-white border border-white/20 shadow-[0_0_10px_rgba(0,0,0,0.5)] opacity-100 hover:bg-[#42454e]'
                             : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#34363d] hover:text-white hover:bg-[#1c1c20] opacity-0 group-hover:opacity-100 shadow-sm hover:scale-105'
@@ -247,7 +247,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         </div>
                       ) : isDiscount ? (
                         <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                          <span className="bg-[#34363d] text-white font-extrabold text-xs px-1.5 py-0.5 rounded border border-white/15">
+                          <span className="bg-[#34363d] text-white font-extrabold text-xs px-1.5 py-0.5 rounded-[var(--radius-xs,8px)] border border-white/15 shadow-xs">
                             {item.statusBadge}
                           </span>
                           <span className="line-through text-zinc-500 text-xs font-normal">
@@ -324,7 +324,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                       key={item.id}
                       href={isComingSoon ? `/store?coming_soon=true` : `/product/${item.slug}`}
                       prefetch={true}
-                      className="group flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer select-none"
+                      className="group flex items-center gap-3.5 p-2 rounded-xl hover:bg-white/[0.04] transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[var(--color-border-focus,rgba(255,255,255,0.6))] focus-visible:outline-offset-2"
                     >
                       {/* Square Thumbnail */}
                       <div className="relative w-[56px] h-[56px] rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/[0.08] flex-shrink-0 shadow-sm">
@@ -340,7 +340,8 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                         <button
                           type="button"
                           onClick={(e) => handleBookmarkClick(e, item)}
-                          className={`absolute top-1 right-1 w-5 h-5 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-150 z-10 active:scale-95 ${
+                          aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
+                          className={`absolute top-1 right-1 w-5 h-5 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-150 z-10 active:scale-95 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none before:absolute before:-inset-2 before:content-[''] ${
                             isSaved
                               ? 'bg-[#34363d] text-white border border-white/20 opacity-100 shadow-xs'
                               : 'bg-[#121214]/80 text-zinc-300 border border-white/10 hover:border-[#34363d] hover:text-white hover:bg-[#1c1c20]'
@@ -363,7 +364,7 @@ export function EpicStorefrontLists({ products = [] }: EpicStorefrontListsProps)
                           </span>
                         ) : isDiscount ? (
                           <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                            <span className="bg-[#34363d] text-white font-black text-[10px] px-1.5 py-0.5 rounded border border-white/15">
+                            <span className="bg-[#34363d] text-white font-black text-[10px] px-1.5 py-0.5 rounded-[var(--radius-xs,8px)] border border-white/15">
                               {item.statusBadge}
                             </span>
                             <span className="line-through text-zinc-500 text-[11px] font-normal">

@@ -157,12 +157,12 @@ export const SubBar: React.FC<SubBarProps> = ({
 
   return (
     <div className="w-full bg-[#121212] relative z-50">
-      
+
       {/* ========================================================================= */}
       {/* 1. MOBILE SUBBAR (< 768px): Exact Epic Games Store Mobile Search & Discover */}
       {/* ========================================================================= */}
       <div className="flex md:hidden w-full px-4 sm:px-6 h-[54px] items-center justify-between relative z-50 bg-[#121212]">
-        
+
         {isMobileSearchOpen ? (
           /* Mobile Expandable Search Bar */
           <form
@@ -294,11 +294,10 @@ export const SubBar: React.FC<SubBarProps> = ({
                       href={item.href}
                       prefetch={true}
                       onClick={() => setIsDiscoverMenuOpen(false)}
-                      className={`block py-3.5 text-[15px] tracking-normal transition-colors ${
-                        isSelected
+                      className={`block py-3.5 text-[15px] tracking-normal transition-colors ${isSelected
                           ? 'text-white font-semibold'
                           : 'text-zinc-400 font-normal hover:text-white'
-                      }`}
+                        }`}
                     >
                       {item.label}
                     </Link>
@@ -315,10 +314,10 @@ export const SubBar: React.FC<SubBarProps> = ({
       {/* 2. DESKTOP SUBBAR (>= 768px): Products ˅, Deals, Brands, Blog, Free ˅      */}
       {/* ========================================================================= */}
       <div className="hidden md:flex w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-[76px] items-center justify-between">
-        
+
         {/* Left Side: Search Capsule + Navigation Links */}
         <div className="flex items-center">
-          
+
           {/* Search Pill with Live Suggestions Dropdown */}
           <div ref={searchContainerRef} className="relative w-[240px] lg:w-[270px] flex-shrink-0">
             <form
@@ -426,9 +425,8 @@ export const SubBar: React.FC<SubBarProps> = ({
             >
               <button
                 type="button"
-                className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${
-                  isProductsMegaOpen ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
-                }`}
+                className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${isProductsMegaOpen ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+                  }`}
               >
                 <span>Products</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isProductsMegaOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
@@ -446,11 +444,10 @@ export const SubBar: React.FC<SubBarProps> = ({
                   key={link.label}
                   href={link.href}
                   prefetch={true}
-                  className={`transition-colors py-2 font-medium ${
-                    isActive
+                  className={`transition-colors py-2 font-medium ${isActive
                       ? 'text-white font-bold'
                       : 'text-zinc-400 font-normal hover:text-white'
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -465,11 +462,10 @@ export const SubBar: React.FC<SubBarProps> = ({
             >
               <button
                 type="button"
-                className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${
-                  isFreeActive || isFreeMegaOpen
+                className={`flex items-center gap-1.5 font-medium transition-colors cursor-pointer ${isFreeActive || isFreeMegaOpen
                     ? 'text-white font-bold'
                     : 'text-zinc-400 hover:text-white'
-                }`}
+                  }`}
               >
                 <span>Free</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isFreeMegaOpen ? 'rotate-180 text-white' : 'text-zinc-400'}`} />
@@ -484,9 +480,8 @@ export const SubBar: React.FC<SubBarProps> = ({
           <Link
             href="/wishlist"
             prefetch={true}
-            className={`transition-colors font-normal ${
-              pathname === '/wishlist' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
+            className={`transition-colors font-normal ${pathname === '/wishlist' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+              }`}
           >
             Wishlist
           </Link>
@@ -511,9 +506,8 @@ export const SubBar: React.FC<SubBarProps> = ({
           <Link
             href="/cart"
             prefetch={true}
-            className={`flex items-center gap-2 font-normal transition-colors py-1.5 px-2 rounded-lg group ${
-              pathname === '/cart' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
-            }`}
+            className={`flex items-center gap-2 font-normal transition-colors py-1.5 px-2 rounded-lg group ${pathname === '/cart' ? 'text-white font-bold' : 'text-zinc-400 hover:text-white'
+              }`}
           >
             <span>Cart</span>
             {itemCount > 0 && (

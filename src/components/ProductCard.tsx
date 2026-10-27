@@ -196,29 +196,29 @@ export function ProductCard({ product }: { product: Product }) {
     <Link
       href={`/product/${product.slug}`}
       prefetch={true}
-      className="group flex flex-col cursor-pointer select-none"
+      className="group flex flex-col cursor-pointer select-none rounded-xl focus-visible:outline-2 focus-visible:outline-[var(--color-border-focus,rgba(255,255,255,0.6))] focus-visible:outline-offset-4"
       title={`${product.name} by ${brandName}`}
     >
       {/* 3:4 Tall Epic Games Store Poster Card */}
-      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#181818] border border-[#222222] shadow-md mb-3.5 sm:mb-4">
+      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[var(--color-surface-strong,#14181e)] border border-[var(--color-border-subtle,rgba(255,255,255,0.1))] group-hover:border-white/20 shadow-md mb-3.5 sm:mb-4 transition-colors duration-200">
         <Image
           src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=600&auto=format&fit=crop', { width: 600 })}
           alt={`${product.name} by ${brandName} - ${product.product_type ? product.product_type.replace('_', ' ') : 'Audio Plugin'}`}
           title={`${product.name} - ${brandName}`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover object-center group-hover:brightness-110 transition-all duration-200 ease-out"
+          className="object-cover object-center group-hover:scale-[1.03] group-hover:brightness-105 transition-all duration-[var(--motion-duration-fast,200ms)] ease-out"
         />
         
         {/* Minimal Epic Games Store Light Glow Overlay on Hover */}
         <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
         
-        {/* Wishlist Bookmark Button (Top Right Glass Badge) */}
+        {/* Wishlist Bookmark Button (Top Right Glass Badge with 44px min touch target) */}
         <button 
           type="button"
           onClick={handleWishlistToggle}
           aria-label={isSaved ? "Remove from Wishlist" : "Save to Wishlist"}
-          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 ${
+          className={`absolute top-2.5 sm:top-3 right-2.5 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all duration-200 z-10 active:scale-95 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none before:absolute before:-inset-2 before:content-[''] ${
             isSaved
               ? 'bg-[#34363d] text-white border border-white/20 shadow-[0_0_14px_rgba(0,0,0,0.6)] opacity-100 hover:bg-[#42454e] hover:scale-105'
               : 'bg-[#121214]/80 text-zinc-300 border border-white/15 hover:border-[#34363d] hover:text-white hover:bg-[#1c1c20] opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-md hover:scale-105'
@@ -233,7 +233,7 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             type="button"
             onClick={handlePlayToggle}
-            className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-black/85 hover:bg-white hover:text-black text-white rounded-full backdrop-blur-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all z-20 shadow-xl active:scale-95 border border-white/20"
+            className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-black/85 hover:bg-white hover:text-black text-white rounded-full backdrop-blur-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all z-20 shadow-xl active:scale-95 border border-white/20 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none before:absolute before:-inset-1 before:content-['']"
             aria-label={isCurrentPlaying ? "Pause audio preview" : "Preview sound demo"}
             title={isCurrentPlaying ? "Pause preview" : "Play preview"}
           >
@@ -290,7 +290,7 @@ export function ProductCard({ product }: { product: Product }) {
           ) : (
             <>
               {discountPercent > 0 && (
-                <span className="text-xs bg-[#34363d] text-white font-extrabold px-1.5 py-0.5 rounded border border-white/15">
+                <span className="text-[11px] sm:text-xs bg-[var(--color-badge-discount,#34363d)] text-white font-extrabold px-1.5 py-0.5 rounded-[var(--radius-xs,8px)] border border-white/15 tracking-tight shadow-xs">
                   -{discountPercent}%
                 </span>
               )}
