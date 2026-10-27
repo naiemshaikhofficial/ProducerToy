@@ -111,22 +111,6 @@ function PairForm() {
           </div>
         ) : (
           <form onSubmit={handlePair} className="w-full space-y-4">
-            {/* Account Info Pill */}
-            {!authLoading && user && (
-              <div className="flex items-center justify-between bg-[#18181b] border border-[#27272a] rounded-xl px-3.5 py-2 text-xs text-[#a1a1aa] mb-2">
-                <span className="truncate">
-                  Signed in as <strong className="text-white font-medium">{user.email}</strong>
-                </span>
-                <button
-                  type="button"
-                  onClick={handleSignInRedirect}
-                  className="ml-2 text-xs text-[#71717a] hover:text-white transition-colors cursor-pointer flex-shrink-0"
-                >
-                  Switch
-                </button>
-              </div>
-            )}
-
             <div>
               <input
                 type="text"
@@ -139,19 +123,16 @@ function PairForm() {
               />
             </div>
 
-            {/* Error Message with Auth-style subtle rose pill */}
+            {/* Coral-Red Error Pill matching Auth page */}
             {status === 'error' && (
-              <div className="text-xs text-rose-400 bg-rose-500/10 rounded-lg p-3 leading-relaxed border border-rose-500/20 text-left">
-                {message}
+              <div className="bg-[#ff4053] text-black font-extrabold p-3 rounded-xl text-xs text-center flex items-center justify-center gap-2 shadow-md animate-in fade-in">
+                <span>{message}</span>
               </div>
             )}
 
             {/* If user is NOT signed in: enforce sign-in first */}
             {!authLoading && !user ? (
               <div className="space-y-3 pt-1">
-                <div className="text-xs text-[#a1a1aa] bg-[#18181b] rounded-xl p-3 leading-relaxed border border-[#27272a] text-center">
-                  Sign in required. Only accounts that own the plugin in their library can authorize machines.
-                </div>
                 <button
                   type="button"
                   onClick={handleSignInRedirect}
@@ -166,7 +147,7 @@ function PairForm() {
                 href={productSlug ? `/product/${productSlug}` : '/store'}
                 className="w-full h-12 bg-white text-[#121212] font-semibold text-sm rounded-xl hover:bg-[#e4e4e7] active:scale-[0.99] transition-all cursor-pointer shadow-lg shadow-white/5 flex items-center justify-center"
               >
-                {productName ? `Get ${productName} & Add to Library` : 'Add Plugin to Library'}
+                Purchase
               </Link>
             ) : (
               /* Authenticated user ready to authorize */

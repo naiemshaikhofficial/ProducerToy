@@ -136,14 +136,15 @@ export async function POST(req: NextRequest) {
         .or(`recipient_user_id.eq.${user.id}${userEmail ? `,recipient_email.ilike.${userEmail}` : ''}`)
         .limit(1)
 
+      const cleanProductName = (product.name || '').split('–')[0].split('-')[0].trim() || 'Plugin'
       if (!userGift || userGift.length === 0) {
         return NextResponse.json(
           {
             success: false,
-            error: `${product.name} is not in your ProducerToy library. Please add it to your library first.`,
+            error: 'Please purchase this plugin to authorize your workstation.',
             needsPurchase: true,
             productSlug: product.slug || 'proverb',
-            productName: product.name,
+            productName: cleanProductName,
           },
           { status: 403 }
         )
@@ -209,10 +210,11 @@ export async function POST(req: NextRequest) {
       })
       .eq('id', challenge.id)
 
+    const cleanProductName = (product.name || '').split('–')[0].split('-')[0].trim() || 'Plugin'
     return NextResponse.json({
       success: true,
-      message: `Successfully authorized and paired "${challenge.device_name}" for ${product.name}!`,
-      productName: product.name,
+      message: `Successfully authorized and paired "${challenge.device_name}" for ${cleanProductName}!`,
+      productName: cleanProductName,
       deviceName: challenge.device_name,
       token: entitlement.token,
     })
