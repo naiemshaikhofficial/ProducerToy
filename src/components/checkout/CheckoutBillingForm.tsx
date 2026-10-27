@@ -205,17 +205,17 @@ export function CheckoutBillingForm({
       </div>
 
       {/* Newsletter */}
-      <div className="flex items-center gap-2.5 pt-1">
+      <div className="flex items-center gap-2 pt-1.5">
         <input
           id="checkout-newsletter"
           type="checkbox"
           checked={newsletterOptIn}
           onChange={(e) => setNewsletterOptIn(e.target.checked)}
-          className="w-3.5 h-3.5 bg-[#181818] border border-[#333333] rounded accent-zinc-200 cursor-pointer"
+          className="w-3.5 h-3.5 bg-[#141414] border border-[#333333] rounded text-white accent-white cursor-pointer hover:border-zinc-500 transition-colors"
         />
         <label
           htmlFor="checkout-newsletter"
-          className="text-[11px] text-zinc-400 cursor-pointer select-none"
+          className="text-[11px] text-zinc-400 hover:text-zinc-300 cursor-pointer select-none transition-colors"
         >
           Send updates about new plugin releases, updates, and presets.
         </label>
