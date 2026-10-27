@@ -564,7 +564,7 @@ export async function processCheckoutAction(
         }
       })
 
-      sendOrderInvoiceEmail({
+      const emailResult = await sendOrderInvoiceEmail({
         orderNumber,
         orderDate: new Date().toISOString(),
         customerName: cleanFullName,
@@ -583,7 +583,12 @@ export async function processCheckoutAction(
         subtotal: rawSubtotalUsd,
         discount: couponDiscountUsd + verifiedRewardDiscountUsd,
         totalAmount: expectedTotalUsd,
-      }).catch((emailErr) => console.warn('Order invoice email dispatch note:', emailErr))
+      })
+      if (!emailResult.success) {
+        console.warn('[CHECKOUT] Order invoice email dispatch notice:', emailResult.error)
+      } else {
+        console.log('[CHECKOUT] Order invoice email successfully sent:', emailResult.messageId)
+      }
     } catch (e) {
       console.warn('Invoice preparation note:', e)
     }
