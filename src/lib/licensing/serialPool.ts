@@ -9,11 +9,14 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 export function isDedicatedLicensedProduct(prod: any): boolean {
   if (!prod) return false
   const delivery = String(prod.delivery_method || '').toLowerCase().trim()
+  const licDelivery = String(prod.license_delivery_type || '').toLowerCase().trim()
   if (
     delivery === 'dedicated_licensing_server' ||
     delivery === 'dedicated_licensing' ||
     delivery === 'machine_bound' ||
-    delivery === 'licensing_server'
+    delivery === 'licensing_server' ||
+    licDelivery === 'dedicated_licensing_server' ||
+    licDelivery === 'machine_bound'
   ) {
     return true
   }
@@ -21,7 +24,13 @@ export function isDedicatedLicensedProduct(prod: any): boolean {
   if (licType === 'dedicated' || licType === 'machine_bound') {
     return true
   }
-  if (prod.plugin_identifier && (delivery.includes('dedicated') || delivery.includes('server'))) {
+  if (
+    prod.plugin_identifier &&
+    (delivery.includes('dedicated') ||
+      delivery.includes('server') ||
+      licDelivery.includes('dedicated') ||
+      licDelivery.includes('server'))
+  ) {
     return true
   }
   // Backward compatibility fallback for legacy ProVerb entries
