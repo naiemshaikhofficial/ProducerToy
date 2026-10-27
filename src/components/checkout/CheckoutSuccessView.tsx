@@ -108,7 +108,7 @@ export function CheckoutSuccessView({
 
       {/* Title */}
       <h2 className="text-[21px] sm:text-[23px] font-black text-white tracking-tight mb-2">
-        Is ProducerToy installed?
+        Open your Library?
       </h2>
 
       {/* Description */}
@@ -120,7 +120,7 @@ export function CheckoutSuccessView({
           </>
         ) : (
           <>
-            To install and launch this audio plugin, you&apos;ll need the installer or ProducerToy desktop app. Is it installed on this device?
+            Your license has been added to your account. To access your downloads, manage activations, and explore presets, visit your ProducerToy Library.
           </>
         )}
       </p>
@@ -138,32 +138,24 @@ export function CheckoutSuccessView({
           </Link>
         ) : (
           <>
-            {/* Primary: Download Installer (Charcoal Black matching user rules) */}
-            <button
-              type="button"
-              onClick={handleDownloadInstaller}
-              disabled={downloadLoading}
-              className="w-full sm:flex-1 h-11 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[13px] rounded-md border border-[#38383e] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-            >
-              {downloadLoading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>No, get installer</span>
-                  <Download className="w-4 h-4 stroke-[2.5]" />
-                </>
-              )}
-            </button>
-
-            {/* Secondary: Yes, it's installed (Dark Grey Pill matching Screenshot 2) */}
+            {/* Primary: Open Library */}
             <Link
               href="/library"
               onClick={onClose}
+              className="w-full sm:flex-1 h-11 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[13px] rounded-md border border-[#38383e] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Open Library</span>
+              <ExternalLink className="w-3.5 h-3.5 text-zinc-300" />
+            </Link>
+
+            {/* Secondary: Stay on Store */}
+            <button
+              type="button"
+              onClick={onClose}
               className="w-full sm:flex-1 h-11 bg-[#18181a] hover:bg-[#222226] active:scale-[0.99] text-zinc-200 hover:text-white font-semibold text-[13px] rounded-md border border-[#2e2e32] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
-              <span>Yes, it&apos;s installed</span>
-              <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
-            </Link>
+              <span>Stay on Store</span>
+            </button>
           </>
         )}
       </div>
