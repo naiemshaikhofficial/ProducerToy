@@ -61,15 +61,12 @@ export async function validateGiftEligibilityAction({
     // 0. Strict check: Free / 0-value items cannot be gifted
     const { data: prodData } = await adminSupabase
       .from('products')
-      .select('id, name, price_usd, price_inr, is_free')
+      .select('id, name, price_usd')
       .eq('id', productId)
       .maybeSingle()
 
     if (prodData) {
-      const isFree = Boolean(
-        prodData.is_free ||
-        (Number(prodData.price_usd || 0) <= 0 && Number(prodData.price_inr || 0) <= 0)
-      )
+      const isFree = Number(prodData.price_usd || 0) <= 0
       if (isFree) {
         return {
           allowed: false,

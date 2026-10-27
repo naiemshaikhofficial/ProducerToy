@@ -188,7 +188,7 @@ export async function processCheckoutAction(
     try {
       const { data, error } = await adminSupabase
         .from('products')
-        .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
+        .select('id, name, price_usd, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
         .in('id', productIds)
 
       if (!error && data && data.length > 0) {
@@ -203,7 +203,7 @@ export async function processCheckoutAction(
         const slugs = items.map((i) => i.slug || i.id)
         const { data: slugData } = await adminSupabase
           .from('products')
-          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
+          .select('id, name, price_usd, product_type, delivery_method, license_type, slug, download_url, download_url_win, download_url_mac, external_url, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
           .in('slug', slugs)
         if (slugData && slugData.length > 0) {
           dbProducts = slugData
@@ -240,7 +240,7 @@ export async function processCheckoutAction(
 
     // 3.1 Verify server-side total and coupons strictly against database to prevent unpaid bypass
     const rawSubtotalUsd = dbProducts.reduce((sum, p) => sum + Number(p.price_usd || 0), 0)
-    const rawSubtotalInr = dbProducts.reduce((sum, p) => sum + Number(p.price_inr || 0), 0)
+    const rawSubtotalInr = Math.round(rawSubtotalUsd * 95)
 
     let verifiedDiscountPercent = 0
     if (options?.couponCode) {
@@ -592,7 +592,7 @@ export async function createRazorpayOrderAction(
     const productIds = items.map((i) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, slug, price_inr, price_usd, delivery_method, license_type, download_url, download_url_win, download_url_mac, external_url')
+      .select('id, name, slug, price_usd, delivery_method, license_type, download_url, download_url_win, download_url_mac, external_url')
       .in('id', productIds)
 
     if (!dbProducts || dbProducts.length === 0) {
@@ -778,7 +778,7 @@ export async function verifyRazorpayPaymentAction(params: {
     let dbProducts: any[] = []
     const { data: prodsData } = await adminSupabase
       .from('products')
-      .select('id, name, price_inr, price_usd, product_type, delivery_method, license_type, slug, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
+      .select('id, name, price_usd, product_type, delivery_method, license_type, slug, license_delivery_type, license_api_url, license_api_secret, license_api_timeout_ms, license_api_fallback_to_pool')
       .in('id', productIds)
 
     if (!prodsData || prodsData.length === 0) {
@@ -799,7 +799,7 @@ export async function verifyRazorpayPaymentAction(params: {
     const { getUsdToInrRate } = await import('@/lib/exchangeRate')
     const liveRate = await getUsdToInrRate()
     const rawSubtotalInr = dbProducts.reduce((sum, p) => {
-      const inr = Number(p.price_inr || 0)
+      const inr = Number((p as any).price_inr || 0)
       const usd = Number(p.price_usd || 0)
       if (inr > 0) return sum + inr
       if (usd > 0) return sum + Math.round(usd * liveRate)
@@ -864,8 +864,8 @@ export async function verifyRazorpayPaymentAction(params: {
         const dbProduct =
           dbProducts.find((p) => p.id === cartItem.id || p.slug === cartItem.slug) || cartItem
 
-        const itemInr = Number(dbProduct.price_inr || 0) > 0
-          ? Number(dbProduct.price_inr)
+        const itemInr = Number((dbProduct as any).price_inr || 0) > 0
+          ? Number((dbProduct as any).price_inr)
           : Math.round(Number(dbProduct.price_usd || 0) * liveRate)
 
         const isGiftItem = Boolean(cartItem.is_gift || cartItem.gift_recipient_email)
@@ -1134,7 +1134,7 @@ export async function createPayPalOrderAction(
     const productIds = items.map((i) => i.id)
     const { data: dbProducts } = await adminSupabase
       .from('products')
-      .select('id, name, slug, price_usd, price_inr, delivery_method, license_type, download_url, download_url_win, download_url_mac, external_url')
+      .select('id, name, slug, price_usd, delivery_method, license_type, download_url, download_url_win, download_url_mac, external_url')
       .in('id', productIds)
 
     if (!dbProducts || dbProducts.length === 0) {
@@ -1155,7 +1155,7 @@ export async function createPayPalOrderAction(
     const prods = dbProducts
 
     const rawSubtotalUsd = prods.reduce(
-      (sum: number, p: any) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 85 : 0)),
+      (sum: number, p: any) => sum + Number(p.price_usd || 0),
       0
     )
 
@@ -1245,7 +1245,7 @@ export async function capturePayPalOrderAction(params: {
     const productIds = items.map((i) => i.id).filter(Boolean)
     const { data: prodsData } = await adminSupabase
       .from('products')
-      .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type, slug')
+      .select('id, name, price_usd, product_type, delivery_method, license_type, slug')
       .in('id', productIds)
 
     if (!prodsData || prodsData.length === 0) {
@@ -1264,7 +1264,7 @@ export async function capturePayPalOrderAction(params: {
     }
 
     const rawSubtotalUsd = dbProducts.reduce(
-      (sum, p) => sum + Number(p.price_usd || (p.price_inr ? p.price_inr / 85 : 0)),
+      (sum, p) => sum + Number(p.price_usd || 0),
       0
     )
 
@@ -1447,7 +1447,7 @@ export async function capturePayPalOrderAction(params: {
             claim_code: claimCode,
             status: 'unopened',
             price_usd: Number(dbProduct.price_usd || 0),
-            price_inr: Number(dbProduct.price_inr || 0),
+            price_inr: Number((dbProduct as any).price_inr || 0),
             created_at: new Date().toISOString(),
           })
         }
@@ -1575,7 +1575,7 @@ export async function claimGiftAction(params: {
         // Fallback: Create verified purchase record for recipient claiming the gift
         const { data: prod } = await adminSupabase
           .from('products')
-          .select('id, name, price_usd, price_inr, product_type, delivery_method, license_type')
+          .select('id, name, price_usd, product_type, delivery_method, license_type')
           .eq('id', params.productId)
           .maybeSingle()
 
