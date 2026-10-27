@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { generateInvoicePDF } from '@/lib/invoice/generateInvoicePdf'
 
 export interface OrderInvoiceItem {
   name: string
@@ -31,11 +32,13 @@ export interface SendOrderInvoiceParams {
   paymentMethod?: string
 }
 
-const MASCOT_LOGO_URL = 'https://imagizer.imageshack.com/a/img922/3023/eqSeKm.png'
+// Unified Top Header Image provided by user (Mascot + PRODUCER TOY brand logo)
+const TOP_LOGO_IMAGE_URL = 'https://imagizer.imageshack.com/a/img923/2206/2pwK36.png'
+// Bottom Producer Toy 3D Logo
 const PRODUCER_TOY_LOGO_URL = 'https://imagizer.imageshack.com/a/img922/171/nu2UgR.png'
 
 /**
- * Sends a high-conversion, brand-themed ProducerToy Order Invoice & Receipt email via Resend.
+ * Sends a high-conversion, brand-themed ProducerToy Order Invoice & Receipt email via Resend with PDF attachment.
  * Styled in ProducerToy's signature dark luxury monochrome aesthetic.
  */
 export async function sendOrderInvoiceEmail(
@@ -66,9 +69,8 @@ export async function sendOrderInvoiceEmail(
     const libraryUrl = `${siteUrl}/library`
     const fromAddress = process.env.EMAIL_FROM || 'ProducerToy Orders <orders@producertoy.com>'
 
-    // 1. Dynamic Subject Formulation based on purchased item + order number (NO license key in subject)
+    // 1. Dynamic Subject Line: Purchased item name + Order Number (NO serial key in subject)
     const primaryItem = params.items[0]?.name || 'ProducerToy Asset'
-    // Clean product title (remove long marketing descriptions for clean email subject)
     const shortProductName = primaryItem
       .split(/[–—\-:]/)[0]
       .trim() || primaryItem.slice(0, 30).trim()
@@ -91,7 +93,7 @@ export async function sendOrderInvoiceEmail(
       year: 'numeric',
     })
 
-    // Build items rows
+    // 2. Build items rows (NO serial key rendered in email body as requested)
     const itemsHtml = params.items
       .map((item) => {
         const itemPrice =
@@ -106,29 +108,7 @@ export async function sendOrderInvoiceEmail(
             ? 'Audio Plugin • VST3 / AU / AAX'
             : item.product_type === 'sample_pack'
             ? 'Sample Pack • 24-Bit WAV'
-            : 'Audio Tool • Instant Download'
-
-        const serialBox = item.serial_key
-          ? `
-            <div style="margin-top: 12px; background-color: #141416; border: 1px solid #2c2c30; border-radius: 8px; padding: 12px 14px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td>
-                    <div style="font-size: 10px; font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: 0.12em; color: #a1a1aa; text-transform: uppercase;">
-                      LICENSE SERIAL KEY
-                    </div>
-                    <div style="font-size: 14px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; color: #ffffff; letter-spacing: 0.08em; margin-top: 5px; word-break: break-all;">
-                      ${item.serial_key}
-                    </div>
-                    <div style="font-size: 11px; color: #71717a; margin-top: 5px; line-height: 1.4;">
-                      Use this key to activate inside your DAW or download the offline license (.ptlic) file in your Library.
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          `
-          : ''
+            : 'Audio Asset • Instant Download'
 
         return `
           <tr>
@@ -142,7 +122,6 @@ export async function sendOrderInvoiceEmail(
                     <div style="font-size: 11px; color: #8a8a93; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em;">
                       ${typeLabel}
                     </div>
-                    ${serialBox}
                   </td>
                   <td align="right" style="vertical-align: top; padding-left: 16px; white-space: nowrap;">
                     <div style="font-size: 14px; font-weight: 800; color: #ffffff;">
@@ -173,6 +152,14 @@ export async function sendOrderInvoiceEmail(
       params.subtotal <= 0
         ? '$0.00'
         : `${currencySymbol}${params.subtotal.toFixed(2)}`
+
+    // 3. Generate Official PDF Invoice Buffer
+    let pdfBuffer: Buffer | null = null
+    try {
+      pdfBuffer = await generateInvoicePDF(params)
+    } catch (pdfErr) {
+      console.warn('[ORDER_INVOICE_EMAIL] PDF generation warning:', pdfErr)
+    }
 
     const htmlContent = `<!DOCTYPE html>
 <html lang="en">
@@ -214,27 +201,23 @@ export async function sendOrderInvoiceEmail(
         <!-- Central 580px Card -->
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width: 580px; width: 100%; background-color: #0f0f11; border: 1px solid #202024; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.75);">
 
-          <!-- ================= HEADER WITH MASCOT ================= -->
+          <!-- ================= HEADER WITH UNIFIED IMAGE ================= -->
           <tr>
-            <td align="center" style="padding: 36px 32px 24px 32px; background-color: #121215; border-bottom: 1px solid #1f1f23;">
+            <td align="center" style="padding: 32px 32px 20px 32px; background-color: #121215; border-bottom: 1px solid #1f1f23;">
               
-              <!-- Clean Borderless Mascot Bear (Clickable to Site, Drag Off) -->
+              <!-- Unified Bear + PRODUCER TOY Logo Image (Drag Off, Clickable to Site) -->
               <a href="${siteUrl}" target="_blank" draggable="false" style="text-decoration: none; display: inline-block; border: none; outline: none;">
                 <img
-                  src="${MASCOT_LOGO_URL}"
-                  alt="Producer Toy Mascot"
-                  width="78"
-                  height="72"
+                  src="${TOP_LOGO_IMAGE_URL}"
+                  alt="Producer Toy"
+                  width="170"
                   draggable="false"
-                  style="display: block; margin: 0 auto 16px auto; border: none; outline: none; -webkit-user-drag: none; user-select: none;"
+                  style="display: block; margin: 0 auto; border: none; outline: none; -webkit-user-drag: none; user-select: none;"
                 />
               </a>
 
-              <div style="font-size: 18px; font-weight: 800; letter-spacing: 0.12em; color: #ffffff; text-transform: uppercase;">
-                PRODUCER TOY
-              </div>
-              <div style="font-size: 11px; font-weight: 600; color: #71717a; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px;">
-                OFFICIAL ORDER RECEIPT & LICENSE INVOICE
+              <div style="font-size: 11px; font-weight: 600; color: #71717a; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 10px;">
+                OFFICIAL ORDER RECEIPT &amp; LICENSE INVOICE
               </div>
             </td>
           </tr>
@@ -312,7 +295,7 @@ export async function sendOrderInvoiceEmail(
               </div>
 
               <!-- Primary CTA Button (High conversion white pill) -->
-              <div style="text-align: center; margin-bottom: 12px;">
+              <div style="text-align: center; margin-bottom: 30px;">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 0 auto;">
                   <tr>
                     <td align="center" style="background-color: #ffffff; border-radius: 10px;">
@@ -322,10 +305,6 @@ export async function sendOrderInvoiceEmail(
                     </td>
                   </tr>
                 </table>
-              </div>
-
-              <div style="text-align: center; font-size: 11px; color: #71717a; line-height: 1.5; margin-bottom: 32px;">
-                Instant access to your installers, WAV sample packs, and offline license (.ptlic) files.
               </div>
 
               <!-- Verified Licensee / Billing Information -->
@@ -369,14 +348,9 @@ export async function sendOrderInvoiceEmail(
               </div>
 
               <!-- Minimal Separation Line Underneath Logo -->
-              <div style="width: 48px; height: 1px; background-color: #242428; margin: 0 auto 16px auto;"></div>
+              <div style="width: 48px; height: 1px; background-color: #242428; margin: 0 auto 18px auto;"></div>
 
-              <!-- Producer Toy Brand Description -->
-              <div style="font-size: 11px; color: #71717a; line-height: 1.6; max-width: 420px; margin: 0 auto 20px auto;">
-                The premier digital audio ecosystem for music producers, sound designers, and creators worldwide.
-              </div>
-
-              <!-- Need Help & Support Link -->
+              <!-- Looking for help? support@producertoy.com -->
               <div style="margin-bottom: 22px;">
                 <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
                   <tr>
@@ -384,6 +358,7 @@ export async function sendOrderInvoiceEmail(
                       <img src="https://img.icons8.com/ios-filled/50/a1a1aa/mail.png" width="14" height="14" alt="Email" draggable="false" style="display: block; -webkit-user-drag: none;" />
                     </td>
                     <td style="vertical-align: middle;">
+                      <span style="color: #71717a; font-size: 12px; margin-right: 4px;">Looking for help?</span>
                       <a href="mailto:support@producertoy.com" style="color: #a1a1aa; text-decoration: none; font-size: 12px; font-weight: 600;">
                         support@producertoy.com
                       </a>
@@ -434,10 +409,9 @@ export async function sendOrderInvoiceEmail(
                 </tr>
               </table>
 
-              <!-- Copyright & Legal -->
+              <!-- Copyright Only -->
               <div style="font-size: 11px; color: #52525b; line-height: 1.6;">
-                &copy; ${new Date().getFullYear()} Producer Toy. All rights reserved.<br />
-                Audio plugins and sample packs include 100% royalty-free commercial licenses.
+                &copy; ${new Date().getFullYear()} Producer Toy. All rights reserved.
               </div>
 
               <!-- Unique ID to prevent Gmail thread collapsing -->
@@ -457,18 +431,30 @@ export async function sendOrderInvoiceEmail(
 </body>
 </html>`
 
+    const requestPayload: any = {
+      from: fromAddress,
+      to: [cleanEmail],
+      subject,
+      html: htmlContent,
+    }
+
+    // Attach PDF Invoice if successfully generated
+    if (pdfBuffer) {
+      requestPayload.attachments = [
+        {
+          filename: `ProducerToy-Invoice-${params.orderNumber}.pdf`,
+          content: pdfBuffer.toString('base64'),
+        },
+      ]
+    }
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from: fromAddress,
-        to: [cleanEmail],
-        subject,
-        html: htmlContent,
-      }),
+      body: JSON.stringify(requestPayload),
     })
 
     const data = await res.json().catch(() => ({}))
