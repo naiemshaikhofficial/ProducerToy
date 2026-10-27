@@ -210,12 +210,12 @@ export function EpicCheckoutLayout({
     cover_image: '/placeholder.jpg'
   }
 
-  // 0. DEDICATED EPIC GAMES STORE FREE CHECKOUT MODAL (Big Wide Box 1040px, Left Sidebar & Ambient Glow)
+  // 0. DEDICATED EPIC GAMES STORE FREE CHECKOUT MODAL (Big Wide Box 1040px, Height 680px, Generous Spacing)
   if (isFree) {
     return (
-      <div className="w-full max-w-[1040px] lg:max-w-[1080px] h-auto min-h-[560px] md:h-[600px] mx-auto bg-[#141416] border border-[#242428] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-row relative select-none font-sans text-white animate-in zoom-in-95 duration-150 my-auto">
+      <div className="w-full max-w-[1040px] lg:max-w-[1080px] h-auto min-h-[660px] md:h-[680px] mx-auto bg-[#141416] border border-[#242428] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-row relative select-none font-sans text-white animate-in zoom-in-95 duration-150 my-auto">
         {/* Left Column: Epic Style Logo Sidebar */}
-        <div className="w-[96px] sm:w-[108px] bg-[#18181b] border-r border-[#242428] flex flex-col items-center pt-8 pb-8 select-none flex-shrink-0">
+        <div className="w-[100px] sm:w-[112px] bg-[#18181b] border-r border-[#242428] flex flex-col items-center pt-9 pb-9 select-none flex-shrink-0">
           <div className="w-10 h-10 rounded-lg bg-[#242428] border border-[#323238] flex items-center justify-center text-white shadow-xs">
             <LogoIcon size={20} />
           </div>
@@ -225,13 +225,13 @@ export function EpicCheckoutLayout({
         {/* Right Panel: Main Content Area */}
         <div className="flex-1 bg-[#141416] p-8 sm:p-10 flex flex-col justify-between relative">
           {/* Top Bar: User Badge Pill (Left) & Close Button (Right) */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pb-3">
             {user ? (
-              <div className="flex items-center gap-2.5 px-3 py-1.5 bg-[#1c1c20] border border-[#28282e] rounded-full text-xs text-zinc-300 font-medium">
+              <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-[#1c1c20] border border-[#28282e] rounded-full text-xs text-zinc-300 font-medium">
                 <div className="w-5 h-5 rounded-full bg-[#323238] text-white flex items-center justify-center text-[10px] font-bold uppercase">
                   {initialLetter}
                 </div>
-                <span className="truncate max-w-[160px] text-[12px]">{displayName}</span>
+                <span className="truncate max-w-[170px] text-[12px]">{displayName}</span>
               </div>
             ) : <div />}
 
@@ -239,7 +239,7 @@ export function EpicCheckoutLayout({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 title="Close checkout"
                 aria-label="Close"
               >
@@ -248,7 +248,7 @@ export function EpicCheckoutLayout({
             ) : (
               <Link
                 href="/store"
-                className="w-7 h-7 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 title="Close checkout"
               >
                 <X className="w-5 h-5" />
@@ -256,15 +256,15 @@ export function EpicCheckoutLayout({
             )}
           </div>
 
-          {/* Center Column: Poster with Ambient Glow + Product Info + Action */}
-          <div className="flex flex-col items-center text-center my-auto py-2">
-            {/* Poster with Ambient Glow Behind */}
-            <div className="relative flex items-center justify-center my-1">
+          {/* Center Column: Generously Spaced Poster + Info + Action */}
+          <div className="flex flex-col items-center text-center my-auto py-4">
+            {/* Poster with Soft Ambient Glow Behind */}
+            <div className="relative flex items-center justify-center mb-1">
               {/* Soft Radial Ambient Glow */}
-              <div className="absolute w-[240px] h-[300px] rounded-full bg-white/[0.09] blur-3xl pointer-events-none" />
+              <div className="absolute w-[260px] h-[320px] rounded-full bg-white/[0.09] blur-3xl pointer-events-none" />
 
               {/* Vertical Cover Poster */}
-              <div className="relative z-10 w-[140px] h-[190px] sm:w-[155px] sm:h-[210px] bg-[#121212] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex-shrink-0">
+              <div className="relative z-10 w-[145px] h-[195px] sm:w-[160px] sm:h-[215px] bg-[#121212] border border-white/15 rounded-xl overflow-hidden shadow-2xl flex-shrink-0">
                 <Image
                   src={primaryItem.cover_image || '/placeholder.jpg'}
                   alt={primaryItem.name}
@@ -276,18 +276,18 @@ export function EpicCheckoutLayout({
               </div>
             </div>
 
-            {/* Product Name */}
-            <h2 className="text-[16px] sm:text-[18px] font-bold text-white text-center mt-4 line-clamp-2 max-w-md leading-tight">
+            {/* Product Name (Generous top spacing) */}
+            <h2 className="text-[17px] sm:text-[19px] font-bold text-white text-center mt-6 line-clamp-2 max-w-md leading-tight">
               {primaryItem.name}
             </h2>
 
             {/* Price: ₹0.00 */}
-            <p className="text-[13px] font-semibold text-zinc-400 text-center mt-1">
+            <p className="text-[13.5px] font-semibold text-zinc-400 text-center mt-1.5">
               {currencySymbol}0.00
             </p>
 
-            {/* Epic Prompt Headline */}
-            <h3 className="text-[19px] sm:text-[22px] font-bold text-white text-center mt-4 tracking-tight max-w-lg leading-tight">
+            {/* Epic Prompt Headline (Generous breathing room) */}
+            <h3 className="text-[20px] sm:text-[23px] font-bold text-white text-center mt-6 tracking-tight max-w-lg leading-snug">
               This is free. Add it to your library to get started.
             </h3>
 
@@ -302,7 +302,7 @@ export function EpicCheckoutLayout({
                 onFreeCheckout(true)
               }}
               disabled={loading || paymentStatus === 'processing'}
-              className="w-full max-w-[400px] h-11 sm:h-12 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[13.5px] rounded-lg border border-[#38383e] transition-all shadow-md flex items-center justify-center mt-5 cursor-pointer disabled:opacity-60"
+              className="w-full max-w-[420px] h-12 bg-[#242426] hover:bg-[#2c2c30] active:scale-[0.99] text-white font-bold text-[14px] rounded-lg border border-[#38383e] transition-all shadow-md flex items-center justify-center mt-7 cursor-pointer disabled:opacity-60"
             >
               {loading || paymentStatus === 'processing' ? (
                 <div className="relative w-5 h-5 flex items-center justify-center">
@@ -315,7 +315,7 @@ export function EpicCheckoutLayout({
             </button>
 
             {/* Legal Footnote */}
-            <p className="text-[10px] sm:text-[10.5px] text-zinc-400 text-center leading-relaxed mt-3.5 max-w-[420px] select-none">
+            <p className="text-[10px] sm:text-[11px] text-zinc-400 text-center leading-relaxed mt-4 max-w-[440px] select-none">
               By selecting &lsquo;Add to library&rsquo;, you certify that you are over 18, are authorized to use this payment method, and agree to the{' '}
               <Link href="/eula" target="_blank" className="text-zinc-300 hover:text-white underline font-medium">
                 End User License Agreement
