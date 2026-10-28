@@ -439,22 +439,14 @@ export function EpicProductDetailClient({
               </button>
             </div>
           ) : (
-            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-              <Image
-                src={activeMedia.url || product.cover_image}
-                alt=""
-                fill
-                unoptimized
-                aria-hidden="true"
-                className="object-cover blur-2xl opacity-30 scale-110 pointer-events-none select-none"
-              />
+            <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
               <Image
                 src={activeMedia.url || product.cover_image}
                 alt={product.name}
                 fill
                 unoptimized
                 priority
-                className="object-contain object-center z-10 p-1"
+                className="object-contain object-center"
               />
             </div>
           )}
@@ -825,22 +817,14 @@ export function EpicProductDetailClient({
                   </button>
                 </div>
               ) : (
-                <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                  <Image
-                    src={activeMedia.url || product.cover_image}
-                    alt=""
-                    fill
-                    unoptimized
-                    aria-hidden="true"
-                    className="object-cover blur-2xl opacity-30 scale-110 pointer-events-none select-none"
-                  />
+                <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
                   <Image
                     src={activeMedia.url || product.cover_image}
                     alt={product.name}
                     fill
                     priority
                     unoptimized
-                    className="object-contain object-center z-10 p-1 sm:p-2"
+                    className="object-contain object-center"
                   />
                 </div>
               )}
@@ -1027,115 +1011,120 @@ export function EpicProductDetailClient({
           </div>
         </div>
 
-        {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
-        <div className="hidden lg:block lg:col-span-4 xl:col-span-4 2xl:col-span-3 lg:sticky lg:top-6 space-y-5 w-full max-w-[360px] xl:max-w-[380px] lg:ml-auto bg-[#161616] border border-[#242424] rounded-2xl p-6 sm:p-7 shadow-xl">
-          {/* Direct Prominent Brand Logo */}
-          <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
-            <Image
-              src={
-                ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo)
-                  ? product.brands?.logo_url || product.brand_logo
-                  : '/Producer Toy Charcoal 3D Logo.webp'
-              }
-              alt={
-                ENABLE_BRANDS && (product.brands?.name || product.brand)
-                  ? product.brands?.name || product.brand
-                  : 'Producer Toy'
-              }
-              width={360}
-              height={144}
-              unoptimized
-              className="object-contain max-h-20 sm:max-h-24 w-auto mx-auto drop-shadow-md"
-              onError={(e) => {
-                const target = e.currentTarget
-                if (!target.src.includes('Producer%20Toy%20Charcoal%203D%20Logo')) {
-                  target.src = '/Producer Toy Charcoal 3D Logo.webp'
-                }
-              }}
-            />
-          </div>
-
-          <div className="space-y-2">
-            {isOwned ? (
-              <div className="flex justify-center w-full">
-                <span className="text-xs bg-[#202020] text-zinc-300 font-semibold px-3 py-1 rounded-md border border-[#303030] tracking-wider text-center">
-                  ALREADY OWNED
-                </span>
-              </div>
-            ) : product.is_coming_soon ? (
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-2xl font-black text-white uppercase tracking-tight">COMING SOON</span>
-                {product.release_date && (
-                  <span className="text-[11px] font-bold bg-[#34363d]/15 text-zinc-200 border border-[#34363d]/30 px-2.5 py-0.5 rounded-full">
-                    Available {product.release_date}
-                  </span>
-                )}
-              </div>
+        {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg - EXACT 1:1 EPIC GAMES STORE) ================= */}
+        <div className="hidden lg:block lg:col-span-4 xl:col-span-4 2xl:col-span-3 lg:sticky lg:top-6 space-y-4 w-full max-w-[340px] xl:max-w-[360px] lg:ml-auto">
+          {/* 1. Direct Prominent Title / Graphic Logo */}
+          <div className="w-full flex items-center justify-center py-1 min-h-[64px]">
+            {ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo) ? (
+              <Image
+                src={product.brands?.logo_url || product.brand_logo}
+                alt={product.name}
+                width={300}
+                height={90}
+                unoptimized
+                className="object-contain max-h-20 w-auto mx-auto drop-shadow-md"
+              />
             ) : (
-              <div className="flex items-center gap-3 flex-wrap">
-                {Number(product.price_usd) === 0 ? (
-                  <span className="text-3xl font-bold text-white">FREE</span>
-                ) : (
-                  <>
-                    {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
-                      <>
-                        <span className="text-xs bg-[#34363d] text-white font-bold px-2 py-0.5 rounded">
-                          -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
-                        </span>
-                        <span className="text-sm text-zinc-500 line-through">
-                          {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
-                        </span>
-                      </>
-                    )}
-                    <span className="text-3xl font-bold text-white">
-                      {formatPrice(product.price_inr, product.price_usd)}
-                    </span>
-                  </>
-                )}
-              </div>
+              <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white drop-shadow-md text-center leading-tight">
+                {product.name.split('–')[0].split('-')[0].trim()}
+              </h2>
             )}
-
-            {/* TOYWARDS FEATURE (Commented out for future launch)
-            {Number(product.price_usd) > 0 && !isOwned && !product.is_coming_soon && (
-              <Link
-                href="/features/toywards"
-                target="_blank"
-                className="inline-flex items-center gap-2 bg-[#26150b] hover:bg-[#321b0f] border border-[#4a2412] px-3.5 py-1.5 rounded-full text-xs select-none shadow-xs transition-colors group cursor-pointer"
-                title="Learn more about Toywards"
-              >
-                <ToywardsSparkleIcon size={14} className="text-zinc-200" />
-                <span className="text-zinc-300">
-                  Earn <span className="text-zinc-200 font-semibold">Toywards Rewards</span> on this purchase
-                </span>
-              </Link>
-            )}
-            */}
           </div>
 
-          {/* Desktop CTA Action Buttons (Standardized h-12 Height & Icons) */}
+          {/* 2. Audio Software Studio Badge Box (Exact 1:1 Match to Epic Games Rating Box) */}
+          <div className="border border-[#282828] rounded-xl p-3 bg-[#141414]/50 space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="border border-white/20 rounded-md px-2 py-1 text-center flex-shrink-0">
+                <span className="text-[10px] text-zinc-400 block font-mono leading-none uppercase">STUDIO</span>
+                <span className="text-xs font-black text-white leading-none">64-BIT</span>
+              </div>
+              <div className="text-xs space-y-0.5 min-w-0">
+                <div className="font-bold text-white leading-tight">Universal DSP Ready</div>
+                <div className="text-[11px] text-zinc-400 truncate">FL Studio • Ableton • Logic Pro</div>
+              </div>
+            </div>
+            <div className="border-t border-[#222222] pt-2 text-[11px] text-zinc-400 font-medium">
+              Commercial License • 100% Royalty-Free
+            </div>
+          </div>
+
+          {/* 3. Product Type Pill (Base Game Match) */}
+          <div>
+            <span className="inline-block bg-[#202020] text-zinc-300 text-xs font-semibold px-2.5 py-1 rounded-md">
+              {formattedType(product.product_type)}
+            </span>
+          </div>
+
+          {/* 4. Price & Discount Display */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {Number(product.price_usd) === 0 ? (
+                <>
+                  {product.original_price_usd && Number(product.original_price_usd) > 0 && (
+                    <>
+                      <span className="text-xs bg-[#0074e4] text-white font-bold px-2 py-0.5 rounded">
+                        -100%
+                      </span>
+                      <span className="text-sm text-zinc-500 line-through">
+                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
+                      </span>
+                    </>
+                  )}
+                  <span className="text-2xl font-bold text-white">Free</span>
+                </>
+              ) : (
+                <>
+                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
+                    <>
+                      <span className="text-xs bg-[#0074e4] text-white font-bold px-2 py-0.5 rounded">
+                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
+                      </span>
+                      <span className="text-sm text-zinc-500 line-through">
+                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
+                      </span>
+                    </>
+                  )}
+                  <span className="text-2xl font-bold text-white">
+                    {formatPrice(product.price_inr, product.price_usd)}
+                  </span>
+                </>
+              )}
+            </div>
+            {Number(product.price_usd) === 0 && (
+              <p className="text-[11px] text-zinc-400">Sale ends 10/29/2026 at 8:30 PM GMT+5:30</p>
+            )}
+          </div>
+
+          {/* 5. CTA Action Buttons: Before Buying vs After Buying (Exact Match to Screenshots) */}
           <div className="space-y-2.5 pt-1">
             {(product.allow_external_url && product.external_url) ? (
               <button
                 type="button"
                 onClick={() => handleExternalAction(product.external_url!)}
-                className="bg-[#34363d] hover:bg-[#42454e] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer active:scale-[0.99]"
+                className="bg-[#0074e4] hover:bg-[#0082fc] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer active:scale-[0.99]"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
               </button>
             ) : isOwned ? (
+              /* ================= AFTER BUYING: IN LIBRARY (IMAGE 1 EXACT 1:1 MATCH) ================= */
               <Link
                 href="/library"
-                className="w-full h-12 px-4 rounded-xl border border-[#333333] text-sm font-bold flex items-center justify-center gap-2 bg-[#222222] hover:bg-[#2a2a2a] text-zinc-200 hover:text-white transition-colors cursor-pointer"
+                className="w-full h-12 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#303030] text-sm font-bold flex items-center justify-center gap-2.5 transition-colors cursor-pointer select-none"
               >
-                <Check className="w-4 h-4 text-zinc-300" />
+                <svg className="w-4 h-4 text-zinc-400" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="2" y="2" width="5" height="5" rx="1" />
+                  <rect x="9" y="2" width="5" height="5" rx="1" />
+                  <rect x="2" y="9" width="5" height="5" rx="1" />
+                  <rect x="9" y="9" width="5" height="5" rx="1" />
+                </svg>
                 <span>In Library</span>
               </Link>
             ) : product.is_coming_soon ? (
               <button
                 type="button"
                 disabled
-                className="w-full h-12 px-6 rounded-xl text-sm font-black uppercase tracking-wider bg-[#222222] border border-[#333333] text-zinc-400 cursor-not-allowed flex items-center justify-center select-none shadow-sm"
+                className="w-full h-12 px-6 rounded-xl text-sm font-black uppercase tracking-wider bg-[#202020] border border-[#303030] text-zinc-400 cursor-not-allowed flex items-center justify-center select-none shadow-sm"
               >
                 <span>COMING SOON</span>
               </button>
@@ -1151,141 +1140,157 @@ export function EpicProductDetailClient({
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2 w-full">
+              /* ================= BEFORE BUYING: 3 ROWS (IMAGE 2 EXACT 1:1 MATCH) ================= */
+              <div className="space-y-2.5 w-full">
+                {/* Row 1: Buy Now (Cyan) + Cart */}
+                <div className="flex items-center gap-2 w-full">
+                  <button
+                    type="button"
+                    onClick={handleGetNow}
+                    className="flex-1 h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#0074e4] hover:bg-[#0082fc] text-white active:scale-[0.99] shadow-md select-none"
+                  >
+                    <span>{Number(product.price_usd) === 0 ? 'Claim for Free' : 'Buy Now'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => addItem(product, true)}
+                    className={`w-12 h-12 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
+                      added
+                        ? 'bg-[#282828] hover:bg-[#303030] border-[#383838] text-white'
+                        : 'bg-[#202020] hover:bg-[#282828] border-[#303030] text-zinc-200 hover:text-white'
+                    }`}
+                    aria-label={added ? 'In Cart' : 'Add to Cart'}
+                    title={added ? 'In Cart' : 'Add to Cart'}
+                  >
+                    {added ? <Check className="w-4 h-4 text-white" /> : <ShoppingCart className="w-4 h-4 text-white" />}
+                  </button>
+                </div>
+
+                {/* Row 2: Gift Button (with blue New! pill on right) */}
                 <button
                   type="button"
-                  onClick={handleGetNow}
-                  className="flex-1 h-12 px-6 text-sm font-bold uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#34363d] hover:bg-[#42454e] text-white active:scale-[0.99] shadow-md shadow-black/40"
+                  onClick={() => setGiftModalOpen(true)}
+                  className="w-full h-12 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative select-none"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>{Number(product.price_usd) === 0 ? 'Claim for Free' : 'Buy Now'}</span>
+                  <Gift className="w-4 h-4 text-zinc-300" />
+                  <span>Gift</span>
+                  <span className="absolute right-4 bg-[#0074e4] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                    New!
+                  </span>
                 </button>
 
+                {/* Row 3: Wishlist Button */}
                 <button
                   type="button"
-                  onClick={() => addItem(product, true)}
-                  className={`w-12 h-12 rounded-xl border transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
-                    added
-                      ? 'bg-[#282828] hover:bg-[#303030] border border-[#383838] text-white'
-                      : 'bg-[#202020] hover:bg-[#2c2c2c] border-[#303030] text-zinc-200 hover:text-white'
+                  onClick={() =>
+                    toggleWishlist({
+                      id: product.id,
+                      name: product.name,
+                      slug: product.slug,
+                      brand: product.brands?.name || product.brand || 'Producer Toy',
+                      product_type: product.product_type || 'plugin',
+                      price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
+                      price_usd: Number(product.price_usd) || 0,
+                      cover_image: product.cover_image,
+                      vst_format: product.vst_format,
+                      short_description: product.short_description,
+                    })
+                  }
+                  className={`w-full h-12 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer select-none ${
+                    isSaved
+                      ? 'bg-[#282828] border-zinc-500 text-white'
+                      : 'bg-[#202020] hover:bg-[#282828] border-[#2c2c2c] text-white'
                   }`}
-                  aria-label={added ? 'In Cart' : 'Add to Cart'}
-                  title={added ? 'In Cart' : 'Add to Cart'}
                 >
-                  {added ? <Check className="w-5 h-5 text-white" /> : <ShoppingCart className="w-5 h-5" />}
+                  <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-white' : ''}`} />
+                  <span>{isSaved ? 'In Wishlist' : 'Wishlist'}</span>
                 </button>
               </div>
             )}
-
-            {/* GIFTING FEATURE (Temporarily Commented Out for Future Launch)
-            {!product.is_coming_soon && (Number(product.price_usd || 0) > 0 || Number(product.price_inr || 0) > 0) && (
-              <button
-                type="button"
-                onClick={() => setGiftModalOpen(true)}
-                className="w-full h-12 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-200 hover:text-white text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2 relative"
-              >
-                <Gift className="w-4 h-4 text-zinc-300" />
-                <span>Gift</span>
-                <span className="absolute right-4 bg-[#2c2c2c] text-zinc-400 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#383838]">
-                  New!
-                </span>
-              </button>
-            )}
-            */}
-
-            {/* Wishlist Button */}
-            <button
-              type="button"
-              onClick={() =>
-                toggleWishlist({
-                  id: product.id,
-                  name: product.name,
-                  slug: product.slug,
-                  brand: product.brands?.name || product.brand || 'Producer Toy',
-                  product_type: product.product_type || 'plugin',
-                  price_inr: product.price_inr ? Number(product.price_inr) : convertUsdToInr(Number(product.price_usd) || 0),
-                  price_usd: Number(product.price_usd) || 0,
-                  cover_image: product.cover_image,
-                  vst_format: product.vst_format,
-                  short_description: product.short_description,
-                })
-              }
-              className={`w-full h-12 px-4 rounded-xl border text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                isSaved
-                  ? 'bg-white text-black border-white'
-                  : 'bg-[#222222] hover:bg-[#2a2a2a] border-[#333333] text-white'
-              }`}
-            >
-              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-black' : ''}`} />
-              <span>{isSaved ? 'In Wishlist' : 'Add to Wishlist'}</span>
-            </button>
           </div>
 
-          {/* Desktop Metadata Specs Table */}
-          <div className="space-y-3 pt-4 text-xs border-t border-[#202020]">
-            {ENABLE_BRANDS && (
-              <div className="flex items-center justify-between pb-1">
-                <span className="text-zinc-400">Developer</span>
-                <span className="font-semibold text-white">{developerName}</span>
-              </div>
-            )}
-            <div className="flex items-center justify-between pb-1">
+          {/* 6. Metadata Specs List with Dividers (Exact Match to Image 1 & 2) */}
+          <div className="space-y-0 text-xs divide-y divide-[#202020] border-t border-b border-[#202020] pt-1 pb-1">
+            {/* Epic Rewards / Toywards Rewards */}
+            <div className="flex items-center justify-between py-3">
+              <span className="text-zinc-400">Epic Rewards</span>
+              <span className="font-semibold text-white flex items-center gap-1.5">
+                Earn 5% back
+                <span className="w-3.5 h-3.5 rounded-full bg-[#0074e4] text-white flex items-center justify-center text-[9px] font-bold">+</span>
+              </span>
+            </div>
+
+            {/* Refund Type */}
+            <div className="flex items-center justify-between py-3">
+              <span className="text-zinc-400">Refund Type</span>
+              <span className="font-semibold text-white flex items-center gap-1">
+                Self-Refundable
+                <span className="text-zinc-500 cursor-pointer" title="Self-refundable within policy">?</span>
+              </span>
+            </div>
+
+            {/* Developer */}
+            <div className="flex items-center justify-between py-3">
+              <span className="text-zinc-400">Developer</span>
+              <span className="font-semibold text-white">{developerName}</span>
+            </div>
+
+            {/* Publisher */}
+            <div className="flex items-center justify-between py-3">
               <span className="text-zinc-400">Publisher</span>
               <span className="font-semibold text-white">{publisherName}</span>
             </div>
-            <div className="flex items-center justify-between pb-1">
-              <span className="text-zinc-400">Release Year</span>
+
+            {/* Release Date */}
+            <div className="flex items-center justify-between py-3">
+              <span className="text-zinc-400">Release Date</span>
               <span className="font-semibold text-white">{releaseYear}</span>
             </div>
-            <div className="flex items-center justify-between pb-1">
-              <span className="text-zinc-400">Format</span>
-              <span className="font-semibold text-white">{availableFormats}</span>
-            </div>
-            <div className="flex items-center justify-between pb-1">
+
+            {/* Platform */}
+            <div className="flex items-center justify-between py-3">
               <span className="text-zinc-400">Platform</span>
               <div className="flex items-center gap-2">
-                <span
-                  className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center"
-                  title="Windows"
-                >
-                  <WindowsIcon className="w-4 h-4" />
-                </span>
-                <span
-                  className="p-1.5 bg-[#222222] text-zinc-200 rounded-md border border-[#333333] flex items-center justify-center"
-                  title="macOS"
-                >
-                  <AppleIcon className="w-4 h-4" />
-                </span>
+                <WindowsIcon className="w-3.5 h-3.5" />
+                <AppleIcon className="w-3.5 h-3.5" />
               </div>
-            </div>
-            <div className="flex items-center justify-between pb-1">
-              <span className="text-zinc-400">License Type</span>
-              <span className="font-semibold text-white">{licenseType}</span>
             </div>
           </div>
 
-          <div className="pt-2">
+          {/* 7. Footer Actions */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('addons')
+              const el = document.getElementById('addons-section')
+              if (el) el.scrollIntoView({ behavior: 'smooth' })
+            }}
+            className="w-full text-center text-xs font-semibold text-[#0074e4] hover:text-[#3395ff] flex items-center justify-center gap-1.5 py-1 transition-colors cursor-pointer"
+          >
+            <span>See All Editions and Add-Ons</span>
+            <ChevronDown className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Share & Report Buttons */}
+          <div className="grid grid-cols-2 gap-3 pt-1">
             <button
               type="button"
               onClick={handleShare}
-              className={`w-full h-11 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
-                copied
-                  ? 'bg-zinc-800 text-white border-zinc-500 shadow-md'
-                  : 'bg-[#1e1e1e] hover:bg-[#282828] border-[#2e2e2e] text-zinc-300 hover:text-white'
-              }`}
+              className="h-11 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-300 hover:text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span>Link Copied to Clipboard!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4 text-zinc-300" />
-                  <span>Share</span>
-                </>
-              )}
+              <Share2 className="w-3.5 h-3.5 text-zinc-400" />
+              <span>{copied ? 'Copied!' : 'Share'}</span>
             </button>
+
+            <Link
+              href="/contact"
+              prefetch={true}
+              className="h-11 rounded-xl bg-[#202020] hover:bg-[#282828] border border-[#2c2c2c] text-zinc-300 hover:text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors"
+            >
+              <Flag className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Report</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -1317,7 +1322,7 @@ export function EpicProductDetailClient({
       {/* ========================================================================= */}
       {/* 6. 1:1 SEND GIFT MODAL POPUP (Temporarily Commented Out for Future Launch) */}
       {/* ========================================================================= */}
-      {/* <SendGiftModal isOpen={giftModalOpen} onClose={() => setGiftModalOpen(false)} product={product} /> */}
+      <SendGiftModal isOpen={giftModalOpen} onClose={() => setGiftModalOpen(false)} product={product} />
     </div>
   )
 }
