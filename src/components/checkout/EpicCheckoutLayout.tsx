@@ -216,10 +216,12 @@ export function EpicCheckoutLayout({
       <div className="w-full max-w-[1040px] lg:max-w-[1080px] h-auto min-h-[660px] md:h-[680px] mx-auto bg-[#141416] border border-[#242428] rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] overflow-hidden flex flex-row relative select-none font-sans text-white animate-in zoom-in-95 duration-150 my-auto">
         {/* Left Column: Epic Style Logo Sidebar */}
         <div className="w-[100px] sm:w-[112px] bg-[#18181b] border-r border-[#242428] flex flex-col items-center pt-9 pb-9 select-none flex-shrink-0">
-          <div className="w-10 h-10 rounded-lg bg-[#242428] border border-[#323238] flex items-center justify-center text-white shadow-xs">
-            <LogoIcon size={20} />
-          </div>
-          <span className="text-[10.5px] font-bold text-zinc-400 tracking-wider uppercase mt-2">Checkout</span>
+          <img
+            src="/headphone-bear-mascot.png"
+            alt="Producer Toy Mascot"
+            className="w-10 h-10 object-contain filter drop-shadow-sm select-none"
+          />
+          <span className="text-[10.5px] font-bold text-zinc-400 tracking-wider uppercase mt-2.5">Checkout</span>
         </div>
 
         {/* Right Panel: Main Content Area */}

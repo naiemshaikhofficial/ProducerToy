@@ -14,9 +14,9 @@ export function Logo({ size = 36, className = '', showText = true }: LogoProps) 
     <div className={`inline-flex items-center gap-2.5 ${className}`}>
       {/* Brand Icon */}
       <picture className="flex-shrink-0">
-        <source srcSet="/Charcoal Headphone Bear Mascot.webp" type="image/webp" />
+        <source srcSet="/headphone-bear-mascot.png" type="image/png" />
         <img
-          src="/Charcoal Headphone Bear Mascot.png"
+          src="/headphone-bear-mascot.png"
           alt="Producer Toy Logo"
           style={{ height: `${size}px`, width: 'auto' }}
           className="object-contain filter drop-shadow-sm flex-shrink-0"
@@ -41,9 +41,9 @@ export function Logo({ size = 36, className = '', showText = true }: LogoProps) 
 export function LogoIcon({ size = 48, className = '' }: Omit<LogoProps, 'showText'>) {
   return (
     <picture className={`flex-shrink-0 ${className}`}>
-      <source srcSet="/Charcoal Headphone Bear Mascot.webp" type="image/webp" />
+      <source srcSet="/headphone-bear-mascot.png" type="image/png" />
       <img
-        src="/Charcoal Headphone Bear Mascot.png"
+        src="/headphone-bear-mascot.png"
         alt="Producer Toy Emblem"
         style={{ height: `${size}px`, width: 'auto' }}
         className="object-contain filter drop-shadow-sm flex-shrink-0"
