@@ -1083,9 +1083,17 @@ export function EpicProductDetailClient({
                 </>
               )}
             </div>
-            {Number(product.price_usd) === 0 && (
-              <p className="text-[11px] text-zinc-400">Sale ends 10/29/2026 at 8:30 PM GMT+5:30</p>
-            )}
+            {(product.sale_ends_at || product.offer_ends_at || product.sale_end_date) ? (
+              <p className="text-[11px] text-zinc-400">
+                Sale ends {new Date(product.sale_ends_at || product.offer_ends_at || product.sale_end_date).toLocaleDateString('en-US', {
+                  month: 'numeric',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </p>
+            ) : product.sale_notice ? (
+              <p className="text-[11px] text-zinc-400">{product.sale_notice}</p>
+            ) : null}
           </div>
 
           {/* 4. CTA Action Buttons: Before Buying vs After Buying */}
