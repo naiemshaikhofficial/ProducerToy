@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -13,7 +13,8 @@ import { Lock, Eye, EyeOff, CheckCircle2, AlertCircle, KeyRound, ChevronLeft, Ar
 function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
+  const hasExchangedRef = useRef(false)
 
   // Form Fields
   const [password, setPassword] = useState('')
@@ -31,6 +32,16 @@ function ResetPasswordForm() {
   const [isSuccess, setIsSuccess] = useState(false)
   const [redirectCountdown, setRedirectCountdown] = useState(3)
 
+  // Memoized Turnstile Callbacks (prevents widget iframe re-execution on input change)
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token)
+    setError('')
+  }, [])
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null)
+  }, [])
+
   // Calculate Password Strength (0 to 4) - Matching Auth Page
   const getPasswordStrength = (pass: string) => {
     if (!pass) return 0
@@ -42,77 +53,159 @@ function ResetPasswordForm() {
     return score
   }
 
-  const passwordStrength = getPasswordStrength(password)
+  const passwordStrength = useMemo(() => getPasswordStrength(password), [password])
 
   // Verify Session / Recovery Token on Mount
   useEffect(() => {
     let isMounted = true
 
     const verifyRecoveryState = async () => {
-      // 1. Check for URL error parameters from Supabase redirect
-      let rawError = searchParams.get('error_description') || searchParams.get('error') || ''
-      if (typeof window !== 'undefined' && window.location.hash) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        if (hashParams.get('error_description')) rawError = hashParams.get('error_description') || ''
-      }
-
-      if (rawError) {
-        if (isMounted) {
-          setError(decodeURIComponent(rawError.replace(/\+/g, ' ')) || 'Password reset link is invalid or expired.')
-          setIsVerifyingSession(false)
-          setHasValidSession(false)
+      try {
+        // 1. Check for URL error parameters from Supabase redirect
+        let rawError = searchParams.get('error_description') || searchParams.get('error') || ''
+        let errorCode = searchParams.get('error_code') || ''
+        if (typeof window !== 'undefined' && window.location.hash) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1))
+          if (hashParams.get('error_description')) rawError = hashParams.get('error_description') || ''
+          if (hashParams.get('error_code')) errorCode = hashParams.get('error_code') || ''
         }
-        return
-      }
 
-      // 2. Check for PKCE Authorization Code in query params (from email link)
-      const code = searchParams.get('code')
-      if (code) {
-        try {
-          const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code)
-          if (exchangeErr) {
-            console.warn('PKCE exchange note:', exchangeErr.message)
-          } else {
+        if (rawError) {
+          // Double check if there is an existing authenticated session anyway
+          const { data: { session: existingSession } } = await supabase.auth.getSession()
+          if (existingSession?.user) {
             if (isMounted) {
               setHasValidSession(true)
               setIsVerifyingSession(false)
             }
             return
           }
-        } catch (e) {
-          console.warn('Code exchange error:', e)
-        }
-      }
 
-      // 3. Check URL hash for implicit recovery tokens (#access_token=...&type=recovery)
-      if (typeof window !== 'undefined' && window.location.hash) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const type = hashParams.get('type')
-        const accessToken = hashParams.get('access_token')
-        if (type === 'recovery' || (accessToken && type === 'recovery')) {
           if (isMounted) {
-            setHasValidSession(true)
+            const decoded = decodeURIComponent(rawError.replace(/\+/g, ' '))
+            let userFriendlyMsg = decoded
+            if (errorCode === 'otp_expired' || decoded.toLowerCase().includes('expired')) {
+              userFriendlyMsg = 'This password reset link has expired. For security, reset links can only be used once. If you requested multiple links, please make sure you click the link from the most recent email.'
+            }
+            setError(userFriendlyMsg)
+            setHasValidSession(false)
             setIsVerifyingSession(false)
           }
           return
         }
-      }
 
-      // 4. Short buffer for Supabase background recovery event; if none, deny access
-      const timer = setTimeout(() => {
+        // 2. Check if user ALREADY has a valid active session (e.g. from SSR or previous exchange)
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        if (currentSession?.user) {
+          if (isMounted) {
+            setHasValidSession(true)
+            setIsVerifyingSession(false)
+          }
+          // Clean URL parameters to avoid re-triggering with stale code
+          if (typeof window !== 'undefined' && (searchParams.get('code') || window.location.hash)) {
+            window.history.replaceState({}, document.title, window.location.pathname)
+          }
+          return
+        }
+
+        // 3. Check for PKCE Authorization Code in query params (?code=...)
+        const code = searchParams.get('code')
+        if (code && !hasExchangedRef.current) {
+          hasExchangedRef.current = true
+          try {
+            const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code)
+            if (exchangeErr) {
+              console.warn('PKCE exchange note:', exchangeErr.message)
+              // If exchange returned an error, verify if session was nevertheless established
+              const { data: { session: checkSession } } = await supabase.auth.getSession()
+              if (checkSession?.user) {
+                if (isMounted) {
+                  setHasValidSession(true)
+                  setIsVerifyingSession(false)
+                }
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState({}, document.title, window.location.pathname)
+                }
+                return
+              }
+              if (isMounted) {
+                setError(exchangeErr.message || 'Password reset link is invalid or has expired.')
+                setHasValidSession(false)
+                setIsVerifyingSession(false)
+              }
+              return
+            } else if (data?.session?.user) {
+              if (isMounted) {
+                setHasValidSession(true)
+                setIsVerifyingSession(false)
+              }
+              if (typeof window !== 'undefined') {
+                window.history.replaceState({}, document.title, window.location.pathname)
+              }
+              return
+            }
+          } catch (e: any) {
+            console.warn('Code exchange exception:', e)
+          }
+        }
+
+        // 4. Check URL hash for implicit recovery tokens (#access_token=...&type=recovery)
+        if (typeof window !== 'undefined' && window.location.hash) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1))
+          const type = hashParams.get('type')
+          const accessToken = hashParams.get('access_token')
+          const refreshToken = hashParams.get('refresh_token')
+          if (type === 'recovery' || (accessToken && type === 'recovery')) {
+            if (accessToken && refreshToken) {
+              const { error: setSessionErr } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              })
+              if (!setSessionErr) {
+                if (isMounted) {
+                  setHasValidSession(true)
+                  setIsVerifyingSession(false)
+                }
+                window.history.replaceState({}, document.title, window.location.pathname)
+                return
+              }
+            } else {
+              if (isMounted) {
+                setHasValidSession(true)
+                setIsVerifyingSession(false)
+              }
+              return
+            }
+          }
+        }
+
+        // 5. Fallback session check after async events
+        const { data: { session: finalSession } } = await supabase.auth.getSession()
+        if (finalSession?.user) {
+          if (isMounted) {
+            setHasValidSession(true)
+            setIsVerifyingSession(false)
+          }
+        } else {
+          if (isMounted) {
+            setHasValidSession(false)
+            setIsVerifyingSession(false)
+          }
+        }
+      } catch (err: any) {
+        console.error('Recovery verification error:', err)
         if (isMounted) {
+          setHasValidSession(false)
           setIsVerifyingSession(false)
         }
-      }, 1200)
-
-      return () => clearTimeout(timer)
+      }
     }
 
     verifyRecoveryState()
 
-    // 5. Listen strictly for verified PASSWORD_RECOVERY Auth State Changes
+    // 6. Listen strictly for verified PASSWORD_RECOVERY or SIGNED_IN Auth State Changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
+      if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session?.user)) {
         if (isMounted) {
           setHasValidSession(true)
           setIsVerifyingSession(false)
@@ -203,7 +296,7 @@ function ResetPasswordForm() {
   return (
     <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center px-4 py-8 sm:py-14 selection:bg-[#34363d] selection:text-white">
       {/* Dark Auth Card Container (#161616 background, border #262626, rounded-2xl) */}
-      <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-all">
+      <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-opacity duration-150">
 
         {/* LOADING / VERIFYING STATE */}
         {isVerifyingSession ? (
@@ -285,7 +378,7 @@ function ResetPasswordForm() {
 
             <div className="w-full space-y-3 pt-2">
               <Link
-                href="/auth"
+                href="/auth?mode=forgot"
                 prefetch={true}
                 className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg flex items-center justify-center gap-2"
               >
@@ -293,7 +386,7 @@ function ResetPasswordForm() {
               </Link>
 
               <Link
-                href="/auth"
+                href="/auth?mode=signin"
                 prefetch={true}
                 className="w-full py-3.5 bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#2e2e2e] rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center"
               >
@@ -446,18 +539,15 @@ function ResetPasswordForm() {
 
               {/* Cloudflare Turnstile Verification Widget */}
               <TurnstileWidget
-                onSuccess={(token) => {
-                  setTurnstileToken(token)
-                  setError('')
-                }}
-                onExpire={() => setTurnstileToken(null)}
+                onSuccess={handleTurnstileSuccess}
+                onExpire={handleTurnstileExpire}
               />
 
               {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
-                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
+                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-[transform,background-color,border-color,opacity,box-shadow] duration-100 shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loading ? (
                   <ButtonSpinner size={16} variant="dark" />

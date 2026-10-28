@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { LogoIcon } from '@/components/Logo'
@@ -41,7 +41,9 @@ function AuthForm() {
   const supabase = createClient()
 
   // Navigation mode ('signin' | 'signup' | 'forgot' | 'reset') & Step ('email' | 'details')
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'reset'>('signin')
+  const modeParam = searchParams.get('mode')
+  const initialMode = modeParam === 'forgot' ? 'forgot' : modeParam === 'signup' ? 'signup' : modeParam === 'reset' ? 'reset' : 'signin'
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot' | 'reset'>(initialMode)
   const [step, setStep] = useState<'email' | 'details'>('email')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -55,6 +57,16 @@ function AuthForm() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+
+  // Memoized Turnstile Callbacks (prevents widget iframe re-execution on input change)
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token)
+    setError('')
+  }, [])
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null)
+  }, [])
 
   // UI feedback states
   const [loading, setLoading] = useState(false)
@@ -81,11 +93,18 @@ function AuthForm() {
 
   // Check URL params and Supabase Auth events for Password Recovery
   useEffect(() => {
-    const modeParam = searchParams.get('mode')
-    if (modeParam === 'reset') {
+    const currentMode = searchParams.get('mode')
+    if (currentMode === 'reset') {
       const hash = typeof window !== 'undefined' ? window.location.hash || '' : ''
       router.replace(`/reset-password${hash}`)
       return
+    }
+    if (currentMode === 'forgot') {
+      setMode('forgot')
+    } else if (currentMode === 'signup') {
+      setMode('signup')
+    } else if (currentMode === 'signin') {
+      setMode('signin')
     }
 
     // Catch hash fragments (Supabase sends recovery token in hash)
@@ -308,7 +327,7 @@ function AuthForm() {
     return score
   }
 
-  const passwordStrength = getPasswordStrength(password)
+  const passwordStrength = useMemo(() => getPasswordStrength(password), [password])
 
   // Handle Google OAuth Login (First page - seamless)
   const handleGoogleLogin = async () => {
@@ -497,7 +516,7 @@ function AuthForm() {
     <div className="min-h-screen bg-[#121212] text-white flex items-center justify-center px-4 py-8 sm:py-14">
 
       {/* Dark Auth Card Container (#161616 background, border #262626, rounded-2xl) */}
-      <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-all">
+      <div className="w-full max-w-[480px] bg-[#161616] border border-[#262626] rounded-2xl p-7 sm:p-10 shadow-2xl space-y-6 relative transition-opacity duration-150">
 
         {/* DEDICATED EMAIL CONFIRMATION SCREEN (SIGNUP) */}
         {isEmailSent ? (
@@ -698,17 +717,14 @@ function AuthForm() {
 
                   {/* Cloudflare Turnstile Verification Widget */}
                   <TurnstileWidget
-                    onSuccess={(token) => {
-                      setTurnstileToken(token)
-                      setError('')
-                    }}
-                    onExpire={() => setTurnstileToken(null)}
+                    onSuccess={handleTurnstileSuccess}
+                    onExpire={handleTurnstileExpire}
                   />
 
                   <button
                     type="submit"
                     disabled={loading || !turnstileToken}
-                    className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
+                    className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-[transform,background-color,border-color,opacity,box-shadow] duration-100 shadow-lg cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loading ? (
                       <ButtonSpinner size={16} variant="dark" />
@@ -863,17 +879,14 @@ function AuthForm() {
 
               {/* Cloudflare Turnstile Verification Widget */}
               <TurnstileWidget
-                onSuccess={(token) => {
-                  setTurnstileToken(token)
-                  setError('')
-                }}
-                onExpire={() => setTurnstileToken(null)}
+                onSuccess={handleTurnstileSuccess}
+                onExpire={handleTurnstileExpire}
               />
 
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
-                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
+                className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-[transform,background-color,border-color,opacity,box-shadow] duration-100 shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loading ? (
                   <ButtonSpinner size={16} variant="dark" />
@@ -1102,7 +1115,7 @@ function AuthForm() {
 
                   <button
                     type="submit"
-                    className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer touch-manipulation"
+                    className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-[transform,background-color,border-color,opacity,box-shadow] duration-100 shadow-lg cursor-pointer touch-manipulation"
                   >
                     Continue
                   </button>
@@ -1278,17 +1291,14 @@ function AuthForm() {
 
                 {/* Cloudflare Turnstile Verification Widget */}
                 <TurnstileWidget
-                  onSuccess={(token) => {
-                    setTurnstileToken(token)
-                    setError('')
-                  }}
-                  onExpire={() => setTurnstileToken(null)}
+                  onSuccess={handleTurnstileSuccess}
+                  onExpire={handleTurnstileExpire}
                 />
 
                 <button
                   type="submit"
                   disabled={loading || !turnstileToken}
-                  className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-all shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
+                  className="w-full py-3.5 bg-white hover:bg-zinc-200 active:bg-zinc-300 active:scale-[0.99] text-black font-extrabold text-xs rounded-full tracking-wider uppercase transition-[transform,background-color,border-color,opacity,box-shadow] duration-100 shadow-lg cursor-pointer mt-2 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed touch-manipulation"
                 >
                   {loading ? (
                     <ButtonSpinner size={16} variant="dark" />

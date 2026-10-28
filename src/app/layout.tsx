@@ -146,22 +146,22 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         {/* Google AdSense Site Verification Meta Tag */}
         <meta name="google-adsense-account" content="ca-pub-5611678706554607" />
-        {/* Google AdSense Code Snippet */}
+        {/* Google AdSense Code Snippet - lazyOnload so main thread is unblocked for user interactions */}
         <Script
           id="google-adsense"
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5611678706554607"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        {/* Google Analytics 4 (GA4) */}
+        {/* Google Analytics 4 (GA4) - lazyOnload to prioritize interaction to next paint (INP) */}
         <Script
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="https://www.googletagmanager.com/gtag/js?id=G-4C54Q2P9B3"
         />
         <Script
           id="google-analytics"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];

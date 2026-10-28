@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { memo } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
 
 interface TurnstileWidgetProps {
@@ -10,7 +10,12 @@ interface TurnstileWidgetProps {
   className?: string
 }
 
-export function TurnstileWidget({
+const TURNSTILE_DEFAULT_OPTIONS = {
+  theme: 'dark' as const,
+  size: 'normal' as const,
+}
+
+export const TurnstileWidget = memo(function TurnstileWidget({
   onSuccess,
   onError,
   onExpire,
@@ -25,11 +30,9 @@ export function TurnstileWidget({
         onSuccess={onSuccess}
         onError={onError}
         onExpire={onExpire}
-        options={{
-          theme: 'dark',
-          size: 'normal',
-        }}
+        options={TURNSTILE_DEFAULT_OPTIONS}
       />
     </div>
   )
-}
+})
+
