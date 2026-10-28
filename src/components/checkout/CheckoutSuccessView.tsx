@@ -97,21 +97,9 @@ export function CheckoutSuccessView({
         </h1>
 
         {/* Subtitle */}
-        <p className="text-sm sm:text-base text-zinc-400 font-medium max-w-md leading-relaxed mb-6">
+        <p className="text-sm sm:text-base text-zinc-400 font-medium max-w-md leading-relaxed">
           Thanks for your purchase! Your receipt is on its way to your email.
         </p>
-
-        {/* Skip / Direct Navigation */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            setStage('final_step')
-          }}
-          className="text-[12px] text-zinc-400 hover:text-white font-medium underline underline-offset-4 transition-colors cursor-pointer"
-        >
-          Continue to Final Step &rarr;
-        </button>
       </div>
     )
   }
