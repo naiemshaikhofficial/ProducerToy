@@ -108,6 +108,23 @@ export function EpicProductDetailClient({
     product.has_addons
   )
 
+  const isFree = Number(product.price_usd || 0) === 0
+  const originalPriceUsd = product.original_price_usd ? Number(product.original_price_usd) : 0
+  const currentPriceUsd = Number(product.price_usd || 0)
+  const saleEndDate = product.sale_ends_at || product.offer_ends_at || product.sale_end_date
+  const hasSaleOffer = Boolean(saleEndDate || product.is_on_sale || product.sale_active)
+
+  // Naturally free products show only "Free" (Valorant style)
+  // Only promotional giveaway offers (with sale dates/flags) or discounted paid products show discount & offer pricing
+  const isFreeOnSale = isFree && hasSaleOffer && originalPriceUsd > 0
+  const isPaidOnSale = !isFree && originalPriceUsd > currentPriceUsd
+  const isOnSale = isFreeOnSale || isPaidOnSale
+  const discountPercent = isFreeOnSale
+    ? 100
+    : isPaidOnSale
+    ? Math.round(((originalPriceUsd - currentPriceUsd) / originalPriceUsd) * 100)
+    : 0
+
   useEffect(() => {
     if (initialIsOwned) {
       setIsOwned(true)
@@ -525,29 +542,23 @@ export function EpicProductDetailClient({
             </div>
           ) : (
             <div className="flex items-center gap-3 flex-wrap">
-              {Number(product.price_usd) === 0 ? (
-                <span className="text-3xl font-bold text-white">FREE</span>
-              ) : (
+              {isOnSale && (
                 <>
-                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
-                    <>
-                      <span className="text-xs bg-[#34363d] text-white font-bold px-2 py-0.5 rounded">
-                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
-                      </span>
-                      <span className="text-base text-zinc-500 line-through">
-                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
-                      </span>
-                    </>
-                  )}
-                  <span className="text-3xl font-bold text-white">
-                    {formatPrice(product.price_inr, product.price_usd)}
+                  <span className="text-xs bg-[#282a30] text-zinc-100 border border-[#3e414c] font-bold px-2 py-0.5 rounded">
+                    -{discountPercent}%
                   </span>
-                  {isOutOfStock && (
-                    <span className="text-xs font-extrabold text-black bg-[#ff4053] px-2.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
-                      Out of Stock
-                    </span>
-                  )}
+                  <span className="text-base text-zinc-500 line-through">
+                    {formatPrice(product.original_price_inr, originalPriceUsd)}
+                  </span>
                 </>
+              )}
+              <span className="text-3xl font-bold text-white">
+                {isFree ? 'FREE' : formatPrice(product.price_inr, product.price_usd)}
+              </span>
+              {isOutOfStock && (
+                <span className="text-xs font-extrabold text-black bg-[#ff4053] px-2.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
+                  Out of Stock
+                </span>
               )}
             </div>
           )}
@@ -1051,41 +1062,23 @@ export function EpicProductDetailClient({
           {/* 3. Price & Discount Display */}
           <div className="space-y-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              {Number(product.price_usd) === 0 ? (
+              {isOnSale && (
                 <>
-                  {product.original_price_usd && Number(product.original_price_usd) > 0 && (
-                    <>
-                      <span className="text-xs bg-[#34363d] text-white font-bold px-2 py-0.5 rounded">
-                        -100%
-                      </span>
-                      <span className="text-sm text-zinc-500 line-through">
-                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
-                      </span>
-                    </>
-                  )}
-                  <span className="text-2xl font-bold text-white">Free</span>
-                </>
-              ) : (
-                <>
-                  {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
-                    <>
-                      <span className="text-xs bg-[#34363d] text-white font-bold px-2 py-0.5 rounded">
-                        -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
-                      </span>
-                      <span className="text-sm text-zinc-500 line-through">
-                        {formatPrice(product.original_price_inr, Number(product.original_price_usd))}
-                      </span>
-                    </>
-                  )}
-                  <span className="text-2xl font-bold text-white">
-                    {formatPrice(product.price_inr, product.price_usd)}
+                  <span className="text-xs bg-[#282a30] text-zinc-100 border border-[#3e414c] font-bold px-2 py-0.5 rounded">
+                    -{discountPercent}%
+                  </span>
+                  <span className="text-sm text-zinc-500 line-through">
+                    {formatPrice(product.original_price_inr, originalPriceUsd)}
                   </span>
                 </>
               )}
+              <span className="text-2xl font-bold text-white">
+                {isFree ? 'Free' : formatPrice(product.price_inr, product.price_usd)}
+              </span>
             </div>
-            {(product.sale_ends_at || product.offer_ends_at || product.sale_end_date) ? (
+            {saleEndDate ? (
               <p className="text-[11px] text-zinc-400">
-                Sale ends {new Date(product.sale_ends_at || product.offer_ends_at || product.sale_end_date).toLocaleDateString('en-US', {
+                Sale ends {new Date(saleEndDate).toLocaleDateString('en-US', {
                   month: 'numeric',
                   day: 'numeric',
                   year: 'numeric',
