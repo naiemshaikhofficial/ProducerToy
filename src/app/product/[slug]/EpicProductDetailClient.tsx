@@ -102,6 +102,12 @@ export function EpicProductDetailClient({
     initialRatingStats || { averageRating: 0, totalReviews: 0, userCanRate: true }
   )
 
+  const hasAddons = Boolean(
+    (Array.isArray(product.addons) && product.addons.length > 0) ||
+    (Array.isArray(product.presets) && product.presets.length > 0) ||
+    product.has_addons
+  )
+
   useEffect(() => {
     if (initialIsOwned) {
       setIsOwned(true)
@@ -393,7 +399,7 @@ export function EpicProductDetailClient({
         <div className="flex items-center gap-8 sm:gap-10 text-sm font-medium overflow-x-auto custom-scrollbar">
           {[
             { id: 'overview', label: 'Overview' },
-            { id: 'addons', label: 'Presets & Sounds' },
+            ...(hasAddons ? [{ id: 'addons', label: 'Presets & Sounds' }] : []),
             { id: 'specs', label: 'Specs & Compatibility' },
             { id: 'faq', label: 'FAQ' },
           ].map((tab) => (
@@ -1011,58 +1017,45 @@ export function EpicProductDetailClient({
           </div>
         </div>
 
-        {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg - EXACT 1:1 EPIC GAMES STORE) ================= */}
+        {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
         <div className="hidden lg:block lg:col-span-4 xl:col-span-4 2xl:col-span-3 lg:sticky lg:top-6 space-y-4 w-full max-w-[340px] xl:max-w-[360px] lg:ml-auto">
-          {/* 1. Direct Prominent Title / Graphic Logo */}
-          <div className="w-full flex items-center justify-center py-1 min-h-[64px]">
-            {ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo) ? (
-              <Image
-                src={product.brands?.logo_url || product.brand_logo}
-                alt={product.name}
-                width={300}
-                height={90}
-                unoptimized
-                className="object-contain max-h-20 w-auto mx-auto drop-shadow-md"
-              />
-            ) : (
-              <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white drop-shadow-md text-center leading-tight">
-                {product.name.split('–')[0].split('-')[0].trim()}
-              </h2>
-            )}
+          {/* 1. Direct Prominent Brand Logo / Name */}
+          <div className="relative w-full h-16 sm:h-20 flex items-center justify-center py-1">
+            <Image
+              src={
+                ENABLE_BRANDS && (product.brands?.logo_url || product.brand_logo)
+                  ? product.brands?.logo_url || product.brand_logo
+                  : '/Producer Toy Charcoal 3D Logo.webp'
+              }
+              alt={developerName}
+              width={320}
+              height={120}
+              unoptimized
+              className="object-contain max-h-16 sm:max-h-20 w-auto mx-auto drop-shadow-md"
+              onError={(e) => {
+                const target = e.currentTarget
+                if (!target.src.includes('Producer%20Toy%20Charcoal%203D%20Logo')) {
+                  target.src = '/Producer Toy Charcoal 3D Logo.webp'
+                }
+              }}
+            />
           </div>
 
-          {/* 2. Audio Software Studio Badge Box (Exact 1:1 Match to Epic Games Rating Box) */}
-          <div className="border border-[#282828] rounded-xl p-3 bg-[#141414]/50 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="border border-white/20 rounded-md px-2 py-1 text-center flex-shrink-0">
-                <span className="text-[10px] text-zinc-400 block font-mono leading-none uppercase">STUDIO</span>
-                <span className="text-xs font-black text-white leading-none">64-BIT</span>
-              </div>
-              <div className="text-xs space-y-0.5 min-w-0">
-                <div className="font-bold text-white leading-tight">Universal DSP Ready</div>
-                <div className="text-[11px] text-zinc-400 truncate">FL Studio • Ableton • Logic Pro</div>
-              </div>
-            </div>
-            <div className="border-t border-[#222222] pt-2 text-[11px] text-zinc-400 font-medium">
-              Commercial License • 100% Royalty-Free
-            </div>
-          </div>
-
-          {/* 3. Product Type Pill (Base Game Match) */}
+          {/* 2. Product Type Pill */}
           <div>
             <span className="inline-block bg-[#202020] text-zinc-300 text-xs font-semibold px-2.5 py-1 rounded-md">
               {formattedType(product.product_type)}
             </span>
           </div>
 
-          {/* 4. Price & Discount Display */}
+          {/* 3. Price & Discount Display */}
           <div className="space-y-1">
             <div className="flex items-center gap-2.5 flex-wrap">
               {Number(product.price_usd) === 0 ? (
                 <>
                   {product.original_price_usd && Number(product.original_price_usd) > 0 && (
                     <>
-                      <span className="text-xs bg-[#0074e4] text-white font-bold px-2 py-0.5 rounded">
+                      <span className="text-xs bg-[#34363d] text-white font-bold px-2 py-0.5 rounded">
                         -100%
                       </span>
                       <span className="text-sm text-zinc-500 line-through">
@@ -1076,7 +1069,7 @@ export function EpicProductDetailClient({
                 <>
                   {product.original_price_usd && Number(product.original_price_usd) > Number(product.price_usd) && (
                     <>
-                      <span className="text-xs bg-[#0074e4] text-white font-bold px-2 py-0.5 rounded">
+                      <span className="text-xs bg-[#34363d] text-white font-bold px-2 py-0.5 rounded">
                         -{Math.round(((Number(product.original_price_usd) - Number(product.price_usd)) / Number(product.original_price_usd)) * 100)}%
                       </span>
                       <span className="text-sm text-zinc-500 line-through">
@@ -1095,19 +1088,19 @@ export function EpicProductDetailClient({
             )}
           </div>
 
-          {/* 5. CTA Action Buttons: Before Buying vs After Buying (Exact Match to Screenshots) */}
+          {/* 4. CTA Action Buttons: Before Buying vs After Buying */}
           <div className="space-y-2.5 pt-1">
             {(product.allow_external_url && product.external_url) ? (
               <button
                 type="button"
                 onClick={() => handleExternalAction(product.external_url!)}
-                className="bg-[#0074e4] hover:bg-[#0082fc] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer active:scale-[0.99]"
+                className="bg-[#34363d] hover:bg-[#42454e] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer active:scale-[0.99]"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{product.button_text || 'Get'}</span>
               </button>
             ) : isOwned ? (
-              /* ================= AFTER BUYING: IN LIBRARY (IMAGE 1 EXACT 1:1 MATCH) ================= */
+              /* ================= AFTER BUYING: IN LIBRARY ================= */
               <Link
                 href="/library"
                 className="w-full h-12 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#303030] text-sm font-bold flex items-center justify-center gap-2.5 transition-colors cursor-pointer select-none"
@@ -1140,14 +1133,14 @@ export function EpicProductDetailClient({
                 </button>
               </div>
             ) : (
-              /* ================= BEFORE BUYING: 3 ROWS (IMAGE 2 EXACT 1:1 MATCH) ================= */
+              /* ================= BEFORE BUYING: 3 ROWS (CHARCOAL AESTHETIC) ================= */
               <div className="space-y-2.5 w-full">
-                {/* Row 1: Buy Now (Cyan) + Cart */}
+                {/* Row 1: Buy Now (Charcoal #34363d) + Cart */}
                 <div className="flex items-center gap-2 w-full">
                   <button
                     type="button"
                     onClick={handleGetNow}
-                    className="flex-1 h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#0074e4] hover:bg-[#0082fc] text-white active:scale-[0.99] shadow-md select-none"
+                    className="flex-1 h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-[#34363d] hover:bg-[#42454e] text-white active:scale-[0.99] shadow-md select-none"
                   >
                     <span>{Number(product.price_usd) === 0 ? 'Claim for Free' : 'Buy Now'}</span>
                   </button>
@@ -1167,7 +1160,7 @@ export function EpicProductDetailClient({
                   </button>
                 </div>
 
-                {/* Row 2: Gift Button (with blue New! pill on right) */}
+                {/* Row 2: Gift Button (Charcoal New! pill) */}
                 <button
                   type="button"
                   onClick={() => setGiftModalOpen(true)}
@@ -1175,7 +1168,7 @@ export function EpicProductDetailClient({
                 >
                   <Gift className="w-4 h-4 text-zinc-300" />
                   <span>Gift</span>
-                  <span className="absolute right-4 bg-[#0074e4] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                  <span className="absolute right-4 bg-[#2c2c2c] text-zinc-300 border border-[#383838] text-[10px] font-black px-2 py-0.5 rounded-full">
                     New!
                   </span>
                 </button>
@@ -1210,45 +1203,23 @@ export function EpicProductDetailClient({
             )}
           </div>
 
-          {/* 6. Metadata Specs List with Dividers (Exact Match to Image 1 & 2) */}
+          {/* 5. Metadata Specs List with Dividers (Real Specs Only) */}
           <div className="space-y-0 text-xs divide-y divide-[#202020] border-t border-b border-[#202020] pt-1 pb-1">
-            {/* Epic Rewards / Toywards Rewards */}
-            <div className="flex items-center justify-between py-3">
-              <span className="text-zinc-400">Epic Rewards</span>
-              <span className="font-semibold text-white flex items-center gap-1.5">
-                Earn 5% back
-                <span className="w-3.5 h-3.5 rounded-full bg-[#0074e4] text-white flex items-center justify-center text-[9px] font-bold">+</span>
-              </span>
-            </div>
-
-            {/* Refund Type */}
-            <div className="flex items-center justify-between py-3">
-              <span className="text-zinc-400">Refund Type</span>
-              <span className="font-semibold text-white flex items-center gap-1">
-                Self-Refundable
-                <span className="text-zinc-500 cursor-pointer" title="Self-refundable within policy">?</span>
-              </span>
-            </div>
-
-            {/* Developer */}
             <div className="flex items-center justify-between py-3">
               <span className="text-zinc-400">Developer</span>
               <span className="font-semibold text-white">{developerName}</span>
             </div>
 
-            {/* Publisher */}
             <div className="flex items-center justify-between py-3">
               <span className="text-zinc-400">Publisher</span>
               <span className="font-semibold text-white">{publisherName}</span>
             </div>
 
-            {/* Release Date */}
             <div className="flex items-center justify-between py-3">
               <span className="text-zinc-400">Release Date</span>
               <span className="font-semibold text-white">{releaseYear}</span>
             </div>
 
-            {/* Platform */}
             <div className="flex items-center justify-between py-3">
               <span className="text-zinc-400">Platform</span>
               <div className="flex items-center gap-2">
@@ -1256,21 +1227,33 @@ export function EpicProductDetailClient({
                 <AppleIcon className="w-3.5 h-3.5" />
               </div>
             </div>
+
+            <div className="flex items-center justify-between py-3">
+              <span className="text-zinc-400">Format</span>
+              <span className="font-semibold text-white">{availableFormats}</span>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <span className="text-zinc-400">License Type</span>
+              <span className="font-semibold text-white">{licenseType}</span>
+            </div>
           </div>
 
-          {/* 7. Footer Actions */}
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('addons')
-              const el = document.getElementById('addons-section')
-              if (el) el.scrollIntoView({ behavior: 'smooth' })
-            }}
-            className="w-full text-center text-xs font-semibold text-[#0074e4] hover:text-[#3395ff] flex items-center justify-center gap-1.5 py-1 transition-colors cursor-pointer"
-          >
-            <span>See All Editions and Add-Ons</span>
-            <ChevronDown className="w-3.5 h-3.5" />
-          </button>
+          {/* 6. Footer Actions: Only show editions link if presets/addons actually exist */}
+          {hasAddons && (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab('addons')
+                const el = document.getElementById('addons-section')
+                if (el) el.scrollIntoView({ behavior: 'smooth' })
+              }}
+              className="w-full text-center text-xs font-semibold text-zinc-400 hover:text-white flex items-center justify-center gap-1.5 py-1 transition-colors cursor-pointer"
+            >
+              <span>See All Editions and Add-Ons</span>
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+            </button>
+          )}
 
           {/* Share & Report Buttons */}
           <div className="grid grid-cols-2 gap-3 pt-1">
