@@ -708,17 +708,16 @@ export default function CheckoutPage() {
   if (paymentStatus === 'success') {
     return (
       <div className="fixed inset-0 z-50 bg-[#0e0e0e] text-white overflow-y-auto py-6 sm:py-10 px-4 sm:px-6 select-none flex flex-col items-center justify-center">
-        <div className="relative w-full max-w-lg bg-[#141414] border border-[#242424] rounded-2xl p-6 sm:p-8 shadow-2xl">
-          <CheckoutSuccessView
-            email={billingDetails.email || user?.email}
-            hasGifts={lastGiftInfo?.hasGifts}
-            giftRecipientEmail={lastGiftInfo?.giftRecipientEmail}
-            hasSelfItems={lastGiftInfo?.hasSelfItems}
-            onClose={() => router.push('/store')}
-            items={completedOrder?.items || items}
-            orderNumber={completedOrder?.orderNumber}
-          />
-        </div>
+        <CheckoutSuccessView
+          email={billingDetails.email || user?.email}
+          hasGifts={lastGiftInfo?.hasGifts}
+          giftRecipientEmail={lastGiftInfo?.giftRecipientEmail}
+          hasSelfItems={lastGiftInfo?.hasSelfItems}
+          onClose={() => router.push('/store')}
+          items={completedOrder?.items || items}
+          orderNumber={completedOrder?.orderNumber}
+          sellerName={completedOrder?.items?.[0]?.brand || items?.[0]?.brand}
+        />
       </div>
     )
   }

@@ -576,7 +576,7 @@ export function GlobalCheckoutModal() {
             </div>
           </div>
         ) : paymentStatus === 'success' ? (
-          <div className="relative w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="relative z-10 w-full flex items-center justify-center p-2 sm:p-4 select-none animate-in fade-in duration-200">
             <CheckoutSuccessView
               email={billingDetails.email || user?.email}
               hasGifts={lastGiftInfo?.hasGifts}
@@ -585,6 +585,7 @@ export function GlobalCheckoutModal() {
               onClose={closeCheckout}
               items={completedOrder?.items || items}
               orderNumber={completedOrder?.orderNumber}
+              sellerName={completedOrder?.items?.[0]?.brand || items?.[0]?.brand}
             />
           </div>
         ) : (

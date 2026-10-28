@@ -1714,6 +1714,22 @@ export async function savePostPurchaseEmailShareConsentAction(params: {
       disclosureVersion: 'v1.0',
     })
 
+    // Update purchase records so the creator can view buyer's email in Toy Creator
+    if (params.productId) {
+      const updateData: Record<string, any> = {
+        seller_data_sharing_consented: params.consented,
+      }
+      if (params.consented && user.email) {
+        updateData.customer_email = user.email
+      }
+
+      await adminSupabase
+        .from('purchases')
+        .update(updateData)
+        .eq('user_id', user.id)
+        .eq('product_id', params.productId)
+    }
+
     return { success: true }
   } catch (err: any) {
     console.warn('[SAVE_POST_PURCHASE_CONSENT_NOTE]', err)

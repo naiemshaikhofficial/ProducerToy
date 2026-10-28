@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { X, Download, ExternalLink, FileText, ArrowRight } from 'lucide-react'
+import { X, ExternalLink, FileText, ArrowRight, Check } from 'lucide-react'
 import { CartItem } from '@/context/CartContext'
-import { getSecureDownloadUrlAction } from '@/actions/downloadActions'
 import { savePostPurchaseEmailShareConsentAction } from '@/actions/checkoutActions'
 
 interface CheckoutSuccessViewProps {
@@ -32,52 +31,96 @@ export function CheckoutSuccessView({
   const router = useRouter()
   const isGiftOnly = hasGifts && !hasSelfItems
 
-  const [downloadLoading, setDownloadLoading] = useState(false)
+  const [stage, setStage] = useState<'all_yours' | 'final_step'>('all_yours')
   const [shareConsentAgreed, setShareConsentAgreed] = useState(false)
   const [shareConsentSaved, setShareConsentSaved] = useState(false)
 
   const primaryItem = items?.[0]
-  const resolvedSellerName = sellerName || 'the developer'
+  const resolvedSellerName = primaryItem?.brand || sellerName || 'the developer'
 
-  const handleDownloadInstaller = async () => {
-    if (!primaryItem?.id) {
-      router.push('/library')
-      onClose?.()
-      return
+  // Automatic transition from wide "It's all yours" screen to "FINAL STEP" after 2.4s
+  useEffect(() => {
+    if (stage === 'all_yours') {
+      const timer = setTimeout(() => {
+        setStage('final_step')
+      }, 2400)
+      return () => clearTimeout(timer)
     }
-
-    setDownloadLoading(true)
-    try {
-      const res = await getSecureDownloadUrlAction(primaryItem.id, 'windows')
-      if (res.success && res.downloadUrl) {
-        window.open(res.downloadUrl, '_blank')
-      } else {
-        router.push('/library')
-        onClose?.()
-      }
-    } catch {
-      router.push('/library')
-      onClose?.()
-    } finally {
-      setDownloadLoading(false)
-    }
-  }
+  }, [stage])
 
   const handleToggleShareConsent = async (checked: boolean) => {
     setShareConsentAgreed(checked)
-    if (checked && primaryItem?.id) {
+    if (primaryItem?.id) {
       savePostPurchaseEmailShareConsentAction({
         orderNumber,
         productId: primaryItem.id,
         sellerName: resolvedSellerName,
-        consented: true,
+        consented: checked,
       }).catch(() => {})
-      setShareConsentSaved(true)
+      setShareConsentSaved(checked)
     }
   }
 
+  // --------------------------------------------------------------------------
+  // STAGE 1: Big Wide Screen ("It's all yours" - 1:1 Epic Games Store Layout)
+  // --------------------------------------------------------------------------
+  if (stage === 'all_yours') {
+    return (
+      <div
+        onClick={() => setStage('final_step')}
+        className="relative w-full max-w-[1040px] lg:max-w-[1080px] min-h-[540px] md:h-[620px] bg-[#141416] border border-[#242426] rounded-2xl md:rounded-3xl shadow-[0_30px_90px_rgba(0,0,0,0.95)] flex flex-col items-center justify-center p-8 sm:p-12 text-center select-none cursor-pointer animate-in fade-in zoom-in-95 duration-200"
+      >
+        {/* Top-Right Fixed Close ✕ */}
+        <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-20" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-zinc-500 hover:text-white p-2 rounded-full hover:bg-white/5 transition-colors cursor-pointer"
+            title="Close"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Centered Glowing Ring with Checkmark (Strictly NO BLUE - clean monochrome) */}
+        <div className="relative mb-6">
+          <div className="absolute -inset-4 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-zinc-200/90 bg-[#1a1a1e] flex items-center justify-center shadow-[0_0_50px_rgba(255,255,255,0.15)]">
+            <Check className="w-10 h-10 sm:w-12 sm:h-12 text-white stroke-[3]" />
+          </div>
+        </div>
+
+        {/* Title */}
+        <h1 className="text-3xl sm:text-[38px] font-black text-white tracking-tight mb-3">
+          It&apos;s all yours
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-sm sm:text-base text-zinc-400 font-medium max-w-md leading-relaxed mb-6">
+          Thanks for your purchase! Your receipt is on its way to your email.
+        </p>
+
+        {/* Skip / Direct Navigation */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setStage('final_step')
+          }}
+          className="text-[12px] text-zinc-400 hover:text-white font-medium underline underline-offset-4 transition-colors cursor-pointer"
+        >
+          Continue to Final Step &rarr;
+        </button>
+      </div>
+    )
+  }
+
+  // --------------------------------------------------------------------------
+  // STAGE 2: Exact 1:1 "FINAL STEP" Box (Epic Games Store Final Step)
+  // --------------------------------------------------------------------------
   return (
-    <div className="relative w-full max-w-lg mx-auto bg-[#141414] border border-[#262626] rounded-2xl p-6 sm:p-8 text-left select-none text-white shadow-2xl animate-in zoom-in-95 duration-200">
+    <div className="relative w-full max-w-[500px] mx-auto bg-[#18181b] border border-[#2c2c32] rounded-2xl p-6 sm:p-8 text-left select-none text-white shadow-2xl animate-in zoom-in-95 duration-200">
       {/* Top-Right Fixed Close ✕ */}
       <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20">
         {onClose ? (
@@ -125,7 +168,7 @@ export function CheckoutSuccessView({
         )}
       </p>
 
-      {/* Two Action Buttons (Exact 1:1 Epic Games Store Layout) */}
+      {/* Two Action Buttons (Exact 1:1 Epic Games Store Layout, NO BLUE - charcoal black!) */}
       <div className="flex flex-col sm:flex-row items-center gap-3 w-full mb-5">
         {isGiftOnly ? (
           <Link
@@ -138,7 +181,7 @@ export function CheckoutSuccessView({
           </Link>
         ) : (
           <>
-            {/* Primary: Open Library */}
+            {/* Primary: Open Library (Charcoal black, NO BLUE!) */}
             <Link
               href="/library"
               onClick={onClose}
@@ -160,7 +203,7 @@ export function CheckoutSuccessView({
         )}
       </div>
 
-      {/* Share email with creator checkbox (Screenshot 2 "reciiept sahre wala") */}
+      {/* Share email with creator checkbox */}
       {!isGiftOnly && (
         <div className="pt-2 pb-1 border-t border-[#222222]">
           <div className="flex items-start gap-2.5 pt-2 text-left">
@@ -182,7 +225,7 @@ export function CheckoutSuccessView({
             </label>
           </div>
           {shareConsentSaved && (
-            <p className="text-[10.5px] text-emerald-400 pl-6.5 pt-1 font-medium">
+            <p className="text-[10.5px] text-zinc-400 pl-6.5 pt-1 font-medium">
               Preference saved for {resolvedSellerName} updates.
             </p>
           )}
