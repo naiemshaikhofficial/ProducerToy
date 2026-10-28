@@ -342,7 +342,7 @@ export function EpicProductDetailClient({
     : ['Sound Kits']
 
   return (
-    <div className="space-y-8 sm:space-y-10 text-white max-w-[1440px] mx-auto font-sans select-none pb-28">
+    <div className="space-y-8 sm:space-y-10 text-white max-w-[1600px] 2xl:max-w-[1680px] mx-auto font-sans select-none pb-28">
       {/* ========================================================================= */}
       {/* 1. TOP TITLE HEADER & EPIC RATING (Exact 1:1 Match)                       */}
       {/* ========================================================================= */}
@@ -439,14 +439,24 @@ export function EpicProductDetailClient({
               </button>
             </div>
           ) : (
-            <Image
-              src={activeMedia.url || product.cover_image}
-              alt={product.name}
-              fill
-              unoptimized
-              priority
-              className="object-cover"
-            />
+            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+              <Image
+                src={activeMedia.url || product.cover_image}
+                alt=""
+                fill
+                unoptimized
+                aria-hidden="true"
+                className="object-cover blur-2xl opacity-30 scale-110 pointer-events-none select-none"
+              />
+              <Image
+                src={activeMedia.url || product.cover_image}
+                alt={product.name}
+                fill
+                unoptimized
+                priority
+                className="object-contain object-center z-10 p-1"
+              />
+            </div>
           )}
         </div>
 
@@ -773,9 +783,9 @@ export function EpicProductDetailClient({
       {/* ========================================================================= */}
       {/* 4. MAIN 2-COLUMN GRID (DESKTOP >= lg & SHARED BODY CONTENT)               */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start pt-4 sm:pt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-start pt-4 sm:pt-6">
         {/* ================= LEFT COLUMN (MEDIA & DETAILS) ================= */}
-        <div className="lg:col-span-8 space-y-10 w-full">
+        <div className="lg:col-span-8 xl:col-span-8 2xl:col-span-9 space-y-10 w-full">
           {/* Media Showcase (Desktop Only >= lg - Mobile Media Showcase is Rendered in Section 3) */}
           <div className="hidden lg:block space-y-3.5 w-full">
             <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl bg-[#121212] border border-[#222222]">
@@ -815,14 +825,24 @@ export function EpicProductDetailClient({
                   </button>
                 </div>
               ) : (
-                <Image
-                  src={activeMedia.url}
-                  alt={product.name}
-                  fill
-                  priority
-                  unoptimized
-                  className="object-cover object-center"
-                />
+                <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+                  <Image
+                    src={activeMedia.url || product.cover_image}
+                    alt=""
+                    fill
+                    unoptimized
+                    aria-hidden="true"
+                    className="object-cover blur-2xl opacity-30 scale-110 pointer-events-none select-none"
+                  />
+                  <Image
+                    src={activeMedia.url || product.cover_image}
+                    alt={product.name}
+                    fill
+                    priority
+                    unoptimized
+                    className="object-contain object-center z-10 p-1 sm:p-2"
+                  />
+                </div>
               )}
             </div>
 
@@ -1008,7 +1028,7 @@ export function EpicProductDetailClient({
         </div>
 
         {/* ================= RIGHT COLUMN (STICKY DESKTOP SIDEBAR >= lg) ================= */}
-        <div className="hidden lg:block lg:col-span-4 lg:sticky lg:top-6 space-y-5 w-full bg-[#161616] border border-[#242424] rounded-2xl p-6 sm:p-7 shadow-xl">
+        <div className="hidden lg:block lg:col-span-4 xl:col-span-4 2xl:col-span-3 lg:sticky lg:top-6 space-y-5 w-full max-w-[360px] xl:max-w-[380px] lg:ml-auto bg-[#161616] border border-[#242424] rounded-2xl p-6 sm:p-7 shadow-xl">
           {/* Direct Prominent Brand Logo */}
           <div className="relative w-full h-20 sm:h-24 flex items-center justify-center py-1">
             <Image
