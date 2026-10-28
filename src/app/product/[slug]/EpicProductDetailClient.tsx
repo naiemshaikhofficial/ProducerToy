@@ -1161,7 +1161,7 @@ export function EpicProductDetailClient({
                   </button>
                 </div>
 
-                {/* Row 2: Gift Button (Charcoal New! pill) */}
+                {/* GIFTING FEATURE (Temporarily Commented Out as Gifting is Not Enabled)
                 <button
                   type="button"
                   onClick={() => setGiftModalOpen(true)}
@@ -1173,6 +1173,7 @@ export function EpicProductDetailClient({
                     New!
                   </span>
                 </button>
+                */}
 
                 {/* Row 3: Wishlist Button */}
                 <button
