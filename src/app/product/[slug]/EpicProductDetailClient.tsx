@@ -567,14 +567,21 @@ export function EpicProductDetailClient({
         {/* E. CTA Action Buttons */}
         <div className="space-y-3 pt-1">
           {(product.allow_external_url && product.external_url) ? (
-            <button
-              type="button"
-              onClick={() => handleExternalAction(product.external_url!)}
-              className="bg-[#34363d] hover:bg-[#42454e] text-white py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>{product.button_text || 'Get Now'}</span>
-            </button>
+            <div className="space-y-2 w-full">
+              <button
+                type="button"
+                onClick={() => handleExternalAction(product.external_url!)}
+                className="bg-[#34363d] hover:bg-[#42454e] text-white py-4 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>{product.button_text || 'Get Now'}</span>
+              </button>
+              {product.affiliate_disclosure && (
+                <p className="text-[11px] leading-relaxed text-zinc-400 text-center px-1">
+                  Affiliate Disclosure: ProducerToy may earn a commission if you purchase {product.name || 'this product'} through this link. This does not increase the price you pay.
+                </p>
+              )}
+            </div>
           ) : isOwned ? (
             <Link
               href="/library"
@@ -1099,14 +1106,21 @@ export function EpicProductDetailClient({
           {/* 4. CTA Action Buttons: Before Buying vs After Buying */}
           <div className="space-y-2.5 pt-1">
             {(product.allow_external_url && product.external_url) ? (
-              <button
-                type="button"
-                onClick={() => handleExternalAction(product.external_url!)}
-                className="bg-[#34363d] hover:bg-[#42454e] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer active:scale-[0.99]"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>{product.button_text || 'Get'}</span>
-              </button>
+              <div className="space-y-2 w-full">
+                <button
+                  type="button"
+                  onClick={() => handleExternalAction(product.external_url!)}
+                  className="bg-[#34363d] hover:bg-[#42454e] text-white h-12 px-6 rounded-xl text-sm font-bold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer active:scale-[0.99]"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>{product.button_text || 'Get'}</span>
+                </button>
+                {product.affiliate_disclosure && (
+                  <p className="text-[11px] leading-relaxed text-zinc-400 text-center px-1">
+                    Affiliate Disclosure: ProducerToy may earn a commission if you purchase {product.name || 'this product'} through this link. This does not increase the price you pay.
+                  </p>
+                )}
+              </div>
             ) : isOwned ? (
               /* ================= AFTER BUYING: IN LIBRARY ================= */
               <Link

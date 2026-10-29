@@ -59,6 +59,7 @@ export interface Product {
   external_url?: string
   button_text?: string
   allow_external_url?: boolean
+  affiliate_disclosure?: boolean
   is_featured?: boolean
   is_coming_soon?: boolean
   is_beta?: boolean

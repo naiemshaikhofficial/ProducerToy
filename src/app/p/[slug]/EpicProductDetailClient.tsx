@@ -342,15 +342,22 @@ export function EpicProductDetailClient({ product }: { product: any }) {
         <div className="space-y-3 pt-1">
           {/* Row 1: Buy Now (Orange) + Cart Button */}
           {product.external_url ? (
-            <a
-              href={product.external_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#34363d] hover:bg-[#42454e] text-white py-4 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>{product.button_text || 'Get Now'}</span>
-            </a>
+            <div className="space-y-2 w-full">
+              <a
+                href={product.external_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#34363d] hover:bg-[#42454e] text-white py-4 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>{product.button_text || 'Get Now'}</span>
+              </a>
+              {product.affiliate_disclosure && (
+                <p className="text-[11px] leading-relaxed text-zinc-400 text-center px-1">
+                  Affiliate Disclosure: ProducerToy may earn a commission if you purchase {product.name || 'this product'} through this link. This does not increase the price you pay.
+                </p>
+              )}
+            </div>
           ) : (
             <div className="flex items-center gap-3">
               <button
@@ -857,15 +864,22 @@ export function EpicProductDetailClient({ product }: { product: any }) {
           {/* Desktop CTA Action Buttons */}
           <div className="space-y-2.5 pt-1">
             {product.external_url ? (
-              <a
-                href={product.external_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#34363d] hover:bg-[#42454e] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer"
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span>{product.button_text || 'Get'}</span>
-              </a>
+              <div className="space-y-2 w-full">
+                <a
+                  href={product.external_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#34363d] hover:bg-[#42454e] text-white py-3.5 px-6 rounded-xl text-sm font-extrabold uppercase tracking-wide w-full flex items-center justify-center gap-2 transition-all shadow-lg shadow-black/40 cursor-pointer"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>{product.button_text || 'Get'}</span>
+                </a>
+                {product.affiliate_disclosure && (
+                  <p className="text-[11px] leading-relaxed text-zinc-400 text-center px-1">
+                    Affiliate Disclosure: ProducerToy may earn a commission if you purchase {product.name || 'this product'} through this link. This does not increase the price you pay.
+                  </p>
+                )}
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 <button
