@@ -37,6 +37,37 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+function getCartCookie(): CartItem[] | null {
+  if (typeof document === 'undefined') return null
+  try {
+    const match = document.cookie.match(/(?:^|;\s*)pt_cart=([^;]*)/)
+    if (!match) return null
+    const parsed = JSON.parse(decodeURIComponent(match[1]))
+    return Array.isArray(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+function setCartCookie(items: CartItem[]) {
+  if (typeof document === 'undefined') return
+  try {
+    const isProd = window.location.hostname.includes('producertoy.com')
+    const domainPart = isProd ? '; domain=.producertoy.com' : ''
+    if (items.length === 0) {
+      document.cookie = `pt_cart=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/${domainPart}; SameSite=Lax`
+      return
+    }
+    const expires = new Date(Date.now() + 30 * 864e5).toUTCString()
+    const json = JSON.stringify(items)
+    if (json.length < 3800) {
+      document.cookie = `pt_cart=${encodeURIComponent(json)}; expires=${expires}; path=/${domainPart}; SameSite=Lax${window.location.protocol === 'https:' ? '; Secure' : ''}`
+    }
+  } catch {
+    // Non-blocking cookie error
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const { exchangeRate } = useCurrency()
   const { user } = useAuth()
@@ -71,14 +102,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
+      let loaded: any[] | null = null
       const saved = localStorage.getItem('pt_cart')
       if (saved) {
         const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed)) {
-          const normalized = parsed.map(normalizeItem)
-          setItems(normalized)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          loaded = parsed
         }
       }
+
+      // If localStorage is empty, recover from cross-domain cookie
+      if (!loaded || loaded.length === 0) {
+        const fromCookie = getCartCookie()
+        if (fromCookie && fromCookie.length > 0) {
+          loaded = fromCookie
+          localStorage.setItem('pt_cart', JSON.stringify(fromCookie.map(normalizeItem)))
+        }
+      }
+
+      if (loaded && Array.isArray(loaded)) {
+        const normalized = loaded.map(normalizeItem)
+        setItems(normalized)
+        setCartCookie(normalized)
+      }
+
+      // Sync across open browser tabs
+      const handleStorage = (e: StorageEvent) => {
+        if (e.key === 'pt_cart') {
+          try {
+            if (e.newValue) {
+              const parsed = JSON.parse(e.newValue)
+              if (Array.isArray(parsed)) {
+                setItems(parsed.map(normalizeItem))
+              }
+            } else {
+              setItems([])
+            }
+          } catch {}
+        }
+      }
+      window.addEventListener('storage', handleStorage)
+      return () => window.removeEventListener('storage', handleStorage)
     } catch {
       // JSON parse fallback
     }
@@ -87,7 +151,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const saveCart = (newItems: CartItem[]) => {
     const normalized = newItems.map(normalizeItem)
     setItems(normalized)
-    localStorage.setItem('pt_cart', JSON.stringify(normalized))
+    try {
+      localStorage.setItem('pt_cart', JSON.stringify(normalized))
+    } catch {}
+    setCartCookie(normalized)
   }
 
   const addItem = (item: any, openDrawer: boolean = false) => {

@@ -88,8 +88,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301)
   }
 
-  // 2. Cross-Domain Routing (store.producertoy.com vs producertoy.com)
-  const isApexDomain = host === 'producertoy.com';
+  // 2. Canonical Domain Routing
   const isStoreDomain = host.startsWith('store.');
 
   // Check query parameter ?news redirect
@@ -98,49 +97,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(targetHost, request.url), 307);
   }
 
-  // Paths that strictly live on the apex domain producertoy.com
-  const isApexContentPath =
-    pathname.startsWith('/news') ||
-    pathname.startsWith('/blog') ||
-    pathname.startsWith('/support') ||
-    pathname.startsWith('/faq') ||
-    pathname.startsWith('/faqs') ||
-    pathname.startsWith('/help') ||
-    pathname.startsWith('/site') ||
-    pathname.startsWith('/about') ||
-    pathname.startsWith('/contact') ||
-    pathname.startsWith('/privacy') ||
-    pathname.startsWith('/terms') ||
-    pathname.startsWith('/refund-policy') ||
-    pathname.startsWith('/purchase-policy') ||
-    pathname.startsWith('/eula') ||
-    pathname.startsWith('/licensing');
-
-  // Paths that strictly live on the store subdomain store.producertoy.com
-  const isStoreOnlyPath =
-    pathname.startsWith('/checkout') ||
-    pathname.startsWith('/cart') ||
-    pathname.startsWith('/account');
-
   const isApi = pathname.startsWith("/api");
   const isServerAction = request.headers.has('next-action') || request.method === 'POST';
 
   if (!isLocal) {
-    // If visitor is on store.producertoy.com and visits News / Blog / Support / FAQ / About / Legal -> take to https://producertoy.com
-    if (isStoreDomain && isApexContentPath) {
-      const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://producertoy.com');
-      return NextResponse.redirect(redirectUrl, 308);
-    }
-
-    // If visitor is on root domain producertoy.com and visits cart / checkout / account -> take to https://store.producertoy.com
-    if (isApexDomain && isStoreOnlyPath && !isApi && !isServerAction) {
-      const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://store.producertoy.com');
-      return NextResponse.redirect(redirectUrl, 308);
-    }
-
     // If visitor attempts to access /admin on storefront, redirect them to the dedicated admin portal
     if (pathname.startsWith('/admin')) {
       return NextResponse.redirect('https://app.producertoy.com', 308);
+    }
+
+    // Enforce canonical apex domain producertoy.com for all store subdomain requests (prevents cart/session fragmentation)
+    if (isStoreDomain && !isApi && !isServerAction) {
+      const redirectUrl = new URL(pathname + request.nextUrl.search, 'https://producertoy.com');
+      return NextResponse.redirect(redirectUrl, 308);
     }
   }
 
