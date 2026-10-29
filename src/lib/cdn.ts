@@ -8,6 +8,7 @@ export interface ImageCdnOptions {
   height?: number
   quality?: number
   format?: 'webp' | 'avif' | 'origin'
+  resize?: 'cover' | 'contain' | 'fill'
 }
 
 export function getCdnImageUrl(url: string | null | undefined, options: ImageCdnOptions = {}): string {
@@ -16,7 +17,7 @@ export function getCdnImageUrl(url: string | null | undefined, options: ImageCdn
   // If already a data URI or SVG, return as is
   if (url.startsWith('data:') || url.endsWith('.svg')) return url
 
-  const { width = 600, quality = 80, format = 'webp' } = options
+  const { width = 600, height, quality = 80, format = 'webp', resize = 'contain' } = options
 
   try {
     // 1. If Supabase Storage URL, append Supabase Image CDN transformation parameters
@@ -24,6 +25,8 @@ export function getCdnImageUrl(url: string | null | undefined, options: ImageCdn
       const renderUrl = url.replace('/object/public/', '/render/image/public/')
       const searchParams = new URLSearchParams()
       searchParams.set('width', width.toString())
+      if (height) searchParams.set('height', height.toString())
+      searchParams.set('resize', resize)
       searchParams.set('quality', quality.toString())
       if (format !== 'origin') searchParams.set('format', format)
       

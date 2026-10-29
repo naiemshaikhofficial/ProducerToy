@@ -297,13 +297,13 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   >
                     {/* Background Artwork */}
                     <Image
-                      src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop', { width: 1200 })}
+                      src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1200&auto=format&fit=crop', { width: 1200, resize: 'contain' })}
                       alt={product.name}
                       fill
                       priority={idx === 0}
                       unoptimized
                       sizes="(max-width: 640px) 80vw, 360px"
-                      className="object-contain object-center pointer-events-none transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover object-center pointer-events-none transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {/* Seamless Background Matching Gradients (1:1 with page bg #121212, zero discoloration) */}
@@ -467,17 +467,15 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     display: 'block',
                   }}
                 >
-                  {/* Background Artwork - Same as slug: object-contain inside 16:9 box */}
-                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
-                    <Image
-                      src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1600&auto=format&fit=crop', { width: 1600 })}
-                      alt={product.name}
-                      fill
-                      priority={idx === 0}
-                      unoptimized
-                      className="object-contain object-center pointer-events-none"
-                    />
-                  </div>
+                  {/* Background Artwork - Edge-to-edge 16:9 banner without cropping or letterboxing */}
+                  <Image
+                    src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1920&auto=format&fit=crop', { width: 1920, resize: 'contain' })}
+                    alt={product.name}
+                    fill
+                    priority={idx === 0}
+                    unoptimized
+                    className="object-cover object-center pointer-events-none transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                  />
 
                   {/* Epic Dark Gradients - Subtle so full product UI remains visible */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/30 via-40% to-transparent pointer-events-none" />
@@ -608,7 +606,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   }`}
                 >
                   <Image
-                    src={getCdnImageUrl(item.cover_image, { width: 160 })}
+                    src={getCdnImageUrl(item.cover_image, { width: 240, resize: 'contain' })}
                     alt={item.name}
                     fill
                     unoptimized
