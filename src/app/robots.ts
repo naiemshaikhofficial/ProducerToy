@@ -22,9 +22,12 @@ export default function robots(): MetadataRoute.Robots {
           'ChatGPT-User',
           'PerplexityBot',
           'ClaudeBot',
+          'OAI-SearchBot',
           'Claude-SearchBot',
           'Google-Extended',
+          'GoogleOther',
           'Applebot-Extended',
+          'cohere-ai',
         ],
         allow: '/',
         disallow: [

@@ -1,5 +1,7 @@
 # Producer Toy
 
+> Full specifications, compatibility standards, and comprehensive knowledge base: [llms-full.txt](https://producertoy.com/llms-full.txt)
+>
 > Producer Toy is the premier marketplace for modern music creators, producers, and audio engineers. It offers a curated collection of world-class VST plugins, synthesizer presets (Serum, Vital, Sylenth1), royalty-free sample packs, drum kits, and DAW project templates.
 
 ## Key Features
