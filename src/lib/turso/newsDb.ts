@@ -288,6 +288,16 @@ export async function findExistingArticle(
       conditions.push('source_url = ?')
       args.push(u)
 
+      // Normalize trailing slash to match both variations
+      const stripped = u.replace(/\/+$/, '')
+      if (stripped !== u) {
+        conditions.push('source_url = ?')
+        args.push(stripped)
+      } else {
+        conditions.push('source_url = ?')
+        args.push(stripped + '/')
+      }
+
       // Match normalized hostname + pathname to catch query param differences
       try {
         const parsed = new URL(u)
@@ -329,8 +339,11 @@ export async function findExistingArticle(
 
         if (words.length >= 3) {
           conditions.push('LOWER(title) LIKE ?')
-          args.push(`%${words[1]}%${words[2]}%`)
+          args.push(`%${words[0]}%${words[2]}%`)
         }
+      } else if (words.length === 1 && words[0].length >= 4) {
+        conditions.push('LOWER(title) LIKE ?')
+        args.push(`%${words[0]}%`)
       }
     }
 
@@ -354,6 +367,8 @@ export async function findExistingArticle(
           return candidate
         }
       }
+      // If title search was requested and none matched similarity threshold, do not falsely adopt unrelated candidate
+      return null
     }
 
     return candidates[0]
@@ -438,14 +453,32 @@ export async function getRelatedNews(excludeSlug: string, category: string, limi
   const client = getTursoClient()
 
   try {
+    const currentArticle = await getNewsArticleBySlug(excludeSlug)
+    const currentSig = currentArticle ? getTopicSignature(currentArticle.title) : null
+
     const result = await client.execute({
       sql: `SELECT * FROM news_articles WHERE slug != ? AND badge != 'EXPIRED' ORDER BY CASE WHEN category = ? THEN 0 ELSE 1 END, published_at DESC LIMIT ?`,
-      args: [excludeSlug, category, limit * 2],
+      args: [excludeSlug, category, limit * 4],
     })
     const parsed = result.rows.map((row) => parseArticleRow(row))
     const { detectDealExpiry } = await import('@/lib/news/dealExpiry')
     const activeOnly = parsed.filter((a) => !detectDealExpiry(a).isExpired)
-    return activeOnly.slice(0, limit)
+
+    // Deduplicate by topic and filter out current article's topic / same product
+    const deduplicated = deduplicateArticlesByTopic(activeOnly)
+    const filtered = deduplicated.filter((a) => {
+      if (!currentArticle) return true
+      if (currentSig && getTopicSignature(a.title) === currentSig) return false
+      if (calculateTitleSimilarity(currentArticle.title, a.title) >= 0.5) return false
+      if (currentArticle.source_url && a.source_url) {
+        const cleanCurrent = currentArticle.source_url.split('?')[0].replace(/\/+$/, '')
+        const cleanA = a.source_url.split('?')[0].replace(/\/+$/, '')
+        if (cleanCurrent && cleanCurrent === cleanA) return false
+      }
+      return true
+    })
+
+    return filtered.slice(0, limit)
   } catch {
     return []
   }

@@ -12,7 +12,7 @@ import {
 import { rewriteNewsWithGroq } from '@/lib/news/groqNewsEngine'
 import { findExistingArticle, saveNewsArticle, getNewsArticles } from '@/lib/turso/newsDb'
 import { detectDealExpiry, parseExpiryDateText } from '@/lib/news/dealExpiry'
-import { getTopicSignature, isMajorDealChange } from '@/lib/news/topicDeduplication'
+import { getTopicSignature, isMajorDealChange, calculateTitleSimilarity } from '@/lib/news/topicDeduplication'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60 // 60 seconds
@@ -195,40 +195,6 @@ async function executeSyncJob(limitParam: number) {
       .replace(/(^-|-$)+/g, '')
       .slice(0, 90)
 
-    // 1. FAST DEDUPLICATION CHECK: If this product/article already exists in DB,
-    // only proceed if there is a GENUINELY MAJOR change (price drop, new coupon code, or extended expiry date).
-    // Otherwise preserve the existing stable article without rewriting or re-posting to Telegram!
-    let existingArticle = await findExistingArticle({
-      feedLink: item.link,
-      directDealUrl: item.directDealUrl,
-      sourceUrl: item.directDealUrl || item.link,
-      coverImage: item.imageUrl,
-      title: item.title,
-      slug,
-    })
-
-    if (existingArticle) {
-      const hasMajorChange = isMajorDealChange(existingArticle, {
-        dealPrice: item.dealPrice,
-        regularPrice: item.regularPrice,
-        discount: item.discount,
-        couponCode: (item as any).couponCode,
-        expiryTimeline: item.expiryTimeline,
-      })
-
-      if (!hasMajorChange) {
-        console.log(
-          `[News Sync] Topic already covered by existing article "${existingArticle.title}". Skipping duplicate rewrite & Telegram re-post.`
-        )
-        skippedCount++
-        continue
-      }
-
-      console.log(
-        `[News Sync] Major update detected for existing article "${existingArticle.title}". Updating deal details.`
-      )
-    }
-
     // 1. ALWAYS extract direct developer / merchant deal URL, cover image & pricing from article link (item.link) FIRST!
     if (!item.dealPrice || !item.imageUrl || !item.directDealUrl) {
       const dealInfo = await extractDirectDealInfo(item.link || item.directDealUrl)
@@ -290,6 +256,38 @@ async function executeSyncJob(limitParam: number) {
       }
     }
 
+    // 3. FAST DEDUPLICATION CHECK: Now with fully resolved direct deal URL & verified product details
+    let existingArticle = await findExistingArticle({
+      feedLink: item.link,
+      directDealUrl: item.directDealUrl,
+      sourceUrl: item.directDealUrl || item.link,
+      coverImage: item.imageUrl,
+      title: item.title,
+      slug,
+    })
+
+    if (existingArticle) {
+      const hasMajorChange = isMajorDealChange(existingArticle, {
+        dealPrice: item.dealPrice,
+        regularPrice: item.regularPrice,
+        discount: item.discount,
+        couponCode: (item as any).couponCode,
+        expiryTimeline: item.expiryTimeline,
+      })
+
+      if (!hasMajorChange) {
+        console.log(
+          `[News Sync] Topic already covered by existing article "${existingArticle.title}". Skipping duplicate rewrite & Telegram re-post.`
+        )
+        skippedCount++
+        continue
+      }
+
+      console.log(
+        `[News Sync] Major update detected for existing article "${existingArticle.title}". Updating deal details.`
+      )
+    }
+
     // Strict deal rule: If it's a paid product with no discount or verified sale, skip it!
     if (
       !isFree &&
@@ -313,11 +311,24 @@ async function executeSyncJob(limitParam: number) {
     }
 
     if (canonicalTarget) {
-      article.id = canonicalTarget.id
-      article.slug = canonicalTarget.slug
-      article.created_at = canonicalTarget.created_at
-      article.published_at = new Date().toISOString()
-    } else {
+      const sim = calculateTitleSimilarity(article.title, canonicalTarget.title)
+      const isSameSource = Boolean(
+        article.source_url &&
+        canonicalTarget.source_url &&
+        article.source_url.split('?')[0].replace(/\/+$/, '') === canonicalTarget.source_url.split('?')[0].replace(/\/+$/, '')
+      )
+      // Only merge in-place if topic signature, high similarity or identical source URL matches
+      if (sim >= 0.5 || isSameSource) {
+        article.id = canonicalTarget.id
+        article.slug = canonicalTarget.slug
+        article.created_at = canonicalTarget.created_at
+        article.published_at = new Date().toISOString()
+      } else {
+        canonicalTarget = null
+      }
+    }
+
+    if (!canonicalTarget) {
       const cleanSlug = article.title
         .toLowerCase()
         .replace(/[^a-z0-9\s-]/g, '')

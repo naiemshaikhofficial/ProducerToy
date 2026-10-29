@@ -82,6 +82,14 @@ export const TOPIC_STOPWORDS = new Set([
   'available',
   'download',
   'downloads',
+  'review',
+  'reviews',
+  'overview',
+  'first',
+  'look',
+  'tested',
+  'hands',
+  'guide',
 ])
 
 export function getTitleKeywords(title?: string | null): string[] {
