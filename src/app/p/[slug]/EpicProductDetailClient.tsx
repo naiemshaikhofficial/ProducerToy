@@ -1022,6 +1022,14 @@ export function EpicProductDetailClient({ product }: { product: any }) {
             </button>
           </div>
 
+          {/* Minimalist Beta / Development Notice */}
+          {(product.is_beta || /\(Beta\)/i.test(product.name)) && (
+            <div className="flex items-center justify-center gap-2 pt-2 text-center text-xs text-zinc-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 shrink-0" />
+              <span>This toy is still in development and testing</span>
+            </div>
+          )}
+
         </div>
 
       </div>

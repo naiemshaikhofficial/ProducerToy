@@ -196,29 +196,6 @@ export function ProductSpecsOverview({
 
   return (
     <div className="space-y-8 pt-2 font-sans select-none">
-      {/* Minimalist Beta & Coming Soon Notice - Placed above Producer Ratings */}
-      {(product.is_beta || /\(Beta\)/i.test(product.name)) && (
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#141414] border border-[#242424] text-xs text-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />
-          <span className="font-semibold text-white">Beta Version:</span>
-          <span className="text-zinc-400">
-            This product is currently in active beta testing. You are receiving early access to test and explore the build.
-          </span>
-        </div>
-      )}
-
-      {product.is_coming_soon && (
-        <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#141414] border border-[#242424] text-xs text-zinc-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 shrink-0" />
-          <span className="font-semibold text-white">Coming Soon:</span>
-          <span className="text-zinc-400">
-            {product.release_date
-              ? `Scheduled to launch on ${new Date(product.release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.`
-              : 'This product has no fixed release date yet. Add to wishlist to be notified on launch.'}
-          </span>
-        </div>
-      )}
-
       {/* ========================================================================= */}
       {/* 1. PRODUCER RATINGS                                                       */}
       {/* ========================================================================= */}
