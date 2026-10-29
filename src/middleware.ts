@@ -188,6 +188,16 @@ export async function middleware(request: NextRequest) {
   // 4. Supabase Session Sync with Cookie Presence Check
   const { supabaseResponse } = await updateSession(request)
 
+  // 5. Cloudflare Geo-Location Sync
+  const cfCountry = request.headers.get('cf-ipcountry') || request.headers.get('x-vercel-ip-country') || ''
+  if (cfCountry && cfCountry !== 'XX' && cfCountry !== 'T1') {
+    supabaseResponse.cookies.set('pt_cf_country', cfCountry.toUpperCase(), {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'lax',
+    })
+  }
+
   return supabaseResponse;
 }
 

@@ -122,7 +122,20 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       const savedRegionId = localStorage.getItem('pt_region')
       const savedCurrency = localStorage.getItem('pt_currency') as 'USD' | 'INR'
 
-      if (savedRegionId) {
+      // 0. Cloudflare Geo Cookie Check
+      const cookieMatch = typeof document !== 'undefined' ? document.cookie.match(/(?:^|;\s*)pt_cf_country=([^;]*)/) : null;
+      const cfCountry = cookieMatch ? decodeURIComponent(cookieMatch[1]).toUpperCase() : null;
+
+      if (cfCountry) {
+        const isIndia = cfCountry === 'IN';
+        const detectedRegion = isIndia ? REGIONS[0] : REGIONS[1];
+        setRegionState(detectedRegion);
+        setCurrencyState(detectedRegion.currency);
+        try {
+          localStorage.setItem('pt_region', detectedRegion.id);
+          localStorage.setItem('pt_currency', detectedRegion.currency);
+        } catch {}
+      } else if (savedRegionId) {
         const found = REGIONS.find((r) => r.id === savedRegionId)
         if (found) {
           setRegionState(found)
@@ -181,6 +194,23 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         setExchangeRate(rate)
       }
     })
+
+    // Background sync directly with Cloudflare geo headers
+    fetch('/api/geo')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.country) {
+          const isIndia = data.country === 'IN';
+          const detected = isIndia ? REGIONS[0] : REGIONS[1];
+          setRegionState(detected);
+          setCurrencyState(detected.currency);
+          try {
+            localStorage.setItem('pt_region', detected.id);
+            localStorage.setItem('pt_currency', detected.currency);
+          } catch {}
+        }
+      })
+      .catch(() => {});
 
     return () => {
       isMounted = false

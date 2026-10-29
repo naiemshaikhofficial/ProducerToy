@@ -205,8 +205,7 @@ export default function CheckoutPage() {
       }
 
       setBillingDetails(finalDetails)
-      if (finalDetails.country?.toUpperCase() === 'INDIA') setCurrency('INR')
-      else if (finalDetails.country) setCurrency('USD')
+
 
       localStorage.setItem('pt_billing_details', JSON.stringify(finalDetails))
     }
@@ -254,13 +253,7 @@ export default function CheckoutPage() {
     const updated = { ...billingDetails, [field]: value }
     setBillingDetails(updated)
 
-    if (field === 'country') {
-      if (value === 'India') {
-        setCurrency('INR')
-      } else if (value) {
-        setCurrency('USD')
-      }
-    }
+    // Currency is determined strictly by Cloudflare/region, not country selection
 
     try {
       localStorage.setItem('pt_billing_details', JSON.stringify(updated))
@@ -332,7 +325,7 @@ export default function CheckoutPage() {
   }
 
   // Calculations with Real-Time Conversion
-  const isIndia = billingDetails.country === 'India' || (!billingDetails.country && currency === 'INR')
+  const isIndia = currency === 'INR'
 
   const rawSubtotalUsd = items.reduce((sum, item) => sum + (Number(item.price_usd) || 0), 0)
   const rawSubtotalInr = items.reduce((sum, item) => {

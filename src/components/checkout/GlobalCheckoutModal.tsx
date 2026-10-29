@@ -180,8 +180,7 @@ export function GlobalCheckoutModal() {
       }
 
       setBillingDetails(finalDetails)
-      if (finalDetails.country?.toUpperCase() === 'INDIA') setCurrency('INR')
-      else if (finalDetails.country) setCurrency('USD')
+
     }
 
     loadData()
@@ -209,7 +208,7 @@ export function GlobalCheckoutModal() {
     if (i.price_inr && Number(i.price_inr) > 0) return acc + Number(i.price_inr)
     return acc + Math.round((Number(i.price_usd) || 0) * (exchangeRate || 95.0))
   }, 0)
-  const isIndia = currency === 'INR' || billingDetails.country?.toUpperCase() === 'INDIA'
+  const isIndia = currency === 'INR'
   const currencySymbol = currency === 'INR' ? '₹' : '$'
   const currentSubtotal = currency === 'INR' ? rawSubtotalInr : rawSubtotalUsd
 
@@ -233,10 +232,7 @@ export function GlobalCheckoutModal() {
   const handleBillingChange = (field: keyof BillingDetails, value: string) => {
     setBillingDetails((prev) => {
       const updated = { ...prev, [field]: value }
-      if (field === 'country') {
-        if (value.toUpperCase() === 'INDIA') setCurrency('INR')
-        else setCurrency('USD')
-      }
+      // Currency is determined strictly by Cloudflare/region, not country selection
       return updated
     })
     if (formErrors[field]) {
