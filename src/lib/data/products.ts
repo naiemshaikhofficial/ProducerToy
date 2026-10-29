@@ -23,6 +23,7 @@ export const CATALOG_PRODUCT_SELECT = `
   category_slugs,
   is_featured,
   is_coming_soon,
+  is_beta,
   release_date,
   is_active,
   created_at,

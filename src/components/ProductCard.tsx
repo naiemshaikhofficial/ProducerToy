@@ -61,6 +61,7 @@ export interface Product {
   allow_external_url?: boolean
   is_featured?: boolean
   is_coming_soon?: boolean
+  is_beta?: boolean
   is_out_of_stock?: boolean
   download_url?: string | null
   download_url_win?: string | null
@@ -267,9 +268,16 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
 
           {/* Title with Uniform Height */}
-          <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
-            {product.name}
-          </h3>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <h3 className="text-sm sm:text-base font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-zinc-200 transition-colors">
+              {product.name}
+            </h3>
+            {product.is_beta && !/\(Beta\)/i.test(product.name) && (
+              <span className="text-[9px] font-mono font-medium px-1.5 py-0.2 rounded bg-[#202020] text-zinc-300 border border-zinc-700/50 uppercase shrink-0">
+                Beta
+              </span>
+            )}
+          </div>
 
           {/* Brand Name with Accessible Hit Area */}
           {ENABLE_BRANDS && (
