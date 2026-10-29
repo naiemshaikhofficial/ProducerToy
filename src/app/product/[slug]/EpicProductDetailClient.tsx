@@ -370,40 +370,9 @@ export function EpicProductDetailClient({
       {/* 1. TOP TITLE HEADER & EPIC RATING (Exact 1:1 Match)                       */}
       {/* ========================================================================= */}
       <div className="space-y-1.5">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-            {product.name}
-          </h1>
-          {product.is_beta && !/\(Beta\)/i.test(product.name) && (
-            <span className="text-xs sm:text-sm font-mono uppercase tracking-widest text-zinc-300 border border-zinc-700/60 bg-[#181818] px-2.5 py-0.5 rounded-md align-middle shadow-sm">
-              BETA
-            </span>
-          )}
-        </div>
-
-        {/* Minimalist Monochromatic Beta Notice */}
-        {(product.is_beta || /\(Beta\)/i.test(product.name)) && (
-          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#141414] border border-[#262626] text-xs sm:text-sm text-zinc-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-white shrink-0" />
-            <span className="font-semibold text-white">Beta Version:</span>
-            <span className="text-zinc-400">
-              This product is currently in active beta testing. You are receiving early access to test and explore the build.
-            </span>
-          </div>
-        )}
-
-        {/* Minimalist Coming Soon Notice */}
-        {product.is_coming_soon && (
-          <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#141414] border border-[#262626] text-xs sm:text-sm text-zinc-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 shrink-0" />
-            <span className="font-semibold text-white">Coming Soon:</span>
-            <span className="text-zinc-400">
-              {product.release_date
-                ? `Scheduled to launch on ${new Date(product.release_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.`
-                : 'This product has no fixed release date yet. Add to wishlist to be notified on launch.'}
-            </span>
-          </div>
-        )}
+        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+          {product.name}
+        </h1>
 
         {/* Minimalist Gray Product Type Exactly Below Name (No Box) */}
         <div className="text-sm sm:text-base font-medium text-zinc-400">
