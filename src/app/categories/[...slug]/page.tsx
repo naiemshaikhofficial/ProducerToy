@@ -228,7 +228,8 @@ export async function generateStaticParams() {
   ]
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
+  const { q } = (await searchParams) || {}
   const { slug } = await params
   const rawSlug = slug?.[0] || 'all'
   const cleanSlug = parseCategorySlug(rawSlug)
@@ -240,6 +241,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     description,
     path: `/categories/${rawSlug}`,
     keywords: generateSmartKeywords(title, cleanSlug, '', CATEGORY_META_MAP[cleanSlug]?.productType || 'plugin'),
+    noIndex: Boolean(q),
   })
 }
 

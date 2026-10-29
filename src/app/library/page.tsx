@@ -1,4 +1,14 @@
 import React from 'react'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'My Sound & Plugin Library | Producer Toy',
+  description: 'Access your purchased VST plugins, serial keys, and sound libraries.',
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 import crypto from 'crypto'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'

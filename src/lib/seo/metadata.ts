@@ -279,12 +279,14 @@ export function generatePageMetadata({
   image,
   keywords = [],
   path = '',
+  noIndex = false,
 }: {
   title: string
   description: string
   image?: string
   keywords?: string[]
   path?: string
+  noIndex?: boolean
 }): Metadata {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes('localhost')
@@ -335,10 +337,10 @@ export function generatePageMetadata({
       creator: '@producertoy',
     },
     robots: {
-      index: true,
+      index: !noIndex,
       follow: true,
       googleBot: {
-        index: true,
+        index: !noIndex,
         follow: true,
         'max-video-preview': -1,
         'max-image-preview': 'large',
