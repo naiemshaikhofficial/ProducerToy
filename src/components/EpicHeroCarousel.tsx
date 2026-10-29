@@ -293,7 +293,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                       }
                     }}
                     style={{ height: 435, minHeight: 435 }}
-                    className="group block relative w-full rounded-2xl overflow-hidden bg-[#121212] cursor-pointer"
+                    className="group block relative w-full rounded-2xl overflow-hidden bg-black border border-[#222222] cursor-pointer"
                   >
                     {/* Background Artwork */}
                     <Image
@@ -303,7 +303,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                       priority={idx === 0}
                       unoptimized
                       sizes="(max-width: 640px) 80vw, 360px"
-                      className="object-cover object-center pointer-events-none transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain object-center pointer-events-none transition-transform duration-500 group-hover:scale-105"
                     />
 
                     {/* Seamless Background Matching Gradients (1:1 with page bg #121212, zero discoloration) */}
@@ -421,14 +421,12 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
       {/* ========================================================================= */}
       <div className="hidden lg:grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6 items-stretch">
         
-        {/* Main Hero Banner Container (Left 9 out of 12 columns - Flush against page, no shadow) */}
+        {/* Main Hero Banner Container (Left 9 out of 12 columns - Exact 16:9 Aspect Ratio Same as Slug) */}
         <div 
-          className="col-span-9 relative w-full rounded-2xl overflow-hidden bg-[#121212]"
+          className="col-span-9 relative w-full aspect-[16/9] rounded-2xl overflow-hidden bg-[#121212] border border-[#222222] shadow-2xl"
           style={{ 
             position: 'relative', 
             width: '100%', 
-            height: 620,
-            minHeight: 620,
             overflow: 'hidden',
             isolation: 'isolate',
             transform: 'translateZ(0)'
@@ -458,7 +456,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   key={product.id} 
                   href={`/product/${product.slug}`}
                   prefetch={true}
-                  className="block relative w-full h-full flex-shrink-0 overflow-hidden group cursor-pointer"
+                  className="block relative w-full h-full flex-shrink-0 overflow-hidden group cursor-pointer bg-black"
                   style={{
                     position: 'relative',
                     width: '100%',
@@ -469,26 +467,21 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     display: 'block',
                   }}
                 >
-                  {/* Background Artwork */}
-                  <Image
-                    src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1600&auto=format&fit=crop', { width: 1600 })}
-                    alt={product.name}
-                    fill
-                    priority={idx === 0}
-                    unoptimized
-                    className="object-cover object-center pointer-events-none"
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
+                  {/* Background Artwork - Same as slug: object-contain inside 16:9 box */}
+                  <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={getCdnImageUrl(product.cover_image || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1600&auto=format&fit=crop', { width: 1600 })}
+                      alt={product.name}
+                      fill
+                      priority={idx === 0}
+                      unoptimized
+                      className="object-contain object-center pointer-events-none"
+                    />
+                  </div>
 
-                  {/* Epic Dark Gradients */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/95 via-[#0a0a0a]/40 to-transparent pointer-events-none" style={{ position: 'absolute', inset: 0 }} />
+                  {/* Epic Dark Gradients - Subtle so full product UI remains visible */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/90 via-[#0a0a0a]/30 via-40% to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a]/70 via-transparent to-transparent max-w-xl pointer-events-none" />
 
                   {/* Top Right Wishlist Button for Desktop */}
                   <button
@@ -506,7 +499,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                   </button>
 
                   {/* Hero Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-10 xl:p-12 max-w-2xl space-y-3 z-10">
+                  <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8 xl:p-10 max-w-xl space-y-2 z-10">
                     
                     {/* Brand / Category Tag - Minimalist without border */}
                     <div className="flex items-center gap-2">
@@ -516,17 +509,17 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                     </div>
 
                     {/* Main Product Title - Clean, Balanced Size */}
-                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight font-sans drop-shadow-lg">
+                    <h2 className="text-xl sm:text-2xl xl:text-3xl font-bold tracking-tight text-white leading-tight font-sans drop-shadow-lg">
                       {getCleanProductName(product.name)}
                     </h2>
 
                     {/* Short Description - Compact & Minimalist */}
-                    <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed line-clamp-2 drop-shadow-sm max-w-md">
+                    <p className="text-xs sm:text-sm text-zinc-300 font-normal leading-relaxed line-clamp-2 drop-shadow-sm max-w-md">
                       {product.short_description || 'Professional audio tools and VST plugins designed for modern music producers.'}
                     </p>
 
                     {/* Price & Action Row (Epic Games Store Reference: Same Height & Balanced Proportions) */}
-                    <div className="pt-2 space-y-2">
+                    <div className="pt-1.5 space-y-2">
                       <p className="text-xs uppercase tracking-wider font-semibold text-zinc-300">
                         {isFree ? 'Free' : formatPrice(priceInr, priceUsd)}
                       </p>
@@ -575,12 +568,11 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
         </div>
 
-        {/* Right Sidebar Interactive Product Cards (PC Only) - EXACT 1:1 Epic Games Store Reference */}
+        {/* Right Sidebar Interactive Product Cards (PC Only) - Dynamic Height matching 16:9 Banner */}
         <div 
-          className="col-span-3 flex flex-col justify-center gap-2.5 xl:gap-3 py-1" 
+          className="col-span-3 flex flex-col justify-center gap-2 xl:gap-2.5 py-1 h-full min-h-0" 
           role="tablist" 
           aria-label="Featured slides"
-          style={{ height: 620, minHeight: 620 }}
         >
           {featuredList.map((item, idx) => {
             const isActive = idx === selectedIndex
@@ -592,8 +584,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
                 aria-current={isActive ? 'true' : undefined}
                 aria-label={item.name}
                 onClick={() => handleSelect(idx)}
-                style={{ height: 96, minHeight: 96 }}
-                className={`group relative w-full flex items-center gap-4 px-4 py-3 rounded-2xl border transition-colors duration-200 text-left overflow-hidden cursor-pointer select-none outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus,rgba(255,255,255,0.6))] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212] ${
+                className={`group relative w-full flex items-center gap-3 xl:gap-4 px-3.5 xl:px-4 py-2.5 rounded-2xl border transition-colors duration-200 text-left overflow-hidden cursor-pointer select-none outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-border-focus,rgba(255,255,255,0.6))] focus-visible:ring-offset-2 focus-visible:ring-offset-[#121212] ${featuredList.length <= 3 ? "h-24 xl:h-[96px]" : "flex-1 min-h-0 max-h-[96px]"} ${
                   isActive
                     ? 'bg-[#202020] border-white/10 shadow-md'
                     : 'bg-transparent border-transparent hover:bg-white/[0.05]'
@@ -612,8 +603,7 @@ export function EpicHeroCarousel({ products }: EpicHeroCarouselProps) {
 
                 {/* Poster / Thumbnail Box (Exact 3:4 Epic Games Store Portrait Ratio) */}
                 <div 
-                  style={{ width: 62, height: 82, minWidth: 62, minHeight: 82 }}
-                  className={`relative z-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.08] shadow-sm transition-transform duration-200 ${
+                  className={`relative z-10 w-14 h-16 xl:w-16 xl:h-20 rounded-xl overflow-hidden flex-shrink-0 bg-[#161616] border border-white/[0.08] shadow-sm transition-transform duration-200 ${
                     isActive ? 'scale-[1.02]' : 'group-hover:scale-[1.02]'
                   }`}
                 >
