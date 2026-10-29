@@ -5,17 +5,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import {
-  ExternalLink,
   Gift,
-  ArrowRight,
-  ShieldCheck,
   Info
 } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { useCurrency } from '@/context/CurrencyContext'
-import { ToywardsSparkleIcon } from '@/components/account/RewardsAndWalletTab'
-
 import { SendGiftModal } from '@/components/gifts/SendGiftModal'
 
 // Instant In-Place Checkout Modal
@@ -24,15 +19,23 @@ const GlobalCheckoutModal = dynamic(
   { ssr: false }
 )
 
+function WindowsIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+    </svg>
+  )
+}
+
 export function CartPageClient() {
   const { items, removeItem, openCheckout } = useCart()
   const { toggleWishlist } = useWishlist()
-  const { formatPrice, currency, exchangeRate } = useCurrency()
+  const { formatPrice, exchangeRate } = useCurrency()
 
   const [giftModalOpen, setGiftModalOpen] = useState(false)
   const [selectedGiftItem, setSelectedGiftItem] = useState<any>(null)
-  const [giftRecipient, setGiftRecipient] = useState('')
-  const [giftSuccess, setGiftSuccess] = useState(false)
+  const [, setGiftRecipient] = useState('')
+  const [, setGiftSuccess] = useState(false)
 
   // Calculations
   const rawSubtotalUsd = items.reduce((sum, item) => sum + Number(item.price_usd || 0), 0)
@@ -61,28 +64,15 @@ export function CartPageClient() {
 
   return (
     <div className="min-h-screen bg-[#121212] text-white font-sans select-none pb-28">
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14">
+      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
         
         {/* ========================================================================= */}
-        {/* 1. MOBILE HEADER (< lg) (Exact Screenshot 2 Match: Large & Bold)          */}
+        {/* HEADER: Clean "My Cart" Title matching Epic Games layout                  */}
         {/* ========================================================================= */}
-        <div className="block lg:hidden pb-7 border-b border-[#202020] space-y-4">
-
-          {/* Large Bold Title (Exact Screenshot Match) */}
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none">
+        <div className="pb-6 sm:pb-8 flex items-center justify-between">
+          <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-bold text-white tracking-tight leading-tight">
             My Cart
           </h1>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* 2. DESKTOP HEADER (>= lg) (Exact 1:1 Match)                               */}
-        {/* ========================================================================= */}
-        <div className="hidden lg:flex items-center justify-between pb-8 sm:pb-10 border-b border-[#202020]">
-          <h1 className="text-4xl lg:text-5xl font-black text-white tracking-tight">
-            My Cart
-          </h1>
-
-
         </div>
 
         {/* ========================================================================= */}
@@ -126,23 +116,19 @@ export function CartPageClient() {
               prefetch={true}
               className="mt-2 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-extrabold text-xs sm:text-sm px-8 py-3.5 rounded-lg uppercase tracking-wider transition-all shadow-lg shadow-black/40 active:scale-95 cursor-pointer inline-flex items-center justify-center gap-2"
             >
-              <span>Shop Sound Kits & Plugins</span>
+              <span>Shop Sound Kits &amp; Plugins</span>
             </Link>
 
           </div>
         ) : (
           /* ========================================================================= */
-          /* VIEW 2: FILLED CART STATE                                                 */
+          /* VIEW 2: FILLED CART STATE (1:1 Epic Games Store Layout Match)             */
           /* ========================================================================= */
-          <div className="pt-6 sm:pt-10">
-            
-            {/* --------------------------------------------------------------------- */}
-            {/* A. MOBILE FILLED CART VIEW (< lg ONLY - EXACT SCREENSHOT 1 & 2 MATCH)  */}
-            {/* --------------------------------------------------------------------- */}
-            <div className="block lg:hidden space-y-6">
+          <div className="pt-2 sm:pt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               
-              {/* Mobile Cart Items List */}
-              <div className="space-y-5">
+              {/* Left Column: Cart Items List */}
+              <div className="lg:col-span-8 space-y-5">
                 {items.map((item) => {
                   const categoryLabel =
                     item.product_type === 'sample_pack'
@@ -153,17 +139,16 @@ export function CartPageClient() {
                       ? 'Drum Kit'
                       : item.product_type === 'daw_template'
                       ? 'DAW Project'
-                      : 'Audio Plugin'
+                      : 'Add-On'
 
                   return (
                     <div
                       key={item.id}
-                      className="bg-[#181818] border border-[#242424] rounded-2xl p-5 space-y-4 shadow-lg"
+                      className="bg-[#202020] rounded-2xl p-5 sm:p-6 transition-all shadow-md flex flex-col sm:flex-row gap-5 relative border border-transparent hover:border-[#2d2d2d]"
                     >
-                      {/* Top Row: Thumbnail + Category Tag & Large Title (Screenshot 2 Match) */}
-                      <div className="flex items-start gap-4">
-                        {/* Cover Image */}
-                        <div className="w-16 h-22 bg-[#141414] rounded-xl overflow-hidden relative flex-shrink-0 border border-[#262626] shadow-sm">
+                      {/* Left: Product Poster Image + Platform OS icon */}
+                      <div className="flex sm:flex-col items-center sm:items-start gap-3 sm:gap-2 flex-shrink-0">
+                        <div className="w-20 h-28 sm:w-[110px] sm:h-[146px] bg-[#161616] rounded-xl overflow-hidden relative flex-shrink-0 border border-[#2c2c2c] shadow-sm">
                           <Image
                             src={item.cover_image}
                             alt={item.name}
@@ -172,301 +157,150 @@ export function CartPageClient() {
                             className="object-cover"
                           />
                         </div>
-
-                        {/* Category & Large Title */}
-                        <div className="flex-1 space-y-1.5">
-                          <span className="inline-block bg-[#242424] text-zinc-300 text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded border border-[#333333]">
-                            {categoryLabel}
-                          </span>
-                          <h3 className="text-base sm:text-lg font-black text-white tracking-tight leading-snug">
-                            {item.name}
-                          </h3>
+                        <div className="flex items-center gap-1.5 text-zinc-400 pl-0.5">
+                          <WindowsIcon className="w-3.5 h-3.5 fill-current" />
                         </div>
                       </div>
 
-                      {/* Inner Box: Rating / License Tag (Screenshot 2 Match) */}
-                      <div className="bg-[#141414] border border-[#222222] rounded-xl p-3.5 flex items-center gap-3">
-                        <span className="inline-flex items-center font-black bg-[#34363d] text-white border border-white/15 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider">
-                          100%
-                        </span>
-                        <span className="text-xs font-bold text-zinc-200">
-                          Royalty-Free Commercial License
-                        </span>
-                      </div>
+                      {/* Right: Product Details & Actions */}
+                      <div className="flex-1 flex flex-col justify-between min-w-0">
+                        
+                        {/* Top: Category Tag, Title & Price */}
+                        <div>
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                              <span className="inline-block bg-[#2b2b2b] text-zinc-300 text-[11px] font-semibold px-2 py-0.5 rounded border border-[#383838]">
+                                {categoryLabel}
+                              </span>
+                              <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug mt-1.5 truncate">
+                                {item.name}
+                              </h3>
+                            </div>
 
-                      {/* Price Row + Toywards Note (Screenshot 2 Match: Large Price) */}
-                      <div className="space-y-1.5 pt-1">
-                        <div className="text-2xl font-black text-white tracking-tight">
-                          {formatPrice(item.price_inr, item.price_usd)}
+                            <div className="text-right flex-shrink-0">
+                              <span className="text-base sm:text-lg font-bold text-white tracking-tight">
+                                {formatPrice(item.price_inr, item.price_usd)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Classification / Specs Box (Exact Screenshot Match) */}
+                          <div className="border border-[#333333] rounded-xl p-3 sm:p-3.5 mt-3.5 bg-transparent space-y-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <span className="inline-flex items-center font-bold bg-[#303030] text-white border border-[#444444] px-1.5 py-0.5 rounded text-[11px] tracking-wider">
+                                100%
+                              </span>
+                              <span className="text-xs font-semibold text-zinc-200">
+                                Royalty-Free Commercial License
+                              </span>
+                            </div>
+                            <div className="w-full h-[1px] bg-[#2d2d2d]" />
+                            <div className="text-[11px] text-zinc-400">
+                              Instant Digital Cloud Download
+                            </div>
+                          </div>
                         </div>
 
-                      </div>
+                        {/* Bottom Row: Refundable + Actions (Remove, Gift, Move to wishlist) */}
+                        <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                            <span>Refundable</span>
+                            <Info className="w-3.5 h-3.5 text-zinc-400" />
+                          </div>
 
-                      {/* Actions Row: Gift Icon Button + Move to Wishlist (Screenshot 2 Match) */}
-                      <div className="space-y-2.5 pt-1">
-                        <div className="flex items-center gap-3">
-                          {/* Gift Button (Only for paid items) */}
-                          {(Number(item.price_usd || 0) > 0 || Number(item.price_inr || 0) > 0) && (
+                          <div className="flex items-center gap-3">
                             <button
                               type="button"
-                              onClick={() => handleOpenGiftModal(item)}
-                              className="w-12 h-12 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-200 border border-[#2c2c2c] transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
-                              title="Gift this product"
-                              aria-label="Gift item"
+                              onClick={() => removeItem(item.id)}
+                              className="text-xs font-medium text-zinc-400 hover:text-white underline underline-offset-2 transition-colors cursor-pointer hover:text-red-400 mr-1"
                             >
-                              <Gift className="w-5 h-5" />
+                              Remove
                             </button>
-                          )}
 
-                          {/* Move to Wishlist Button */}
-                          <button
-                            type="button"
-                            onClick={() => handleMoveToWishlist(item)}
-                            className="flex-1 h-12 px-4 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-200 hover:text-white border border-[#2c2c2c] text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center justify-center gap-2"
-                          >
-                            <span>Move to wishlist</span>
-                          </button>
-                        </div>
+                            {/* Gift Button */}
+                            {(Number(item.price_usd || 0) > 0 || Number(item.price_inr || 0) > 0) && (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenGiftModal(item)}
+                                className="w-8 h-8 rounded-lg bg-[#2b2b2b] hover:bg-[#353535] border border-[#383838] flex items-center justify-center text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                                title="Gift this product"
+                                aria-label="Gift item"
+                              >
+                                <Gift className="w-3.5 h-3.5" />
+                              </button>
+                            )}
 
-                        {/* Remove Link on bottom right */}
-                        <div className="text-right pt-1">
-                          <button
-                            type="button"
-                            onClick={() => removeItem(item.id)}
-                            className="text-xs sm:text-sm font-semibold text-zinc-400 hover:text-white transition-colors cursor-pointer underline hover:text-red-400"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Device Compatibility / Instant Delivery Info Pill (Screenshot 2 Match) */}
-                      <div className="bg-[#141414] border border-[#242424] rounded-xl p-3.5 flex items-center gap-2.5 text-xs text-zinc-400">
-                        <div className="w-2.5 h-2.5 rounded-full bg-zinc-400 flex-shrink-0" />
-                        <span>Instant digital cloud delivery to your ProducerToy account</span>
-                      </div>
-
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Mobile Summary Card (Screenshot 1 Match: Large Typography) */}
-              <div className="bg-[#181818] border border-[#242424] rounded-2xl p-6 space-y-6 shadow-2xl">
-                {/* Title */}
-                <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  Order Summary
-                </h2>
-
-                {/* Price Breakdown */}
-                <div className="space-y-3.5 text-sm">
-                  <div className="flex items-center justify-between text-zinc-300 font-medium">
-                    <span>Price</span>
-                    <span className="text-white font-bold text-base">
-                      {formatPrice(rawSubtotalInr, rawSubtotalUsd)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-zinc-300 text-xs">
-                    <span>Taxes</span>
-                    <span className="text-zinc-400">Calculated at Checkout</span>
-                  </div>
-
-                  {/* Subtotal Divider */}
-                  <div className="border-t border-[#262626] pt-4 flex items-center justify-between text-base font-bold">
-                    <span className="text-white">Subtotal</span>
-                    <span className="text-2xl font-black text-white tracking-tight">
-                      {formatPrice(rawSubtotalInr, rawSubtotalUsd)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Check Out Button */}
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => openCheckout()}
-                    className="w-full bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-black text-base py-4 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-black/40 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <span>Check Out</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-
-                  <p className="text-xs text-zinc-500 text-center mt-3 leading-relaxed">
-                    * All products cleared for commercial use with instant download access after checkout.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
-            {/* --------------------------------------------------------------------- */}
-            {/* B. DESKTOP FILLED CART VIEW (>= lg ONLY - 2-COLUMN LAYOUT)            */}
-            {/* --------------------------------------------------------------------- */}
-            <div className="hidden lg:grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-              
-              {/* Left Column: Cart Items List */}
-              <div className="lg:col-span-8 space-y-4">
-                {items.map((item) => {
-                  const categoryLabel =
-                    item.product_type === 'sample_pack'
-                      ? 'Sample Pack'
-                      : item.product_type === 'preset'
-                      ? 'Preset Bank'
-                      : item.product_type === 'sound_kit'
-                      ? 'Drum Kit'
-                      : item.product_type === 'daw_template'
-                      ? 'DAW Project'
-                      : 'Audio Plugin'
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="bg-[#181818] border border-[#242424] hover:border-[#2e2e2e] rounded-2xl p-5 sm:p-6 transition-all shadow-md flex flex-row gap-5 relative"
-                    >
-                      {/* Product Poster Image */}
-                      <div className="w-32 h-44 bg-[#141414] rounded-xl overflow-hidden relative flex-shrink-0 border border-[#262626] shadow-inner group">
-                        <Image
-                          src={item.cover_image}
-                          alt={item.name}
-                          fill
-                          unoptimized
-                          className="object-cover group-hover:brightness-110 transition-all duration-200"
-                        />
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
-                        <div className="absolute bottom-2 left-2 bg-black/80 backdrop-blur-xs p-1.5 rounded-md border border-white/10 shadow-sm">
-                          <svg className="w-3.5 h-3.5 text-white fill-current" viewBox="0 0 24 24">
-                            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      {/* Product Details & Inner Section */}
-                      <div className="flex-1 flex flex-col justify-between space-y-3">
-                        
-                        {/* Top Info + Price */}
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="space-y-1">
-                            <span className="inline-block bg-[#282828] text-zinc-300 text-[10.5px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-[#333333]">
-                              {categoryLabel}
-                            </span>
-
-                            <h3 className="text-lg font-extrabold text-white tracking-tight leading-snug">
-                              {item.name}
-                            </h3>
+                            {/* Move to Wishlist Button */}
+                            <button
+                              type="button"
+                              onClick={() => handleMoveToWishlist(item)}
+                              className="px-3.5 py-1.5 rounded-lg bg-[#2b2b2b] hover:bg-[#353535] border border-[#383838] text-white text-xs font-semibold transition-colors cursor-pointer"
+                            >
+                              Move to wishlist
+                            </button>
                           </div>
-
-                          <div className="text-right flex-shrink-0">
-                            <span className="text-lg font-black text-white tracking-tight">
-                              {formatPrice(item.price_inr, item.price_usd)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Inner Box: Rating/License + Toywards Note */}
-                        <div className="bg-[#141414] border border-[#222222] rounded-xl p-3.5 space-y-2.5">
-                          <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 font-bold bg-[#34363d] text-white border border-white/15 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider">
-                              100%
-                            </span>
-                            <span className="text-xs font-bold text-zinc-200">
-                              Royalty-Free Commercial License
-                            </span>
-                          </div>
-
-                        </div>
-
-                        {/* Bottom Actions Row: Remove, Gift, Move to Wishlist */}
-                        <div className="flex items-center justify-end gap-3 pt-1">
-                          <button
-                            type="button"
-                            onClick={() => removeItem(item.id)}
-                            className="text-xs font-semibold text-zinc-400 hover:text-white transition-colors cursor-pointer px-2 py-1.5 underline hover:text-red-400"
-                          >
-                            Remove
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleOpenGiftModal(item)}
-                            className="p-2.5 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-300 hover:text-white border border-[#2c2c2c] transition-colors cursor-pointer"
-                            title="Gift to a Friend"
-                            aria-label="Gift item"
-                          >
-                            <Gift className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleMoveToWishlist(item)}
-                            className="px-4 py-2.5 rounded-xl bg-[#202020] hover:bg-[#282828] text-zinc-200 hover:text-white border border-[#2c2c2c] text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
-                          >
-                            <span>Move to wishlist</span>
-                          </button>
                         </div>
 
                       </div>
                     </div>
                   )
                 })}
+
+                {/* Bottom Disclaimer (Exact Screenshot Match) */}
+                <p className="text-[11.5px] text-zinc-500 pt-3">
+                  * The lowest price offered on Producer Toy in the last 30 days before discount
+                </p>
               </div>
 
-              {/* Right Column: Order Summary (Sticky 4-5 cols) */}
-              <div className="lg:col-span-4 sticky top-24 space-y-4">
-                <div className="bg-[#181818] border border-[#242424] rounded-2xl p-6 sm:p-7 space-y-6 shadow-xl">
-                  
-                  <h2 className="text-xl font-extrabold text-white tracking-tight">
-                    Order Summary
+              {/* Right Column: Games and Apps Summary (Exact Screenshot Match) */}
+              <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+                <div className="space-y-5">
+                  <h2 className="text-xl font-bold text-white tracking-tight">
+                    Games and Apps Summary
                   </h2>
 
                   <div className="space-y-3.5 text-sm">
-                    <div className="flex items-center justify-between text-zinc-300 font-medium">
+                    <div className="flex items-center justify-between text-zinc-400">
                       <span>Price</span>
-                      <span className="text-white font-bold">
+                      <span className="text-white font-normal">
                         {formatPrice(rawSubtotalInr, rawSubtotalUsd)}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-zinc-300 text-xs">
+                    <div className="flex items-center justify-between text-zinc-400">
                       <span>Taxes</span>
                       <span className="text-zinc-400">Calculated at Checkout</span>
                     </div>
 
-                    <div className="border-t border-[#262626] pt-4 flex items-center justify-between text-base font-bold">
-                      <span className="text-white">Subtotal</span>
-                      <span className="text-xl font-black text-white tracking-tight">
+                    <div className="border-t border-[#262626] pt-4 flex items-center justify-between text-base font-bold text-white">
+                      <span>Subtotal</span>
+                      <span className="font-bold">
                         {formatPrice(rawSubtotalInr, rawSubtotalUsd)}
                       </span>
                     </div>
                   </div>
 
+                  {/* Check Out Button - Non-blue solid charcoal accent */}
                   <div className="pt-2">
                     <button
                       type="button"
                       onClick={() => openCheckout()}
-                      className="w-full bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-extrabold text-sm py-4 rounded-xl uppercase tracking-wider transition-all shadow-lg shadow-black/40 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full h-12 bg-[#34363d] hover:bg-[#42454e] border border-white/10 text-white font-bold text-sm rounded-lg transition-all shadow-md active:scale-[0.99] cursor-pointer flex items-center justify-center"
                     >
                       <span>Check Out</span>
-                      <ArrowRight className="w-4 h-4" />
                     </button>
-
-                    <p className="text-[11px] text-zinc-500 text-center mt-2.5">
-                      Instant 1-click checkout with PayPal, Cards, and UPI.
-                    </p>
                   </div>
-
                 </div>
               </div>
 
             </div>
-
           </div>
         )}
 
       </div>
 
       {/* ========================================================================= */}
-      {/* 1:1 SEND GIFT MODAL POPUP (Exact Screenshots 1 & 2 Match)                 */}
+      {/* 1:1 SEND GIFT MODAL POPUP                                                 */}
       {/* ========================================================================= */}
       <SendGiftModal
         isOpen={giftModalOpen}
