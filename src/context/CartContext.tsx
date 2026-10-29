@@ -15,6 +15,11 @@ export interface CartItem {
   cover_image: string
   product_type: string
   brand: string
+  license_type?: string
+  has_win?: boolean
+  has_mac?: boolean
+  download_url_win?: string
+  download_url_mac?: string
   is_gift?: boolean
   gift_recipient_email?: string
   gift_message?: string
@@ -84,6 +89,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const resolvedInr = priceInr > 0 ? priceInr : (priceUsd > 0 ? Math.round(priceUsd * rate) : 0)
     const resolvedUsd = priceUsd > 0 ? priceUsd : (priceInr > 0 ? Math.round((priceInr / rate) * 100) / 100 : 0)
 
+    const hasWin = Boolean(
+      item.has_win ||
+      item.download_url_win ||
+      item.download_url ||
+      item.product_type === 'plugin' ||
+      item.product_type === 'sample_pack' ||
+      item.product_type === 'preset' ||
+      item.product_type === 'sound_kit'
+    )
+    const hasMac = Boolean(
+      item.has_mac ||
+      item.download_url_mac ||
+      item.slug === 'proverb' ||
+      item.product_type === 'sample_pack' ||
+      item.product_type === 'preset' ||
+      item.product_type === 'sound_kit'
+    )
+
     return {
       id: item.id,
       name: item.name || '',
@@ -93,6 +116,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       cover_image: item.cover_image || '',
       product_type: item.product_type || 'plugin',
       brand: item.brand || item.brands?.name || 'Producer Toy',
+      license_type: item.license_type || (item.product_type === 'plugin' ? 'Single User Perpetual' : 'Royalty-Free Commercial License'),
+      has_win: hasWin,
+      has_mac: hasMac,
+      download_url_win: item.download_url_win || '',
+      download_url_mac: item.download_url_mac || '',
       is_gift: Boolean(item.is_gift),
       gift_recipient_email: item.gift_recipient_email || '',
       gift_message: item.gift_message || '',
