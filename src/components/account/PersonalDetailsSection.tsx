@@ -27,7 +27,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
   const [city, setCity] = useState('')
   const [region, setRegion] = useState('')
   const [postalCode, setPostalCode] = useState('')
-  const [country, setCountry] = useState('INDIA')
+  const [country, setCountry] = useState('')
   const [isEditingCountry, setIsEditingCountry] = useState(false)
   const [saving, setSaving] = useState(false)
 
@@ -40,7 +40,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
       setCity(profile.city || '')
       setRegion(profile.region || profile.state || '')
       setPostalCode(profile.postal_code || '')
-      setCountry(profile.country || 'INDIA')
+      setCountry(profile.country || '')
     } else {
       setFirstName('')
       setLastName('')
@@ -49,7 +49,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
       setCity('')
       setRegion('')
       setPostalCode('')
-      setCountry('INDIA')
+      setCountry('')
     }
   }, [profile])
 
@@ -203,7 +203,7 @@ export const PersonalDetailsSection: React.FC<PersonalDetailsSectionProps> = ({
           <div className="flex items-center gap-2">
             <div className="relative flex-1 bg-[#181818] border border-[#2c2c2c] rounded-xl px-4 py-3 flex items-center justify-between">
               <span className="text-sm font-bold text-white uppercase tracking-wider">
-                {country}
+                {country || 'Not Set'}
               </span>
               <CustomInfoTooltip
                 content="Country / Region is determined by your billing and payment details."

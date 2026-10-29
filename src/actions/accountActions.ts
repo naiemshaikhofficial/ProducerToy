@@ -70,7 +70,7 @@ export async function updatePersonalDetailsAction(userId: string, data: ProfileU
       region: data.region || data.state || '',
       state: data.region || data.state || '',
       postal_code: data.postal_code || '',
-      country: data.country || 'INDIA',
+      country: data.country || '',
       updated_at: new Date().toISOString(),
     }
 
@@ -209,7 +209,7 @@ export async function updateCompanyDetailsAction(userId: string, data: CompanyUp
       company_city: data.company_city || '',
       company_region: data.company_region || '',
       company_postal_code: data.company_postal_code || '',
-      company_country: data.company_country || 'INDIA',
+      company_country: data.company_country || '',
       updated_at: new Date().toISOString(),
     })
 

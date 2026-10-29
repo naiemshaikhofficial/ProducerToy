@@ -127,7 +127,7 @@ export function GlobalCheckoutModal() {
             loadedCity = profile.city || ''
             loadedState = profile.state || profile.region || ''
             loadedZip = profile.postal_code || profile.zip || ''
-            loadedCountry = profile.country || ''
+            loadedCountry = ''
             if (profile.newsletter !== undefined && profile.newsletter !== null) {
               setNewsletterOptIn(Boolean(profile.newsletter))
             }
@@ -146,7 +146,7 @@ export function GlobalCheckoutModal() {
         if (!loadedCity) loadedCity = clean(meta.city)
         if (!loadedState) loadedState = clean(meta.state) || clean(meta.region)
         if (!loadedZip) loadedZip = clean(meta.zip) || clean(meta.postal_code)
-        if (!loadedCountry) loadedCountry = clean(meta.country)
+        // Country is left unselected by default in checkout
       }
 
       try {
@@ -163,7 +163,7 @@ export function GlobalCheckoutModal() {
           if (!loadedCity) loadedCity = parsed.city || ''
           if (!loadedState) loadedState = parsed.state || ''
           if (!loadedZip) loadedZip = parsed.zip || ''
-          if (!loadedCountry) loadedCountry = parsed.country || ''
+          // Country is left unselected by default in checkout
         }
       } catch {}
 
