@@ -31,7 +31,7 @@ export async function GET() {
     const supabase = getAdminClient()
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, slug, cover_image, updated_at, created_at, short_description, description, product_type, brands ( name )')
+      .select('id, name, slug, cover_image, updated_at, created_at, short_description, full_description, product_type, brands ( name )')
       .eq('is_active', true)
       .order('updated_at', { ascending: false })
 
@@ -46,7 +46,7 @@ export async function GET() {
         const lastMod = new Date(p.updated_at || p.created_at || Date.now()).toISOString()
         const title = escapeXml(p.name)
         const brandName = p.brands?.name || 'Producer Toy'
-        const cleanDesc = escapeXml(cleanDescriptionText(p.short_description || p.description || `${p.name} by ${brandName}`))
+        const cleanDesc = escapeXml(cleanDescriptionText(p.short_description || p.full_description || `${p.name} by ${brandName}`))
 
         let coverImg = p.cover_image && !p.cover_image.includes('placeholder')
           ? escapeXml(p.cover_image)

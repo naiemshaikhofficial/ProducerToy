@@ -31,7 +31,7 @@ export async function GET() {
     const supabase = getAdminClient()
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, slug, price_usd, cover_image, short_description, description, product_type, brands ( name )')
+      .select('id, name, slug, price_usd, cover_image, short_description, full_description, product_type, brands ( name )')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
 
@@ -45,7 +45,7 @@ export async function GET() {
         const productUrl = `${baseUrl}/product/${encodeURIComponent(p.slug)}`
         const title = escapeXml(p.name)
         const brandName = p.brands?.name || 'Producer Toy'
-        const rawDesc = cleanDescriptionText(p.short_description || p.description) || `${p.name} - Studio-grade audio plugin by ${brandName}`
+        const rawDesc = cleanDescriptionText(p.short_description || p.full_description) || `${p.name} - Studio-grade audio plugin by ${brandName}`
         const description = escapeXml(rawDesc)
         const numericPrice = Number(p.price_usd) || 0
         const formattedPrice = `${numericPrice.toFixed(2)} USD`
