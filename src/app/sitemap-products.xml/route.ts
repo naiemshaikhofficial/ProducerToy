@@ -1,1 +1,4 @@
-export { GET, dynamic, revalidate } from '../product-sitemap.xml/route'
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600
+
+export { GET } from '../product-sitemap.xml/route'
