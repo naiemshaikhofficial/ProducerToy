@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, MotionValue } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import { Sparkles, ArrowRight, Disc3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,29 +28,6 @@ export const FollowerPointerCard = ({
   const y = useMotionValue(0);
   const ref = useRef<HTMLDivElement>(null);
   const [isInside, setIsInside] = useState<boolean>(false);
-  const [hasFinePointer, setHasFinePointer] = useState<boolean>(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const pointerMedia = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setHasFinePointer(pointerMedia.matches);
-
-    const motionMedia = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(motionMedia.matches);
-
-    const handlePointerChange = (e: MediaQueryListEvent) => setHasFinePointer(e.matches);
-    const handleMotionChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-
-    pointerMedia.addEventListener?.("change", handlePointerChange);
-    motionMedia.addEventListener?.("change", handleMotionChange);
-
-    return () => {
-      pointerMedia.removeEventListener?.("change", handlePointerChange);
-      motionMedia.removeEventListener?.("change", handleMotionChange);
-    };
-  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (ref.current) {
@@ -76,23 +53,23 @@ export const FollowerPointerCard = ({
   return (
     <div
       ref={ref}
+      onMouseOver={handleMouseEnter}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
       style={{
-        cursor: hasFinePointer && isInside ? "none" : undefined,
+        cursor: "none",
       }}
-      className={cn("relative overflow-hidden", className)}
+      className={cn("relative", className)}
     >
       <AnimatePresence>
-        {isInside && hasFinePointer && (
+        {isInside && (
           <FollowPointer
             x={x}
             y={y}
             title={title}
             pointerClassName={pointerClassName}
             badgeClassName={badgeClassName}
-            reducedMotion={prefersReducedMotion}
           />
         )}
       </AnimatePresence>
@@ -102,12 +79,11 @@ export const FollowerPointerCard = ({
 };
 
 export interface FollowPointerProps {
-  x: MotionValue<number>;
-  y: MotionValue<number>;
+  x: any;
+  y: any;
   title?: string | React.ReactNode;
   pointerClassName?: string;
   badgeClassName?: string;
-  reducedMotion?: boolean;
 }
 
 export const FollowPointer = ({
@@ -116,22 +92,22 @@ export const FollowPointer = ({
   title,
   pointerClassName,
   badgeClassName,
-  reducedMotion = false,
 }: FollowPointerProps) => {
   return (
     <motion.div
-      className="absolute top-0 left-0 z-50 pointer-events-none select-none"
+      className="absolute z-[9999] h-4 w-4 rounded-full pointer-events-none select-none"
       style={{
         top: y,
         left: x,
         pointerEvents: "none",
       }}
-      initial={{ scale: reducedMotion ? 1 : 0, opacity: 0 }}
+      initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: reducedMotion ? 1 : 0, opacity: 0 }}
+      exit={{ scale: 0, opacity: 0 }}
       transition={{
-        duration: reducedMotion ? 0.05 : 0.15,
-        ease: "easeOut",
+        type: "spring",
+        stiffness: 500,
+        damping: 28,
       }}
     >
       {/* High precision directional cursor arrow */}
@@ -141,7 +117,7 @@ export const FollowPointer = ({
         strokeWidth="1"
         viewBox="0 0 16 16"
         className={cn(
-          "h-6 w-6 -translate-x-[12px] -translate-y-[10px] transform -rotate-[70deg] text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] filter",
+          "h-6 w-6 -translate-x-[12px] -translate-y-[10px] transform -rotate-[70deg] text-white stroke-black/80 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] filter",
           pointerClassName
         )}
         height="1em"
@@ -155,15 +131,16 @@ export const FollowPointer = ({
       {/* Floating Producer Toy dark glass pill badge */}
       {title ? (
         <motion.div
-          initial={{ scale: reducedMotion ? 1 : 0.6, opacity: 0 }}
+          initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: reducedMotion ? 1 : 0.6, opacity: 0 }}
+          exit={{ scale: 0.5, opacity: 0 }}
           transition={{
-            duration: reducedMotion ? 0.05 : 0.15,
-            ease: "easeOut",
+            type: "spring",
+            stiffness: 400,
+            damping: 25,
           }}
           className={cn(
-            "min-w-max whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold text-white tracking-wide shadow-[0_8px_24px_rgba(0,0,0,0.7)] backdrop-blur-md bg-[#18191e]/95 border border-white/20 -translate-x-2 translate-y-1 flex items-center gap-2",
+            "min-w-max whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold text-white tracking-wide shadow-[0_8px_24px_rgba(0,0,0,0.85)] backdrop-blur-md bg-[#18191e]/95 border border-white/20 -translate-x-2 translate-y-1 flex items-center gap-2",
             badgeClassName
           )}
         >
