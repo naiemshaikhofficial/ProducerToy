@@ -81,12 +81,23 @@ async function handleRevalidation(req: NextRequest) {
             revalidatePath('/store', 'page')
             revalidatePath('/free-vst-plugins', 'page')
 
+            // Revalidate dedicated product sitemaps & Google Merchant feeds
+            revalidatePath('/product-sitemap.xml')
+            revalidatePath('/sitemap-products.xml')
+            revalidatePath('/google-shopping.xml')
+            revalidatePath('/google-merchant.xml')
+            revalidatePath('/sitemap.xml')
+
             revalidatedItems.push(
               'tag:products',
               'tag:homepage_products',
               'path:/',
               'path:/store',
-              'path:/free-vst-plugins'
+              'path:/free-vst-plugins',
+              'path:/product-sitemap.xml',
+              'path:/sitemap-products.xml',
+              'path:/google-shopping.xml',
+              'path:/sitemap.xml'
             )
 
             // Revalidate current product slug
@@ -95,6 +106,18 @@ async function handleRevalidation(req: NextRequest) {
               revalidatePath(`/p/${currentSlug}`, 'page')
               revalidatePath(`/products/${currentSlug}`, 'page')
               revalidatedItems.push(`path:/product/${currentSlug}`)
+
+              // Instant Search Engine Notification (IndexNow for Bing, Yandex, etc.)
+              const productUrl = `https://producertoy.com/product/${encodeURIComponent(currentSlug)}`
+              import('@/lib/seo/indexing')
+                .then(({ submitIndexNowUrls }) => {
+                  submitIndexNowUrls([
+                    productUrl,
+                    'https://producertoy.com/store',
+                    'https://producertoy.com/product-sitemap.xml',
+                  ]).catch((err) => console.warn('[Instant IndexNow Product Hook Error]:', err?.message || err))
+                })
+                .catch((err) => console.warn('[Instant IndexNow Import Error]:', err?.message || err))
             }
 
             // Revalidate old product slug if renamed
@@ -155,6 +178,9 @@ async function handleRevalidation(req: NextRequest) {
       safeRevalidateTag('homepage_products')
       revalidatePath('/')
       revalidatePath('/store')
+      revalidatePath('/product-sitemap.xml')
+      revalidatePath('/sitemap-products.xml')
+      revalidatePath('/google-shopping.xml')
       revalidatedItems.push('tag:products', 'tag:homepage_products', 'path:/', 'path:/store')
     }
 

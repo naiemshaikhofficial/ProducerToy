@@ -59,7 +59,10 @@ export default function robots(): MetadataRoute.Robots {
     ],
     sitemap: [
       `${baseUrl}/sitemap.xml`,
+      `${baseUrl}/product-sitemap.xml`,
+      `${baseUrl}/sitemap-products.xml`,
       `${baseUrl}/news-sitemap.xml`,
+      `${baseUrl}/google-shopping.xml`,
     ],
   }
 }
