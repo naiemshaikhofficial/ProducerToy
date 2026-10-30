@@ -52,18 +52,25 @@ export async function generateMetadata({
   const brandName = product.brands?.name || product.brand || 'Producer Toy'
   const isFree = Number(product.price_usd) === 0
   const productType = product.product_type || 'VST Plugin'
+  const subCategory = product.subcategories?.name || (Array.isArray(product.category_slugs) && product.category_slugs[0]) || ''
+  const daws = product.supported_daws || 'FL Studio, Ableton Live, Logic Pro'
+  const os = product.operating_system || 'Windows & macOS'
+  const topDaws = daws.split(',').slice(0, 2).map((d: string) => d.trim()).join(' & ')
 
-  // Optimal Google 50-60 character high-CTR title formula
-  let pageTitle = `${product.name} by ${brandName} - ${productType}`
+  // Dynamic High-CTR Page Title Formula (incorporates genre/subcategory, brand, and intent)
+  let cleanName = (product.name || '').replace(/Autotune-style\s+Autotune-Style/gi, 'Auto-Tune Style').trim()
+  let pageTitle = `${cleanName} — ${subCategory ? `${subCategory} ` : ''}${productType} by ${brandName}`
   if (isFree) {
-    pageTitle = `${product.name} - Free ${productType} Download (${brandName})`
+    pageTitle = `${cleanName} — Free ${subCategory || productType} Download (${brandName})`
+  }
+  if (pageTitle.length > 68) {
+    pageTitle = `${cleanName} (${brandName})`
   }
 
-  // Clean meta description (<160 chars) with high-intent CTA
-  const baseDesc = cleanDescriptionText(product.short_description || product.description)
-  const pageDescription = baseDesc
-    ? `${baseDesc.slice(0, 110)}. Instant direct download • 100% royalty-free • FL Studio & Ableton ready.`
-    : `Download ${product.name} by ${brandName} on Producer Toy. 100% royalty-free ${productType} with instant direct download for FL Studio, Ableton & Logic Pro.`
+  // Dynamic High-Intent Meta Description (under 160 chars) highlighting DAWs, OS, and licensing
+  const rawDesc = cleanDescriptionText(product.short_description || product.full_description)
+  const descLead = rawDesc ? rawDesc.slice(0, 95).trim().replace(/[.,;:\s]+$/, '') : `${cleanName} by ${brandName}`
+  const pageDescription = `${descLead}. Instant download for ${topDaws} on ${os}. 100% royalty-free commercial license.`
 
   const smartKeywords = generateSmartKeywords(
     product.name,
@@ -117,16 +124,26 @@ export default async function EpicProductDetailPage({
       {/* 🟢 Search Engine Structured Data (Product + Multi-Currency + FAQ + Video Rich Snippets) */}
       <ProductJsonLd
         name={product.name}
-        description={cleanDescriptionText(product.short_description || product.description)}
+        description={cleanDescriptionText(product.short_description || product.full_description)}
         images={[product.cover_image, dynamicOgImage].filter(Boolean)}
         brandName={brandName}
         brandWebsite={(product.brands as any)?.website_url}
         priceUsd={product.price_usd || 0}
+        priceOriginalUsd={product.original_price_usd}
         priceInr={product.price_inr}
         isFree={isFree}
         url={`https://producertoy.com/product/${product.slug}`}
-        categoryName={product.product_type || 'VST Plugin'}
+        categoryName={product.subcategories?.name || (Array.isArray(product.category_slugs) ? product.category_slugs[0] : null) || product.product_type || 'VST Plugin'}
+        genres={Array.isArray(product.category_slugs) ? product.category_slugs : []}
         vstFormat={product.vst_format || 'VST3, AU, AAX'}
+        supportedDaws={product.supported_daws}
+        operatingSystem={product.operating_system}
+        fileSize={product.file_size}
+        softwareVersion={product.version}
+        releaseDate={product.release_date || product.created_at}
+        mpn={product.plugin_identifier}
+        licenseType={product.license_type}
+        isComingSoon={product.is_coming_soon}
         ratingValue={ratingStats.averageRating || 4.9}
         reviewCount={ratingStats.totalReviews || 96}
         youtubeUrl={product.youtube_url || product.video_url}
@@ -135,7 +152,7 @@ export default async function EpicProductDetailPage({
       {ytVideoId && (
         <VideoObjectJsonLd
           name={product.name}
-          description={cleanDescriptionText(product.short_description || product.description)}
+          description={cleanDescriptionText(product.short_description || product.full_description)}
           thumbnailUrl={`https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg`}
           uploadDate={product.created_at || '2026-01-01T00:00:00+00:00'}
           embedUrl={`https://www.youtube.com/embed/${ytVideoId}`}

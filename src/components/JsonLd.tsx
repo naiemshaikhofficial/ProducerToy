@@ -19,6 +19,17 @@ export interface ProductJsonLdProps {
   keywords?: string[]
   vstFormat?: string
   youtubeUrl?: string
+  // Dynamic Real DB Attributes:
+  operatingSystem?: string
+  supportedDaws?: string
+  fileSize?: string
+  softwareVersion?: string
+  releaseDate?: string
+  genres?: string[]
+  mpn?: string
+  licenseType?: string
+  priceOriginalUsd?: number
+  isComingSoon?: boolean
 }
 
 export function ProductJsonLd({
@@ -39,7 +50,29 @@ export function ProductJsonLd({
   isFree = false,
   keywords = [],
   vstFormat = 'VST3, AU, AAX',
+  operatingSystem,
+  supportedDaws,
+  fileSize,
+  softwareVersion,
+  releaseDate,
+  genres = [],
+  mpn,
+  licenseType,
+  priceOriginalUsd,
+  isComingSoon = false,
 }: ProductJsonLdProps) {
+  // Dynamically extract DAWs and genres for rich keyword generation
+  const dawKeywords = supportedDaws
+    ? supportedDaws.split(',').map((d) => `${name} ${d.trim()}`)
+    : [`${name} FL Studio`, `${name} Ableton`]
+
+  const genreKeywords = (genres || []).flatMap((g) => [
+    `${name} ${g}`,
+    `${g} VST`,
+    `${g} plugin`,
+    `best ${g} plugin`,
+  ])
+
   const autoKeywords = [
     name,
     `free ${name}`,
@@ -49,8 +82,28 @@ export function ProductJsonLd({
     `${name} plugin`,
     `${brandName} plugins`,
     ...(isFree ? [`free ${categoryName}`, 'free VST download'] : []),
+    ...dawKeywords,
+    ...genreKeywords,
     ...keywords,
   ]
+
+  // Dynamic Competitor / Entity Linkage for Google Knowledge Graph
+  const genreLowerList = (genres || []).map((g) => g.toLowerCase())
+  const catLower = (categoryName || '').toLowerCase()
+  const nameLower = name.toLowerCase()
+  const similarProducts: Array<{ '@type': string; name: string }> = []
+
+  if (genreLowerList.some((g) => g.includes('autotune') || g.includes('pitch')) || catLower.includes('autotune') || nameLower.includes('tune')) {
+    similarProducts.push({ '@type': 'Product', name: 'Antares Auto-Tune' }, { '@type': 'Product', name: 'Celemony Melodyne' })
+  } else if (genreLowerList.some((g) => g.includes('reverb')) || catLower.includes('reverb')) {
+    similarProducts.push({ '@type': 'Product', name: 'Valhalla VintageVerb' }, { '@type': 'Product', name: 'FabFilter Pro-R' })
+  } else if (genreLowerList.some((g) => g.includes('compressor')) || catLower.includes('compressor')) {
+    similarProducts.push({ '@type': 'Product', name: 'Teletronix LA-2A Compressor' }, { '@type': 'Product', name: 'FabFilter Pro-C 2' })
+  } else if (genreLowerList.some((g) => g.includes('saturation') || g.includes('distortion')) || catLower.includes('saturation')) {
+    similarProducts.push({ '@type': 'Product', name: 'Soundtoys Decapitator' }, { '@type': 'Product', name: 'FabFilter Saturn 2' })
+  } else if (genreLowerList.some((g) => g.includes('synth')) || catLower.includes('synth')) {
+    similarProducts.push({ '@type': 'Product', name: 'Xfer Serum' }, { '@type': 'Product', name: 'Vital Synth' })
+  }
 
   const imageList =
     images && images.length > 0
@@ -90,6 +143,7 @@ export function ProductJsonLd({
       '@id': url,
     },
     sku: sku || name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+    mpn: mpn || sku || name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
     keywords: autoKeywords.join(', '),
     brand: {
       '@type': 'Brand',
@@ -97,9 +151,15 @@ export function ProductJsonLd({
       ...(brandWebsite ? { url: brandWebsite, sameAs: [brandWebsite] } : {}),
     },
     applicationCategory: 'MultimediaApplication',
-    operatingSystem: 'Windows 10/11 64-bit, macOS 10.15+ (Apple Silicon M1/M2/M3 & Intel)',
-    softwareVersion: 'Latest',
+    operatingSystem: operatingSystem || 'Windows 10/11 64-bit, macOS 10.15+ (Apple Silicon M1/M2/M3/M4 & Intel)',
+    softwareVersion: softwareVersion || '1.0.0',
     fileFormat: vstFormat,
+    fileSize: fileSize || undefined,
+    datePublished: releaseDate || undefined,
+    softwareRequirements: supportedDaws ? `${supportedDaws} compatible` : 'FL Studio, Ableton Live, Logic Pro, Pro Tools, Studio One',
+    genre: genres && genres.length > 0 ? genres : [categoryName],
+    ...(similarProducts.length > 0 ? { isSimilarTo: similarProducts } : {}),
+    ...(licenseType ? { license: 'https://producertoy.com/eula' } : {}),
     offers: {
       '@type': 'AggregateOffer',
       priceCurrency: 'USD',

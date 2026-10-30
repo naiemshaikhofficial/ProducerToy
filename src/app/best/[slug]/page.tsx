@@ -384,7 +384,7 @@ export default async function BestOfRoundupPage({
           name: p.name,
           url: `https://producertoy.com/product/${p.slug}`,
           image: p.cover_image,
-          description: p.short_description || p.description,
+          description: p.short_description || p.full_description,
         }))}
       />
       <FAQPageJsonLd faqs={config.faqs} />

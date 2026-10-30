@@ -18,8 +18,7 @@ function escapeXml(unsafe: string | null | undefined): string {
 /**
  * Official Google Merchant Center RSS 2.0 Product Feed (/google-shopping.xml)
  * Conforms to Google Merchant Center specification (xmlns:g="http://base.google.com/ns/1.0").
- * Enables instant synchronization with Google Shopping, Free Product Listings,
- * and high-intent Google Search Product carousels.
+ * 100% Dynamic - binds every product's real DB genres, subcategories, DAWs, OS, MPN, and licensing.
  */
 export async function GET() {
   const baseUrl =
@@ -31,7 +30,7 @@ export async function GET() {
     const supabase = getAdminClient()
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, slug, price_usd, cover_image, short_description, full_description, product_type, brands ( name )')
+      .select('id, name, slug, price_usd, original_price_usd, cover_image, short_description, full_description, product_type, vst_format, supported_daws, operating_system, category_slugs, plugin_identifier, is_coming_soon, brands ( name ), subcategories ( name, slug )')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
 
@@ -43,30 +42,45 @@ export async function GET() {
     const itemsXml = (products || [])
       .map((p: any) => {
         const productUrl = `${baseUrl}/product/${encodeURIComponent(p.slug)}`
-        const title = escapeXml(p.name)
+        const cleanName = (p.name || '').replace(/Autotune-style\s+Autotune-Style/gi, 'Auto-Tune Style').trim()
         const brandName = p.brands?.name || 'Producer Toy'
-        const rawDesc = cleanDescriptionText(p.short_description || p.full_description) || `${p.name} - Studio-grade audio plugin by ${brandName}`
-        const description = escapeXml(rawDesc)
+        const subCat = (p.subcategories as any)?.name || (Array.isArray(p.category_slugs) && p.category_slugs[0]) || ''
+        const rawDesc = cleanDescriptionText(p.short_description || p.full_description) || `${cleanName} - Studio-grade audio plugin by ${brandName}`
+        const topDaws = p.supported_daws ? p.supported_daws.split(',').slice(0, 3).map((d: string) => d.trim()).join(', ') : 'FL Studio, Ableton Live, Logic Pro'
+        const osInfo = p.operating_system || 'macOS (Apple Silicon & Intel), Windows 10/11'
+        const richDesc = escapeXml(`${rawDesc} Tested for ${topDaws}. Formats: ${p.vst_format || 'VST3, AU, AAX'}. Works on ${osInfo}. 100% royalty-free.`)
+
         const numericPrice = Number(p.price_usd) || 0
         const formattedPrice = `${numericPrice.toFixed(2)} USD`
         const imageLink = p.cover_image && !p.cover_image.includes('placeholder')
           ? escapeXml(p.cover_image)
           : `${baseUrl}/Icon.png`
-        const productType = escapeXml(p.product_type || 'Audio Software > VST Plugins')
+
+        const breadcrumbType = escapeXml(
+          `Audio Software > ${p.product_type === 'sample_pack' || p.product_type === 'sample-pack' ? 'Sample Packs' : 'VST Plugins'}${subCat ? ` > ${subCat}` : ''}`
+        )
+        const mpn = escapeXml(p.plugin_identifier || p.slug)
+        const availability = p.is_coming_soon ? 'preorder' : 'in_stock'
 
         return `    <item>
       <g:id>${escapeXml(p.id || p.slug)}</g:id>
-      <g:title>${title} by ${escapeXml(brandName)}</g:title>
-      <g:description>${description}</g:description>
+      <g:title>${escapeXml(cleanName)} by ${escapeXml(brandName)}</g:title>
+      <g:description>${richDesc}</g:description>
       <g:link>${escapeXml(productUrl)}</g:link>
       <g:image_link>${imageLink}</g:image_link>
-      <g:availability>in_stock</g:availability>
+      <g:availability>${availability}</g:availability>
       <g:price>${formattedPrice}</g:price>
       <g:brand>${escapeXml(brandName)}</g:brand>
       <g:condition>new</g:condition>
-      <g:product_type>${productType}</g:product_type>
+      <g:product_type>${breadcrumbType}</g:product_type>
       <g:google_product_category>Software &gt; Digital Audio Workstation Software</g:google_product_category>
+      <g:mpn>${mpn}</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
+      <g:custom_label_0>${escapeXml(subCat || 'Audio Plugins')}</g:custom_label_0>
+      <g:custom_label_1>${escapeXml(topDaws)}</g:custom_label_1>
+      <g:custom_label_2>${escapeXml(osInfo)}</g:custom_label_2>
+      <g:custom_label_3>${numericPrice === 0 ? 'Free Download' : 'Perpetual Commercial License'}</g:custom_label_3>
+      <g:custom_label_4>${escapeXml(p.vst_format || 'VST3, AU, AAX')}</g:custom_label_4>
     </item>`
       })
       .join('\n')

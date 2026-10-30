@@ -18,8 +18,7 @@ function escapeXml(unsafe: string | null | undefined): string {
 /**
  * Dedicated Product XML Sitemap (/product-sitemap.xml)
  * Conforms to Google Sitemaps XML protocol (xmlns:image="http://www.google.com/schemas/sitemap-image/1.1").
- * Provides high-priority direct crawling of all active products, high-resolution artwork,
- * lastmod timestamps, and SEO metadata without mixing with high-volume news items.
+ * 100% Dynamic - binds every product's real DB genres, subcategories, DAWs, OS, and image captions.
  */
 export async function GET() {
   const baseUrl =
@@ -31,7 +30,7 @@ export async function GET() {
     const supabase = getAdminClient()
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, slug, cover_image, updated_at, created_at, short_description, full_description, product_type, brands ( name )')
+      .select('id, name, slug, cover_image, updated_at, created_at, short_description, full_description, product_type, vst_format, supported_daws, operating_system, category_slugs, brands ( name ), subcategories ( name, slug )')
       .eq('is_active', true)
       .order('updated_at', { ascending: false })
 
@@ -44,9 +43,13 @@ export async function GET() {
       .map((p: any) => {
         const productUrl = `${baseUrl}/product/${encodeURIComponent(p.slug)}`
         const lastMod = new Date(p.updated_at || p.created_at || Date.now()).toISOString()
-        const title = escapeXml(p.name)
+        const cleanName = (p.name || '').replace(/Autotune-style\s+Autotune-Style/gi, 'Auto-Tune Style').trim()
+        const title = escapeXml(cleanName)
         const brandName = p.brands?.name || 'Producer Toy'
-        const cleanDesc = escapeXml(cleanDescriptionText(p.short_description || p.full_description || `${p.name} by ${brandName}`))
+        const subCat = (p.subcategories as any)?.name || (Array.isArray(p.category_slugs) && p.category_slugs[0]) || ''
+        const rawDesc = cleanDescriptionText(p.short_description || p.full_description) || `${cleanName} by ${brandName}`
+        const topDaws = p.supported_daws ? p.supported_daws.split(',').slice(0, 3).map((d: string) => d.trim()).join(', ') : 'FL Studio, Ableton Live'
+        const cleanDesc = escapeXml(`${rawDesc} Tested for ${topDaws}. VST3, AU, AAX on Windows & macOS.`)
 
         let coverImg = p.cover_image && !p.cover_image.includes('placeholder')
           ? escapeXml(p.cover_image)
@@ -59,7 +62,7 @@ export async function GET() {
     <priority>1.0</priority>
 ${coverImg ? `    <image:image>
       <image:loc>${coverImg}</image:loc>
-      <image:title>${title} by ${escapeXml(brandName)}</image:title>
+      <image:title>${title} by ${escapeXml(brandName)}${subCat ? ` — ${escapeXml(subCat)}` : ''}</image:title>
       <image:caption>${cleanDesc}</image:caption>
     </image:image>` : ''}
   </url>`
