@@ -123,6 +123,10 @@ export function ProductJsonLd({
   const formattedPriceUsd = isFree || numericPriceUsd === 0 ? '0.00' : numericPriceUsd.toFixed(2)
   const formattedPriceInr = isFree || numericPriceInr === 0 ? '0.00' : numericPriceInr.toFixed(2)
   const priceValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const availabilitySchema = isComingSoon ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock'
+  const availabilityStarts = isComingSoon
+    ? (releaseDate ? new Date(releaseDate).toISOString() : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString())
+    : undefined
 
   const productSchema = {
     '@context': 'https://schema.org',
@@ -174,7 +178,8 @@ export function ProductJsonLd({
           price: formattedPriceUsd,
           priceValidUntil: priceValidUntil,
           itemCondition: 'https://schema.org/NewCondition',
-          availability: 'https://schema.org/InStock',
+          availability: availabilitySchema,
+          ...(availabilityStarts ? { availabilityStarts } : {}),
           seller: {
             '@type': 'Organization',
             name: 'Producer Toy',
@@ -222,7 +227,8 @@ export function ProductJsonLd({
           price: formattedPriceInr,
           priceValidUntil: priceValidUntil,
           itemCondition: 'https://schema.org/NewCondition',
-          availability: 'https://schema.org/InStock',
+          availability: availabilitySchema,
+          ...(availabilityStarts ? { availabilityStarts } : {}),
           seller: {
             '@type': 'Organization',
             name: 'Producer Toy',

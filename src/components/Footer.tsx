@@ -56,6 +56,7 @@ export function Footer() {
               <div><Link href="/terms" prefetch={true} className="hover:text-white transition-colors">Terms and Conditions</Link></div>
               <div><Link href="/privacy" prefetch={true} className="hover:text-white transition-colors">Privacy Policy</Link></div>
               <div><Link href="/refund-policy" prefetch={true} className="hover:text-white transition-colors">Refund Policy</Link></div>
+              <div><Link href="/shipping-policy" prefetch={true} className="hover:text-white transition-colors">Shipping &amp; Delivery</Link></div>
               <div><Link href="/eula" prefetch={true} className="hover:text-white transition-colors">EULA Agreement</Link></div>
               <div><Link href="/purchase-policy" prefetch={true} className="hover:text-white transition-colors">Purchase Policy</Link></div>
             </div>
@@ -68,9 +69,6 @@ export function Footer() {
               <div><Link href="/about" prefetch={true} className="hover:text-white transition-colors">About Us</Link></div>
               <div><Link href="/faq" prefetch={true} className="hover:text-white transition-colors">Frequently Asked Questions (FAQ)</Link></div>
               <div><Link href="/support" prefetch={true} className="hover:text-white transition-colors">Help Center &amp; Tickets</Link></div>
-              <div><Link href="/support?tab=raise-ticket" prefetch={true} className="hover:text-white transition-colors">Raise Support Ticket</Link></div>
-              <div><Link href="/support?tab=track-ticket" prefetch={true} className="hover:text-white transition-colors">Track Ticket Status</Link></div>
-              <div><Link href="/library" prefetch={true} className="hover:text-white transition-colors">License Retrieval</Link></div>
               <div><Link href="/contact" prefetch={true} className="hover:text-white transition-colors">Contact &amp; Grievance</Link></div>
             </div>
           </div>

@@ -30,7 +30,7 @@ export async function GET() {
     const supabase = getAdminClient()
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, slug, price_usd, original_price_usd, cover_image, short_description, full_description, product_type, vst_format, supported_daws, operating_system, category_slugs, plugin_identifier, is_coming_soon, brands ( name ), subcategories ( name, slug )')
+      .select('id, name, slug, price_usd, original_price_usd, cover_image, short_description, full_description, product_type, vst_format, supported_daws, operating_system, category_slugs, plugin_identifier, is_coming_soon, release_date, brands ( name ), subcategories ( name, slug )')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
 
@@ -42,7 +42,11 @@ export async function GET() {
     const itemsXml = (products || [])
       .map((p: any) => {
         const productUrl = `${baseUrl}/product/${encodeURIComponent(p.slug)}`
-        const cleanName = (p.name || '').replace(/Autotune-style\s+Autotune-Style/gi, 'Auto-Tune Style').trim()
+        const cleanName = (p.name || '')
+          .replace(/[\u2010-\u2015\u2212]/g, '-')
+          .replace(/Autotune-style\s+Autotune-Style/gi, 'Auto-Tune Style')
+          .replace(/\s+/g, ' ')
+          .trim()
         const brandName = p.brands?.name || 'Producer Toy'
         const subCat = (p.subcategories as any)?.name || (Array.isArray(p.category_slugs) && p.category_slugs[0]) || ''
         const rawDesc = cleanDescriptionText(p.short_description || p.full_description) || `${cleanName} - Studio-grade audio plugin by ${brandName}`
@@ -60,7 +64,22 @@ export async function GET() {
           `Audio Software > ${p.product_type === 'sample_pack' || p.product_type === 'sample-pack' ? 'Sample Packs' : 'VST Plugins'}${subCat ? ` > ${subCat}` : ''}`
         )
         const mpn = escapeXml(p.plugin_identifier || p.slug)
-        const availability = p.is_coming_soon ? 'preorder' : 'in_stock'
+        const isPreorder = Boolean(p.is_coming_soon)
+        const availability = isPreorder ? 'preorder' : 'in_stock'
+
+        let availabilityDateXml = ''
+        if (isPreorder) {
+          let dateObj: Date
+          if (p.release_date) {
+            dateObj = new Date(p.release_date)
+            if (isNaN(dateObj.getTime()) || dateObj.getTime() <= Date.now()) {
+              dateObj = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+            }
+          } else {
+            dateObj = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+          }
+          availabilityDateXml = `\n      <g:availability_date>${dateObj.toISOString()}</g:availability_date>`
+        }
 
         return `    <item>
       <g:id>${escapeXml(p.id || p.slug)}</g:id>
@@ -68,14 +87,59 @@ export async function GET() {
       <g:description>${richDesc}</g:description>
       <g:link>${escapeXml(productUrl)}</g:link>
       <g:image_link>${imageLink}</g:image_link>
-      <g:availability>${availability}</g:availability>
+      <g:availability>${availability}</g:availability>${availabilityDateXml}
       <g:price>${formattedPrice}</g:price>
       <g:brand>${escapeXml(brandName)}</g:brand>
       <g:condition>new</g:condition>
       <g:product_type>${breadcrumbType}</g:product_type>
       <g:google_product_category>Software &gt; Digital Audio Workstation Software</g:google_product_category>
       <g:mpn>${mpn}</g:mpn>
-      <g:identifier_exists>no</g:identifier_exists>
+      <g:shipping>
+        <g:country>US</g:country>
+        <g:service>Digital Download</g:service>
+        <g:price>0.00 USD</g:price>
+        <g:min_handling_time>0</g:min_handling_time>
+        <g:max_handling_time>0</g:max_handling_time>
+        <g:min_transit_time>0</g:min_transit_time>
+        <g:max_transit_time>0</g:max_transit_time>
+      </g:shipping>
+      <g:shipping>
+        <g:country>IN</g:country>
+        <g:service>Digital Download</g:service>
+        <g:price>0.00 USD</g:price>
+        <g:min_handling_time>0</g:min_handling_time>
+        <g:max_handling_time>0</g:max_handling_time>
+        <g:min_transit_time>0</g:min_transit_time>
+        <g:max_transit_time>0</g:max_transit_time>
+      </g:shipping>
+      <g:shipping>
+        <g:country>GB</g:country>
+        <g:service>Digital Download</g:service>
+        <g:price>0.00 USD</g:price>
+        <g:min_handling_time>0</g:min_handling_time>
+        <g:max_handling_time>0</g:max_handling_time>
+        <g:min_transit_time>0</g:min_transit_time>
+        <g:max_transit_time>0</g:max_transit_time>
+      </g:shipping>
+      <g:shipping>
+        <g:country>CA</g:country>
+        <g:service>Digital Download</g:service>
+        <g:price>0.00 USD</g:price>
+        <g:min_handling_time>0</g:min_handling_time>
+        <g:max_handling_time>0</g:max_handling_time>
+        <g:min_transit_time>0</g:min_transit_time>
+        <g:max_transit_time>0</g:max_transit_time>
+      </g:shipping>
+      <g:shipping>
+        <g:country>AU</g:country>
+        <g:service>Digital Download</g:service>
+        <g:price>0.00 USD</g:price>
+        <g:min_handling_time>0</g:min_handling_time>
+        <g:max_handling_time>0</g:max_handling_time>
+        <g:min_transit_time>0</g:min_transit_time>
+        <g:max_transit_time>0</g:max_transit_time>
+      </g:shipping>
+      <g:shipping_weight>0 kg</g:shipping_weight>
       <g:custom_label_0>${escapeXml(subCat || 'Audio Plugins')}</g:custom_label_0>
       <g:custom_label_1>${escapeXml(topDaws)}</g:custom_label_1>
       <g:custom_label_2>${escapeXml(osInfo)}</g:custom_label_2>
