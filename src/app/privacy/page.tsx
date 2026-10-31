@@ -192,7 +192,7 @@ export default function PrivacyPolicyPage() {
 
               <div className="bg-[#1b1b1e] border border-[#2a2a30] rounded-xl p-4 space-y-1">
                 <strong className="text-zinc-200 block text-xs uppercase tracking-wider">5. Data Rectification &amp; Erasure</strong>
-                <p>Customers may request access, correction, or deletion of their shared profile details at any time by contacting our Privacy Desk at <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:text-white underline underline-offset-2">grievance@producertoy.com</a>, subject to necessary statutory tax records and active software license verification records.</p>
+                <p>Customers may request access, correction, or deletion of their shared profile details at any time by contacting our Privacy Desk at <a href="mailto:legal@producertoy.com" className="text-zinc-200 hover:text-white underline underline-offset-2">legal@producertoy.com</a>, subject to necessary statutory tax records and active software license verification records.</p>
               </div>
             </div>
           </section>
@@ -287,7 +287,7 @@ export default function PrivacyPolicyPage() {
               <p><strong className="text-zinc-200">Designation:</strong> Data Protection &amp; Grievance Officer</p>
               <p><strong className="text-zinc-200">Entity:</strong> Producer Toy Store (India)</p>
               <p><strong className="text-zinc-200">Address:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</p>
-              <p><strong className="text-zinc-200">Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:text-white underline underline-offset-2 font-semibold">grievance@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Grievance Email:</strong> <a href="mailto:legal@producertoy.com" className="text-zinc-200 hover:text-white underline underline-offset-2 font-semibold">legal@producertoy.com</a></p>
               <p><strong className="text-zinc-200">Support Desk:</strong> <a href="mailto:support@producertoy.com" className="text-zinc-200 hover:text-white underline underline-offset-2 font-semibold">support@producertoy.com</a></p>
               <p><strong className="text-zinc-200">Response Timeline:</strong> Acknowledgment within 24 hours, resolution within D+4 business days.</p>
             </div>

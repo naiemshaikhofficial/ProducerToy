@@ -333,7 +333,7 @@ export function ContactClient() {
               </p>
               <p className="flex items-center gap-2">
                 <Mail size={14} className="text-zinc-500 flex-shrink-0" />
-                <span><strong>Grievance Email:</strong> <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:underline">grievance@producertoy.com</a></span>
+                <span><strong>Grievance Email:</strong> <a href="mailto:legal@producertoy.com" className="text-zinc-200 hover:underline">legal@producertoy.com</a></span>
               </p>
               <p className="text-[11px] text-zinc-500 leading-relaxed">
                 In compliance with Consumer Protection Rules 2020 and RBI Payment Aggregator Directions, grievances are acknowledged within 24 hours and resolved within <strong>D+4 business days</strong>.

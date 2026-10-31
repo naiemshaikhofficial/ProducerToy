@@ -197,7 +197,7 @@ export default function TermsAndConditionsPage() {
               <p><strong className="text-zinc-200">Merchant Entity:</strong> Producer Toy Store (Operated in India)</p>
               <p><strong className="text-zinc-200">Registered Office:</strong> Producer Toy Studios, Sangamner, Maharashtra - 422605, India</p>
               <p><strong className="text-zinc-200">Compliance &amp; Legal Desk:</strong> <a href="mailto:support@producertoy.com" className="text-zinc-200 hover:text-white hover:underline font-semibold">support@producertoy.com</a></p>
-              <p><strong className="text-zinc-200">Statutory Nodal / Grievance Officer:</strong> <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:text-white hover:underline font-semibold">grievance@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Statutory Nodal / Grievance Officer:</strong> <a href="mailto:legal@producertoy.com" className="text-zinc-200 hover:text-white hover:underline font-semibold">legal@producertoy.com</a></p>
             </div>
           </section>
 

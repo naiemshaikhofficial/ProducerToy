@@ -152,7 +152,7 @@ export default function RefundPolicyPage() {
               <p><strong className="text-zinc-200">Step 1:</strong> Visit our <Link href="/support" className="text-zinc-200 hover:text-white hover:underline font-semibold">Contact &amp; Support Desk</Link> or email <a href="mailto:support@producertoy.com" className="text-zinc-200 hover:text-white hover:underline font-semibold">support@producertoy.com</a>.</p>
               <p><strong className="text-zinc-200">Step 2:</strong> Include your Order Number (e.g., <code>PT-M...</code>), registered email address, and specific issue details.</p>
               <p><strong className="text-zinc-200">Step 3:</strong> Our technical team will respond within 2–6 hours and guarantee resolution within <strong>D+4 business days</strong>.</p>
-              <p><strong className="text-zinc-200">Grievance Escalation:</strong> <a href="mailto:grievance@producertoy.com" className="text-zinc-200 hover:text-white hover:underline font-semibold">grievance@producertoy.com</a></p>
+              <p><strong className="text-zinc-200">Grievance Escalation:</strong> <a href="mailto:legal@producertoy.com" className="text-zinc-200 hover:text-white hover:underline font-semibold">legal@producertoy.com</a></p>
             </div>
           </section>
 
