@@ -1738,3 +1738,72 @@ export async function savePostPurchaseEmailShareConsentAction(params: {
 }
 
 
+
+
+export interface RecordFailedOrderParams {
+  customerEmail: string
+  customerName?: string
+  totalAmount: number
+  currency?: string
+  items?: any[]
+  gateway?: string
+  orderId?: string
+  paymentId?: string
+  failureReason?: string
+  billingDetails?: any
+}
+
+/**
+ * High-Speed Server Action to record failed payment attempts in Supabase orders table.
+ * Ensures the support desk (Groq) and admin dashboard immediately have live access to failed checkouts.
+ */
+export async function recordFailedOrderAction(params: RecordFailedOrderParams) {
+  try {
+    const adminSupabase = getAdminClient()
+
+    let targetUserId: string | null = null
+    try {
+      const supabase = await createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) targetUserId = user.id
+    } catch {}
+
+    const orderNumber =
+      params.orderId || `PT-ORD-FAIL-${Date.now().toString().slice(-6).toUpperCase()}`
+
+    const { error } = await adminSupabase.from('orders').insert({
+      user_id: targetUserId,
+      order_number: orderNumber,
+      customer_email: (params.customerEmail || '').toLowerCase().trim(),
+      customer_name: params.customerName || params.billingDetails?.fullName || null,
+      customer_phone: params.billingDetails?.phone || null,
+      billing_address: params.billingDetails?.address || null,
+      billing_city: params.billingDetails?.city || null,
+      billing_state: params.billingDetails?.state || null,
+      billing_zip: params.billingDetails?.zip || null,
+      billing_country: params.billingDetails?.country || null,
+      subtotal: params.totalAmount || 0,
+      discount: 0,
+      total_amount: params.totalAmount || 0,
+      currency: params.currency || 'USD',
+      payment_status: 'failed',
+      payment_gateway: params.gateway || 'razorpay',
+      razorpay_order_id: params.orderId || null,
+      razorpay_payment_id: params.paymentId || null,
+      items: params.items || [],
+      created_at: new Date().toISOString(),
+    })
+
+    if (error) {
+      console.warn('[recordFailedOrderAction] Order insert warning:', error.message)
+      return { success: false, error: error.message }
+    }
+
+    return { success: true, orderNumber }
+  } catch (err: any) {
+    console.warn('[recordFailedOrderAction] Exception:', err)
+    return { success: false, error: err.message || 'Failed to record failed order' }
+  }
+}

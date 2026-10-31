@@ -32,7 +32,7 @@ export const KNOWLEDGE_BASE: KnowledgeArticle[] = [
     category: 'free_and_licensing',
     categoryLabel: 'Free & Royalties',
     question: 'Are there any free plugins or sample packs currently available on Producer Toy?',
-    shortAnswer: 'Currently, Producer Toy features exclusively master-grade commercial sound libraries (such as Tabla Master\'s and upcoming Sexy Drill). All products in our live store are commercial releases; there are currently no 0-cost free tier packs or free plugins in the store database.',
+    shortAnswer: 'Currently, Producer Toy features exclusively master-grade commercial sound libraries, premium VST plugins, and studio audio tools. All products in our live store are commercial releases; there are currently no 0-cost free tier packs or free plugins in the store database.',
     detailedSteps: [
       'All sample packs and sound libraries on Producer Toy are master-grade commercial products crafted by professional sound engineers.',
       'Every purchase includes a 100% royalty-free commercial license for lifetime use in your music.',

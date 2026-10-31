@@ -14,6 +14,7 @@ import {
   processCheckoutOrderAction,
   createRazorpayOrderAction,
   verifyRazorpayPaymentAction,
+  recordFailedOrderAction,
 } from '@/actions/checkoutActions'
 import { saveBillingAddressAction } from '@/actions/accountActions'
 import {
@@ -632,6 +633,18 @@ export default function CheckoutPage() {
               clearCart()
               setPaymentStatus('success')
             } else {
+              recordFailedOrderAction({
+                customerEmail: billingDetails.email || user.email,
+                customerName: billingDetails.fullName,
+                totalAmount: orderRes.amount ? Number(orderRes.amount) / 100 : finalTotal,
+                currency: 'INR',
+                items: items,
+                gateway: 'razorpay',
+                orderId: orderRes.orderId,
+                paymentId: response.razorpay_payment_id,
+                failureReason: verifyRes.error || 'Payment verification failed on server.',
+                billingDetails,
+              }).catch(() => {})
               setErrorMsg(verifyRes.error || 'Payment verification failed.')
               setPaymentStatus('idle')
             }
@@ -648,6 +661,23 @@ export default function CheckoutPage() {
       }
 
       const rzp = new (window as any).Razorpay(options)
+      rzp.on('payment.failed', function (resp: any) {
+        recordFailedOrderAction({
+          customerEmail: billingDetails.email || user.email,
+          customerName: billingDetails.fullName,
+          totalAmount: orderRes.amount ? Number(orderRes.amount) / 100 : finalTotal,
+          currency: 'INR',
+          items: items,
+          gateway: 'razorpay',
+          orderId: orderRes.orderId,
+          paymentId: resp.error?.metadata?.payment_id,
+          failureReason: resp.error?.description || resp.error?.reason || 'Transaction declined by bank/network',
+          billingDetails,
+        }).catch(() => {})
+        setErrorMsg(resp.error?.description || 'Payment was declined or failed.')
+        setLoading(false)
+        setPaymentStatus('idle')
+      })
       rzp.open()
     } catch (err: any) {
       console.error('Razorpay Error:', err)
@@ -673,6 +703,16 @@ export default function CheckoutPage() {
   }
 
   const handlePayPalError = (msg: string) => {
+    recordFailedOrderAction({
+      customerEmail: billingDetails.email || user?.email || '',
+      customerName: billingDetails.fullName,
+      totalAmount: finalTotal,
+      currency: 'USD',
+      items: items,
+      gateway: 'paypal',
+      failureReason: msg || 'PayPal payment cancelled or failed',
+      billingDetails,
+    }).catch(() => {})
     setErrorMsg(msg)
     setPaymentStatus('idle')
     setLoading(false)

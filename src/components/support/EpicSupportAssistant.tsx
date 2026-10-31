@@ -2203,6 +2203,7 @@ export function EpicSupportAssistant({
                             </div>
 
                             <div className="flex items-center gap-3 pt-1 flex-wrap">
+
                               <a
                                 href={msg.verifiedDownload.downloadUrl}
                                 download
@@ -2233,8 +2234,12 @@ export function EpicSupportAssistant({
                                   Official Tax Invoice &bull; Order #{msg.verifiedOrder.orderNumber}
                                 </span>
                               </div>
-                              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded">
-                                ● Payment Completed
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${msg.verifiedOrder.status === 'failed' ? 'text-red-400 bg-red-950/40 border-red-500/30' : msg.verifiedOrder.status === 'pending' ? 'text-amber-400 bg-amber-950/40 border-amber-500/30' : 'text-emerald-400 bg-emerald-950/40 border-emerald-500/30'}`}>
+                                {msg.verifiedOrder.status === 'failed'
+                                  ? '● Payment Failed'
+                                  : msg.verifiedOrder.status === 'pending'
+                                  ? '● Payment Pending'
+                                  : '● Payment Completed'}
                               </span>
                             </div>
 
@@ -2285,6 +2290,7 @@ export function EpicSupportAssistant({
                             )}
 
                             <div className="flex items-center gap-3 pt-1 flex-wrap">
+
                               <button
                                 type="button"
                                 onClick={() => {
@@ -2317,7 +2323,7 @@ export function EpicSupportAssistant({
                                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#34363d] hover:bg-[#42454e] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
                               >
                                 <FileText size={13} />
-                                <span>View &amp; Print Official Tax Invoice</span>
+                                <span>{msg.verifiedOrder.status === 'failed' ? 'Order Failed • View Invoice / Statement' : 'View & Print Official Tax Invoice'}</span>
                               </button>
 
                               <Link

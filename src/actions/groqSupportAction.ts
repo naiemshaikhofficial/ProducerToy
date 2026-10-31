@@ -20,6 +20,7 @@ import {
   buildSupportSystemPrompt,
   type SupportPromptContext,
 } from '@/lib/support/rules'
+import { getLiveSupportDynamicContext } from '@/lib/support/dynamicContextEngine'
 
 export type { LiveGatewayVerificationResult }
 
@@ -179,215 +180,62 @@ export async function askGroqSupportAction(
       null
     const scannedEmail = emailMatch ? emailMatch[0].toLowerCase().trim() : null
 
-    const targetEmail = userEmail || scannedEmail
+    let targetEmail = userEmail || scannedEmail
 
-    // 3. Fetch Live Products Catalog from Supabase (Full specs + is_coming_soon)
-    let liveInventoryList = ''
-    let allProducts: any[] = []
+    // 3. Fetch 100% Dynamic, Real-time Platform Snapshot (Catalog, Orders, Failures, User 360, Gateways)
+    const dynamicCtx = await getLiveSupportDynamicContext({
+      userId,
+      userEmail,
+      userName,
+      query,
+      history,
+    })
 
-    try {
-      const { data: dbProducts } = await adminSupabase
-        .from('products')
-        .select(
-          'id, name, slug, cover_image, price_usd, original_price_usd, product_type, short_description, bpm, vst_format, file_size, is_coming_soon, release_date'
-        )
-        .eq('is_active', true)
-        .limit(60)
-
-      if (dbProducts && dbProducts.length > 0) {
-        allProducts = dbProducts
-        liveInventoryList = dbProducts
-          .map((p) => {
-            const price = p.price_usd ? `$${p.price_usd}` : 'Free'
-            const desc = p.short_description ? ` - ${p.short_description}` : ''
-            const bpmInfo =
-              p.bpm && !p.is_coming_soon
-                ? ` [${p.bpm} BPM]`
-                : p.is_coming_soon
-                ? ' [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING]'
-                : ''
-            const sizeInfo = p.file_size ? ` [${p.file_size}]` : ''
-            const statusInfo = p.is_coming_soon
-              ? ' [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET]'
-              : ' [STATUS: AVAILABLE FOR INSTANT PURCHASE]'
-            return `- [${p.name}](/p/${p.slug}) (${price}, ${p.product_type})${statusInfo}${bpmInfo}${sizeInfo}${desc}`
-          })
-          .join('\n')
-      }
-    } catch (dbErr) {
-      console.warn('[askGroqSupportAction] Failed to query products from DB:', dbErr)
-    }
-
-    // 4. Fetch User Purchases, Orders, and Tickets with Admin Privileges from Supabase
-    let userPurchases: any[] = []
-    let userOrders: any[] = []
+    const allProducts = dynamicCtx.catalog.allProducts
+    const liveInventoryList = dynamicCtx.catalog.inventorySummaryText
+    let userPurchases = dynamicCtx.user.purchases
+    let userOrders = dynamicCtx.user.orders
     let matchedSpecificOrder: any = null
-    let userTickets: any[] = []
-    let matchedSpecificTicket: any = null
-    let ticketEmployeeReplies: Array<{
-      ticketNumber: string
-      status: string
-      subject: string
-      createdAt: string
-      agentName: string
-      agentMessage: string
-      agentReplyTime: string
-    }> = []
-    let ticketStatusSummary = ''
+    const userTickets = dynamicCtx.user.tickets
+    const ticketEmployeeReplies = dynamicCtx.user.ticketReplies
+    targetEmail = dynamicCtx.user.email || targetEmail
 
-    try {
-      // A. Query Purchases
-      if (userId || targetEmail) {
-        let pQuery = adminSupabase
-          .from('purchases')
-          .select(
-            '*, products(id, name, slug, cover_image, product_type, price_usd, download_url, download_url_win, download_url_mac)'
-          )
+    // Find specific order if explicit order number or payment ID was provided
+    if (scannedOrderNumber || scannedPaymentId) {
+      matchedSpecificOrder = userOrders.find(
+        (o) =>
+          (scannedOrderNumber &&
+            (o.order_number?.toLowerCase() === scannedOrderNumber.toLowerCase() ||
+              o.id === scannedOrderNumber)) ||
+          (scannedPaymentId &&
+            (o.razorpay_payment_id === scannedPaymentId ||
+              o.razorpay_order_id === scannedPaymentId))
+      )
 
-        if (userId) {
-          pQuery = pQuery.eq('user_id', userId)
-        } else if (targetEmail) {
-          pQuery = pQuery.ilike('customer_email', targetEmail)
-        }
-
-        const { data: pData } = await pQuery.order('purchased_at', { ascending: false }).limit(20)
-        if (pData) userPurchases = pData
-      }
-
-      // B. Query Orders
-      let oQuery = adminSupabase.from('orders').select('*')
-      if (userId && targetEmail) {
-        oQuery = oQuery.or(`user_id.eq.${userId},customer_email.eq.${targetEmail}`)
-      } else if (userId) {
-        oQuery = oQuery.eq('user_id', userId)
-      } else if (targetEmail) {
-        oQuery = oQuery.ilike('customer_email', targetEmail)
-      }
-
-      if (userId || targetEmail) {
-        const { data: oData } = await oQuery.order('created_at', { ascending: false }).limit(10)
-        if (oData) userOrders = oData
-      }
-
-      // C. Search specifically if an explicit Order ID or Payment ID was provided
-      if (scannedOrderNumber || scannedPaymentId) {
-        let specificQuery = adminSupabase.from('orders').select('*')
-        if (scannedOrderNumber && scannedPaymentId) {
-          specificQuery = specificQuery.or(
-            `order_number.ilike.${scannedOrderNumber},razorpay_payment_id.eq.${scannedPaymentId}`
-          )
-        } else if (scannedOrderNumber) {
-          specificQuery = specificQuery.ilike('order_number', scannedOrderNumber)
-        } else if (scannedPaymentId) {
-          specificQuery = specificQuery.eq('razorpay_payment_id', scannedPaymentId)
-        }
-
-        const { data: specOrders } = await specificQuery.maybeSingle()
-        if (specOrders) {
-          matchedSpecificOrder = specOrders
-          if (!userOrders.some((o) => o.id === specOrders.id)) {
-            userOrders.unshift(specOrders)
-          }
-        }
-      }
-
-      // D. Query Live Support Tickets and Staff/Employee Replies
-      userTickets = []
-      matchedSpecificTicket = null
-      ticketEmployeeReplies = []
-      ticketStatusSummary = ''
-
-      // Ticket format scanner: PT-TK-..., PT-TCK-..., SW-TK-..., SW-TCK-..., TK-..., TCK-...
-      const TICKET_REGEX = /\b((?:PT|SW)?-?(?:TCK|TK)-[A-Za-z0-9_-]+)\b/i
-      const scannedTicketMatch = query.match(TICKET_REGEX)
-      const scannedTicketNumber = scannedTicketMatch ? scannedTicketMatch[1].toUpperCase() : null
-
-      const queryLowerForTickets = query.toLowerCase()
-      const isTicketInquiry =
-        Boolean(scannedTicketNumber) ||
-        queryLowerForTickets.includes('ticket') ||
-        queryLowerForTickets.includes('complaint') ||
-        queryLowerForTickets.includes('support request') ||
-        queryLowerForTickets.includes('status of my') ||
-        queryLowerForTickets.includes('ticket status') ||
-        queryLowerForTickets.includes('employee answer') ||
-        queryLowerForTickets.includes('staff reply') ||
-        queryLowerForTickets.includes('did anyone reply') ||
-        queryLowerForTickets.includes('mera ticket') ||
-        queryLowerForTickets.includes('ticket ka kya')
-
-      try {
-        if (scannedTicketNumber || isTicketInquiry || userId || targetEmail) {
-          let tQuery = adminSupabase.from('support_tickets').select('*')
-          if (scannedTicketNumber) {
-            tQuery = tQuery.ilike('ticket_number', scannedTicketNumber)
-          } else if (userId && targetEmail) {
-            tQuery = tQuery.or(`user_id.eq.${userId},email.ilike.${targetEmail}`)
-          } else if (userId) {
-            tQuery = tQuery.eq('user_id', userId)
-          } else if (targetEmail) {
-            tQuery = tQuery.ilike('email', targetEmail)
+      if (!matchedSpecificOrder) {
+        try {
+          let specificQuery = adminSupabase.from('orders').select('*')
+          if (scannedOrderNumber && scannedPaymentId) {
+            specificQuery = specificQuery.or(
+              `order_number.ilike.${scannedOrderNumber},razorpay_payment_id.eq.${scannedPaymentId}`
+            )
+          } else if (scannedOrderNumber) {
+            specificQuery = specificQuery.ilike('order_number', scannedOrderNumber)
+          } else if (scannedPaymentId) {
+            specificQuery = specificQuery.eq('razorpay_payment_id', scannedPaymentId)
           }
 
-          const { data: tData } = await tQuery.order('created_at', { ascending: false }).limit(5)
-          if (tData && tData.length > 0) {
-            userTickets = tData
-            if (scannedTicketNumber) {
-              matchedSpecificTicket = tData[0]
-            }
-
-            // For found tickets, retrieve any employee messages from ticket_messages
-            for (const t of userTickets) {
-              const { data: msgs } = await adminSupabase
-                .from('ticket_messages')
-                .select('*')
-                .eq('ticket_id', t.id)
-                .order('created_at', { ascending: true })
-
-              const agentReplies = (msgs || []).filter(
-                (m: any) =>
-                  m.sender_type?.toUpperCase() === 'AGENT' ||
-                  m.sender_type?.toUpperCase() === 'STAFF' ||
-                  m.sender_type?.toUpperCase() === 'SUPPORT'
-              )
-
-              if (agentReplies.length > 0) {
-                const latest = agentReplies[agentReplies.length - 1]
-                ticketEmployeeReplies.push({
-                  ticketNumber: t.ticket_number,
-                  status: t.status || 'OPEN',
-                  subject: t.subject || 'Support Ticket',
-                  createdAt: t.created_at,
-                  agentName: latest.sender_name || 'Senior Support Engineer',
-                  agentMessage: latest.message,
-                  agentReplyTime: latest.created_at,
-                })
-              }
+          const { data: specOrders } = await specificQuery.maybeSingle()
+          if (specOrders) {
+            matchedSpecificOrder = specOrders
+            if (!userOrders.some((o) => o.id === specOrders.id)) {
+              userOrders.unshift(specOrders)
             }
           }
+        } catch (specErr) {
+          console.warn('[askGroqSupportAction] Specific order query warning:', specErr)
         }
-      } catch (ticketLookupErr) {
-        console.warn('[askGroqSupportAction] Ticket DB lookup error:', ticketLookupErr)
       }
-
-      if (userTickets.length > 0) {
-        ticketStatusSummary = `\nLIVE DATABASE SUPPORT TICKETS & EMPLOYEE REPLIES:
-${userTickets
-  .map((t) => {
-    const emp = ticketEmployeeReplies.find((r) => r.ticketNumber === t.ticket_number)
-    const replyText = emp
-      ? `  * EMPLOYEE / AUDIO DESK ANSWER (From ${emp.agentName} on ${new Date(emp.agentReplyTime).toLocaleDateString()}): "${emp.agentMessage}"`
-      : `  * EMPLOYEE RESPONSE: No employee reply has been recorded yet. The ticket is currently ${t.status || 'OPEN'} and under active review by the senior audio engineering desk.`
-    return `- [Ticket #${t.ticket_number}] Subject: "${t.subject}" | Status: ${t.status || 'OPEN'} | Submitted: ${new Date(t.created_at).toLocaleDateString()}\n${replyText}`
-  })
-  .join('\n')}`
-      } else if (scannedTicketNumber) {
-        ticketStatusSummary = `\nLIVE DATABASE SUPPORT TICKETS & EMPLOYEE REPLIES:\n- [NO TICKET FOUND]: Searched for Ticket ID "${scannedTicketNumber}", but no matching record was found in the database. Ask user to double-check the ticket number or provide their registered email address.`
-      } else if (isTicketInquiry && !userId && !targetEmail) {
-        ticketStatusSummary = `\nLIVE DATABASE SUPPORT TICKETS & EMPLOYEE REPLIES:\n- [NOTICE]: User is asking for their ticket status, but no ticket reference number was provided and user is not logged in. Ask them for their Ticket Reference Number (e.g. PT-TK-...) or their registered email address.`
-      }
-    } catch (adminErr) {
-      console.warn('[askGroqSupportAction] Admin DB lookup error:', adminErr)
     }
 
     // 5. Intelligent Intent Analysis & Autonomous Administrative Operations
@@ -742,13 +590,8 @@ STRICT INSTRUCTION:
     }
 
     // Build User Context String for LLM
-    const isUserLoggedIn = Boolean(userEmail || userId)
-    const userAccountSummary = `
-USER SESSION & DATABASE STATUS:
-- Logged-in User: ${isUserLoggedIn ? `YES (Logged in as ${userName} <${userEmail}>)` : 'Guest / Not Logged In'}
-- Account Purchases: ${userPurchases.length > 0 ? `${userPurchases.length} items (${userPurchases.map((p) => p.products?.name || p.product_id).join(', ')})` : '0 purchases recorded in Supabase database'}
-- Recent Orders: ${userOrders.length > 0 ? userOrders.map((o) => `[Order #${o.order_number} | Status: ${o.payment_status} | Amount: ${o.currency || '$'}${o.total_amount}]`).join(', ') : 'No recent orders recorded in Supabase database'}
-${ticketStatusSummary}
+    const isUserLoggedIn = dynamicCtx.user.isLoggedIn
+    const userAccountSummary = `${dynamicCtx.user.userAccountSummaryText}
 ${adminActionResultNotes}`
 
     // 6. Build Modular System Prompt using rules engine
@@ -767,8 +610,14 @@ ${adminActionResultNotes}`
         userEmail,
         userPurchasesCount: userPurchases.length,
         userOrdersCount: userOrders.length,
-        purchasedProductNames: userPurchases.map((p) => p.products?.name || p.product_id),
+        purchasedProductNames: userPurchases.map((p) => (p.products ? p.products.name : p.product_id)),
         isVerifiedDownloadActive: Boolean(verifiedDownload),
+        failedOrdersCount: dynamicCtx.user.failedOrders.length,
+        pendingOrdersCount: dynamicCtx.user.pendingOrders.length,
+        walletBalance: dynamicCtx.user.walletBalance,
+        rewardBalance: dynamicCtx.user.rewardBalance,
+        activeDevicesCount: dynamicCtx.user.deviceActivations.length,
+        wishlistCount: dynamicCtx.user.wishlist.length,
       },
       comingSoon: {
         candidateProduct: candidateProduct
@@ -778,16 +627,18 @@ ${adminActionResultNotes}`
               price_usd: candidateProduct.price_usd,
             }
           : null,
+        comingSoonProducts: dynamicCtx.catalog.comingSoonProducts.map((p) => ({
+          name: p.name,
+          price_usd: Number(p.price_usd || 0),
+          release_date: p.release_date || null,
+        })),
       },
       policy: {
         currentStrikes,
       },
       userAccountSummary,
       isUserLoggedIn,
-      liveInventoryList:
-        liveInventoryList ||
-        `- [Tabla Master's](/p/tabla-masters) ($19.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING] - Authentic Indian tabla sample pack featuring professionally recorded dry & processed hits, loops, and rolls.
-- [Sexy Drill](/p/sexy-drill) ($9.99, sample_pack) [STATUS: COMING SOON - NOT YET RELEASED / CANNOT BE PURCHASED YET] [BPM: NOT YET ANNOUNCED - IN AUDIO MASTERING] - Chart-topping UK & NY Drill drum kit, sliding 808s, and dark melody loops.`,
+      liveInventoryList,
     }
 
     const systemPrompt = buildSupportSystemPrompt(promptCtx)

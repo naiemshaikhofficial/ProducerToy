@@ -8,6 +8,12 @@ export interface AdminContext {
   userOrdersCount: number
   purchasedProductNames: string[]
   isVerifiedDownloadActive: boolean
+  failedOrdersCount?: number
+  pendingOrdersCount?: number
+  walletBalance?: number
+  rewardBalance?: number
+  activeDevicesCount?: number
+  wishlistCount?: number
 }
 
 export function getAdministrativeRules(ctx: AdminContext): string {
@@ -16,13 +22,22 @@ export function getAdministrativeRules(ctx: AdminContext): string {
    - YOU MUST BASE ALL PURCHASE & ORDER CLAIMS EXCLUSIVELY ON REAL DATABASE RECORDS.
    ${
      ctx.userPurchasesCount === 0 && ctx.userOrdersCount === 0
-       ? `- [HARD DATABASE REALITY - ZERO PURCHASES]: The Supabase database contains exactly 0 purchases and 0 orders under ${ctx.userName} (${ctx.userEmail || 'current session'}).
+       ? `- [HARD DATABASE REALITY - ZERO PURCHASES]: The Supabase database contains exactly 0 purchases and 0 completed orders under ${ctx.userName} (${ctx.userEmail || 'current session'}).
    - IF THE USER ASKS "what i have purchased?", "kya kharida hai?", OR CLAIMS "i have purchase a sample pack":
-     You MUST state clearly and truthfully that there are currently NO purchases or orders registered under their account (${ctx.userEmail || 'account'}).
+     You MUST state clearly and truthfully that there are currently NO completed purchases or orders registered under their account (${ctx.userEmail || 'account'}).
    - NEVER invent or say "I see that you have purchased a sample pack" or "verified your purchase" when 0 purchases exist in Supabase!
    - NEVER output "[ADMIN VERIFICATION SUCCESS]" unless the system explicitly confirmed a live payment!`
        : `- [DATABASE AUDIT]: User currently has ${ctx.userPurchasesCount} verified item(s) in database: ${ctx.purchasedProductNames.join(', ')}.
    - If the user asks what they purchased, list these EXACT product names clearly. Do NOT invent other products.`
+   }
+   ${
+     ctx.failedOrdersCount && ctx.failedOrdersCount > 0
+       ? `\n- [FAILED TRANSACTION RECORD DETECTED]: The database contains ${ctx.failedOrdersCount} failed order attempt(s) under this account.
+   - If the user asks why their payment failed, why money was deducted, or whether their order went through:
+     Confirm that their attempt was marked as FAILED / DECLINED by the payment gateway.
+     Reassure them that no money was received or credited to Producer Toy.
+     Explain that if their bank account debited funds, banking networks auto-reverse the money back to source within 3 to 5 business days.`
+       : ''
    }
 
 2. RESOLVING MISSING FILES OR PAYMENT CLAIMS:
