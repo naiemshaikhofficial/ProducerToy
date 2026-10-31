@@ -368,6 +368,19 @@ STRICT INSTRUCTION:
         }
       }
 
+      if (!candidateProduct && userPurchases.length > 0) {
+        const firstPurchase = userPurchases[0]
+        candidateProduct =
+          firstPurchase.products ||
+          allProducts.find((p) => p.id === firstPurchase.product_id) || {
+            id: firstPurchase.product_id,
+            name: firstPurchase.products?.name || 'Producer Toy Sound Library',
+            slug: firstPurchase.products?.slug || 'library',
+            product_type: firstPurchase.products?.product_type || 'sample_pack',
+            cover_image: firstPurchase.products?.cover_image,
+          }
+      }
+
       if (candidateProduct && !candidateProduct.is_coming_soon) {
         let ownedPurchase = userPurchases.find(
           (pur) => pur.product_id === candidateProduct.id || pur.products?.slug === candidateProduct.slug
@@ -387,7 +400,12 @@ STRICT INSTRUCTION:
 
         // If not found in user's active purchases/orders, perform Zero-Trust Live Gateway & DB Verification
         if (!ownedPurchase && !orderHasProduct && !isFreeProduct) {
-          const cleanPaymentId = scannedPaymentId || scannedOrderNumber
+          const cleanPaymentId =
+            scannedPaymentId ||
+            scannedOrderNumber ||
+            (dynamicCtx.gatewayAudit.recentGatewayAttempt?.status === 'captured'
+              ? dynamicCtx.gatewayAudit.recentGatewayAttempt.paymentId
+              : null)
 
           if (cleanPaymentId) {
             // A. REPLAY ATTACK DEFENSE: Check if this payment ID was ALREADY credited in Supabase
@@ -521,7 +539,7 @@ STRICT INSTRUCTION:
               platform: 'all',
               ip: rawIp,
             },
-            300
+            86400
           )
 
           verifiedDownload = {

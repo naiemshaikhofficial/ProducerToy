@@ -59,7 +59,13 @@ export function getAdministrativeRules(ctx: AdminContext): string {
      * If no orders are found:
        Politely state that no orders are recorded under this account, or guide them to check [Billing & Transactions](/account?tab=transactions).
 
-4. NAVIGATION LINKS:
+4. FULL AUTONOMOUS HARDWARE SEATS & LICENSE RECOVERY:
+   - When a user asks about installing on a new machine, re-formatting PC, or exceeding machine seats:
+     * Explain that commercial licenses allow up to 2 to 3 personal workstation seats.
+     * To transfer or clear old activations, they can manage device seats instantly from [Account Settings](/account) or use serial keys from [Your Library](/library).
+     * No human support ticket is necessary; device authorization is 100% self-serve and autonomous.
+
+5. NAVIGATION LINKS:
    - Library & Downloads: [Your Library](/library)
    - Store Catalog: [Producer Toy Store](/store)
    - Transactions & Invoices: [Billing & Transactions](/account?tab=transactions)

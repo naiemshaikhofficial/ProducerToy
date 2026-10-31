@@ -343,17 +343,25 @@ export async function getLiveSupportDynamicContext(params: {
   const isPaymentInquiry =
     Boolean(scannedPaymentId || scannedOrderNumber) ||
     queryLower.includes('payment') ||
+    queryLower.includes('pay') ||
     queryLower.includes('fail') ||
     queryLower.includes('declined') ||
     queryLower.includes('paise') ||
     queryLower.includes('kat gaye') ||
     queryLower.includes('deducted') ||
     queryLower.includes('refund') ||
-    queryLower.includes('download nahi') ||
+    queryLower.includes('download') ||
+    queryLower.includes('file') ||
+    queryLower.includes('link') ||
+    queryLower.includes('button') ||
     queryLower.includes('kharida') ||
     queryLower.includes('bought') ||
     queryLower.includes('purchased') ||
     queryLower.includes('order') ||
+    queryLower.includes('transaction') ||
+    queryLower.includes('invoice') ||
+    queryLower.includes('receipt') ||
+    queryLower.includes('bill') ||
     queryLower.includes('razorpay') ||
     queryLower.includes('paypal') ||
     queryLower.includes('cashfree')
@@ -481,7 +489,7 @@ A transaction of ${gwCheck.currency || '$'}${gwCheck.amount} on ${gwCheck.gatewa
       const emp = ticketReplies.find((r) => r.ticketNumber === t.ticket_number)
       const replyText = emp
         ? `  * EMPLOYEE / AUDIO DESK ANSWER (From ${emp.agentName} on ${new Date(emp.agentReplyTime).toLocaleDateString()}): "${emp.agentMessage}"`
-        : `  * EMPLOYEE RESPONSE: No employee reply has been recorded yet. The ticket is currently ${t.status || 'OPEN'} and under active review by the senior audio engineering desk.`
+        : `  * TICKET DETAILS & ISSUE: Subject: "${t.subject}". User Inquiry: "${t.description || 'General support'}". Status: ${t.status || 'OPEN'}. AUTONOMOUS RESOLUTION MANDATE: Do not tell the user to wait for human staff! Read their inquiry and give them the definitive, numbered step-by-step technical solution immediately right here in chat!`
       summaryLines.push(`- [Ticket #${t.ticket_number}] Subject: "${t.subject}" | Status: ${t.status || 'OPEN'} | Submitted: ${new Date(t.created_at).toLocaleDateString()}\n${replyText}`)
     }
   }
@@ -529,3 +537,4 @@ A transaction of ${gwCheck.currency || '$'}${gwCheck.amount} on ${gwCheck.gatewa
     },
   }
 }
+

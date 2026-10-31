@@ -16,8 +16,11 @@ export function getTicketRules(): string {
      * Inform the user they can track or reply further on their ticket at [Support Portal](/support).
 
 3. IF A TICKET RECORD EXISTS BUT NO EMPLOYEE HAS REPLIED YET:
-   - Clearly inform the user that Ticket #[Number] is safely recorded and currently in [Status] status.
-   - Explain that our senior audio engineering desk is actively reviewing their inquiry and will post a reply shortly both on the portal and to their email.
+   - Clearly inform the user that Ticket #[Number] is safely logged and currently in [Status] status.
+   - IMMEDIATE AUTONOMOUS RESOLUTION (ZERO-WAIT POLICY):
+     * Do NOT tell them to wait 24-48 hours.
+     * Analyze the subject and issue described in the ticket, and provide the definitive technical fix, folder paths, and instructions immediately in the chat so their problem is solved on the spot!
+     * Assure them they can proceed with these steps immediately without having to wait.
 
 4. IF NO TICKET IS FOUND:
    - If the user supplied a ticket number: Inform them that no record was found under that specific ticket ID in our database, and ask them to check for typos.

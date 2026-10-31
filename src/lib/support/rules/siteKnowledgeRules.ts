@@ -99,6 +99,17 @@ export function getSiteKnowledgeRules(): string {
       4. Paste your Serial Key and associated account email address. Click "Authorize" or "Activate".
       5. If the product uses a developer license manager (iLok, Native Access, Arturia Software Center, Waves Central, Universal Audio Connect): open that manager, click "Add Serial" or "Register Product", paste the key, and install.
 
+   G. HOW TO FIX PLUGIN NOT SHOWING IN DAW (FORCE PLUGIN RESCAN):
+      1. In FL Studio: Go to Options > Manage Plugins. In the left panel, enable "Verify plugins" and "Rescan previously verified plugins", then click "Find installed plugins".
+      2. In Ableton Live: Open Preferences > Plug-Ins. Toggle "Use VST3 Plug-In Custom Folder" and click "Rescan". For a forced deep rescan, hold down the Alt / Option key while clicking "Rescan".
+      3. In Logic Pro: Open Logic Pro > Settings > Plug-in Manager. Find the plugin, click "Reset & Rescan Selection". If macOS blocked it, go to macOS System Settings > Privacy & Security > click "Open Anyway".
+      4. In Studio One / Cubase: Open Studio One Options > Locations > VST Plug-Ins > click "Reset Blacklist" and click "Scan for Plugins".
+
+   H. HOW TO FIX AUDIO CRACKLING, LATENCY & BUFFER UNDERRUNS:
+      1. Driver Selection: On Windows PC, never use generic MME/DirectSound; always select a dedicated ASIO audio driver (Focusrite ASIO, Universal Audio, FL Studio ASIO, or ASIO4ALL). On Mac, ensure default CoreAudio device is selected.
+      2. Buffer Size Adjustment: For recording MIDI without latency, use 128 or 256 samples. For heavy mixing and CPU-intensive VST chains, increase buffer size to 512 or 1024 samples to eliminate audio glitches.
+      3. Match Sample Rate: Set your DAW project sample rate to 44.1 kHz or 48 kHz to match your audio interface.
+
 3. PRODUCT CATALOG EXPERTISE:
    - Formats available: VST, VST3, AU (Audio Units for Mac), AAX (Pro Tools), CLAP, Standalone software, WAV (24-bit / 44.1kHz - 96kHz lossless), MIDI, and Synth Presets.
    - Compatibility: 100% royalty-free for commercial music releases, Spotify streaming, TV, film, radio, and gaming sync.
